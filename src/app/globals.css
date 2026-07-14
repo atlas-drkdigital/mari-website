@@ -1,26 +1,280 @@
+/* ============================================================================
+   globals.css  -  Mari Liveaboard | token layer (SINGLE SOURCE OF TRUTH)
+   Ported 2026-07-14 from ../v1-static-homepage/theme.css (frozen static build).
+   Generated from Figma file TKjkHpjqPVn5yL5TnpuWAt (MARI-Website-1.0), 2026-07-01.
+   Sources: Color 413:2 | Typography 492:1527 | Spacing (Component/Layout screenshot).
+   Tailwind v4 CSS-first @theme. Sections REFERENCE tokens only - never hardcode.
+
+   DECISIONS (locked): Figma variable values win | exact names kept | two layers
+   (primitives -> semantics alias) | ONLY Display headings scale via clamp() 375->1440
+   (min=55%); Editorial + body + UI are FIXED. Radius default 'rounded' = MD (8px).
+
+   Porting deltas from the static-build source (Next.js specific, not new decisions):
+   - Font: static build loaded "Bricolage Grotesque" via a <link> tag; here it's
+     `var(--font-bricolage-grotesque)`, set by next/font/google in src/app/layout.tsx.
+   - Texture URLs: static build's were dist-relative (`../assets/...`); here they're
+     Next.js public-folder-absolute (`/assets/...`) — assets copied to public/assets/.
+   - Dropped the default create-next-app `@media (prefers-color-scheme: dark)` block —
+     Mari's design system uses explicit ondark/onimage semantic tokens per-section, not
+     OS-preference-driven dark mode.
+   ============================================================================ */
+
 @import "tailwindcss";
 
+/* ---------- LAYER 1 | PRIMITIVES (raw palette; not utilities; aliased by semantics) ---------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primitive-cream-10: #fdfcfa;
+  --primitive-cream-30: #fbf8f2;
+  --primitive-cream-50: #f5f0e8;
+  --primitive-cream-70: #ece4d6;
+  --primitive-cream-80: #dbcdb2;
+  --primitive-copper-300: #cfbbaa;
+  --primitive-copper-600: #8f6d51;
+  --primitive-amber-600: #b58a2d;
+  --primitive-navy-900: #1b2a4a;
+  --primitive-navy-950: #131d34;
+  --primitive-stone-400: #7c7469;
+  --primitive-red-600: #c10007;
+  --primitive-teal-600: #008236;
+  --white: #ffffff;
+  --beige-250: #e4d8c4;
+  --beige-350: #d3c1a1;
+  --beige-400: #c9b89a;
+  --beige-450: #c3aa7e;
+  --beige-500: #bb9f6d;
+  --chocolate-50: #fbfaf8;
+  --chocolate-100: #f4efeb;
+  --chocolate-150: #ebe2db;
+  --chocolate-200: #e1d5cb;
+  --chocolate-250: #d8c8bb;
+  --chocolate-350: #c6ae9a;
+  --chocolate-400: #bca18a;
+  --chocolate-450: #b3947a;
+  --chocolate-500: #aa8669;
+  --chocolate-550: #9f7a5b;
+  --chocolate-650: #7f6148;
+  --chocolate-700: #6f543f;
+  --amber-100: #f9f3e6;
+  --amber-200: #efdfbe;
+  --amber-300: #e5cb95;
+  --amber-400: #dab86c;
+  --amber-500: #d0a443;
+  --amber-550: #c89932;
+  --navy-600: #446abb;
+  --navy-700: #375595;
+  --navy-800: #294070;
+  --stone-100: #e8e6e3;
+  --stone-200: #d0cdc8;
+  --stone-300: #b9b3ac;
+  --stone-400: #a19a91;
+  --stone-600: #615a52;
+  --stone-700: #534d46;
+  --stone-800: #45403a;
+  --stone-900: #37342f;
+  --stone-950: #292723;
+  --green-800: #0d542b;
+  --red-600: #e7000b;
+  --red-800: #9f0712;
+
+  /* ---------- TEXTURES ----------
+     --texture-light: a TILEABLE topographic line-art pattern (shells/seahorse/coral). Reusable as a faint
+     section-background overlay on cream/light sections. Usage (opacity handled at point of use):
+       <div aria-hidden class="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] bg-repeat opacity-20"></div>
+     --texture-dark: NOT the same kind of asset — despite the matching name, this is a single full-bleed
+     photographic grain/gradient background (exported from the FAQ section, Figma node 401:1774), not a
+     tileable line pattern. Figma's own design-system library only lists ONE shared "Texture/Primary" fill
+     style (no separate dark variant), and this section's actual composited background doesn't show the
+     topo-line pattern at all when exported — Adinda confirmed: use this exact photo verbatim as the dark
+     texture, not a recolored derivation of the light pattern. Because it's a photo, not a tile, use it with
+     `bg-cover bg-center` (crops to fill), NEVER `bg-repeat` — repeating it would show hard seams from its
+     directional lighting falloff. Usage:
+       <div aria-hidden class="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-dark)] bg-cover bg-center"></div> */
+  --texture-light: url("/assets/texture-light.webp");
+  --texture-dark: url("/assets/texture-dark.webp");
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@theme {
+  /* ---------- FONT ---------- */
+  --font-sans: var(--font-bricolage-grotesque), ui-sans-serif, system-ui, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* ---------- LAYER 2 | SEMANTIC COLORS (utilities: bg- / text- / border-) ---------- */
+  /* aliased to a primitive where a unique match exists; translucent/unmatched keep raw value */
+  --color-bg-page: var(--primitive-cream-10);
+  --color-bg-surface: var(--white);
+  --color-bg-accent: var(--primitive-cream-50);
+  --color-text-primary: var(--primitive-navy-900);
+  --color-text-secondary: var(--stone-400);
+  --color-border-default: var(--primitive-cream-80);
+  --color-border-input: var(--beige-400);
+  --color-action-primary: var(--primitive-copper-600);
+  --color-action-primary-text: var(--primitive-cream-10);
+  --color-status-limited: var(--primitive-red-600);
+  --color-status-available: #016630; /* no primitive match */
+  --color-background-ondark-muted: var(--primitive-navy-950);
+  --color-background-ondark-page: var(--primitive-navy-900);
+  --color-background-ondark-surface: #fdfcfa0a; /* translucent (baked alpha) */
+  --color-background-onimage-surface: var(--primitive-navy-900);
+  --color-text-eyebrow: var(--primitive-copper-600);
+  --color-text-link: var(--primitive-copper-600);
+  --color-text-linkhover: var(--chocolate-500);
+  --color-text-muted: var(--stone-300);
+  --color-text-ondark-eyebrow: var(--amber-500);
+  --color-text-ondark-link: var(--primitive-cream-50);
+  --color-text-ondark-linkhover: var(--beige-250);
+  --color-text-ondark-muted: #fdfcfab2; /* translucent (baked alpha) */
+  --color-text-ondark-primary: var(--primitive-cream-10);
+  --color-text-ondark-secondary: var(--primitive-cream-80);
+  --color-text-onimage-eyebrow: var(--primitive-cream-10);
+  --color-border-ondark-input: var(--beige-500);
+  --color-border-ondark-inputactive: var(--primitive-cream-80);
+  --color-border-ondark-muted: #fdfcfa66; /* translucent (baked alpha) */
+  --color-border-ondark-subtle: #fdfcfa33; /* translucent (baked alpha) */
+  --color-border-onimage-input: #fdfcfacc; /* translucent (baked alpha) */
+  --color-border-onimage-inputactive: var(--primitive-cream-10);
+  --color-border-onimage-primary: var(--primitive-cream-10);
+  --color-accent-muted: var(--chocolate-500);
+  --color-accent-subtle: var(--beige-400);
+  --color-accent-ondark-muted: var(--primitive-amber-600);
+  --color-accent-ondark-onprimary: var(--primitive-cream-10);
+  --color-accent-ondark-onprimarymuted: var(--amber-200);
+  --color-accent-ondark-primary: var(--amber-500);
+  --color-accent-ondark-subtle: #fdfcfacc; /* translucent (baked alpha) */
+  --color-accent-onimage-muted: #fdfcfacc; /* translucent (baked alpha) */
+  --color-accent-onimage-onprimary: var(--amber-500);
+  --color-accent-onimage-onprimarymuted: var(--primitive-amber-600);
+  --color-accent-onimage-primary: var(--primitive-cream-10);
+  --color-accent-onimage-subtle: #fdfcfa66; /* translucent (baked alpha) */
+
+  /* ---------- SPACING (name = px value) ---------- */
+  --spacing-*: initial;   /* reset Tailwind's default 0.25rem-multiplier scale: any bare number
+                             NOT explicitly listed below must fail loudly, never silently fall back */
+  --spacing-0: 0px;   /* zero is not a Figma spacing step but is required for inset-0/top-0/p-0/etc. */
+  /* component */
+  --spacing-2: 0.125rem;   /* 2px */
+  --spacing-4: 0.25rem;   /* 4px */
+  --spacing-8: 0.5rem;   /* 8px */
+  --spacing-12: 0.75rem;   /* 12px */
+  --spacing-16: 1rem;   /* 16px */
+  --spacing-20: 1.25rem;   /* 20px */
+  --spacing-24: 1.5rem;   /* 24px */
+  --spacing-32: 2rem;   /* 32px */
+  /* layout */
+  --spacing-48: 3rem;   /* 48px */
+  --spacing-64: 4rem;   /* 64px */
+  --spacing-80: 5rem;   /* 80px */
+  --spacing-96: 6rem;   /* 96px */
+  --spacing-128: 8rem;   /* 128px */
+  --spacing-160: 10rem;   /* 160px */
+
+  /* ---------- RADIUS (from Figma; default 'rounded' = MD 8px) ---------- */
+  --radius: 0.5rem;   /* default (bare `rounded`) = MD 8px */
+  --radius-none: 0;
+  --radius-xs: 0.125rem;   /* 2px */
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.5rem;   /* 8px (default) */
+  --radius-lg: 1rem;   /* 16px */
+  --radius-full: 9999px;
+
+  /* ---------- SHADOW (effect layer; from Figma effect styles) ---------- */
+  --shadow-card: 0 16px 40px rgb(0 0 0 / 0.4);   /* elevated overlays e.g. search dropdown; verify vs Figma Shadow/Card */
+
+  /* ---------- TYPE (two-track; headings clamp, body/UI fixed) ----------
+     SCALED DOWN 2026-07-04 (Adinda: sizing felt "too extreme"), THREE ROUNDS, DISPLAY TRACK ONLY:
+     Round 1: base 17px -> 16px, same modular ratio (x1.333) + same min/max ratio, only the anchor moved.
+     Round 2: H1 restored to its original pre-rescale clamp; H2-H5 + accent cut further (desktop max only).
+     Round 3 (this one): mobile minimums for H2-H5 + accent were an unintended side effect of round 1/2 (the
+     shared min/max ratio pulled mobile down whenever desktop was cut) — Adinda didn't ask for mobile to
+     shrink and it now reads too small there. DECOUPLED: mobile minimums restored to their ORIGINAL
+     pre-rescale values; only the desktop maximum keeps the round-2 smaller size. H1 already decoupled
+     (fully restored both ends in round 2).
+     Editorial track and body/UI tokens are explicitly UNCHANGED (Adinda: editorial H5/H6 are "already very
+     small," don't touch; only Display was flagged).
+     FLAGGED FOR FIGMA: these new sizes need to be applied in the Figma type styles too. */
+  --text-display-h1: clamp(2.75rem, 1.9577rem + 3.3803vw, 5rem);   /* RESTORED to original 44->80 */
+  --text-display-h1--line-height: 1.04;
+  --text-display-h1--letter-spacing: -0.0187em;
+  --text-display-h1--font-weight: 600;
+  --text-display-h2: clamp(1.875rem, 1.5669rem + 1.3146vw, 2.75rem);   /* mobile min RESTORED to original 30, desktop max 44 */
+  --text-display-h2--line-height: 1.1;
+  --text-display-h2--letter-spacing: -0.0093em;
+  --text-display-h2--font-weight: 600;
+  --text-display-h3: clamp(1.375rem, 1.1109rem + 1.1268vw, 2.125rem);   /* mobile min RESTORED to original 22, desktop max 34 */
+  --text-display-h3--line-height: 1.15;
+  --text-display-h3--font-weight: 600;
+  --text-display-h4: clamp(1.25rem, 0.8019rem + 0.8451vw, 1.5625rem);   /* mobile min bumped 16->20px (2026-07-07): at real phone widths the curve is pinned at its floor anyway (doesn't meaningfully grow until ~611px viewport), and 16px made H4 card titles (Why Us, Latest Articles) the same size as body text -- zero hierarchy step between a heading and its own paragraph. Desktop max 25 untouched. */
+  --text-display-h4--line-height: 1.2;
+  --text-display-h4--font-weight: 600;
+  --text-display-h5: clamp(0.8125rem, 0.6805rem + 0.5634vw, 1.1875rem);   /* mobile min RESTORED to original 13, desktop max 19 */
+  --text-display-h5--line-height: 1.3;
+  --text-display-h5--font-weight: 600;
+  --text-display-accent: clamp(2rem, 1.8239rem + 0.7512vw, 2.5rem);   /* mobile min RESTORED to original 32, desktop max 40 */
+  --text-display-accent--line-height: 1.04;
+  --text-display-accent--letter-spacing: -0.05em;
+  --text-display-accent--font-weight: 200;
+  --text-editorial-h1: 2.0625rem;   /* was 35px, now 33px */
+  --text-editorial-h1--line-height: 1.25;
+  --text-editorial-h1--font-weight: 600;
+  --text-editorial-h2: 1.75rem;   /* was 29px, now 28px */
+  --text-editorial-h2--line-height: 1.3;
+  --text-editorial-h2--font-weight: 600;
+  --text-editorial-h3: 1.4375rem;   /* was 24px, now 23px */
+  --text-editorial-h3--line-height: 1.35;
+  --text-editorial-h3--font-weight: 500;
+  --text-editorial-h4: 1.1875rem;   /* was 20px, now 19px */
+  --text-editorial-h4--line-height: 1.4;
+  --text-editorial-h4--font-weight: 500;
+  --text-editorial-h5: 1rem;   /* was 17px, now 16px */
+  --text-editorial-h5--line-height: 1.45;
+  --text-editorial-h5--font-weight: 600;
+  --text-editorial-h6: 0.8125rem;   /* was 14px, now 13px */
+  --text-editorial-h6--line-height: 1.5;
+  --text-editorial-h6--font-weight: 600;
+  --text-editorial-quote-text: 1.5rem;
+  --text-editorial-quote-text--line-height: 1.45;
+  --text-editorial-quote-text--font-weight: 300;
+  --text-editorial-quote-cite: 0.875rem;
+  --text-editorial-quote-cite--line-height: 1.6;
+  --text-editorial-quote-cite--font-weight: 500;
+  --text-body-large: 1rem;   /* was 17px, now 16px (the scale's new base) */
+  --text-body-large--line-height: 1.65;
+  --text-body-large--font-weight: 400;
+  --text-body-medium: 0.875rem;
+  --text-body-medium--line-height: 1.6;
+  --text-body-medium--font-weight: 500;
+  --text-caption-label: 0.75rem;
+  --text-caption-label--line-height: 1.5;
+  --text-caption-label--font-weight: 400;
+  --text-eyebrow: 0.6875rem;
+  --text-eyebrow--line-height: 1.5;
+  --text-eyebrow--letter-spacing: 0.125em;
+  --text-eyebrow--font-weight: 500;
+  --text-button: 0.875rem;
+  --text-button--line-height: 1.1;
+  --text-button--letter-spacing: 0.0857em;
+  --text-button--font-weight: 600;
+  --text-button-small: 0.75rem;
+  --text-button-small--line-height: 1.25;
+  --text-button-small--letter-spacing: 0.1em;
+  --text-button-small--font-weight: 600;
+  --text-nav: 0.875rem;
+  --text-nav--line-height: 1.1;
+  --text-nav--letter-spacing: 0.0857em;
+  --text-nav--font-weight: 400;
+  --text-nav-large: 1.5rem;
+  --text-nav-large--line-height: 1.3;
+  --text-nav-large--font-weight: 600;
+  --text-nav-xl: 1.75rem;
+  --text-nav-xl--line-height: 1.2;
+  --text-nav-xl--font-weight: 600;
+  --text-system-caption-s-lowercase: 0.625rem;
+  --text-system-caption-s-lowercase--line-height: 1.4;
+  --text-system-caption-s-lowercase--font-weight: 400;
+  --text-system-caption-s-uppercase: 0.6875rem;
+  --text-system-caption-s-uppercase--line-height: 1.4;
+  --text-system-caption-s-uppercase--font-weight: 400;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
 }
