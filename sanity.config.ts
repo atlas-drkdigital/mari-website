@@ -22,6 +22,10 @@ const theme = buildLegacyTheme({
   '--brand-primary': '#8f6d51', // primitive-copper-600
   '--default-button-primary-color': '#8f6d51',
   '--focus-color': '#b58a2d', // primitive-amber-600
+  '--component-text-color': '#1b2a4a', // primitive-navy-900, same as the website's --color-text-primary
+  // --font-bricolage-grotesque is set by next/font/google on the <html> element in
+  // src/app/layout.tsx — cascades down into /studio since it's the same document.
+  '--font-family-base': 'var(--font-bricolage-grotesque), ui-sans-serif, system-ui, sans-serif',
 })
 
 export default defineConfig({

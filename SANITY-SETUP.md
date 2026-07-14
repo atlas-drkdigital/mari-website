@@ -83,8 +83,35 @@ Done on Sanity's side, not in code — Studio access is entirely project-members
 
 ## Studio branding
 
-`sanity.config.ts` sets `title: 'Mari Studio'` and a `buildLegacyTheme(...)` override (copper/amber accent
-colors, sourced from `../v1-static-homepage/theme.css`'s `--primitive-copper-600` / `--primitive-amber-600`)
-— cosmetic only, no functional effect. `buildLegacyTheme` is flagged `@deprecated` in Sanity's own types
-("will be removed in an upcoming major version") — still the current supported API as of v6.4.0, but
-re-check this when upgrading Sanity majors.
+`sanity.config.ts` sets `title: 'Mari Studio'` and a `buildLegacyTheme(...)` override — cosmetic only, no
+functional effect. All values sourced directly from `../v1-static-homepage/theme.css` (the frozen static
+build's Figma-generated design tokens — NOT the MVP repo, that's a different, unrelated codebase):
+
+| Theme property | Value | theme.css token |
+|---|---|---|
+| `--brand-primary` / `--default-button-primary-color` | `#8f6d51` | `--primitive-copper-600` |
+| `--focus-color` | `#b58a2d` | `--primitive-amber-600` |
+| `--component-text-color` | `#1b2a4a` | `--primitive-navy-900` (= site's `--color-text-primary`) |
+| `--font-family-base` | `var(--font-bricolage-grotesque), ...` | `--font-sans` ("Bricolage Grotesque") |
+
+Font is loaded via `next/font/google` in the root `layout.tsx` (not yet a full theme.css port — see the
+"static homepage not yet ported" note below — just this one font, loaded early enough to reach `/studio`
+since it's the same document).
+
+`buildLegacyTheme` is flagged `@deprecated` in Sanity's own types ("will be removed in an upcoming major
+version") — still the current supported API as of v6.4.0, but re-check this when upgrading Sanity majors.
+
+**Known limitation (not a bug):** Studio's theming only exposes ONE background color slot
+(`--component-bg`), not per-section colors — "green in some places, beige in others" isn't achievable
+without fragile custom CSS against Sanity's undocumented internal class names. Not implemented for this
+reason — see the `drk-website` skill's `sanity-cms.md` "Studio branding" section for the full reasoning.
+
+---
+
+## Static homepage — not yet ported into this repo (2026-07-14 status)
+
+`src/app/page.tsx` and `globals.css` are still the untouched `create-next-app` defaults — the actual Mari
+homepage (built and frozen in `../v1-static-homepage`) has NOT been ported into this repo yet. This was
+always the planned sequence (build static HTML first, then port into the real Next.js+Sanity build) — not a
+gap or oversight, just not started yet. This session was 100% backend/schema work; the port (theme.css →
+Tailwind v4 `@theme`, then the homepage markup itself) is next.
