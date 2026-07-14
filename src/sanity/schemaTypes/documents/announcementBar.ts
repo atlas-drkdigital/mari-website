@@ -19,19 +19,21 @@ export const announcementBarType = defineType({
     }),
     defineField({
       name: 'urgencyLevel',
-      title: 'Urgency / style',
+      title: 'Urgency level',
       type: 'string',
       options: {
         list: [
           { title: 'Normal', value: 'normal' },
-          { title: 'Medium (soft warning)', value: 'medium' },
-          { title: 'Warning', value: 'warning' },
-          { title: 'Promotion', value: 'promotion' },
+          { title: 'Medium', value: 'medium' },
+          { title: 'High', value: 'high' },
         ],
         layout: 'radio',
       },
       initialValue: 'normal',
-      description: 'Drives the color scheme on the frontend — each level renders with its own colors.',
+      description:
+        'Drives the color scheme on the frontend. "High" covers both severe warnings (e.g. weather/storm ' +
+        'advisories) and promotions — both render in the same high-urgency color for now, distinguished ' +
+        'only by copy. Known limitation, revisit with a separate visual treatment later if needed.',
     }),
     defineField({
       name: 'active',
