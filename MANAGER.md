@@ -10,6 +10,76 @@ forward — this file is now the live one.
 
 ---
 
+## SESSION CHECKPOINT — end of 2026-07-14 session (read this first for "what's next")
+
+### Done, committed, verified (typecheck + lint + Studio/homepage smoke-tested clean throughout)
+- Sanity project `kb8eim50` ("Mari Liveaboard") created, Studio embedded at `/studio`, fully isolated from
+  the live MVP project (`sjkpkyaw`) — see `SANITY-SETUP.md`.
+- Full schema skeleton: `page` (generic, rich text matched to the live MVP's proven spec — colors via
+  `@sanity/color-input`, sized/aligned images, HTML embed, no link annotation), `scheduleRates`,
+  `announcementBar` (multi-doc, exclusive-active warning validation, Normal/Medium/High urgency),
+  `navigation` (shared `link` object, Destinations-mega-menu placeholder field), `siteSettings` (tabs +
+  fieldsets, contact arrays, social platform enum), `redirect`, `language`, plus shared objects (`seo`
+  with full Yoast-parity checklist + live char-count, `linkItem`, `socialLink`, `contactEmail`/`Phone`,
+  `htmlEmbed`).
+- Custom Studio structure (grouped sidebar: Pages, Announcements, Settings, SEO Tools, Languages), singleton
+  locks on Site Settings/Navigation, auto-slug component.
+- Studio branding: copper/amber/navy colors + Bricolage Grotesque font + "Mari Studio" title, via
+  `buildLegacyTheme` (values sourced from `theme.css`, not invented).
+- **`theme.css` fully ported into this repo** as Tailwind v4 `@theme` (`globals.css`) — full color/spacing/
+  radius/shadow/type-scale token layer, adapted for Next.js (font via `next/font`, texture URLs public-
+  absolute). Static asset library (images/icons/per-section JS) copied to `public/assets/`
+  (`pre-webp-originals/` deliberately excluded — confirmed unreferenced dev-only files first).
+- Documentation: `drk-website` skill's `sanity-cms.md` has all reusable patterns from this session (Structure
+  grouping, singleton lock, slug/char-count components, shared `link` object, exclusive-active validation,
+  SEO checklist, Studio branding boundaries — what's realistic vs. not); its `workflow.md` now has the
+  session-time-tracking convention. CLAUDE.md has the handoff-doc-reading instruction + Destinations
+  mega-menu reminder. `_handoff/mari-website.md`'s announcement-bar conflict is reconciled.
+
+### What's next, in order
+1. **Homepage markup port** (unblocked now — theme.css foundation exists). Port the 11 static sections (Nav,
+   Hero, The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials, CTA, Contact, Footer) from
+   `../v1-static-homepage/sections/*.html` into real Next.js components, wired to the schema already built.
+   Agreed explicitly this session: do this *before* Tier 4, since `homePage`'s own schema shape should be
+   informed by the real component structure, not guessed at.
+2. **Tier 4 schema types**: `homePage`, `destinationPage`, `boatPage`, `itinerary` (stub), `testimonial`,
+   `faq`, page-builder block shell. Adinda will resequence exact timing — likely informed by what the
+   homepage port reveals about real content shape.
+3. Once `destinationPage` exists: wire the Destinations mega-menu (`navItem`'s `menuStyle` placeholder is
+   already there — see CLAUDE.md's Navigation section for the exact to-do).
+
+### Still open / needs Adinda's action — not blocking, don't lose track of these
+- [ ] Add the "English" `Language` document in Studio (name: English, tag: en, default: true) — a content
+  task, not code; may already be done, check before re-asking.
+- [ ] Verify Sanity Studio v6.4's bulk-edit/multi-select capability — asked, not yet researched.
+- [ ] Decide the `robots.ts` AI-crawler policy (block rules stubbed/commented, ready to uncomment) and update
+  its hardcoded sitemap URL once the production domain is confirmed.
+- [ ] Decide whether to ship `llms.txt` (parked until real page URLs exist to list).
+- [ ] CORS: add the production Vercel URL once deployed (currently only `localhost:3000` allowlisted).
+- [ ] Sanity Studio UI localization (e.g. German for Stefan) — discussed as genuinely possible
+  (`@sanity/locale-de-de`), not yet requested to build.
+- [ ] Full icon-level accent-color customization (every icon branded, not just hover/active states) —
+  discussed, flagged as bigger than a "simple pass," not yet requested.
+
+### Reviews — nothing currently pending, one thing worth a glance
+Schema was reviewed live in-browser by Adinda throughout, iterated on directly. Studio branding was
+implemented per her direct requests. The one thing not yet visually re-confirmed: the final
+`--component-text-color` addition (after the font/color pass) — quick glance next session, not urgent since
+it's a one-line, easily-reversible value.
+
+---
+
+## Session Time Log (for DRK sprint/hour-estimation calibration — see `drk-website` skill's `workflow.md`)
+
+Adinda's own tracked estimate, not independently measured. Append future sessions here, don't recompute past
+ones.
+
+| Date | Session focus | Duration | Notes |
+|---|---|---|---|
+| 2026-07-14 | Sanity schema pass + Studio branding + theme.css port | ~2h15–2h30 | First full backend session on this build — established schema/Studio/branding conventions from scratch. Expect meaningfully faster on similar future sessions now that the patterns exist. |
+
+---
+
 ## 2026-07-14 — Repo scaffolded, stack verified, 3 open questions resolved
 
 Full detail lives in `CLAUDE.md` (stack table, Next 16 convention deltas, resolved findings) — not
@@ -72,9 +142,9 @@ rebuilt.
   `aeo-considerations.md`. Also update the hardcoded `sitemap` URL once the production domain is confirmed.
 - [ ] **Decide whether to ship an `llms.txt`** file at launch (emerging AEO practice, static root file like
   `robots.txt`) — needs real page URLs to be worth building, so parked until more page types exist.
-- [ ] **`page` type's rich text body needs upgrading** — Adinda has an existing MVP page (already solved
-  colors + inline images there) she wants matched. Waiting on her to paste that spec in before building —
-  don't guess at this shape. Reminder flag: ask her for it next session if she hasn't already provided it.
+- [x] **`page` type's rich text body upgraded** — resolved by pulling the actual spec directly from the
+  live MVP repo (`atlas-drkdigital/mari-website-mvp`) instead of waiting on a paste: H1-H4/Quote styles,
+  underline/strike/code marks, align + text-color annotations, sized/aligned images, HTML embed block.
 
 ## Tier 4 backlog additions from schema-review session (2026-07-14)
 
