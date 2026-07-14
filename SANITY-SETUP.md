@@ -64,3 +64,27 @@ re-running init from scratch in future.
 
 `npx sanity projects list` — read-only, lists every project the logged-in account can see, with its ID. Used
 above to confirm `sjkpkyaw` (MVP) is untouched and separate from `kb8eim50` (this build).
+
+---
+
+## Adding editors / team members
+
+Done on Sanity's side, not in code — Studio access is entirely project-membership + CORS, no app-level auth.
+
+1. Go to `https://www.sanity.io/manage/project/kb8eim50` → **Members**
+2. **Invite members** → enter email → pick a role:
+   - **Administrator** — full control incl. billing/inviting others
+   - **Editor** — create/edit/publish all content, no project settings — the role for Serge/Mila/Ayu
+   - **Viewer** — read-only
+   - Contributor roles can be scoped to specific document types if someone needs to be limited further
+3. They accept the email invite, then log into `/studio` with their own account (own email/Google/GitHub —
+   separate from yours). No separate site password; project membership + CORS origin allowlisting is the
+   entire access story (same mechanism noted above for Studio auth generally).
+
+## Studio branding
+
+`sanity.config.ts` sets `title: 'Mari Studio'` and a `buildLegacyTheme(...)` override (copper/amber accent
+colors, sourced from `../v1-static-homepage/theme.css`'s `--primitive-copper-600` / `--primitive-amber-600`)
+— cosmetic only, no functional effect. `buildLegacyTheme` is flagged `@deprecated` in Sanity's own types
+("will be removed in an upcoming major version") — still the current supported API as of v6.4.0, but
+re-check this when upgrading Sanity majors.
