@@ -278,3 +278,61 @@ body {
   background: var(--color-bg-page);
   color: var(--color-text-primary);
 }
+
+/* ---------- Page gutter — the site's one horizontal-inset system, ported from
+   ../v1-static-homepage/src/input.css. Use page-gutter-x for full padding-inline;
+   -l/-r for one side only; -inset-l/-inset-r for absolutely/fixed positioned elements
+   using left-N/right-N instead of padding. ---------- */
+@utility page-gutter-x {
+  padding-inline: var(--spacing-24);
+  @media (width >= 48rem) { padding-inline: var(--spacing-48); }
+  @media (width >= 64rem) { padding-inline: var(--spacing-80); }
+}
+@utility page-gutter-l {
+  padding-left: var(--spacing-24);
+  @media (width >= 48rem) { padding-left: var(--spacing-48); }
+  @media (width >= 64rem) { padding-left: var(--spacing-80); }
+}
+@utility page-gutter-r {
+  padding-right: var(--spacing-24);
+  @media (width >= 48rem) { padding-right: var(--spacing-48); }
+  @media (width >= 64rem) { padding-right: var(--spacing-80); }
+}
+@utility page-gutter-inset-r {
+  right: var(--spacing-24);
+  @media (width >= 48rem) { right: var(--spacing-48); }
+  @media (width >= 64rem) { right: var(--spacing-80); }
+}
+@utility page-gutter-inset-l {
+  left: var(--spacing-24);
+  @media (width >= 48rem) { left: var(--spacing-48); }
+  @media (width >= 64rem) { left: var(--spacing-80); }
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  label[for],
+  summary {
+    cursor: pointer;
+  }
+
+  /* Scroll-reveal primitive — elements marked [data-reveal] start hidden and animate in once
+     ScrollReveal.tsx adds [data-revealed] (IntersectionObserver). Direction via the attribute value:
+       [data-reveal]        fade + rise from below (default)
+       [data-reveal="left"] fade + slide in from the left (text / body copy)
+       [data-reveal="none"] fade only (e.g. the nav on load) */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(1.25rem);
+      transition: opacity 700ms ease-out, transform 700ms ease-out;
+    }
+    [data-reveal="left"] { transform: translateX(-1.5rem); }
+    [data-reveal="none"] { transform: none; }
+    [data-reveal][data-revealed] {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
