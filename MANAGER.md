@@ -36,17 +36,50 @@ forward — this file is now the live one.
   session-time-tracking convention. CLAUDE.md has the handoff-doc-reading instruction + Destinations
   mega-menu reminder. `_handoff/mari-website.md`'s announcement-bar conflict is reconciled.
 
+### Homepage markup port — DONE this session too (was the top "what's next" item, now complete)
+All 11 static sections (Nav, Hero, The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials, CTA,
+Contact, Footer) ported from `../v1-static-homepage` into real Next.js components at `src/components/` +
+`src/components/sections/`, assembled in `src/app/page.tsx`. Content is still hardcoded (matches the static
+build verbatim) — no Sanity wiring yet, that's blocked on the `homePage` schema type (Tier 4). Verified:
+`tsc --noEmit`, `eslint`, and `next build` all clean; `/` and `/studio` both smoke-tested.
+
+**Two deliberate simplifications vs. the source** (noted in-file, not oversights):
+- Destinations' drag-swipe no longer live-previews the incoming photo sliding in mid-gesture — swaps on
+  release instead, same crossfade as the tab/arrow navigation. Real visual-polish item to revisit.
+- Testimonials dropped 4 explicit test-only placeholder reviews from the original (they were only ever
+  there to verify carousel overflow behavior, never real content) — ported only the 4 genuine reviews.
+
 ### What's next, in order
-1. **Homepage markup port** (unblocked now — theme.css foundation exists). Port the 11 static sections (Nav,
-   Hero, The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials, CTA, Contact, Footer) from
-   `../v1-static-homepage/sections/*.html` into real Next.js components, wired to the schema already built.
-   Agreed explicitly this session: do this *before* Tier 4, since `homePage`'s own schema shape should be
-   informed by the real component structure, not guessed at.
+1. **Visual/functional QA of the homepage port** — see the checklist below. Needs Adinda's eyes in a real
+   browser; I can't visually confirm hover states, animation feel, or real-device touch/drag behavior myself.
 2. **Tier 4 schema types**: `homePage`, `destinationPage`, `boatPage`, `itinerary` (stub), `testimonial`,
-   `faq`, page-builder block shell. Adinda will resequence exact timing — likely informed by what the
-   homepage port reveals about real content shape.
-3. Once `destinationPage` exists: wire the Destinations mega-menu (`navItem`'s `menuStyle` placeholder is
+   `faq`, page-builder block shell — now genuinely informed by the real ported component structure (the
+   reason this was sequenced after the port, not before).
+3. **Wire the homepage to Sanity** once `homePage` schema exists — replace the hardcoded content in each
+   section with real GROQ-fetched data.
+4. Once `destinationPage` exists: wire the Destinations mega-menu (`navItem`'s `menuStyle` placeholder is
    already there — see CLAUDE.md's Navigation section for the exact to-do).
+
+### Homepage port QA checklist — for Adinda, before Tier 4 starts
+Run `npm run dev`, open `http://localhost:3000/`, and check:
+- [ ] **Nav**: scroll-flip (top → light background) happens at the right point; Destinations mega menu
+  opens/closes, hover/focus crossfades the right image; Resources mega menu opens; mobile hamburger menu +
+  its Destinations/Resources accordions work on a real narrow viewport (not just a resized desktop window).
+- [ ] **Hero**: destination search dropdown filters as you type (desktop); on mobile, tapping the search
+  field opens the full-screen takeover, not the inline dropdown.
+- [ ] **Why Us**: hovering a card expands it and reveals its description (desktop); mobile swipes as a
+  peek-carousel.
+- [ ] **Destinations**: tabs/arrows switch the crossfade correctly; try the drag-swipe on an actual touch
+  device or trackpad, not just a mouse click — this is the section with a known simplified interaction (see
+  above).
+- [ ] **FAQ**: only one item open at a time; clicking the open item closes it.
+- [ ] **Testimonials**: "Read more" expands each card; arrows disable/hide correctly (there are only 4 real
+  cards now, so on a wide desktop screen you may not see any overflow/arrows at all — that's expected).
+- [ ] **Contact**: both multi-selects (Destination, Departure Month) open/close, show the right "+N more"
+  label; Number of Guests select works; submitting shows the thank-you message.
+- [ ] **Footer**: newsletter field submits (clears, no real backend yet); social icons render.
+- [ ] General: compare side-by-side against `../v1-static-homepage` (still running, unedited) for anything
+  that looks or feels off — spacing, hover timing, colors.
 
 ### Still open / needs Adinda's action — not blocking, don't lose track of these
 - [ ] Add the "English" `Language` document in Studio (name: English, tag: en, default: true) — a content
@@ -60,12 +93,13 @@ forward — this file is now the live one.
   (`@sanity/locale-de-de`), not yet requested to build.
 - [ ] Full icon-level accent-color customization (every icon branded, not just hover/active states) —
   discussed, flagged as bigger than a "simple pass," not yet requested.
+- [ ] Destinations drag-swipe live-preview polish (see simplification note above).
 
-### Reviews — nothing currently pending, one thing worth a glance
+### Reviews — homepage port needs a first pass (see QA checklist above); schema/Studio already reviewed
 Schema was reviewed live in-browser by Adinda throughout, iterated on directly. Studio branding was
-implemented per her direct requests. The one thing not yet visually re-confirmed: the final
-`--component-text-color` addition (after the font/color pass) — quick glance next session, not urgent since
-it's a one-line, easily-reversible value.
+implemented per her direct requests. The homepage port itself has NOT been visually reviewed yet — it's
+verified correct at the code level (typecheck/lint/build all clean) but nothing replaces an actual look in a
+browser, especially for animation feel and touch/drag behavior on a real device.
 
 ---
 
