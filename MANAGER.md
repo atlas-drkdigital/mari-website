@@ -61,6 +61,45 @@ Practically: every rich-text field uses default Portable Text today (tier-2 beha
 get the heading/alignment customization layered on later — same field type, enhanced config, nothing gets
 rebuilt.
 
+## Pre-launch to-dos surfaced during schema-review session (2026-07-14)
+
+- [ ] **Verify Sanity Studio v6.4's actual bulk-edit / multi-select capability** — Adinda asked; not yet
+  researched (didn't find it documented in the skills checked so far). Look up before answering, don't guess.
+- [x] `app/robots.ts` created (Next.js dynamic Metadata Files API, default allow-all + `/api/`/`/studio/`
+  disallowed). **Still open:** [ ] decide the AI-crawler policy (GPTBot / ClaudeBot / PerplexityBot /
+  Google-Extended — allow increases AI-citation chances, block prevents AI-training use) — the block rules
+  are stubbed out commented in the file, ready to uncomment once decided. See `drk-seo` skill's
+  `aeo-considerations.md`. Also update the hardcoded `sitemap` URL once the production domain is confirmed.
+- [ ] **Decide whether to ship an `llms.txt`** file at launch (emerging AEO practice, static root file like
+  `robots.txt`) — needs real page URLs to be worth building, so parked until more page types exist.
+- [ ] **`page` type's rich text body needs upgrading** — Adinda has an existing MVP page (already solved
+  colors + inline images there) she wants matched. Waiting on her to paste that spec in before building —
+  don't guess at this shape. Reminder flag: ask her for it next session if she hasn't already provided it.
+
+## Tier 4 backlog additions from schema-review session (2026-07-14)
+
+Captured while reviewing the schema locally, not built yet (Tier 4 is deferred — Adinda will resequence
+later):
+- **Destination page** and **Itinerary page**: each needs an optional INSEANQ `embedCode` field (same
+  pattern as `scheduleRates`), so availability can be shown/filtered in context, not just on the dedicated
+  Schedule & Rates page.
+- **Private Charters page**: needs its own INSEANQ `embedCode` field too (filtered sync).
+- **New page type: "Specials"** — an Atlas-website page candidate, essentially a filtered INSEANQ sync view.
+  Cheap to add ("just a matter of filtering and sync") — flagged as a likely near-free addition once
+  Destination/Itinerary embed wiring exists. Not in the original page inventory — add to `atlas-website`
+  skill's page checklist when Tier 4 resumes.
+- INSEANQ filtering email sent to Andrew (Adinda's own to-do, non-blocking) — placeholder `embedCode`
+  content is fine until his response arrives.
+
+## Sanity project created, Studio embedded (2026-07-14)
+
+New Sanity project **`kb8eim50`** ("Mari Liveaboard"), dataset `production`, fully separate from the live
+MVP's project (`sjkpkyaw`) — Adinda's call: full isolation, new repo + new Sanity project (+ new Vercel
+project later at deploy time), zero shared state with the currently-live site. Studio embedded at
+`/studio/[[...tool]]`, smoke-tested (200 response, boots clean, zero schema types yet). Upgraded off the
+CLI's default `sanity@5`/`@sanity/vision@5` to the verified `6.4.0` per CLAUDE.md's stack table. Full
+connection details + redo steps: see `SANITY-SETUP.md` (new file, root of repo).
+
 ## Studio editor-organization — deferred to last, confirmed safe (2026-07-14)
 
 Field `title`/`description`/tab-grouping and the Structure Builder (sidebar navigation) are presentational
