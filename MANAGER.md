@@ -50,8 +50,9 @@ build verbatim) — no Sanity wiring yet, that's blocked on the `homePage` schem
   there to verify carousel overflow behavior, never real content) — ported only the 4 genuine reviews.
 
 ### What's next, in order
-1. **Visual/functional QA of the homepage port** — see the checklist below. Needs Adinda's eyes in a real
-   browser; I can't visually confirm hover states, animation feel, or real-device touch/drag behavior myself.
+1. **Finish visual/functional QA of the homepage port** — in progress, see checklist below (Why Us already
+   reviewed and fixed, see next section). Needs Adinda's eyes in a real browser; I can't visually confirm
+   hover states, animation feel, or real-device touch/drag behavior myself.
 2. **Tier 4 schema types**: `homePage`, `destinationPage`, `boatPage`, `itinerary` (stub), `testimonial`,
    `faq`, page-builder block shell — now genuinely informed by the real ported component structure (the
    reason this was sequenced after the port, not before).
@@ -60,15 +61,32 @@ build verbatim) — no Sanity wiring yet, that's blocked on the `homePage` schem
 4. Once `destinationPage` exists: wire the Destinations mega-menu (`navItem`'s `menuStyle` placeholder is
    already there — see CLAUDE.md's Navigation section for the exact to-do).
 
-### Homepage port QA checklist — for Adinda, before Tier 4 starts
+### QA in progress — bug found + fixed this session (2026-07-14, same day)
+Adinda reviewed **Why Us** first and caught a real bug via screenshots (not-expanded state showed 2 of 4
+cards blank/washed-out; any card interaction "fixed" it). Diagnosed by reading the actual rendered HTML
+(not guessed from source review alone) — two real, separate causes, both fixed in `WhyUs.tsx`:
+- `next/image`'s `fill` prop forces `width:100%;height:100%` as an inline style, which no Tailwind class can
+  override — the ported "55vw-wide, shifted-to-center" framing classes were dead on 3 of 4 cards. Fixed by
+  moving those classes to a wrapping div and letting the Image fill *that* instead.
+- All 4 images had `loading="lazy"` + a large fallback size — genuine load-timing flash on a section sitting
+  just below the fold, read as broken in a screenshot taken during that window. Switched to eager loading.
+Both confirmed via `curl`-diffing the actual rendered HTML before/after, not just re-reading source. Verified
+clean: `tsc --noEmit`, `eslint`, `next build`. Committed (`bc1aaa7`).
+
+**Given this exact bug pattern (framing classes silently dead under `next/image`'s `fill`), spot-check the
+other sections using the same `fill` + non-trivial-positioning-classes combo** when reviewing them — Nav's
+mega-menu destination images and Destinations' background crossfade layers use `fill` too, though their
+positioning is simpler (`object-cover` only, no extra shift/width classes), so they're lower-risk than Why
+Us was, but worth a deliberate glance rather than assuming they're fine by analogy.
+
+### Homepage port QA checklist — for Adinda, remaining sections
 Run `npm run dev`, open `http://localhost:3000/`, and check:
+- [x] **Why Us** — reviewed, bug found + fixed (see above).
 - [ ] **Nav**: scroll-flip (top → light background) happens at the right point; Destinations mega menu
   opens/closes, hover/focus crossfades the right image; Resources mega menu opens; mobile hamburger menu +
   its Destinations/Resources accordions work on a real narrow viewport (not just a resized desktop window).
 - [ ] **Hero**: destination search dropdown filters as you type (desktop); on mobile, tapping the search
   field opens the full-screen takeover, not the inline dropdown.
-- [ ] **Why Us**: hovering a card expands it and reveals its description (desktop); mobile swipes as a
-  peek-carousel.
 - [ ] **Destinations**: tabs/arrows switch the crossfade correctly; try the drag-swipe on an actual touch
   device or trackpad, not just a mouse click — this is the section with a known simplified interaction (see
   above).
@@ -95,11 +113,12 @@ Run `npm run dev`, open `http://localhost:3000/`, and check:
   discussed, flagged as bigger than a "simple pass," not yet requested.
 - [ ] Destinations drag-swipe live-preview polish (see simplification note above).
 
-### Reviews — homepage port needs a first pass (see QA checklist above); schema/Studio already reviewed
+### Reviews — in progress (Why Us done, rest of checklist still open); schema/Studio already reviewed
 Schema was reviewed live in-browser by Adinda throughout, iterated on directly. Studio branding was
-implemented per her direct requests. The homepage port itself has NOT been visually reviewed yet — it's
-verified correct at the code level (typecheck/lint/build all clean) but nothing replaces an actual look in a
-browser, especially for animation feel and touch/drag behavior on a real device.
+implemented per her direct requests. Homepage port review started 2026-07-14 (same day as the build) — Why
+Us is reviewed and its bug fixed (see above); Nav, Hero, Destinations, FAQ, Testimonials, Contact, and
+Footer still need an actual look in a browser — code-level checks (typecheck/lint/build) don't substitute
+for that, especially for animation feel and touch/drag behavior on a real device.
 
 ---
 
