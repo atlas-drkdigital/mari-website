@@ -47,10 +47,18 @@ Off by default in Next.js; leave it off — do not set `cacheComponents: true` i
 ## Styling
 Tailwind v4 CSS-first `@theme` layer. **Not yet ported** — the static build's `theme.css` (colors, type, spacing, radius, all generated from Figma variables) needs to move into this repo before any section gets built; don't hand-copy values ad hoc per component. Same "no custom CSS classes / no `@apply` / native utilities only" rule as the static build.
 
+## Content modeling — Portable Text tiers (locked 2026-07-14)
+Not one global rich-text config — three tiers, decide which applies by field:
+1. **Plain string** (headings, labels, CTA text, eyebrows) — no rich text.
+2. **Constrained rich text** (most body copy — card descriptions, FAQ answers) — default Portable Text, paragraph + basic marks only, no heading styles or alignment override (layout/CSS already governs presentation).
+3. **Full rich text with headings + alignment** — only T&C body, Blog post body, and the page-builder's "Rich Text" block for overview-style sections (Private Charters, possibly About). This is the only tier that gets the heading/alignment customization work.
+Every rich-text field uses plain default Portable Text (tier-2 shape) at schema-pass time; only tier-3 fields get the customization layered on later, once that work is actually scheduled — see `MANAGER.md`.
+
+## Sanity Studio editor-organization — defer to last, confirmed safe
+Field `title`/`description`/tab-grouping and the Structure Builder (sidebar navigation/grouping) are presentational metadata — changing them later costs no data migration. What needs to be reasonably right from the schema-pass itself: the actual field `name` keys and document type `name`s, since renaming those after real content exists needs a migration script. Polish the editor experience last, once every type exists and the full picture is visible — don't front-load it.
+
 ## Doc split (replicate the static-build pattern — see `drk-website/references/claude-code.md`)
-This file = prose rules + active decisions. Two more files follow the same convention as the old repo, **not yet created**:
-- `COMPONENTS.md` — reusable component specs (ports from the static build's `COMPONENTS.md` at first use, not up front)
-- `MANAGER.md` — session/decision log. Full Jul 14–25 build sprint plan (day-by-day, contracted deliverables, page inventory) currently lives in `../v1-static-homepage/MANAGER.md`'s "Build sprint scope — locked 2026-07-13" entry — port the still-relevant parts into this repo's own `MANAGER.md` the first time it's created, rather than reading cross-repo indefinitely.
+This file = prose rules + active decisions. `MANAGER.md` (session/decision log, created 2026-07-14) and `COMPONENTS.md` (reusable component specs, **not yet created** — ports from the static build's `COMPONENTS.md` at first use, not up front) follow the same convention as the old repo. Check `MANAGER.md` for today's active task scope and session history before re-deriving it.
 
 ## Session discipline (carried over from the static build, still applies)
 - Verify by reading actual compiled CSS/build output, not by trusting a class or config name's apparent meaning
