@@ -17,7 +17,7 @@ duplicated here. Summary: Next.js 16.2.10 + Sanity v6.4.0 confirmed correct (not
 skill still says); `cacheComponents` decided OFF for launch; embedded Studio confirmed to need no custom
 auth (Sanity's own SSO+CORS); localization plugin compatibility only partially verified, smoke-test before
 relying on it. All queued for the next `drk-website` skill-update round in
-`../v1-static-homepage/_handoff/drk-website.md`.
+`_handoff/drk-website.md` (moved here from the old repo 2026-07-14 — this is now the single live copy).
 
 ## Today's work session — 3pm–6pm (3h), schema-pass day
 
