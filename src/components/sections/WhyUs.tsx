@@ -70,14 +70,22 @@ export function WhyUs() {
               onFocus={() => setActive(card.id)}
               className={`group/card relative aspect-[2/3] w-[84%] shrink-0 snap-center overflow-hidden [transition:flex-grow_500ms_cubic-bezier(0.65,0,0.35,1)] lg:h-[580px] lg:w-auto lg:flex-1 ${isActive ? 'lg:grow-[3]' : ''}`}
             >
-              <Image
-                src={card.image}
-                alt={card.alt}
-                fill
-                sizes="(min-width: 1024px) 55vw, 84vw"
-                style={card.objectPosition ? { objectPosition: card.objectPosition } : undefined}
-                className={`object-cover ${card.objectPosition ? '' : 'lg:left-1/2 lg:w-[55vw] lg:max-w-none lg:-translate-x-1/2'}`}
-              />
+              {/* Wrapper carries the "wider than the card, shifted to center" framing — next/image's
+                  `fill` mode forces `width:100%;height:100%` as an INLINE style on the <img> itself,
+                  which no Tailwind class (however specific) can ever override. Putting the sizing
+                  classes on this wrapper instead, and letting the Image just `fill` *it*, is what
+                  actually makes the effect work under next/image. */}
+              <div className="absolute inset-0 lg:left-1/2 lg:w-[55vw] lg:max-w-none lg:-translate-x-1/2">
+                <Image
+                  src={card.image}
+                  alt={card.alt}
+                  fill
+                  loading="eager"
+                  sizes="(min-width: 1024px) 55vw, 84vw"
+                  style={card.objectPosition ? { objectPosition: card.objectPosition } : undefined}
+                  className="object-cover"
+                />
+              </div>
               <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background-ondark-page via-background-ondark-page/50 via-45% to-transparent" />
               <div className="absolute inset-x-0 bottom-0 flex flex-col gap-12 p-24 lg:p-32">
                 <h3 className="text-display-h4 text-text-ondark-primary">{card.title}</h3>
