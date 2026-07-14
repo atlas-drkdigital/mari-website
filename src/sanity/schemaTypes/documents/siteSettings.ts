@@ -27,6 +27,7 @@ export const siteSettingsType = defineType({
       type: 'string',
       group: 'general',
       fieldset: 'siteBasics',
+      initialValue: 'PT Wisata Laut Indah',
       description: 'Legal/full company name — used in footer copyright and structured data (Organization schema).',
     }),
     defineField({

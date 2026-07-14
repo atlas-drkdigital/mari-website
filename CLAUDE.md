@@ -13,6 +13,13 @@ other page directly against Figma/spec (no static intermediate step for non-home
 - `mari-core` + `mari-website` — brand facts and page copy
 Load `atlas-destinations` / `mari-itineraries` only for destination or itinerary work specifically.
 
+**Also read every file in `_handoff/*.md` before relying on a skill's content as current.** Those files are
+a staging area for decisions made in this repo that haven't been merged into the skill sources yet (no live
+bridge from this local session to the chat-side skill containers — see `_handoff/drk-website.md`'s own
+explanation). A skill can be stale relative to a handoff file, and a handoff file can itself describe a
+decision this session's own work has since superseded — when they conflict, flag it back to Adinda rather
+than silently picking one. Don't skip this because the skill "should" already have it; verify.
+
 ## Stack — verified live 2026-07-14, corrects `drk-website/references/stack.md` (stale, dated 2026-06-10)
 | Layer | Version | Note |
 |---|---|---|

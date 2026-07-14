@@ -7,6 +7,7 @@ import { navItemType } from './objects/navItem'
 import { socialLinkType } from './objects/socialLink'
 import { contactEmailType } from './objects/contactEmail'
 import { contactPhoneType } from './objects/contactPhone'
+import { htmlEmbedType } from './objects/htmlEmbed'
 import { redirectType } from './documents/redirect'
 import { languageType } from './documents/language'
 import { navigationType } from './documents/navigation'
@@ -25,6 +26,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     socialLinkType,
     contactEmailType,
     contactPhoneType,
+    htmlEmbedType,
     // documents
     redirectType,
     languageType,
