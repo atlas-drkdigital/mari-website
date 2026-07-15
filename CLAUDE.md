@@ -6,6 +6,23 @@ Production build for Mari Liveaboard, by Atlas (DRK Digital). Migrates the locke
 (`../v1-static-homepage`, frozen — do not edit) into a real Next.js + Sanity site, then builds every
 other page directly against Figma/spec (no static intermediate step for non-homepage pages).
 
+## Working principle — ship fast, document everything, avoid costly-to-reverse decisions (locked 2026-07-15)
+Locked explicitly by Adinda, this governs every decision in this file and in MANAGER.md: the goal is
+a working website presented as quickly as possible, with every decision made along the way written
+down (MANAGER.md, this file, `_handoff/*.md`) so no work is ever lost — not a goal of getting every
+field, label, or edge case perfect on the first pass. 80/20 governs where time actually goes: spend
+real time on what's genuinely expensive to redo later (field `name` keys and document type `name`s
+once real content exists, URL slugs once real traffic/backlinks exist, anything needing a data
+migration) — move fast and don't over-think what isn't (Studio field titles/descriptions/grouping,
+exact copy before real content exists, cosmetic-only structure, anything a `redirect` document or a
+straightforward rename can fix later for free).
+
+**Standing instruction, not a one-time note:** when a request is trending toward low-value nitpicking
+on something that's actually cheap to change later, say so explicitly — something like "this is
+deferrable and costs nothing to change later, want to do it now or move on?" — rather than silently
+complying either way. This is a "surface it and let Adinda decide" rule, every time it comes up, not
+a judgment call to make quietly on her behalf.
+
 ## Skills to load this session
 - `mari-project` — engagement status, active workstreams, what's next
 - `drk-website` — stack conventions (this file adds only what's Mari-specific)
@@ -65,18 +82,137 @@ Tailwind v4 CSS-first `@theme` layer. **Not yet ported** — the static build's 
 ## Content modeling — Portable Text tiers (locked 2026-07-14)
 Not one global rich-text config — three tiers, decide which applies by field:
 1. **Plain string** (headings, labels, CTA text, eyebrows) — no rich text.
-2. **Constrained rich text** (most body copy — card descriptions, FAQ answers) — default Portable Text, paragraph + basic marks only, no heading styles or alignment override (layout/CSS already governs presentation).
+2. **Constrained rich text** (most body copy — card descriptions, FAQ answers) — default Portable Text, paragraph + bold/italic/link + bullet lists (revised 2026-07-15 to add bullets), no heading styles or alignment override (layout/CSS already governs presentation).
 3. **Full rich text with headings + alignment** — only T&C body, Blog post body, and the page-builder's "Rich Text" block for overview-style sections (Private Charters, possibly About). This is the only tier that gets the heading/alignment customization work.
 Every rich-text field uses plain default Portable Text (tier-2 shape) at schema-pass time; only tier-3 fields get the customization layered on later, once that work is actually scheduled — see `MANAGER.md`.
+
+## Images — every image has an editable alt field, hard requirement locked 2026-07-15 (clarified same day)
+**The DRK-wide hard rule: every image field must HAVE an editable `alt` field — NOT that alt is
+required-to-fill.** An editor can upload an image without writing alt; the requirement is that the
+field is always THERE and editable, on every image, on every DRK-built site. This is why every image
+field uses `imageWithAlt` (or the `galleryImage` object, which also carries `title` + `caption`),
+never bare `type: 'image'` — no exceptions, including retrofitted fields (`siteSettings.logo`/
+`favicon`, the rich-text inline image). Applies to every future schema pass (`destinationPage`,
+`privateCharters`, `blogPost`, all of Tier 4) without needing to be re-requested.
+**Do NOT put `Rule.required()` on alt** — that was an early over-application, corrected 2026-07-15;
+alt (and title/caption) are recommended-not-required everywhere.
+
+Alt matters for two reasons beyond accessibility: Sanity's CDN URLs are hash-based and can't be made
+descriptive at upload, but Sanity supports "vanity filenames" — a descriptive name appended after the
+hash (`.../{hash}-{w}x{h}.{ext}/{seo-name}.{ext}`), confirmed against Sanity's own docs. The
+`src/sanity/lib/image.ts` `urlFor()` helper should slugify from `alt` and append it as the vanity
+filename once image-rendering gets wired to Sanity (not built yet — no components consume Sanity
+images today). When alt is present it improves SEO; when blank the helper just falls back gracefully.
+
+**Known follow-up:** `seo.ts`'s `ogImage`/`twitterImage`/`siteSettings` social images are still bare
+`type: 'image'` without an alt field — technically an exception to "every image has editable alt."
+Social meta images use a separate `og:image:alt` mechanism, so it's a judgment call whether to add
+alt there; flagged for review, not yet changed (see _QA-CHECKLIST.md).
+
+**Also queued for the `drk-website` skill** (this is a DRK-wide convention, not Mari-specific) — see
+`_handoff/drk-website.md`.
+
+## Galleries — array-on-the-page, grouped by category, for native bulk upload (locked 2026-07-15, EXPERIMENTAL)
+Galleries are a **flat array field directly on the page document** (`boatPage.gallery`, and every future
+gallery-bearing page the same way) — NOT a separate `galleryImage`/`galleryCategory` document type, and
+**NOT grouped by category**. The array's members ARE images (the shared `galleryImage` object:
+`type: 'image'` + `title` + `alt` + `caption` + `categories` tag field). **Flat, not grouped — learned
+the hard way 2026-07-15:** a category-grouped structure (array of group *objects*, each holding an inner
+images array) breaks the obvious drop target — dropping image files onto an array whose members are
+objects gives *"no known conversion from content types to array item,"* because Studio can't turn a file
+into a group. Flat means the gallery array's members are images, so multi-file drag-drop lands directly
+on it and uploads. Category is a per-image tag; per-batch category tagging is deferred to the future
+custom upload button.
+
+**Why (this is the whole reason, don't undo it without re-reading):** Sanity's docs confirm *"arrays of
+images accept batches of files to be dropped on them"* — so an editor can drag/select many files at once
+and they all upload natively, no custom code, usable by any non-technical editor. That batch behavior is
+documented for an array of the **`image` type**, and does NOT reliably apply to an array of an *object
+that wraps* an image — so the gallery image MUST stay a bare `image` type with extra fields, never a
+wrapper object. The earlier separate-document model blocked native batch upload entirely, which is why it
+was reversed. Verified directly against the v6.4 image-type docs, not assumed.
+
+**Scope of what's solved vs. not:** bulk upload is about getting the **files** in fast. Per-image `alt`,
+`caption`, `title` are still edited individually afterward — there is NO native bulk-alt-editing UI in
+v6.4, and that's accepted (alt is human-written for SEO anyway; Adinda explicitly doesn't need alt-at-
+scale, only file upload at scale). Category is set **once per group/batch**, not per image, to cut the
+per-image busywork.
+
+**Status: EXPERIMENTAL** — the category-per-batch grouping is being tried, not proven; revisit once real
+editors actually use it. Reusable beyond Mari (every Atlas liveaboard/destination gallery) — queued for
+the skill in `_handoff/drk-website.md`.
+
+## Eyebrow fields — toggle-to-reveal pattern, standard going forward (locked 2026-07-15)
+Every eyebrow field on every page type gets a `showXEyebrow` boolean immediately before it
+(`hidden: ({ parent }) => !parent?.showXEyebrow`), same mechanism the `seo` object's `jsonLd`
+override already used — keeps the Studio form from getting cluttered with rarely-used fields.
+Applies to every page type going forward (all of them have eyebrows, per the "every heading and
+eyebrow is editable" rule above) — **not a retrofit task**: `page` and `scheduleRates` don't
+currently have an eyebrow field at all, so there's nothing to add the toggle to yet. Apply this the
+moment either of those (or any new type) actually gets an eyebrow field, not before.
 
 ## Sanity Studio editor-organization — defer to last, confirmed safe
 Field `title`/`description`/tab-grouping and the Structure Builder (sidebar navigation/grouping) are presentational metadata — changing them later costs no data migration. What needs to be reasonably right from the schema-pass itself: the actual field `name` keys and document type `name`s, since renaming those after real content exists needs a migration script. Polish the editor experience last, once every type exists and the full picture is visible — don't front-load it.
 
 ## Doc split (replicate the static-build pattern — see `drk-website/references/claude-code.md`)
-This file = prose rules + active decisions. `MANAGER.md` (session/decision log, created 2026-07-14) and `COMPONENTS.md` (reusable component specs, **not yet created** — ports from the static build's `COMPONENTS.md` at first use, not up front) follow the same convention as the old repo. Check `MANAGER.md` for today's active task scope and session history before re-deriving it.
+This file = prose rules + active decisions. `MANAGER.md` (session/decision log, created 2026-07-14) and `COMPONENTS.md` (reusable component specs, **not yet created** — ports from the static build's `COMPONENTS.md` at first use, not up front) follow the same convention as the old repo. Check `MANAGER.md` for today's active task scope and session history before re-deriving it. `_SCHEMA-SPECS.md` (created 2026-07-15) is a fourth doc in this split — a flat, checkable field-by-field spec per Sanity page type, distinct from MANAGER.md's dated log: Adinda marks fields approved there as they're tested in a real build, without re-reading history to find "did we settle this." Update it alongside any schema change, same habit as the other docs. `_CONTENT-STATUS.md` (created 2026-07-15) is the fifth — tracks whether the *value* in a field is real vs. placeholder (Figma-sourced copy preferred by default, stock/Pexels fallback for images Figma doesn't have enough of), a different axis from _SCHEMA-SPECS.md's field-existence tracking. Zero remaining 🔴 rows in it is a hard pre-launch gate, same weight as the other pre-launch checks already in this file. `_QA-CHECKLIST.md` (created 2026-07-15) is the sixth — for an external human reviewer's click-through pass, distinct from both: open design decisions worth a second opinion (e.g. eyebrow-toggle placement), not field approval or content-placeholder tracking.
 
 ## Local-only files — underscore prefix convention, locked 2026-07-15
 Any folder or file that is internal/scratch (not real project output — handoff docs, skill-build packaging, test images, throwaway scripts) gets a leading `_` **at the repo root**. That prefix is the standing signal for "never commit this, not a real working file" — `.gitignore`'s `/_*` rule enforces it automatically. Root-anchored only, deliberately not recursive (`/_*`, not `**/_*`): Next.js App Router uses `_`-prefixed folders inside `src/app/` as a real, committed routing convention (private folders like `_components/`, `_lib/` that opt out of routing) — this rule must never touch those. When creating a new scratch file/folder, default to the `_` prefix rather than inventing a new naming scheme per task.
+
+## Daily recap template — standing format, locked 2026-07-16
+Whenever Adinda asks for a session/day recap ("give me today's recap," "what did we do," "where are we"),
+use this structure every time — she journals from it and wants it consistent, not reinvented per ask.
+Don't wait to be asked for each section; include all of them.
+
+1. **What we did today** — grouped by workstream, not a flat chronological dump. Name concrete
+   decisions/files/bugs, not vague summaries ("fixed the gallery" → "flattened the gallery array because
+   drag-drop broke on the grouped structure"). Pull from MANAGER.md's dated entries, don't re-derive from
+   memory.
+2. **Sprint status** — the locked sprint-plan table (see "Website" workstream in `mari-project` skill)
+   with the current period marked, PLUS a per-page breakdown: which pages have a real Figma mockup vs.
+   which don't yet, and which pages need real refinement even WITH a mockup (e.g. a sub-nav or dynamic
+   interaction the static mockup can't fully spec). Don't just say "on schedule" — name the specific
+   bottlenecks/risks (e.g. FAQ taxonomy still open, mega-menu wiring not built) so the schedule read is
+   honest, not just reassuring.
+3. **Open decisions / bottlenecks** — anything waiting on Adinda, Serge, or Stefan, and anything flagged
+   as "needs a second pass" or "not yet reviewed." Say plainly when something was built fast and hasn't
+   been reviewed yet (don't imply reviewed-and-approved when it's actually a same-day shell).
+4. **Tomorrow's plan** — prioritized, ordered list, not a grab-bag.
+5. **Learnings to document** — classify anything worth keeping into: **local-only** (stays in this
+   repo's CLAUDE.md/MANAGER.md, Mari-specific), **`atlas-website`-wide** (reusable across any Atlas
+   liveaboard/destination site build, not just Mari), or **`drk-website`-wide** (reusable across any DRK
+   client site, not just Atlas). Queue DRK-wide and Atlas-wide items into the matching `_handoff/*.md`
+   file immediately, don't batch it for later.
+
+Full spec for this format lives here; the generalized (non-Mari) version is queued for `drk-website`'s
+`references/workflow.md` — see `_handoff/drk-website.md`.
+
+## Commit cadence — commit at every checkpoint + remind at session end, locked 2026-07-16
+Adinda's explicit standing instruction (she will forget otherwise, so this is on Claude to drive, not
+her). Two triggers:
+1. **After every MANAGER.md checkpoint is written and confirmed** — commit automatically. This is a
+   durable standing authorization, not an ask-each-time: once the checkpoint exists and the
+   preconditions below hold, just do it (show the message, don't block waiting for a fresh yes each time).
+2. **At the natural end of a session** — if there's uncommitted work, proactively offer/remind to commit
+   before wrapping, even if a checkpoint wasn't fully finished. Don't wait to be asked.
+
+**Hard preconditions (both required, every time):**
+- **Repo is verified-clean** — `tsc`/`eslint`/dev-server actually run and green, not assumed. NEVER
+  commit a mid-repair or known-broken state (the reverted `useDelayedUnmount` work on 2026-07-15 is the
+  precedent — that correctly stayed uncommitted).
+- **Open to-dos are clearly logged** — the checkpoint (or MANAGER.md / `_SCHEMA-SPECS.md`) spells out
+  what's still undecided, unreviewed, or half-done, so an incomplete-but-clean state is committed
+  honestly, not as if it were finished. Committing mid-arc is fine *as long as the "what's left" is
+  written down* — that's the whole trade that makes this safe.
+
+**Safe because commits stay LOCAL** — a commit is not a push, so it's private and fully reversible.
+The standing authorization here is for local commits to this private, DRK-internal repo only. **Revisit
+this decision if that ever changes** (a push-to-remote habit, the repo going public, client repo access)
+— same condition already attached to the "no AI-authorship traces / repo stays private" rule above.
+
+Skill-wide for all DRK sites (Adinda's explicit ask) — queued for `drk-website`'s `references/workflow.md`
+via `_handoff/drk-website.md`, generalized (drop the Mari-specific file names).
 
 ## Review requests must always call out mobile explicitly, locked 2026-07-15
 Whenever Claude asks Adinda to review/QA something in a browser, the ask must name checking the **mobile

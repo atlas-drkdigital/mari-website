@@ -10,6 +10,649 @@ forward — this file is now the live one.
 
 ---
 
+## SESSION CHECKPOINT — 2026-07-16, Tier 4 shell pass (READ THIS FIRST — supersedes all checkpoints below)
+
+### State of the repo right now
+Clean and verified: `tsc`, `eslint`, fresh dev server restart (all node processes killed first, `.next`
+cleared), Studio 200, homepage 200, zero `SchemaError` in the fresh log (one harmless "Building schema
+for synchronization took >1s" info line, and an unrelated `cz-shortcut-listen` hydration warning from a
+browser extension, not our code). Migration verified via GROQ query-back, not just script exit code.
+
+### The big move: Tier 4 document-type shells, built in one pass
+Per Adinda's explicit ask ("I need the stubs, even if empty, so I have something to review tomorrow") —
+every remaining Tier 4 type now exists and is registered/placed in Studio. **All of it is 🟡 Draft,
+same-day, unreviewed — `boat` is the ONLY type with a real multi-session review pass behind it.** New
+types: `destination`, `itinerary` (stub), `faq` (built with real depth — question/answer/category/scope +
+conditional destination-or-boat reference), `testimonial`, `blogPost`, `blogCategory`, `author`,
+`homePage` (singleton, deliberately shallow — homepage content is still 100% hardcoded), `whyUsItem` (own
+document type, referenced from `homePage.whyUsItems` with `Rule.min(2).max(4)`). Full field-by-field spec
+in `_SCHEMA-SPECS.md`'s new "Tier 4 shells" section.
+
+### Rename: `boatPage`/`destinationPage` → `boat`/`destination`, 2026-07-16
+Adinda asked why the "Page" suffix existed. Real answer: it wasn't an actual convention — `scheduleRates`
+and `blogPost` don't have it either, so it was just how the first two types happened to get named, not a
+deliberate rule. Renamed both. `destination` was free (zero content existed). `boat` needed a real
+migration since `boatPage-mari` had real content: wrote `_scripts/rename-boatpage-to-boat.ts` (`_type` is
+immutable in Sanity, so this creates `boat-mari` fresh, repoints `cabinType-mari-deluxe.boat` to it, then
+deletes the old document) — ran via `npx sanity exec ... --with-user-token`, verified via GROQ: `boat-mari`
+exists with correct data, `cabinType-mari-deluxe`'s reference correctly repointed, zero `boatPage`
+documents remain. Every schema-file reference (`cabinType`, `cabin`, `link`, `faq`, `itinerary`, comments)
+updated to match. Queued for `drk-website` handoff: check for a REAL naming pattern before assuming a
+suffix is deliberate, before copying it into new types.
+
+### Studio sidebar reorganized into 3 sections, per Adinda's explicit spec (several corrections mid-session)
+1. **Main Page Content**: Homepage, Destinations, Boats (nested), Private Charters, About,
+   Schedule & Rates, Itineraries, then generic **Pages LAST** (catch-all for T&C, Onboard Prices, etc.).
+2. **Blog** (its own section, not lumped into #3 — Adinda's correction): Blog Posts, Blog Categories,
+   Blog Authors.
+3. **Shared/cross-page components** (repeatable, reusable across pages/page types): Announcements,
+   Why Us Items, FAQ, Testimonials. (Why Us Items moved here from Main Page Content mid-session —
+   Adinda's correction: it's a repeatable component that may appear on a different page, not homepage-only.)
+Then Settings / SEO Tools / Languages, unchanged. Private Charters and About are pinned `page` documents
+by fixed ID (`page-private-charters`, `page-about`), not a new schema type — generic `page` per the
+already-stated default assumption, just given a fixed sidebar slot the same way `singleton()` pins
+Site Settings/Navigation. **Private Charters' slug is still a placeholder** (`private-charters-slug-tbc`)
+— real slug unconfirmed, see the open item further down this file.
+
+### Site Settings — `headScripts` field added, 2026-07-16
+Adinda's ask: a place for Google Tag Manager / Search Console verification / other `<head>` tracking
+snippets, without a code deploy. Added under a new "Tracking & Verification" fieldset in the SEO tab.
+Not wired to actual `<head>` rendering yet (same status as everything waiting on the Sanity-wiring pass).
+robots.txt/llms.txt are separate static Next.js route files, not Sanity content — nothing to add there.
+
+### Open items from this session, not yet resolved
+- **`author.bio`** — built from Adinda's "author name and value," where "value" wasn't clearly specified.
+  Interpreted as a short bio field; flag/confirm before treating as final.
+- **Required/optional field markers** — Adinda wants a clear upfront visual marker (asterisk or similar)
+  on required fields, site-wide, seen before filling the form, not discovered later via an error. Not yet
+  actioned — needs verifying whether Sanity Studio already does this by default before assuming custom
+  work is needed. Queued as one full pass, applied everywhere, not per-field ad hoc.
+- **Private Charters slug + schema-type decision** — still open (see the 2026-07-15 entries below).
+- Everything in the Tier 4 shells list above needs an actual review pass — Adinda was explicit she
+  couldn't review all of it in this session; treat as the next session's real priority, not "done."
+
+### Daily recap template — locked into CLAUDE.md this session
+Adinda wants a consistent recap structure every time she asks ("today/tomorrow/sprint status"), so it
+isn't reinvented per ask. Full spec now in CLAUDE.md's "Daily recap template" section; generalized version
+queued for `drk-website`'s `references/workflow.md` via `_handoff/drk-website.md`.
+
+---
+
+## SESSION CHECKPOINT — 2026-07-15, LATE second session, saved as Adinda heads to a workout (superseded by the checkpoint above)
+
+### State of the repo right now
+Clean and verified — `tsc`, `eslint`, fresh dev server (cache cleared, `Ready in ~2.4s`), Studio 200,
+zero `SchemaError` in the fresh log, all confirmed as the last actions. Nothing half-done in the
+committable sense. Dev server IS running. Sanity has one real `boatPage-mari` document with mostly-real
+content (see _CONTENT-STATUS.md for the real-vs-placeholder breakdown).
+
+### What Adinda should REVIEW first, in Studio (the human-eyes part I can't do)
+1. **Hard-reload Studio first** (`Ctrl+Shift+R`, or an incognito tab on `localhost:3000/studio`). Your
+   earlier stale-tab errors were pure browser cache — live data was always correct. If a normal browser
+   still shows stale state: DevTools → Application → Clear site data for localhost.
+2. **Open the Mari boat document** and look at the whole form with real content in it — this is the
+   actual test of whether the schema feels right to *use*, not just whether the field list looks right.
+3. **Test the gallery bulk upload for real:** add a gallery group (set a category), then **drag several
+   image files at once** onto its images array. Confirm one item per file appears. That's the
+   experimental bet we need to validate (see "gallery" note below).
+
+### What changed this session (the big arc)
+- **Boat page schema** fully built + refined against the real Figma mock: Basic Info (short name / full
+  title / slug in that order), Overview (full rich text body, "Read more" truncate — NOT a CTA link,
+  that field was removed), Cabins (own group), Gallery (see below), Specifications (8 fixed categories,
+  one rich-text body each, matching the mock exactly), SEO.
+- **Two shared rich-text types locked:** `richTextBasic` (tier 2 — paragraph + bold/italic/link +
+  bullets) and `richTextFull` ("Full Rich Text Block", tier 3 — H1-H6, marks, alignment, image, HTML
+  embed, NO text color for now). `page.body` and `boatPage.overviewBody` both use `richTextFull` — one
+  source of truth, update once.
+- **Gallery reworked to array-on-the-page, grouped by category (EXPERIMENTAL)** — for native multi-file
+  bulk upload. Deleted the old galleryImage/galleryCategory document types + their 6 test docs. See the
+  dedicated entry below and CLAUDE.md's "Galleries" section for the full why.
+- **Image alt rule CORRECTED** (this was a real mistake I made): alt is **editable-not-required** on
+  every image, never `Rule.required()`. The DRK hard rule = every image HAS an editable alt field, not
+  that alt must be filled. Removed all `Rule.required()` from alt. `galleryImage` now has **title + alt
+  + caption**, all optional. Saved as a memory + corrected in CLAUDE.md + handoff.
+- **Gallery images now carry an upload recommendation** in the field description: landscape 4:3, ≥
+  1600×1200px (retina-ready, bigger than it displays), web-optimized JPEG/WebP under ~500KB.
+- **New tracking docs created this session:** `_SCHEMA-SPECS.md` (per-field approval checklist),
+  `_CONTENT-STATUS.md` (real-vs-placeholder content), `_QA-CHECKLIST.md` (external-reviewer open
+  decisions). All part of the doc-split, all listed in CLAUDE.md.
+
+### What Adinda needs to DECIDE / DO next (prioritized)
+1. **Gallery upload button — a real decision, needs your call.** Researched 2026-07-15: dragging many
+   files at once works natively (good). BUT a click-to-browse **multi-select "Upload" button** (distinct
+   from "Add item", which only picks one file at a time) does **NOT** exist natively in v6.4 — it needs a
+   **custom array-input component** (real build work). Decide: build the custom upload button, or accept
+   drag-and-drop-only for now. (Open Sanity feature requests confirm it's a known gap: GH #1547, #4483.)
+2. **Validate the experimental gallery** — the drag-many test above. If it feels right, we promote it out
+   of EXPERIMENTAL; if the category-per-batch grouping is awkward with real content, we adjust.
+3. **Eyebrow toggle: global vs. per-section** — still pending Serge's input (in _QA-CHECKLIST.md).
+4. **Social image alt** — `seo.ts`'s ogImage/twitterImage are bare images with no alt field, a technical
+   exception to the alt rule. Decide whether to add alt there (in _QA-CHECKLIST.md).
+
+### Gallery FLATTENED — drag-drop was failing on the grouped structure (fixed 2026-07-15, same session)
+Adinda hard-refreshed and tried to drag 4 jpegs into the gallery → *"no known conversion from content
+types to array item."* Diagnosed: NOT a drag-drop bug — she dropped onto the **outer** array, which held
+category-group *objects*, not images (Studio can't convert a file into a group object). The grouping made
+the obvious drop target dead. **Fixed by flattening:** `boatPage.gallery` is now a FLAT array of
+`galleryImage` (the array members ARE images), so multi-file drop lands directly on it. Category moved to
+a per-image `categories` tag field. Per-category heading/body descriptions dropped in the flatten
+(deferred — flagged in SCHEMA-SPECS). Per-batch category tagging is recoverable later via the custom
+upload button. Verified `tsc`/`eslint` clean, dev server restarted fresh, Studio 200, no SchemaError.
+**Still needs Adinda's real-file test** to confirm the flat array accepts multi-drop (should, but she
+should verify — that's the remaining validation).
+
+### Gallery categories — fixed list now, better options to raise next session (2026-07-15)
+Adinda: doesn't like categories being a **plain free-text field** — they should be chosen from a known
+set, not typed. **Done now (interim):** `galleryImage.categories` is a fixed multi-select list matching
+the Figma gallery mockup tabs — **The Boat, Dining, Diving, Relaxation, Others** (hardcoded in
+`objects/galleryImage.ts`). No more free text.
+**Options to bring up NEXT SESSION (Adinda's explicit ask to surface these as possible add-ons):**
+1. A centrally-managed, editor-editable **Gallery Categories** set — its own small document/list type —
+   so the client can add/rename categories without a code change, and images reference from that set.
+2. Or the same idea but housed **inside site settings** (a categories field there), if a full document
+   type feels heavier than needed.
+Both replace the hardcoded list with something the site owner controls. Interim hardcoded list is fine to
+start with (matches the mockup exactly); pick the managed approach when categories need to vary per client
+or the owner wants to edit them.
+
+### Custom multi-select "Upload" button — schedulable to-do, researched 2026-07-15
+Native drag-drop of many files works (once flattened). A click-to-browse **multi-select** Upload button
+(distinct from "Add item," which only picks one file) does NOT exist natively in v6.4 — needs a custom
+array-input component. **Assessed: small-to-moderate build, ~60-120 lines, ~2-4 focused hours.** Approach:
+`components.input` on the gallery array that calls `props.renderDefault(props)` (keeps all native array UI
+incl. drag-drop) and adds a styled `<input type="file" multiple>` button that uploads each file via
+`props.client.assets.upload('image', file)` and inserts an array item per asset via `set`/`insert` on
+`onChange`. No drop-in plugin exists for this exact thing (it's a long-standing open Sanity feature
+request, GH #1547/#4483) — build from documented primitives. **Reusable across all DRK galleries.**
+Not launch-blocking (drag works). Adinda's call on whether/when to build; slotted as schedulable.
+
+### What CLAUDE should DO next session (in order)
+1. **T&C page content** — import the real, final 16-section content from `mari-website` skill's
+   `references/pages/tc.md` into an actual `page` document, using the new `richTextFull` editor. This was
+   deliberately held to avoid rushing a 16-section import at end-of-session. Clear #1.
+2. **Specifications content** — the live doc has all 8 category labels; verify/reload the bodies during
+   the content pass (Adinda's call to do it then, not now — see _CONTENT-STATUS.md).
+3. **Destination page + Private Charters** Figma passes — links already shared, never got started (this
+   whole session was boat-page + gallery). These are the next real page-schema builds.
+4. If Adinda greenlights it: the custom multi-select gallery upload button component.
+5. Research whether Sanity's Portable Text editor supports a smaller default height (Adinda asked; the
+   editor box renders tall by default — may need a custom input, not yet investigated).
+
+### Models / effort (confirmed logic, one open mechanism question)
+Locked logic: no Haiku, no Fable. **Sonnet high = default** for this build (higher-risk dynamic
+Next+Sanity site). Sonnet medium for menial tasks. **Opus for architecture-tier decisions.** Adinda
+switched to **Opus 4.8** partway through this late session (the gallery rework, alt-rule correction, and
+rich-text-type extraction were genuinely architecture-tier, so that fit). Still open/honest: the exact
+mechanism to set *this session's* reasoning-effort level (vs. sub-agent effort) isn't something I've
+confirmed — worth checking `/config` or asking directly before treating that part as fully actionable.
+
+### Contract timeline — RESOLVED 2026-07-15, do not re-raise as a concern
+Earlier notes (this file and `_handoff/mari-project.md`) flagged an apparent conflict: "contract end
+~Jul 24" vs. the internally-planned Jul 28–Aug 1 launch window. **Corrected directly by Adinda: that was
+wrong.** Contract signed ~May 10, 12-week term, real target is **Aug 10**. We're on schedule. The Type A
+brochure (~1 week) was extra work Adinda chose to take on, outside contracted scope — that's what created
+the earlier appearance of time pressure, not an actual scheduling conflict. **Stop mentioning the
+contract-vs-launch-window concern in future sessions** — it was never a real problem. Corrected in
+`_handoff/mari-project.md` too (marked resolved there).
+
+### Tracking docs renamed with underscore prefix — 2026-07-15, so they auto-gitignore going forward
+`SCHEMA-SPECS.md` → `_SCHEMA-SPECS.md`, `CONTENT-STATUS.md` → `_CONTENT-STATUS.md`, `QA-CHECKLIST.md` →
+`_QA-CHECKLIST.md` — Adinda didn't want these build-process tracking docs committed to git, and didn't
+want to have to remember to gitignore each new one individually. Applied the convention already locked
+in this repo (`CLAUDE.md`'s "Local-only files" section, `.gitignore` line 47: `/_*`) rather than invent a
+new mechanism — any root-level file/folder starting with `_` is automatically excluded, no per-file
+gitignore entry ever needed. All three were untracked (`??` in git status) before the rename, so this was
+a clean rename with nothing to purge from git history. `CLAUDE.md`/`MANAGER.md` were NOT touched — they're
+already tracked and are the intentionally-committed doc-split pair, not scratch. Every cross-reference to
+the old filenames (in CLAUDE.md, MANAGER.md, and a code comment in `boatPage.ts`) updated to match.
+
+---
+
+## SESSION CHECKPOINT — 2026-07-15, END of second session (superseded by the checkpoint above; kept for history)
+
+### Where things actually stand
+Repo is in a clean, verified-working state — `tsc`, `eslint`, and a live Studio reload all confirmed
+clean as the very last action before this checkpoint was written (not assumed). `boatPage-mari` has
+real content loaded and correct per the latest schema shape. Nothing is mid-edit or half-done.
+
+**One real bug hit and fixed this session, worth knowing about if it recurs:** after a burst of rapid
+schema-file edits, the dev server threw a persistent `SchemaError` in Next.js/Turbopack even though
+`npx sanity schemas validate` (Sanity's own independent validator) found zero errors — confirming it
+was stale Turbopack/dev-server state, not a real schema problem, same class of issue as the earlier
+"Jest worker" crash-loop from a long-running process. Fix: kill the dev server, clear `.next/cache`,
+restart. If Studio ever throws `SchemaError` again after heavy schema editing, this is the first thing
+to try, not a code investigation.
+
+### What changed this round (chronological, both messages)
+1. **Vessel & Accommodation was WRONG the first time** — I pulled it out as its own separate
+   `vesselAccommodationDetails` rich-text field, reasoning it "reads better as prose." Adinda: "not
+   what I mean at all." Then she sent the actual Figma screenshot of the Specifications accordion,
+   which resolved it cleanly: **8 fixed categories total, ALL the same shape** — a single
+   `richTextBasic` body per category, not label/value pairs, not one category singled out. Final
+   list: Vessel & Accommodation, Crew, Diving Equipment, Tenders, Machinery & Power, Navigation &
+   Communication, Safety Equipment, **Amenities & Others** (one combined category, confirmed by the
+   screenshot — not "Amenities" and "Others" split into two, which is what her dictated list had
+   genuinely read as ambiguous before the image arrived). Reverted the separate field, restored one
+   unified `specifications` array with 8 categories, each `{category, body: richTextBasic}`,
+   `initialValue` seeding all 8 on every new boatPage. Real mari-core content loaded into all 8,
+   formatted as flat lines (no bullets) matching the mockup's actual visual style exactly — see
+   `_scripts/smoke-test-fix-specs.ts`, verified via GROQ query-back (categories list confirmed).
+2. **`overviewCta` field deleted — was a modeling mistake, not a refinement.** Adinda: there's no
+   separate CTA/link here at all. `overviewBody`'s "Read More" is a truncate-and-expand on the SAME
+   text (identical pattern to the homepage Testimonials cards), not navigation anywhere. Removed the
+   `link`-type field entirely; the truncate/expand behavior is a frontend requirement, not yet built
+   (no boat page component exists), flagged in-file and in _SCHEMA-SPECS.md.
+3. **`overviewBody` upgraded from tier-2 (`richTextBasic`) to tier-3** — same editor as the T&C page.
+4. **New shared type: `objects/richTextFull.ts`, named "Full Rich Text Block" per Adinda's explicit
+   naming request.** Extracted from `page.ts`'s previously-inline body config. Spec: H1 through H6
+   (page.ts only had H1-H4 before — H5/H6 added per Adinda), bold/italic/underline/strike/code,
+   alignment, inline image, raw HTML embed. **Text color annotation removed** — Adinda: "not allowed
+   for now... not resolved yet," explicit removal, not an oversight. `page.body` and
+   `boatPage.overviewBody` both now use this ONE shared type — update it once, both update together,
+   matches the same "shared type = single source of truth" pattern already used for `richTextBasic`.
+5. **`richTextBasic` (tier 2) gained bullet-list support** — was `lists: []` (none), Adinda wanted
+   bold/italic/bullets/links for the specifications rich text. CLAUDE.md's content-model section
+   updated to match (tier 2 is now "paragraph + bold/italic/link + bullets", not "basic marks only").
+6. **Field descriptions rewritten site-wide** to be evergreen/tight — no names, dates, or
+   instance-specific examples ("e.g. Mari") in anything Studio-visible; that reasoning now lives only
+   in code comments and this file. Verified Sanity has no built-in tooltip/info-icon alternative to
+   always-visible inline description text (would need a custom field component — not worth building).
+7. **Cabins moved to its own Studio group**, out of Overview. `cabinsHeading` confirmed + seeded as
+   literally "Cabins."
+8. **Gallery**: fields now sit inside a `fieldset` with a `description` ("images/categories live in
+   the shared Gallery section, not here") — fieldset descriptions render before their fields, verified
+   live with no schema error; group-level descriptions don't have this property, which is why a
+   fieldset was needed specifically.
+9. **Slug repositioned to Basic Info, ordered short name → title → slug** (WordPress-style), applied
+   to `boatPage` AND retrofitted `page.ts`/`scheduleRates.ts` (their `settings` groups removed
+   entirely, `slug` now lives next to `title`) — "for every page type," per Adinda's explicit ask, not
+   boatPage-only.
+10. **New `_QA-CHECKLIST.md`** — for an external human reviewer, distinct from _SCHEMA-SPECS.md (field
+    approval) and _CONTENT-STATUS.md (content-placeholder tracking). One item so far: whether the
+    eyebrow-toggle should be global or per-section (currently per-section) — explicitly left open,
+    Adinda is checking with Serge.
+
+### Explained, not changed (Adinda asked, no code action needed)
+- **Red warning icons on Studio tab names** = Sanity's own built-in validation-error indicator,
+  appears on a tab when a `Rule.required()` field inside it is empty on an unsaved/incomplete
+  document. Not a bug — will clear once required fields are filled in.
+- **"If a specification category is empty, hide that accordion item entirely"** — understood and
+  agreed, this is a frontend rendering requirement (check if `body` has content before rendering that
+  accordion row), not a schema change. Not buildable yet, no boat page component exists. Flagged in
+  the `specifications` field's code comment.
+- **Rich text editor "a little bit smaller by default"** — Adinda wants the Portable Text editor box
+  shown smaller than the tall default in her screenshot. **NOT implemented — genuinely unsure whether
+  Sanity's block editor supports a configurable default height** (it auto-grows with content by
+  design; a fixed/smaller default might need a custom input component). Needs research before
+  building, flagged rather than guessed at.
+- **Documentation embedded inside Studio itself** — Adinda agreed with the earlier recommendation
+  (keep external for now). Logged as an explicit **post-launch backlog item**: a custom Studio tool
+  hosting docs, "looks more professional," possibly paired with an intro Loom video — a bonus, not
+  pre-launch scope.
+- **SEO auto-population tracking** — confirmed it IS tracked (_SCHEMA-SPECS.md's `boatPage` SEO row:
+  "real frontend `generateMetadata` work, not schema, not built yet") — same bucket as the JSON-LD
+  auto-generation, both blocked on the eventual Sanity-wiring pass, not lost or forgotten.
+- **T&C page "is gone"** — real gap, not a bug: the `page` document TYPE exists but no actual T&C
+  `page` document was ever created in Sanity. Real content already exists and is ported/final in
+  `mari-website` skill's `references/pages/tc.md` (16 sections). **Deliberately NOT done this
+  session** — a 16-section content import right as Adinda was stepping away risked rushing it; this
+  is the clear top item for the next session instead of a discussion topic.
+
+### Models/effort — confirmed, not yet fully resolved
+Adinda confirmed reasoning-effort levels (low/medium/high) are a real concept and accepted the
+proposed logic: no Haiku, no Fable, Sonnet at medium effort for menial tasks, **Sonnet at high effort
+as the default** (this build is the higher-risk dynamic Next.js+Sanity site, not the old static one),
+Opus reserved for architecture-tier decisions. She noted correctly that a lot of *this specific
+session's* work (gallery redesign, content-model changes, cross-cutting renames) really was
+architecture-tier, not just skeleton-building. **Confirmed directly: current model for this whole
+session has been Sonnet 5, not Opus** (per her own `/model` check earlier in the session). **Still
+open, flagged honestly both times it came up:** the exact mechanism for adjusting *this session's*
+reasoning effort (not sub-agent effort, which is a separate, already-real parameter) isn't something
+I have confirmed knowledge of — worth Adinda checking `/config` or asking directly before we treat the
+effort-level part of this logic as fully actionable, not just agreed in principle.
+
+### Top of the list for next session
+1. **T&C page** — import the real, already-final 16-section content from `mari-website`'s
+   `references/pages/tc.md` into an actual `page` document using the new `richTextFull` editor.
+2. Research whether Sanity's Portable Text editor supports a smaller default height, before touching
+   `richTextBasic`/`richTextFull`'s presentation.
+3. Resolve eyebrow-toggle placement (global vs. per-section) once Serge weighs in.
+4. Destination page + Private Charters Figma passes — queued, links already shared, not yet started
+   (this whole final stretch of the session was boat-page refinement, destination/PC never got to).
+
+---
+
+## SESSION CHECKPOINT — 2026-07-15, second session same day — full page inventory + Tier 4 scope locked (superseded by the checkpoint above for "current state," kept for its own history below)
+
+Late-night session, Adinda explicitly low-energy/ADHD, budgeted ~2.5-3h. No code risk taken — this session
+is primarily a locking/decision pass, not a build pass, plus one small content edit (Testimonials, below).
+
+### Full page inventory — locked this session, replaces the incomplete 7-type Tier 4 list below
+Cross-checked against the real `Nav.tsx` (not assumption) before asking Adinda to mark it up.
+
+| Page | Slug | SEO-first? | Schema approach | Notes |
+|---|---|---|---|---|
+| Homepage | `/` | Yes | `homePage` (not built) | |
+| The Boat | — | — | — | **STILL OPEN — Adinda did not answer this one.** Currently a homepage anchor only (`#the-boat`). Ask directly next session: standalone `/boat` page too, or is the homepage section enough for launch? |
+| Destinations | one per destination | Yes | `destinationPage` (not built) | Template-based, one doc per destination. Will also host that destination's own destination-specific FAQ items (see FAQ below). |
+| Private Charters | **tentatively** `/private-liveaboard-charter-indonesia` — **unconfirmed, transcription was garbled, needs a one-line confirm from Adinda** | Yes | Own page — schema type (dedicated vs. generic `page`) not yet specified, default assumption is generic `page` unless Adinda says otherwise | |
+| About | `/about` | No (Adinda's explicit call) | Generic `page` type | Also hosts the Testimonials component (see below) |
+| Schedule & Rates | **tentatively** `/booking` — **unconfirmed, Adinda said "I think," needs a one-line confirm** | Yes | Already built: `scheduleRates` schema (singleton, has `embedCode` field for INSEANQ) | No new schema decision needed, just the slug |
+| Blog | `/blog` | No | **New — `blogPost` doc type + listing page, NOT previously in Tier 4 scope, Adinda caught the gap** | Needs categories. Marine Life Guide folds into Blog as a category rather than its own page — Adinda wants a few dummy/placeholder posts to demo what it looks like, not real content yet |
+| Terms & Conditions | — | No | Generic `page` type (confirmed) | Content already sourced, 16 sections, mechanical port |
+| Onboard Prices | — | No | Generic `page` type (confirmed) | Adinda has the content already from the current live MVP site |
+| FAQ | `/faq` | No | **New — needs an `faq` (or `faqItem`) doc type**, fields: question, answer, `category` (topic grouping for hub-page tabs), `type` (`general` \| `destinationSpecific`), and if destination-specific, a reference to which `destinationPage` | Hub page shows only `general`-type items, tabbed by category. Does NOT list destination-specific FAQs — instead the hub page includes a "browse by destination" slider (reuse the homepage Destinations component) that routes users to the relevant destination page, where that destination's specific FAQ items live |
+| Contact | — | — | No standalone page — confirmed | Contact stays as sections distributed across pages (homepage already has one) |
+| Itinerary pages | list only, not clickable | Secondary | `itinerary` stub (not built) | Unchanged from already-locked scope |
+| Testimonials | — | — | **New — `testimonial` doc type (not built)** | **Correction from Adinda: NOT homepage-only** — also appears on the About page, same component. Needs an optional `tripAdvisorEmbedCode` field: if present, the card's "Read more" button becomes "View on TripAdvisor" and links out directly instead of expanding inline; if absent, current inline-expand behavior applies. No TripAdvisor integration exists yet (contingent on Stefan signing the social add-on, per `mari-project` skill) — build the field now so it's ready, don't wire the actual integration |
+
+**Confirmed OUT of scope, not building:** Gallery, standalone Marine Life Guide page (folded into Blog instead), Booking flow (INSEANQ widget replaces this).
+
+**Revised Tier 4 type list** (supersedes the 7-type list in the 2026-07-14 checkpoint below): `homePage`,
+`destinationPage`, `boatPage` *(pending The Boat decision above — may not be needed)*, `itinerary` (stub),
+`testimonial` (+ TripAdvisor embed field), `faq` (+ category/type/destination-reference fields), page-builder
+block shell, **`blogPost`** (new). `page` (generic), `scheduleRates` already exist from the 2026-07-14 pass
+and cover About, T&C, Onboard Prices, and (pending confirm) Private Charters.
+
+### Testimonials — content added this session (code only, no schema yet)
+Adinda: the old `TEST_ONLY_REVIEWS` (4 generic "Placeholder review text..." cards) weren't good enough to
+show Stefan ahead of launch. Replaced with `DRAFT_REVIEWS_REMOVE_BEFORE_LAUNCH` in `Testimonials.tsx` — 4
+AI-drafted, realistic-reading reviews (Mara J, Tomas B, Priya N, Julian F), each with a `[DRAFT]` prefix on
+its headline (the `title` field, not the person's `name`) as the tracking marker. **Explicit decision:**
+these ARE meant to be visible now (pre-launch, for Stefan's review) — Adinda's call, not a draft/unpublished
+staging pattern — but **must be deleted or replaced with real guest reviews before public launch**. Flagged
+in-file and here so it isn't lost. `tsc --noEmit` clean after the edit.
+
+### Still open from this session — resolve before locking Tier 4 fully
+- [ ] **The Boat** — standalone page or homepage-section-only? Not answered yet.
+- [ ] **Private Charters slug** — confirm exact spelling (`private-liveaboard-charter-indonesia`?).
+- [ ] **Schedule & Rates slug** — confirm `/booking` is actually what Adinda wants.
+- [ ] **Private Charters schema approach** — dedicated type or generic `page`? Not specified.
+
+### Boat page schema — built this session, from the actual Figma mock (node 778:8702), not guessed
+Three new document types: `boatPage` (repeatable, NOT singleton — see below), `cabinType` (Deluxe/
+Superior etc., references `boat`), `cabin` (individual physical cabin, references both `boat` and
+`cabinType`, options-filtered so only cabin types belonging to the already-picked boat are
+selectable). New shared object `richTextBasic` — the first real implementation of the locked tier-2
+content-model (paragraph + basic marks only); `page.body` remains the only tier-3 field until a
+second one is actually needed. `link.ts`'s referenceable-page list now includes `boatPage`.
+Registered in `schemaTypes/index.ts` and given a "Boats" nested entry in `structure.ts` (Boats /
+Cabin Types / Cabins) — cabinType/cabin deliberately not top-level, matches the "editor-organization
+deferred to last" convention. `tsc`, `eslint`, and a live Studio reload all verified clean.
+
+**Real Figma finding that resolved the multi-boat URL question:** the Hero's breadcrumb component
+(node 718:5417, inside `MARI Website 1.0`) literally renders `Home / Boats / Mari` — plural
+collection, singular boat — while the top nav still shows singular "The Boat" with no dropdown
+chevron. Not a Figma inconsistency: this is exactly the two-state nav behavior Adinda described
+(single boat today → direct link; multiple boats later → mega-menu dropdown), already built into
+the design. **This overrides url-structure.md's currently-locked `/boat`** — recommend `/boats/mari`
+(collection pattern, matches `/destinations/[slug]` already in this codebase) instead, avoiding a
+redirect/SEO-equity cost if a second boat is ever added post-launch. **Not yet confirmed by Adinda —
+flag before treating `/boats/mari` as locked.**
+
+**Hero stats strip — corrected mid-build.** Figma's 3-slot stats strip shows literal Komodo
+destination copy (Season/Duration/Minimum Skill Level) — a known placeholder issue already flagged
+in mari-website's boat.md open item #7. First pass dropped the strip entirely (doesn't make sense
+at boat level). **Adinda corrected this, not dropped:** boat-level stats belong here, just different
+content — number of cabins, number of guests, boat size, number of crew. Built as `heroStats`, a
+flexible label/value array (not 4 fixed fields), seeded with those 4 as initial values.
+
+**Not built — deliberately deferred, needs a decision first:** boat-level FAQ. The Layout&Specs
+section's FAQ tab in Figma likely reuses the same shared `faq` document pattern already planned for
+destination-specific FAQs (see the earlier page-inventory lock) — extending `faq`'s reference field
+to optionally point at a `boatPage` as well as a `destinationPage` once `faq` itself gets built,
+rather than bolting on a separate parallel mechanism now. Also not built: `destinationPage`,
+`private-charters` schema approach — next in line per Adinda, Figma links pending for those.
+
+### Gallery reworked to array-on-page for native bulk upload — 2026-07-15, EXPERIMENTAL, decided after Perplexity + docs verification
+**Driver:** Adinda's hard requirement — non-technical editors must be able to **bulk-upload gallery
+image files** (drag/select many at once), because one-by-one is too slow. She explicitly does NOT need
+bulk *alt* editing — alt/caption/title edited per image after upload is fine.
+
+**Research done properly, not guessed:** wrote a Perplexity prompt, then independently verified its two
+load-bearing claims against the actual Sanity v6.4 docs via WebFetch (Perplexity's own citations were
+mostly fake — they pointed at `localhost:3000/studio`, i.e. Adinda's own Studio URL, not sources; flagged
+this to her). Confirmed verbatim from the image-type docs: *"Arrays of images accept batches of files to
+be dropped on them."* And from presenting-images: alt lives on the image field (`image.alt`), not the
+asset — so alt isn't globally reusable, it's per-usage. The one thing the docs DON'T promise: batch drop
+for an array member that's an *object wrapping* an image. **Key insight that resolved everything: we don't
+need the wrapper** — use a bare `image` type WITH extra fields, which is both "an array of images" (batch
+drop works) and the documented way to attach per-image alt.
+
+**What changed:**
+- `boatPage.gallery` is now an **array on the page**, grouped by category: each entry =
+  `{ category (required), heading, body, images[] }`. The inner `images` array member is the new shared
+  `galleryImage` **object** (`objects/galleryImage.ts`, `type: 'image'` + required `alt` + `caption`).
+  Native multi-file batch drop lands on that inner images array. Category set once per group/batch.
+- **Deleted both document types** `documents/galleryImage.ts` and `documents/galleryCategory.ts`, their
+  schema-index + structure.ts entries, and the "Gallery" Studio sidebar section. Deleted the 6 test
+  documents from the dataset (3 galleryImage + 3 galleryCategory — galleryImages first since they
+  referenced the categories; verified 0 remain). `boatPage-mari.gallery` is now empty, ready for real
+  content in the content pass.
+- Three-level description model preserved: page-level `galleryDescription` (level 1) → group
+  `heading`/`body` (level 2) → image `caption` (level 3).
+- Reverses the galleryImage/galleryCategory-as-documents decision logged earlier this session — a real
+  reversal, but driven by a genuine new requirement (not nitpicking), cheap now (only test data), and
+  expensive post-launch, so the right time to change.
+- **Locked into CLAUDE.md** (new "Galleries" section, with the full reasoning + the load-bearing "must be
+  `image` type not a wrapper object" gotcha, per Adinda's ask to document the why) and **queued for the
+  `drk-website` skill** (`_handoff/drk-website.md`) as a reusable DRK-wide pattern.
+- **Status EXPERIMENTAL** — the category-per-batch grouping is an untested UX bet; _SCHEMA-SPECS.md has an
+  explicit "verify with real multi-file drop in Studio" checkbox. Adinda: "we're still trying this out."
+
+Verified: `tsc`, `eslint` clean; dev server restarted fresh (cache cleared), Studio 200, zero
+`SchemaError` in the fresh dev log.
+
+### Post-smoke-test schema cleanup round — 2026-07-15, same day
+Adinda reviewed the live Studio form directly (per last message's suggestion) and found real issues
+a field-list review alone couldn't have caught:
+- **Field descriptions had internal/dated/instance-specific language leaking into Studio-visible
+  text** ("Adinda's ask", "locked 2026-07-15", "e.g. Mari") — real problem, not nitpicking:
+  descriptions are what an actual editor reads, and none of that context is useful or evergreen to
+  them. Rewrote every description across `boatPage`/`cabinType`/`cabin`/`galleryImage`/
+  `galleryCategory` to be short and generic; decision history stays in code comments and
+  MANAGER.md/_SCHEMA-SPECS.md only. Verified: Sanity's `description` renders as always-visible
+  inline text by default (confirmed via search — no built-in tooltip/info-icon, would need a custom
+  field component, not worth building for this) — tight text is the actual fix, not a UI feature.
+- **Cabins moved to its own Studio group**, out of Overview — confirmed `cabinsHeading` should
+  literally read "Cabins" (now seeded as its `initialValue`).
+- **Gallery**: added a `fieldset` with a `description` wrapping its fields — fieldset descriptions
+  render before their fields (verified live, no schema error), group-level ones don't have this
+  property, which is why a fieldset was needed specifically here.
+- **Vessel & Accommodation pulled out of the `specifications` array into its own
+  `vesselAccommodationDetails` rich-text field** — reads as prose, not a spec sheet, unlike the
+  other 6 categories. Required upgrading `richTextBasic` (tier 2 of the locked content model) to
+  support bullet lists, which it didn't have before — CLAUDE.md's content-model section updated to
+  match. `specifications`'s fixed category list dropped to 6 or the remaining categories; now seeded
+  via `initialValue` on every new boatPage doc (same pattern as `stats`), not built from empty.
+  Real mari-core data loaded for all 6 remaining categories + the new prose field via
+  `_scripts/smoke-test-update-specs.ts`, verified via GROQ query-back.
+- **Slug repositioning, locked as a convention for every page type, not just boatPage:** short
+  name → full title → slug, WordPress-style, always together near the top of the main content
+  group — not buried in a separate Settings tab. Applied to `boatPage` (new Basic Info order) AND
+  retrofitted `page.ts`/`scheduleRates.ts` (slug moved out of their now-removed `settings` groups,
+  next to `title`). Caught and fixed one transient `SchemaError` mid-edit (a field still pointed at
+  the deleted `settings` group between the two edits) — confirmed clean afterward, not just assumed.
+- **Deferred, not decided:** whether the eyebrow-toggle should be one global toggle or per-section
+  (currently per-section) — Adinda is checking with Serge, left as an explicit open question, not
+  quietly picked one way.
+
+Verified throughout: `tsc`, `eslint` clean, Studio confirmed loading with no schema errors after
+every file change (checked the dev log directly for `SchemaError`, not just HTTP 200).
+
+### Smoke test executed — real documents populated in Sanity, 2026-07-15
+Ran `_scripts/smoke-test-content.ts` via `npx sanity exec ... --with-user-token` (underscore-prefix
+throwaway script, not a real project file). Created: 1 `boatPage` (Mari), 1 `cabinType` (Deluxe
+only), 3 `galleryCategory`, 3 `galleryImage`. Images: 3 uploaded from Figma's own embedded assets
+(hero, key features, one gallery photo — all still-valid short-lived Figma asset URLs fetched
+earlier this session), 3 from Picsum (stock, standing in for "Pexels or whatever," explicit
+PLACEHOLDER alt text on each). Verified via GROQ query-back, not just "script exited 0" — confirmed
+`coverImage`'s `_type` correctly resolved to `imageWithAlt` (not the base `image` type), and
+`galleryImage.categories[]->name` correctly dereferenced multi-category assignment (one image
+tagged to both Relaxation and The Boat). `tsc`/`eslint`/Studio all still clean afterward.
+`_CONTENT-STATUS.md` filled in field-by-field with what's real vs. Figma-sourced vs. Claude-authored
+placeholder — see that file for the honest per-field breakdown, including a few Claude-authored
+stand-ins (cabinsHeading, galleryDescription, 2 of 3 gallery category blurbs) that aren't Figma text
+and shouldn't be mistaken for it.
+
+### Field-list review round — boatPage revised again, gallery category model resolved, 2026-07-15
+Adinda reviewed the full field list (asked for it explicitly after not having seen it laid out).
+Changes: `hero` group renamed `basicInfo` (fields aren't hero-only — `coverImage`/`tagline`/`stats`
+also feed a future Boats-listing card component); `heroImage`→`coverImage`, `heroSubheading`→
+`tagline`, `heroStats`→`stats`. Reviewed mari-core's `boat.md` for additional at-a-glance stats per
+Adinda's ask — nothing essential enough to force into the seed list beyond her original 4
+(Cabins/Guests/Boat Size/Crew), noted 1:1 crew ratio and "Built 2008" as optional additions given
+the array is already flexible. Added toggle-to-reveal booleans (`showXEyebrow`) on all 4 eyebrow
+fields, reusing the exact `hidden: ({parent}) => !parent?.x` pattern the SEO object's `jsonLd`
+override already used — genuinely cheap given that precedent, not deferred. `keyFeatures`
+description corrected — always was unlimited, wording just implied a cap.
+
+**Gallery category model resolved** — Adinda's own "how do we separate these" question. New
+`galleryCategory` document type: `belongsTo` (reference), `name`, `heading`, `body` — one per
+category (e.g. "Dining"), giving each its own description distinct from both the whole-gallery
+`galleryDescription` and each photo's own `caption`. `galleryImage.tags` (free string array)
+changed to `galleryImage.categories` (reference array to `galleryCategory`) — same multi-select
+behavior, no typo-driven drift between an image's tag and a category's actual content.
+
+**SEO JSON-LD — already built, not new work.** Checked `seo.ts` directly before assuming anything
+needed building: `overrideJsonLd` (boolean) + `jsonLd` (hidden unless toggled) already exists,
+exactly matching "auto-populated by default, overridable if wanted" from the 2026-07-14 pass.
+
+Verified throughout: `tsc`, `eslint` clean; Studio hit one transient HMR error right after
+`galleryCategory.ts` was added (`module factory is not available` — stale chunk from a brand-new
+file, self-healed on the next compile, confirmed via a second curl after the auto-reload). Not a
+real bug.
+
+### `_SCHEMA-SPECS.md` created — new root doc, checkbox spec per Sanity page type, 2026-07-15
+Adinda: wants the boat page's Sanity field spec documented somewhere durable, checkable per field
+("this is approved, this is approved"), distinct from MANAGER.md's dated log — and eventually
+promoted to `atlas-website` as a reusable pattern once validated, not before (Mari is explicitly the
+pilot). New file, 4th in the CLAUDE.md-documented doc split. 🟡 Draft status on every field right
+now — Adinda hasn't approved anything yet, this session just gave her something to approve *against*.
+Promotion path staged in `_handoff/atlas-website.md` (new "Sanity schema patterns" reference category
+that skill doesn't have yet) — not promoted now, correctly held for validated-at-scale status.
+
+### Gallery, layout diagrams, alt text — reworked same session, before the URL question got answered
+New shared `imageWithAlt` object (required `alt` field) — replaces bare `type: 'image'` everywhere
+across `boatPage`/`cabinType`. New `galleryImage` document type: ONE shared type for boat AND
+future destination galleries (not two types merged later) — each image is its own doc with
+`belongsTo` (reference, `boatPage` only for now), `tags` (free-text multi-select, `layout: 'tags'`,
+one image can carry several), and `caption`. `boatPage` keeps only `galleryTitle`/
+`galleryDescription` — no reference-array field back to the images, since Studio's built-in
+"Referenced by" panel already shows that per-document; a hand-maintained array would just be a
+second, driftable source of truth. `layoutDiagram` (single image) upgraded to `layoutDiagrams`
+(array of {heading, body, images — 1+ `imageWithAlt`, stackable}) per Adinda's actual ask — Figma
+only showed one static diagram, not this structure. Verified: `tsc`, `eslint`, live Studio reload
+(1.68s schema sync, no errors).
+
+**Image SEO — verified against Sanity's actual docs, not assumed.** Sanity CDN URLs are hash-based
+and can't be made descriptive at upload time, but Sanity does support "vanity filenames" — a
+descriptive name appended to the URL after the hash (`.../​{hash}-{w}x{h}.{ext}/​{seo-name}.{ext}`),
+which still works with all transform params. That's a `src/sanity/lib/image.ts` / `urlFor()`
+helper change (slugify from `alt`), not a schema field — not built yet, no components consume
+Sanity images yet. What the schema pass CAN and does guarantee now: every image has a required
+`alt`, so that helper has something real to slugify once it's built. Source: [Sanity Answers —
+preserving image filenames for SEO](https://www.sanity.io/answers/preserving-image-filenames-in-sanity-cdn-urls-for-seo-visibility).
+
+### `/boats/mari` vs `/boat` — SEO analysis, still needs Adinda's final word
+Asked directly: is repeating "mari" (domain already `mari-liveaboard.com`) redundant? Answer: no —
+URL slugs are a very minor, near-negligible direct Google ranking factor (title tag, H1, body
+content, and site authority all matter far more); repeating a brand term in a URL isn't penalized
+and is extremely common on real sites. The actual tradeoff is structural, not keyword-density:
+`/boats/mari` (collection pattern, matches the Figma breadcrumb and the existing
+`/destinations/[slug]` precedent) costs nothing today and avoids a 301 redirect + temporary
+crawl/indexing lag if a second boat is ever added later; `/boat` (singular) is marginally shorter
+today but would need that migration later if the multi-boat future actually happens. Recommendation
+unchanged: `/boats/mari`. **Real reassurance, not just politeness: this costs nothing to change
+right now** — zero real content/backlinks exist yet, so a slug rename pre-launch is free; the
+"costly to change" scenario only kicks in post-launch with real traffic/backlinks pointing at the
+old URL. Still flagged as pending Adinda's actual confirm, not silently locked.
+
+### Alt text + SEO filenames — escalated to a hard, site-wide AND skill-wide rule, locked 2026-07-15
+Adinda: bake this in so she never has to repeat it, for this project or future DRK ones. Written into
+CLAUDE.md as a standing rule (new "Images" section) and staged in `_handoff/drk-website.md` tagged
+`[DRK]` for the skill itself. Retrofitted the two pre-existing image fields that predated `imageWithAlt`
+(`page.body`'s inline image — added required validation to its existing `alt` field; `siteSettings.logo`/
+`favicon` — switched to `imageWithAlt`). `tsc`/`eslint` clean after the retrofit.
+
+### URL alias / redirect readiness — confirmed prepared, asked directly 2026-07-15
+Adinda asked "worst case, are we prepared for a URL alias" before green-lighting `/boats/mari`. Checked
+`redirect.ts` directly rather than assume: the Sanity document type already exists and is fully
+editor-manageable (`source`, `destination`, `permanent` fields, no code deploy needed to add one). **Not
+yet true:** the actual Next.js handler that reads those documents and executes the redirects (`proxy.ts`,
+per CLAUDE.md's Next 16 convention note) hasn't been built — data layer ready, wiring not done, same
+"queued, not wired" status as several other pieces this build. Answered honestly rather than overstating
+readiness: worst case is a small, already-scoped task when needed, not a novel problem — good enough for
+Adinda to proceed with `/boats/mari` now.
+
+### FAQ scope field — Adinda's build method for this locked 2026-07-15, not the field itself
+Not resolving the general/booking/destination-specific taxonomy question now (still explicitly open, see
+above) — instead: build FAQ scope on one real page first, test it, refine, then carry the refined pattern
+into the next page's FAQ build, documenting each round. Matches this project's existing skeleton-first /
+don't-speculate discipline (e.g. the dropped `is_featured` field) rather than introducing a new process.
+
+### FAQ "scope" field — noted for whenever `faq` gets built, not built now
+Adinda: the shared `faq` type needs a way to say what a given FAQ item is *for* — this session,
+just "for a boat" as one valid value. Bigger open question (general/booking/payment vs.
+boat-specific vs. destination-specific sub-taxonomies e.g. diving/travel/general) explicitly NOT
+resolved — Adinda flagged it as something to keep revisiting as the FAQ pass actually happens, not
+a today decision. Don't build `faq` speculatively ahead of that pass; just don't lose this
+requirement when it does happen.
+
+### Editability + section headings — locked 2026-07-15, boatPage revised accordingly
+Adinda's rule, worked through out loud then landed on the definitive version: every heading and
+every eyebrow is editable (SEO reason — stated explicitly), full stop, with a short, closed
+exception list — everything else on the page is also editable text. Not editable: the Layout &
+Specs section's 7 category labels (Vessel & Accommodation, Crew, Diving Equipment, Tenders,
+Machinery & Power, Navigation & Communication, Safety Equipment — "standard categories... with
+specifications", now a fixed `options.list` on `specifications[].category` instead of free text);
+CTA/Contact/Footer (shared components, not boat-specific fields at all); the breadcrumb
+(auto-generated from `name`, never a field). Everything else — every section's eyebrow, heading,
+body, `keyFeatures` bullets — stays free text, confirmed no exceptions beyond that list.
+
+Gap found applying this: **Cabins and Specifications sections had no eyebrow/heading fields at
+all** — `cabinsIntro` and `layoutDiagrams`/`specifications` existed but nothing above them. Added
+`cabinsEyebrow`/`cabinsHeading` and `specificationsEyebrow`/`specificationsHeading`. Also added
+`overviewEyebrow` and `galleryEyebrow` (headings for those two already existed, eyebrows didn't).
+
+**Short name vs. full title, explicitly split:** `name` ("Mari" — breadcrumb, Studio document
+title, internal references) vs. new `pageTitle` ("Mari Liveaboard" — the actual hero heading).
+Renamed from the old `heroHeading` for clarity, not just relabeled — Adinda wanted these
+distinguishable, they weren't clearly two different things before.
+
+**Cabin type feature list, restructured from a free array to 5 named fields** (`bedConfiguration`,
+`deckLocation`, `window`, `bathroom`, `airConditioning`) replacing the old generic
+`features: array of string`. Icons are fixed per field in frontend code, not editor-uploadable —
+"maybe easiest no" was Adinda's explicit call on custom icons. `bedConfiguration`/`deckLocation`
+already existed and already matched her "bed type"/"location" asks — no rename needed there, just
+kept as-is and added the 3 new ones alongside.
+
+Verified throughout: `tsc`, `eslint`, live Studio reload, no errors.
+
+### Session time — 2026-07-15, second session (Adinda's own tracked estimate)
+~1h clock time, but ~30 min of that was a personal call — net working time roughly 1h to 1h40m.
+Append to the Session Time Log table below once this session closes out.
+
+### Favicon — wired this session
+`src/app/favicon.ico` was still the stale Next.js/`create-next-app` default (confirmed via checksum
+mismatch against the real Mari favicon already sitting unused in `public/assets/favico/` since the
+2026-07-14 asset port) — replaced with the real file. Also wired the fuller icon set that was sitting in
+that same folder but never referenced anywhere: `layout.tsx`'s `metadata.icons`/`metadata.manifest` now
+point to `favicon-16x16.png`, `favicon-32x32.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png`,
+`apple-touch-icon.png`, and `site.webmanifest` (manifest's icon paths were already correct, no edit needed
+there). Verified via a live curl against the running dev server, not just source-reading: all `<link
+rel="icon"/manifest"/apple-touch-icon">` tags render with the right paths, and every file 200s with the
+correct content-type and byte size matching its source file.
+
+**`siteSettings`'s `favicon` upload field already existed** (added in the 2026-07-14 schema pass, `type:
+'image'`) — nothing to add there. Worth flagging though: that field isn't wired to anything yet — the
+favicon serving today is 100% the static files above, same as every other still-hardcoded piece of the
+site. The Sanity field will only actually control the live favicon once metadata generation is wired to
+Sanity (`CLAUDE.md`'s roadmap step 3, "wire the homepage to Sanity"), not before.
+
+---
+
 ## SESSION CHECKPOINT — end of 2026-07-15 session (READ THIS FIRST — supersedes the 2026-07-14 checkpoint below)
 
 ### Where things stand
@@ -455,6 +1098,7 @@ ones.
 |---|---|---|---|
 | 2026-07-14 | Sanity schema pass + Studio branding + theme.css port | ~2h15–2h30 | First full backend session on this build — established schema/Studio/branding conventions from scratch. Expect meaningfully faster on similar future sessions now that the patterns exist. |
 | 2026-07-15 | Full homepage QA pass (every section, desktop + mobile) + fixes | **~2h** (Adinda's own tracked estimate, rounded up from ~1h48m measured mid-session) | **~1h of this was a false-alarm chase** (see below), not real QA/bug-fixing time. Once resolved, the actual QA pass covered all 11 sections (Nav, Hero, The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials, CTA, Contact, Footer) and turned up ~10 real bugs total, all fixed same session. **Calibration takeaway, revises the 2026-07-14 row's own assumption:** that earlier entry expected future sessions to be "meaningfully faster... now that the patterns exist" — true for *coding* patterns, but a full QA pass has its own largely-fixed cost regardless of how established the code conventions are, because QA time is dominated by *discovering* each section's specific bugs, not by applying known patterns. Budget a full single-homepage QA pass at **~2h** even on a well-patterned codebase, not scaled down just because earlier sessions established good conventions. Sub-note: a "barely any content on mobile" report that looked like a WebKit/iOS bug turned out to be `allowedDevOrigins` (dev server blocking LAN-IP requests), unrelated to any browser engine — see `references/troubleshooting.md`'s localhost-vs-LAN-IP check, which exists specifically to prevent this cost recurring. |
+| 2026-07-15 (later, same day) | Boat page full schema build + gallery redesign (3 iterations) + content-model changes (Full Rich Text Block extraction, alt-rule correction) + new tracking docs (`_SCHEMA-SPECS.md`/`_CONTENT-STATUS.md`/`_QA-CHECKLIST.md`) | **~4h30m elapsed, but Adinda estimates only ~70% (~3h10m) was active desk time** — ~30% was her doing other things (learning Japanese, cooking) while background tasks (dev server restarts, Sanity scripts) ran, not actively reviewing/responding. | **New calibration point, distinct from the 2026-07-14 row's caution:** elapsed time and active time diverge meaningfully when a session has real background-task latency (dev server restarts, `sanity exec` scripts, Perplexity/web research) — Adinda could step away during those. **Track both going forward**, not just one figure — elapsed matters for calendar/deadline planning, active time matters for comparing actual effort across sessions. This session's scope was large (full boat schema + 3 gallery redesign iterations + several corrected mistakes), so the ~3h10m active figure is the more honest "how much work was this" number. |
 
 ---
 

@@ -20,6 +20,7 @@ export const siteSettingsType = defineType({
     { name: 'contact', title: 'Contact & Social' },
     { name: 'assetsFieldset', title: 'Assets' },
     { name: 'seoDefaults', title: 'Default SEO' },
+    { name: 'tracking', title: 'Tracking & Verification' },
   ],
   fields: [
     defineField({
@@ -73,17 +74,17 @@ export const siteSettingsType = defineType({
     }),
     defineField({
       name: 'logo',
-      type: 'image',
+      type: 'imageWithAlt',
       group: 'assets',
       fieldset: 'assetsFieldset',
       description: 'Main site logo — used in the header and footer.',
     }),
     defineField({
       name: 'favicon',
-      type: 'image',
+      type: 'imageWithAlt',
       group: 'assets',
       fieldset: 'assetsFieldset',
-      description: 'Browser tab icon. Square, works best simplified (favicons render very small).',
+      description: 'Browser tab icon. Square, works best simplified (favicons render very small). Alt text here is mostly moot (favicons aren\'t announced by screen readers) but kept for schema consistency — the hard site-wide image rule applies everywhere, no per-field exceptions.',
     }),
     defineField({
       name: 'defaultSeo',
@@ -92,6 +93,22 @@ export const siteSettingsType = defineType({
       group: 'seo',
       fieldset: 'seoDefaults',
       description: 'Fallback used by any page that doesn’t set its own SEO tab — not homepage-specific, applies to every page without its own SEO override.',
+    }),
+    // Added 2026-07-16, Adinda's ask — a place to paste tracking/verification snippets (Google Tag
+    // Manager, Google Search Console site-verification meta tag, etc.) without a code deploy.
+    // Rendered into the document <head> once the frontend's metadata/layout wiring reads this
+    // field — not built yet (no components consume siteSettings yet, same status as everything
+    // else waiting on the Sanity-wiring pass). robots.txt / llms.txt are separate: they're static
+    // Next.js route files (src/app/robots.ts and similar), not Sanity content, so nothing to add
+    // here for those.
+    defineField({
+      name: 'headScripts',
+      title: 'Head scripts',
+      type: 'text',
+      rows: 8,
+      group: 'seo',
+      fieldset: 'tracking',
+      description: 'Raw HTML/script snippets injected into every page\'s <head> — e.g. Google Tag Manager, Google Search Console verification, other meta tracking tags.',
     }),
   ],
 })

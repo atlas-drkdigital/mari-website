@@ -25,15 +25,16 @@ const REVIEWS = [
   { name: 'Doralysa N', date: '07 Oct, 2023', title: 'Everything was just perfect', text: 'The staff was amazing—very professional and concerned about diving safety. The boat has all the dive amenities you could ask for, and the cabins were spotless and comfortable after long dive days. Every detail felt thought through, from the dive briefings to the food. This trip exceeded all my expectations.' },
 ]
 
-// TEST-ONLY — added 2026-07-15 at Adinda's request, solely to verify carousel scroll/arrow
-// behavior with more cards than fit in one view (same reason the static build once had 4 of
-// these). NOT real content. Remove before launch / once real reviews fill this out — see
-// MANAGER.md's QA log for this session.
-const TEST_ONLY_REVIEWS: typeof REVIEWS = [
-  { name: 'TEST — Card 5', date: '01 Jan, 2026', title: 'Scroll-overflow test card', text: 'Placeholder review text for testing carousel overflow and arrow behavior with more than four cards. Not real content — remove before launch.' },
-  { name: 'TEST — Card 6', date: '01 Jan, 2026', title: 'Scroll-overflow test card', text: 'Placeholder review text for testing carousel overflow and arrow behavior with more than four cards. Not real content — remove before launch.' },
-  { name: 'TEST — Card 7', date: '01 Jan, 2026', title: 'Scroll-overflow test card', text: 'Placeholder review text for testing carousel overflow and arrow behavior with more than four cards. Not real content — remove before launch.' },
-  { name: 'TEST — Card 8', date: '01 Jan, 2026', title: 'Scroll-overflow test card', text: 'Placeholder review text for testing carousel overflow and arrow behavior with more than four cards. Not real content — remove before launch.' },
+// DRAFT — added 2026-07-15 at Adinda's request, replacing the earlier TEST-ONLY placeholder
+// cards. AI-drafted, NOT real guest submissions — written to be realistic enough to show Stefan
+// what an 8-card carousel looks like ahead of launch, not to be mistaken for genuine reviews.
+// The "[DRAFT]" prefix on each title is the tracking marker: MUST be removed (either deleted
+// outright or replaced with real guest reviews) before public launch — see MANAGER.md.
+const DRAFT_REVIEWS_REMOVE_BEFORE_LAUNCH: typeof REVIEWS = [
+  { name: 'Mara J', date: '14 Feb, 2026', title: '[DRAFT] Incredible dive planning, spotless cabin', text: 'The crew read every dive site perfectly, from the strong current at Castle Rock to the calmer muck dives near Rinca. The cabin was spotless, the food never repeated itself over eleven nights, and the Cruise Director briefed each site in enough detail that we always knew what to expect underwater.' },
+  { name: 'Tomas B', date: '02 Mar, 2026', title: '[DRAFT] Manta encounters we will not forget', text: 'The manta encounters at Manta Sandy were the highlight, but what stayed with me was how organized everything was above water too. Nitrox fills were fast, rinse stations were always ready, and the dive guides split the group so nobody felt rushed.' },
+  { name: 'Priya N', date: '19 Apr, 2026', title: '[DRAFT] Personal service on an intimate boat', text: 'Seven cabins meant the boat never felt crowded, and the deck layout gave everyone space to log dives or just watch the water. The crew learned our names and preferences within a day, which made the trip feel personal rather than like a standard charter.' },
+  { name: 'Julian F', date: '30 May, 2026', title: '[DRAFT] Banda Sea route worth every night', text: 'Twelve nights is a serious commitment and Mari earned it. The route covered sites we could not have reached any other way, the boat handled the long crossings smoothly, and the galley kept up a standard I did not expect this far from anywhere.' },
 ]
 
 function StarRating() {
@@ -162,7 +163,7 @@ export function Testimonials() {
 
         <div className="relative">
           <div ref={trackRef} data-reveal className="flex w-full cursor-grab snap-x snap-mandatory items-start gap-16 overflow-x-auto pb-16 select-none [-ms-overflow-style:none] [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden lg:gap-24">
-            {[...REVIEWS, ...TEST_ONLY_REVIEWS].map((review, i) => (
+            {[...REVIEWS, ...DRAFT_REVIEWS_REMOVE_BEFORE_LAUNCH].map((review, i) => (
               <article key={review.name} className="group/card w-[84%] shrink-0 snap-center bg-bg-surface p-24 shadow-[0px_4px_10px_rgba(44,37,34,0.2)] md:w-[calc(50%-8px)] md:snap-start lg:w-[calc(25%-18px)]">
                 <div className="flex items-center gap-8">
                   <Image src="/assets/testimonial-avatar-placeholder.jpg" alt="" aria-hidden="true" width={49} height={49} className="size-[49px] shrink-0 rounded-full object-cover" />

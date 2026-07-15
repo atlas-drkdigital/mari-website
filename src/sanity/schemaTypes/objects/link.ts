@@ -1,7 +1,7 @@
 import { defineField, defineType } from 'sanity'
 
 // Shared by navItem, linkItem, and any CTA button — one place to add more
-// referenceable page types to `to: [...]` as they're built (destinationPage, boatPage, ...).
+// referenceable page types to `to: [...]` as they're built (destination, boat, ...).
 export const linkType = defineType({
   name: 'link',
   title: 'Link',
@@ -17,7 +17,7 @@ export const linkType = defineType({
       name: 'internalLink',
       title: 'Page',
       type: 'reference',
-      to: [{ type: 'page' }],
+      to: [{ type: 'page' }, { type: 'boat' }, { type: 'destination' }, { type: 'blogPost' }],
       hidden: ({ parent }) => parent?.linkType !== 'internal',
     }),
     defineField({

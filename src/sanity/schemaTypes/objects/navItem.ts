@@ -21,9 +21,8 @@ export const navItemType = defineType({
       initialValue: 'simple',
       description:
         '"Destinations grid" is a placeholder — the actual auto-population from Destination pages ' +
-        'isn’t wired yet (destinationPage type doesn’t exist). See CLAUDE.md’s Navigation ' +
-        'section for the to-do to wire this once it does. Until then this item still uses the manual ' +
-        'children list below regardless of this setting.',
+        'isn’t wired yet. See CLAUDE.md’s Navigation section for the to-do to wire this. Until then ' +
+        'this item still uses the manual children list below regardless of this setting.',
     }),
     defineField({
       name: 'children',

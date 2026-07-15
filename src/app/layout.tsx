@@ -13,6 +13,16 @@ const bricolageGrotesque = Bricolage_Grotesque({
 export const metadata: Metadata = {
   title: "Mari Liveaboard",
   description: "A traditional Phinisi liveaboard for serious divers.",
+  icons: {
+    icon: [
+      { url: "/assets/favico/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/assets/favico/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/assets/favico/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/assets/favico/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/assets/favico/apple-touch-icon.png",
+  },
+  manifest: "/assets/favico/site.webmanifest",
 };
 
 export default function RootLayout({

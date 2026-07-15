@@ -11,10 +11,19 @@ export const scheduleRatesType = defineType({
   groups: [
     { name: 'content', title: 'Content', default: true },
     { name: 'seo', title: 'SEO' },
-    { name: 'settings', title: 'Settings' },
   ],
   fields: [
     defineField({ name: 'title', type: 'string', group: 'content' }),
+    // Slug order locked 2026-07-15: title, then slug immediately after — same order for every
+    // page type.
+    defineField({
+      name: 'slug',
+      type: 'slug',
+      options: { source: 'title' },
+      components: { input: AutoSlugInput },
+      group: 'content',
+      description: 'URL path for this page.',
+    }),
     defineField({
       name: 'embedCode',
       title: 'INSEANQ embed code',
@@ -23,12 +32,5 @@ export const scheduleRatesType = defineType({
       group: 'content',
     }),
     defineField({ name: 'seo', type: 'seo', group: 'seo' }),
-    defineField({
-      name: 'slug',
-      type: 'slug',
-      options: { source: 'title' },
-      components: { input: AutoSlugInput },
-      group: 'settings',
-    }),
   ],
 })
