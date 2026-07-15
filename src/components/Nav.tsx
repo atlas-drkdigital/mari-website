@@ -122,6 +122,12 @@ export function Nav() {
     setMegaOpen(key)
   }
 
+  // Next.js's <Link> only resets scroll on an actual route change — clicking "home" while
+  // already on "/" (the only route that exists so far) is a no-op with no visible effect,
+  // which reads as "the home link doesn't work." Force scroll-to-top explicitly so it always
+  // behaves like "home" regardless of current route; harmless once other pages exist too.
+  const goHome = () => window.scrollTo({ top: 0, behavior: 'smooth' })
+
   return (
     <header
       ref={navRef}
@@ -130,7 +136,7 @@ export function Nav() {
     >
       {/* MOBILE bar (<lg): wordmark + hamburger */}
       <div className="flex items-center justify-between page-gutter-x py-8 lg:hidden">
-        <Link href="/" aria-label="MariLiveaboard — home" className="text-caption-label uppercase tracking-[0.238em]">
+        <Link href="/" onClick={goHome} aria-label="MariLiveaboard — home" className="text-caption-label uppercase tracking-[0.238em]">
           <span className="font-bold">Mari</span>
           <span className="font-medium">Liveaboard</span>
         </Link>
@@ -154,6 +160,7 @@ export function Nav() {
           <div className="flex w-[480px] items-center">
             <Link
               href="/"
+              onClick={goHome}
               aria-label="MariLiveaboard — home"
               className="inline-flex items-center opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100"
             >
@@ -164,7 +171,7 @@ export function Nav() {
             </Link>
           </div>
 
-          <Link href="/" aria-label="MariLiveaboard — home" className="flex-1 text-center text-caption-label uppercase tracking-[0.238em]">
+          <Link href="/" onClick={goHome} aria-label="MariLiveaboard — home" className="flex-1 text-center text-caption-label uppercase tracking-[0.238em]">
             <span className="font-bold">Mari</span>
             <span className="font-medium">Liveaboard</span>
           </Link>
@@ -250,18 +257,30 @@ export function Nav() {
                 })}
               </ul>
 
-              <div aria-hidden="true" className={`pointer-events-none absolute inset-x-0 bottom-0 flex h-96 items-end justify-center bg-gradient-to-t from-background-ondark-muted to-background-ondark-muted/0 pb-16 transition-opacity duration-300 ease-in-out ${scrollHint === 'more' ? 'opacity-100' : 'opacity-0'}`}>
+              <button
+                type="button"
+                aria-label="Scroll to see more destinations"
+                tabIndex={scrollHint === 'more' ? 0 : -1}
+                onClick={() => destListRef.current?.scrollTo({ top: destListRef.current.scrollHeight, behavior: 'smooth' })}
+                className={`absolute inset-x-0 bottom-0 flex h-96 items-end justify-center bg-gradient-to-t from-background-ondark-muted to-background-ondark-muted/0 pb-16 transition-opacity duration-300 ease-in-out ${scrollHint === 'more' ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+              >
                 <span className="flex items-center gap-4 text-caption-label uppercase tracking-[1.5px] text-text-ondark-primary">
                   Scroll for more
                   <span aria-hidden="true" className="block size-[10px] shrink-0 bg-text-ondark-primary [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
                 </span>
-              </div>
-              <div aria-hidden="true" className={`pointer-events-none absolute inset-x-0 top-0 flex h-96 items-start justify-center bg-gradient-to-b from-background-ondark-muted to-background-ondark-muted/0 pt-16 transition-opacity duration-300 ease-in-out ${scrollHint === 'top' ? 'opacity-100' : 'opacity-0'}`}>
+              </button>
+              <button
+                type="button"
+                aria-label="Scroll back to top of destinations"
+                tabIndex={scrollHint === 'top' ? 0 : -1}
+                onClick={() => destListRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
+                className={`absolute inset-x-0 top-0 flex h-96 items-start justify-center bg-gradient-to-b from-background-ondark-muted to-background-ondark-muted/0 pt-16 transition-opacity duration-300 ease-in-out ${scrollHint === 'top' ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+              >
                 <span className="flex items-center gap-4 text-caption-label uppercase tracking-[1.5px] text-text-ondark-primary">
                   Scroll to top
                   <span aria-hidden="true" className="block size-[10px] shrink-0 rotate-180 bg-text-ondark-primary [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
                 </span>
-              </div>
+              </button>
             </div>
 
             <div className="h-full shrink-0 py-48">
@@ -358,7 +377,15 @@ export function Nav() {
         aria-label="Menu"
       >
         <div className="flex items-center justify-between border-b-[0.25px] border-accent-ondark-onprimary page-gutter-x py-8">
-          <Link href="/" aria-label="MariLiveaboard — home" className="text-caption-label uppercase tracking-[0.238em]">
+          <Link
+            href="/"
+            onClick={() => {
+              goHome()
+              setMobileMenuOpen(false)
+            }}
+            aria-label="MariLiveaboard — home"
+            className="text-caption-label uppercase tracking-[0.238em]"
+          >
             <span className="font-bold">Mari</span>
             <span className="font-medium">Liveaboard</span>
           </Link>
@@ -384,8 +411,11 @@ export function Nav() {
                 className={`block h-[8px] w-[10px] shrink-0 transition-[background-color,transform] duration-300 ease-in-out [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${mobileAccordion.destinations ? 'rotate-180 bg-accent-ondark-muted' : 'bg-text-ondark-primary'}`}
               />
             </button>
-            <div id="mobile-mega-destinations" className={mobileAccordion.destinations ? 'pb-16' : 'hidden'}>
-              <ul aria-label="Destinations" className="flex flex-col divide-y divide-accent-ondark-onprimary/10">
+            {/* Same grid-rows 0fr/1fr animated-height pattern as FAQ.tsx — overflow-hidden lives on
+                the inner content (not this grid wrapper), so its own bottom padding collapses away
+                too when the row animates to 0fr, matching the established, proven approach. */}
+            <div className={`grid [transition:grid-template-rows_500ms_cubic-bezier(0.65,0,0.35,1)] ${mobileAccordion.destinations ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+              <ul id="mobile-mega-destinations" aria-label="Destinations" className="flex flex-col divide-y divide-accent-ondark-onprimary/10 overflow-hidden pb-16">
                 {DESTINATIONS.map((dest) => (
                   <li key={dest.id}>
                     <button type="button" className="flex w-full flex-col gap-2 py-12 text-left">
@@ -416,8 +446,8 @@ export function Nav() {
                 className={`block h-[8px] w-[10px] shrink-0 transition-[background-color,transform] duration-300 ease-in-out [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${mobileAccordion.resources ? 'rotate-180 bg-accent-ondark-muted' : 'bg-text-ondark-primary'}`}
               />
             </button>
-            <div id="mobile-mega-resources" className={mobileAccordion.resources ? 'pb-16' : 'hidden'}>
-              <ul aria-label="Resources" className="flex flex-col divide-y divide-accent-ondark-onprimary/10">
+            <div className={`grid [transition:grid-template-rows_500ms_cubic-bezier(0.65,0,0.35,1)] ${mobileAccordion.resources ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+              <ul id="mobile-mega-resources" aria-label="Resources" className="flex flex-col divide-y divide-accent-ondark-onprimary/10 overflow-hidden pb-16">
                 {RESOURCE_LINKS.map((label) => (
                   <li key={label}>
                     <button type="button" className="flex w-full py-12 text-left">

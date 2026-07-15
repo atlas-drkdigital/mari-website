@@ -83,7 +83,7 @@ export function WhyUs() {
                   loading="eager"
                   sizes="(min-width: 1024px) 55vw, 84vw"
                   style={card.objectPosition ? { objectPosition: card.objectPosition } : undefined}
-                  className="object-cover"
+                  className="object-cover transition-transform duration-[1100ms] ease-in-out group-hover/card:scale-105"
                 />
               </div>
               <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background-ondark-page via-background-ondark-page/50 via-45% to-transparent" />

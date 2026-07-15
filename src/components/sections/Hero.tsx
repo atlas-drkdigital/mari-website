@@ -115,8 +115,8 @@ export function Hero() {
                         onClick={() => selectDestination(dest.name)}
                         className="flex w-full items-baseline gap-8 px-24 py-12 text-left transition-colors duration-300 ease-in-out hover:bg-text-ondark-primary/5"
                       >
-                        <span className="text-body-medium text-text-ondark-primary">{dest.name}</span>
-                        <span className="text-caption-label text-text-ondark-muted">{dest.tagline}</span>
+                        <span className="shrink-0 whitespace-nowrap text-body-medium text-text-ondark-primary">{dest.name}</span>
+                        <span className="min-w-0 truncate text-caption-label text-text-ondark-muted">{dest.tagline}</span>
                       </button>
                     </li>
                   ))}
@@ -178,8 +178,8 @@ export function Hero() {
           {filterDestinations(mobileQuery).map((dest) => (
             <li key={dest.id}>
               <button type="button" onClick={() => selectMobileDestination(dest.name)} className="flex w-full items-baseline gap-8 py-16 text-left">
-                <span className="text-body-medium text-text-primary">{dest.name}</span>
-                <span className="text-caption-label text-text-secondary">{dest.tagline}</span>
+                <span className="shrink-0 whitespace-nowrap text-body-medium text-text-primary">{dest.name}</span>
+                <span className="min-w-0 truncate text-caption-label text-text-secondary">{dest.tagline}</span>
               </button>
             </li>
           ))}

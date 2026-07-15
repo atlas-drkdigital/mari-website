@@ -75,10 +75,50 @@ Field `title`/`description`/tab-grouping and the Structure Builder (sidebar navi
 ## Doc split (replicate the static-build pattern — see `drk-website/references/claude-code.md`)
 This file = prose rules + active decisions. `MANAGER.md` (session/decision log, created 2026-07-14) and `COMPONENTS.md` (reusable component specs, **not yet created** — ports from the static build's `COMPONENTS.md` at first use, not up front) follow the same convention as the old repo. Check `MANAGER.md` for today's active task scope and session history before re-deriving it.
 
+## Local-only files — underscore prefix convention, locked 2026-07-15
+Any folder or file that is internal/scratch (not real project output — handoff docs, skill-build packaging, test images, throwaway scripts) gets a leading `_` **at the repo root**. That prefix is the standing signal for "never commit this, not a real working file" — `.gitignore`'s `/_*` rule enforces it automatically. Root-anchored only, deliberately not recursive (`/_*`, not `**/_*`): Next.js App Router uses `_`-prefixed folders inside `src/app/` as a real, committed routing convention (private folders like `_components/`, `_lib/` that opt out of routing) — this rule must never touch those. When creating a new scratch file/folder, default to the `_` prefix rather than inventing a new naming scheme per task.
+
+## Review requests must always call out mobile explicitly, locked 2026-07-15
+Whenever Claude asks Adinda to review/QA something in a browser, the ask must name checking the **mobile
+viewport** as its own explicit step, not bundle it into a generic "look at it" — desktop-only review is the
+default failure mode otherwise. Background/full writeup (iframe-`dvh` testing artifact, real-device LAN
+`allowedDevOrigins` incident): `drk-website` skill's `references/troubleshooting.md`.
+
+## `allowedDevOrigins` required for real-device LAN testing, locked 2026-07-15
+`next.config.ts` sets `allowedDevOrigins: ["192.168.0.101"]` (Adinda's Wi-Fi IP — update if it changes,
+check via `ipconfig`). Without it, `next dev` silently blocks the site for any device on the LAN, including
+Adinda's own desktop browser when hitting the IP instead of `localhost`. Standing diagnostic rule: **when a
+"broken on this device" report comes in, ask first whether it also fails via `localhost`** before
+investigating device/browser-engine-specific causes. Full writeup: `drk-website` skill's
+`references/troubleshooting.md`.
+
+## No AI-tool authorship traces in the public build — hard requirement, locked 2026-07-15
+Nothing in the deployed site's public output (HTML, HTTP headers, shipped JS/CSS, meta tags, Sanity Studio
+copy) may reveal it was built with an AI coding tool. Checked clean as of 2026-07-15 (only hits were
+dev-only comments referencing `CLAUDE.md` the file, and `ClaudeBot` in `robots.ts`'s AI-crawler policy —
+neither is an authorship trace). `poweredByHeader: false` added to `next.config.ts` as a same-class bonus
+hardening. Treat this as a standing pre-launch check, not a one-time pass — re-verify before the actual
+launch, not just now. Full checklist: `drk-website` skill's `references/pre-launch.md`.
+
+**Git-history question, resolved 2026-07-15:** this repo's history carries `Co-Authored-By: Claude Sonnet 5
+<noreply@anthropic.com>` trailers (Claude Code's default commit format). Adinda's call: fine as-is, no
+history rewrite needed — her concern is specifically clients/outsiders finding out Claude is used, not the
+trailer's mere existence. Git history isn't part of the deployed build and isn't visible to a site visitor.
+**Standing condition, not a one-time check: this repo must stay private, DRK-internal-only access — never
+made public, never given to the client or the client's other vendors as a collaborator.** If that condition
+would ever change (repo goes public, client asks for repo access, etc.), revisit this decision first.
+
 ## Session discipline (carried over from the static build, still applies)
 - Verify by reading actual compiled CSS/build output, not by trusting a class or config name's apparent meaning
 - Tag reusable rules `[DRK]` as they emerge — don't defer to a batch audit
 - MANAGER.md (once created): archive past ~1,900 lines
+- **Propose an end-of-session retrospective at the natural close of a substantive session**, locked
+  2026-07-15 per Adinda's explicit request — don't wait to be asked. Trigger on: the user signaling
+  they're wrapping up, or the session having accumulated a lot without one yet (3+ real bugs fixed,
+  several logged decisions, conversation clearly grown long). Propose it as a question, not an automatic
+  action. Covers time logging + project-specific learnings (this file/MANAGER.md) + reusable DRK-wide
+  learnings (the relevant `drk-website` skill reference + a `_handoff/drk-website.md` entry). Full
+  spec: `drk-website` skill's `references/workflow.md`, "End-of-session retrospective."
 
 ## Commands
 ```

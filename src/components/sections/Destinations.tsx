@@ -1,9 +1,10 @@
 'use client'
 
 import Image from 'next/image'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { DESTINATIONS } from '@/lib/destinations'
+import { useDragScroll } from '@/lib/useDragScroll'
 
 // Ported from ../v1-static-homepage/sections/destinations.html + assets/destinations.js.
 // Figma Home/Section/Destinations 401:2510. Full-bleed crossfade slideshow, one slide per
@@ -43,9 +44,28 @@ export function Destinations() {
   const [index, setIndex] = useState(0)
   const stageRef = useRef<HTMLDivElement>(null)
   const dragState = useRef({ dragging: false, startX: 0, moved: 0 })
+  const tabTrackRef = useDragScroll<HTMLDivElement>()
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   const count = DESTINATIONS.length
   const goTo = (newIndex: number) => setIndex(((newIndex % count) + count) % count)
+
+  // Keep the active tab in view — aligns it to the start of the visible track; for tabs near
+  // the end (not enough remaining items to fill the width), the browser naturally clamps this
+  // to the max scroll position instead, showing as much trailing content as exists.
+  // Must skip the very first run: this effect fires on mount too (not just on real index
+  // changes), and `block: 'nearest'` scrolls the whole PAGE vertically if the tab isn't yet
+  // in the viewport — which it never is on load, since the user starts at the top of the
+  // page. Without this guard, every page load force-scrolls straight to the Destinations
+  // section regardless of where the user actually is.
+  const skipFirstScrollIntoView = useRef(true)
+  useEffect(() => {
+    if (skipFirstScrollIntoView.current) {
+      skipFirstScrollIntoView.current = false
+      return
+    }
+    tabRefs.current[index]?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
+  }, [index])
 
   return (
     <section id="destinations" aria-labelledby="destinations-heading" className="group/dest relative isolate flex min-h-[max(720px,calc(100dvh-70px))] w-full flex-col bg-background-ondark-page">
@@ -61,10 +81,16 @@ export function Destinations() {
       </div>
 
       <div className="relative z-10 flex items-center justify-between gap-24 page-gutter-x pt-64 lg:pt-[100px]">
-        <div className="flex flex-1 items-center overflow-x-auto scroll-smooth select-none py-2 [-ms-overflow-style:none] [scrollbar-width:none] lg:max-w-[632px] [&::-webkit-scrollbar]:hidden">
+        <div
+          ref={tabTrackRef}
+          className="flex flex-1 cursor-grab items-center overflow-x-auto scroll-smooth select-none py-2 active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] lg:max-w-[632px] [&::-webkit-scrollbar]:hidden"
+        >
           {DESTINATIONS.map((dest, i) => (
             <button
               key={dest.id}
+              ref={(el) => {
+                tabRefs.current[i] = el
+              }}
               type="button"
               onClick={() => goTo(i)}
               className={`shrink-0 border-b-2 p-8 text-button-small uppercase transition-colors duration-300 ease-in-out ${

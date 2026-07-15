@@ -40,5 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# DRK skill handoff tracking (local-only, never committed — see _handoff/*.md)
-_handoff/
+# Local-only / internal, never committed — standard convention: prefix with "_" at repo ROOT
+# (handoff docs, skill packaging, scratch/test output, etc.). Root-anchored only (no /**/_*) — Next.js
+# App Router uses "_"-prefixed folders inside src/app/ as a real, committed routing convention
+# (e.g. _components/, _lib/), and this must never touch those.
+/_*

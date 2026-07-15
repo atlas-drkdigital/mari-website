@@ -30,6 +30,11 @@ export function Footer() {
               <span className="text-text-ondark-primary">Join our </span>
               <span className="text-accent-ondark-primary">newsletter</span>
             </p>
+            {/* Placeholder copy, hardcoded like the rest of the homepage pending Sanity wiring —
+                make this a siteSettings/footer field once that schema exists (Tier 4), not a
+                permanent hardcoded string. Same text size/color as the "Also known as..." line
+                below (text-body-medium text-text-ondark-secondary) per Adinda's ask. */}
+            <p className="text-body-medium text-text-ondark-secondary">Subscribe to receive the latest news, itinerary updates, and exclusive specials straight to your inbox.</p>
             <form
               onSubmit={(e) => {
                 e.preventDefault()
