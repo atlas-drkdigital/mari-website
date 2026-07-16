@@ -90,6 +90,13 @@ export const structure: StructureResolver = (S) =>
 
       S.documentTypeListItem('itinerary').title('Itineraries'),
 
+      // The General FAQ is a PAGE, not a shared component — moved here from the shared-components
+      // section 2026-07-16 (Adinda's call). It backs the /faq hub, carries its own `seo`, and will
+      // carry page-level section toggles (contact form, CTA), so it describes a page rather than a
+      // reusable content item. Destination/boat pages PULLING categories from it doesn't make it a
+      // component: the homepage pulls Destinations and Blog Posts, which live here too.
+      singleton(S, 'faqGeneral', 'General FAQ'),
+
       // Generic `page` catch-all (T&C, Onboard Prices, and anything else not pinned above) goes
       // LAST in this section, per Adinda's explicit ordering ask 2026-07-16.
       S.documentTypeListItem('page').title('Pages'),

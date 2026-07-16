@@ -18,11 +18,19 @@ Where the two disagree, **this list wins**. Adinda's explicit call 2026-07-16: c
 here rather than waiting for a chat-side skill-update round, because this file loads first.
 
 ### Order of work (next sessions)
-1. **Section toggles + auto-hide + theme tweak** — `_handoff/_NEXT-SESSION-toggles-theme.md`. **~3–4h**
-   (not a quick job: 8 per-section toggles, auto-hide guards, FAQ min-height vs Figma 778-8603, plus the
-   theme tokens). Its two quick fixes are already DONE in the FAQ commit — skip them.
-2. **`boatDefaults` singleton** — **~1–1.5h. MUST come BEFORE the boat page slice, not after.** See the
+1. **Section toggles + auto-hide + theme tweak** — `_handoff/_NEXT-SESSION-toggles-theme.md`. **~1–1.5h**
+   (8 booleans + a Sections group ~15min, page.tsx respecting them ~10min, 4 auto-hide guards ~10min, FAQ
+   min-height ~5min + a Figma check, theme tokens ~15min, plus verify/trackers ~20min). Its two quick fixes
+   are already DONE in the FAQ commit — skip them. **The only real unknown is the accent-contrast call**,
+   which needs Adinda's eyes and may take a review round or two — that's her time, not build time.
+2. **`boatDefaults` singleton** — **~20–30min. MUST come BEFORE the boat page slice, not after.** See the
    dedicated note below.
+
+**Estimating note (Adinda's correction, 2026-07-16 — worth not repeating):** the first pass at these was
+padded to "3–4h" and "1–1.5h". She pushed back correctly — `destinationDefaults` took ~15 min, and
+`boatDefaults` is the same job. The padding came from folding verify+docs+commit into the build number and
+then rounding up again; that overhead is real but it's ~20 min, not a doubling. **Estimate the build, add
+the overhead once, and don't price the user's own review time as build time.**
 3. **Boat page slice** — 3–4h (sprint's Jul 17 item).
 4. **Destination page slice** — where the destination FAQ *render* composition + the stable-key cross-page
    pull get built.
@@ -30,9 +38,9 @@ here rather than waiting for a chat-side skill-update round, because this file l
 
 ### Known deviations from the skill's sprint (don't "fix" these back)
 - The skill's day-by-day has **Jul 17 = Boat + Destination start (4–5h)** and does **not contain** toggles+
-  theme or `boatDefaults` at all. Reality: those come first, so Jul 17 realistically holds theme +
-  boatDefaults + boat page (~6h) and the destination start slips. **Flag the slip honestly; don't absorb
-  it silently.**
+  theme or `boatDefaults` at all. Reality: those come first, so Jul 17 realistically holds toggles+theme
+  (~1–1.5h) + boatDefaults (~0.5h) + boat page (3–4h) ≈ **5.5–6h**, and the destination start slips.
+  **Flag the slip honestly; don't absorb it silently.**
 - The skill's sprint still lists **SEO as a separate QA-Pass-1 (Jul 24) + Content pass (Jul 28–29)**. That
   is superseded: SEO structure + the image pipeline now fold **per-slice**, leaving only a light final
   review. (Pre-existing flag, restated here so it's in one place.)
@@ -53,7 +61,8 @@ does not.
 nothing today. Build the boat page first and this becomes a rewire of a page we just shipped. Same logic as
 folding SEO into each slice — cheap while the page is fresh.
 
-**Scope (~1–1.5h), mirroring `destinationDefaults` exactly:**
+**Scope (~20–30 min — it's the same job `destinationDefaults` was, and that took ~15 min), mirroring
+`destinationDefaults` exactly:**
 - MOVE to the singleton (shared chrome): `overviewEyebrow`, `cabinsEyebrow`, `cabinsHeading`, `galleryEyebrow`,
   `galleryTitle`, `specificationsEyebrow`, `specificationsHeading`, `keyFeaturesHeading`. Add a `{boat}` token
   (same mechanism as `{destination}`).
