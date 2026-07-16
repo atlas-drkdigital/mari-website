@@ -119,6 +119,38 @@ bindings in the same pass — a rename desyncs them otherwise, so it is NOT a co
 **Per-token safety net, proven 2026-07-16:** snapshot every hex the SERVED css emits before and after; the
 sets must be identical. (63 distinct hexes, identical across the first two renames.)
 
+### 📅 DAY PLAN to the Jul 24 staging push — Adinda's re-shuffle 2026-07-16. Overrides the skill's day-by-day.
+**Jul 20 = DESTINATION ONLY, a deliberately BLOCKED day (Adinda's explicit call).** Private Charters was
+sharing it in the skill's sprint — **she rejected that outright**: Destination is the deepest slice left
+(11 sections + the FAQ render composition + the stable-key cross-page pull + reconciling the interim
+`seasonNights`/`excerpt`/`order` fields) and **she expects it to bleed through the day.** Do not re-pack it.
+If it finishes early she may pull the next day's work forward — that direction only, never the reverse.
+
+| Day | Work | Est. |
+|---|---|---|
+| **Thu Jul 17** | auto-hide + FAQ min-height (0.5h) · `boatDefaults` (0.5h) · **Boat page** (3–4h) | 4–5h ✅ fits |
+| **Mon Jul 20** | **Destination template + Komodo — BLOCKED, nothing else** | 4–5h + bleed |
+| **Tue Jul 21** | Private Charters (2–3h) · Schedule & Rates (1–2h) · T&C (~1h) | 4–6h |
+| **Wed Jul 22** | Announcement bar (1–1.5h) · Sanity schema review (1–2h) · **About** (2–3h, copy from scratch) | 4–6.5h |
+| **Thu Jul 23** | FAQ page (2–3h) · **Testimonials page** (1–1.5h) · Blog listing (1.5–2h) · Blog post (1–1.5h) | **5.5–8h ⚠️ OVER** |
+| **Fri Jul 24** | Push to staging + QA Pass 1 | 5–6h |
+
+### ⚠️ SCHEDULE HONESTY — the Jul 23 buffer is GONE. Say this out loud; do not absorb it.
+Jul 21–23 now carries **~14–21.5h into ~15–18h of capacity**. It fits at the optimistic end and **does not
+at the realistic end**. The skill's sprint had **Jul 23 as buffer/catch-up** — that buffer is now consumed by
+(a) giving Destination its own blocked day, (b) Private Charters needing a real slot, (c) the **new**
+Testimonials page. **There is now no slack before the Jul 24 staging push.** Adinda is not worried about
+Jul 22–23 specifically ("FAQ page + blog listing + post can share a day") and she's right that those three
+need no new copy — but the arithmetic still leaves zero margin.
+
+**The natural flex, if something has to give (recommend in this order):**
+1. **Blog listing + Blog post (2.5–3.5h)** — template-only, **no real content at launch anyway**. Shipping
+   them a few days after staging costs almost nothing; they'd go to staging empty regardless. Cleanest cut.
+2. **Testimonials page (1–1.5h)** — brand new, wasn't in scope this morning. Post-launch is defensible.
+3. **Announcement bar** — no page depends on it.
+**Do NOT cut:** About (needed for staging review), FAQ page (the homepage "Read More" points at `#` until
+it exists), schema review (field names get expensive to change once real content lands).
+
 ### Known deviations from the skill's sprint (don't "fix" these back)
 - The skill's day-by-day has **Jul 17 = Boat + Destination start (4–5h)** and does **not contain** the
   auto-hide work, `boatDefaults`, or the **Testimonials page** — none of them exist in the sprint. Reality
