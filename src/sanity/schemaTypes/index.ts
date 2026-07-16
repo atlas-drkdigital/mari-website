@@ -24,6 +24,8 @@ import { cabinTypeType } from './documents/cabinType'
 import { cabinDocType } from './documents/cabin'
 import { homePageType } from './documents/homePage'
 import { destinationType } from './documents/destination'
+import { destinationDefaultsType } from './documents/destinationDefaults'
+import { ctaType } from './documents/cta'
 import { itineraryType } from './documents/itinerary'
 import { testimonialType } from './documents/testimonial'
 import { faqType } from './documents/faq'
@@ -60,6 +62,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     cabinDocType,
     homePageType,
     destinationType,
+    destinationDefaultsType,
+    ctaType,
     itineraryType,
     testimonialType,
     faqType,

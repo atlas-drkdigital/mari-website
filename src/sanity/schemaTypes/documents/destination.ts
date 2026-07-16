@@ -2,24 +2,25 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { AutoSlugInput } from '../../components/AutoSlugInput'
 
-// Named `destination`, not `destinationPage` — the "Page" suffix wasn't an actual convention in
-// this schema (scheduleRates/blogPost don't have it either), so dropped it. No documents existed
-// yet under the old name, so this was a free rename (2026-07-16), unlike `boat` which needed an
-// actual data migration — see MANAGER.md.
+// Named `destination`, not `destinationPage` — the "Page" suffix wasn't an actual convention here
+// (scheduleRates/blogPost don't have it either). Free rename 2026-07-16 (no content existed yet).
 //
-// Built out from a shell 2026-07-16 against the REAL Figma mockup (node 778:8608, `Page/Destination`
-// — newer + more detailed than the older 675-2363 the skill docs referenced).
+// Built against the real Figma mockup (node 778:8608, `Page/Destination`).
 //
-// Sections deliberately NOT modeled as fields here, because they're not this page's own content:
-// the itinerary carousel cards (auto — `itinerary` documents referencing this destination), the
-// availability/booking widget (the ONE global scheduling embed, reused from Schedule & Rates), the
-// FAQ items / boats / articles CONTENT (separate documents queried by scope/reference), and
-// CTA/Contact/Footer (shared components — the CTA is the generic two-card block, confirmed against
-// the mockup, no per-destination override).
+// Slimmed 2026-07-16: the shared section eyebrows + structural headings (Overview eyebrow, Gallery
+// eyebrow/title, Itineraries/Upcoming Trips/FAQ/Boats/Articles eyebrows + headings) moved to the
+// `destinationDefaults` singleton — edited ONCE for all destinations, with a {destination} token
+// for the name (see destinationDefaults.ts / CLAUDE.md). This document now holds ONLY what's
+// genuinely unique per destination: the Overview heading (the bespoke line) + body + highlights,
+// tagline, stats values, gallery images, cover, slug, SEO.
 //
-// Groups (tabs) are each mirrored by a titled `fieldset` (site-wide convention, locked 2026-07-16 —
-// see CLAUDE.md): fieldsets render as visible section headers even in the flat "All Fields" view,
-// groups only separate tabs. Every field declares BOTH its group and its matching fieldset.
+// Auto-queried / shared sections are not fields here: itinerary cards (from `itinerary` docs
+// referencing this destination), FAQ items (`faq` docs scoped to this destination), boats-on-route
+// (from `boat` docs), articles (from `blogPost` docs), the booking widget (the one global
+// scheduling embed), and CTA/Contact/Footer (shared components — CTA is now the `cta` singleton).
+//
+// Groups mirrored by titled fieldsets (site-wide convention) so section headers show in "All
+// Fields"; every field declares both.
 export const destinationType = defineType({
   name: 'destination',
   title: 'Destination',
@@ -28,18 +29,12 @@ export const destinationType = defineType({
     { name: 'basicInfo', title: 'Basic Info', default: true },
     { name: 'overview', title: 'Overview' },
     { name: 'gallery', title: 'Gallery' },
-    { name: 'itineraries', title: 'Itineraries' },
-    { name: 'upcomingTrips', title: 'Upcoming Trips' },
-    { name: 'sections', title: 'Section Headings' },
     { name: 'seo', title: 'SEO' },
   ],
   fieldsets: [
     { name: 'basicInfoFs', title: 'Basic Info' },
     { name: 'overviewFs', title: 'Overview' },
     { name: 'galleryFs', title: 'Gallery' },
-    { name: 'itinerariesFs', title: 'Itineraries' },
-    { name: 'upcomingTripsFs', title: 'Upcoming Trips' },
-    { name: 'sectionsFs', title: 'Section Headings' },
     { name: 'seoFs', title: 'SEO' },
   ],
   fields: [
@@ -50,7 +45,7 @@ export const destinationType = defineType({
       type: 'string',
       group: 'basicInfo',
       fieldset: 'basicInfoFs',
-      description: 'Short reference name — used in the nav breadcrumb and anywhere this item is referenced by name elsewhere.',
+      description: 'Short reference name — used in the nav breadcrumb, and dropped into shared headings via the {destination} token.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -84,8 +79,7 @@ export const destinationType = defineType({
     // would burn the cap fast. Sanity's Media Library video CDN is Enterprise-only, so that's out
     // too. Instead the editor points at a video CDN (Cloudflare Stream / Bunny / Cloudinary). When
     // set, the frontend plays it muted + looped + playsinline as the hero background over the cover
-    // image (which stays as poster/fallback + the card/thumbnail source elsewhere); autoplay/mute/
-    // loop are fixed behavior, not editor toggles.
+    // image (which stays as poster/fallback); autoplay/mute/loop are fixed behavior, not toggles.
     defineField({
       name: 'coverVideo',
       title: 'Cover video',
@@ -125,7 +119,7 @@ export const destinationType = defineType({
       type: 'array',
       group: 'basicInfo',
       fieldset: 'basicInfoFs',
-      description: 'At-a-glance stats shown in the hero.',
+      description: 'At-a-glance stats shown in the hero. Labels are seeded; fill the values per destination.',
       of: [
         defineArrayMember({
           type: 'object',
@@ -144,28 +138,15 @@ export const destinationType = defineType({
       ],
     }),
 
-    // Overview
-    defineField({
-      name: 'showOverviewEyebrow',
-      title: 'Show eyebrow?',
-      type: 'boolean',
-      group: 'overview',
-      fieldset: 'overviewFs',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'overviewEyebrow',
-      title: 'Overview eyebrow',
-      type: 'string',
-      group: 'overview',
-      fieldset: 'overviewFs',
-      hidden: ({ parent }) => !parent?.showOverviewEyebrow,
-    }),
+    // Overview — the heading + body + highlights are UNIQUE per destination (the eyebrow is shared,
+    // in Destination Defaults).
     defineField({
       name: 'overviewHeading',
+      title: 'Overview heading',
       type: 'string',
       group: 'overview',
       fieldset: 'overviewFs',
+      description: 'The bespoke headline for this destination (not templated) — e.g. a line that captures what makes it special.',
     }),
     defineField({
       name: 'overviewBody',
@@ -181,7 +162,7 @@ export const destinationType = defineType({
       type: 'array',
       group: 'overview',
       fieldset: 'overviewFs',
-      description: 'Mixed diving and non-diving highlights shown in the Overview carousel (e.g. a marine-life encounter, a land excursion). Each needs its own image.',
+      description: 'Mixed diving and non-diving highlights shown in the Overview carousel. Each needs its own image.',
       of: [
         defineArrayMember({
           type: 'object',
@@ -196,30 +177,8 @@ export const destinationType = defineType({
       ],
     }),
 
-    // Gallery — same flat-array-on-page pattern as boat.gallery, for native bulk upload.
-    defineField({
-      name: 'showGalleryEyebrow',
-      title: 'Show eyebrow?',
-      type: 'boolean',
-      group: 'gallery',
-      fieldset: 'galleryFs',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'galleryEyebrow',
-      title: 'Gallery eyebrow',
-      type: 'string',
-      group: 'gallery',
-      fieldset: 'galleryFs',
-      hidden: ({ parent }) => !parent?.showGalleryEyebrow,
-    }),
-    defineField({
-      name: 'galleryTitle',
-      type: 'string',
-      group: 'gallery',
-      fieldset: 'galleryFs',
-      initialValue: 'Gallery',
-    }),
+    // Gallery — the IMAGES are unique per destination (the eyebrow/heading are shared, in
+    // Destination Defaults). Flat array-on-page for native bulk upload.
     defineField({
       name: 'gallery',
       title: 'Gallery',
@@ -228,150 +187,6 @@ export const destinationType = defineType({
       fieldset: 'galleryFs',
       of: [defineArrayMember({ type: 'galleryImage' })],
       description: 'Drop or select many images at once — they upload straight onto this list.',
-    }),
-
-    // Itineraries — the cards themselves come from `itinerary` documents referencing this
-    // destination; this is just the heading block above the carousel. The booking/availability
-    // widget is its own section below ("Upcoming Trips"), not part of this one.
-    defineField({
-      name: 'showItinerariesEyebrow',
-      title: 'Show eyebrow?',
-      type: 'boolean',
-      group: 'itineraries',
-      fieldset: 'itinerariesFs',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'itinerariesEyebrow',
-      title: 'Itineraries eyebrow',
-      type: 'string',
-      group: 'itineraries',
-      fieldset: 'itinerariesFs',
-      hidden: ({ parent }) => !parent?.showItinerariesEyebrow,
-    }),
-    defineField({
-      name: 'itinerariesHeading',
-      type: 'string',
-      group: 'itineraries',
-      fieldset: 'itinerariesFs',
-    }),
-    defineField({
-      name: 'itinerariesIntro',
-      type: 'richTextBasic',
-      group: 'itineraries',
-      fieldset: 'itinerariesFs',
-      description: 'Optional intro line under the heading, above the itinerary cards.',
-    }),
-
-    // Upcoming Trips — the live availability/booking widget (the scheduling-partner embed). The
-    // widget itself is the ONE global embed, reused from Schedule & Rates and rendered by the
-    // frontend — NOT a per-destination field, because the mockup's widget lists every route with
-    // its own date/route filters. Only this section's eyebrow/heading/intro are editable here.
-    defineField({
-      name: 'showUpcomingTripsEyebrow',
-      title: 'Show eyebrow?',
-      type: 'boolean',
-      group: 'upcomingTrips',
-      fieldset: 'upcomingTripsFs',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'upcomingTripsEyebrow',
-      title: 'Upcoming Trips eyebrow',
-      type: 'string',
-      group: 'upcomingTrips',
-      fieldset: 'upcomingTripsFs',
-      hidden: ({ parent }) => !parent?.showUpcomingTripsEyebrow,
-    }),
-    defineField({
-      name: 'upcomingTripsHeading',
-      type: 'string',
-      group: 'upcomingTrips',
-      fieldset: 'upcomingTripsFs',
-    }),
-    defineField({
-      name: 'upcomingTripsIntro',
-      title: 'Upcoming Trips intro',
-      type: 'richTextBasic',
-      group: 'upcomingTrips',
-      fieldset: 'upcomingTripsFs',
-      description: 'Short line shown above the availability widget.',
-    }),
-
-    // Section Headings — these sections render their CONTENT automatically (FAQ items, boats, and
-    // blog articles are all separate documents queried by reference/scope), but their section
-    // eyebrow + heading are editable page chrome, per the "every heading is editable" rule.
-    defineField({
-      name: 'showFaqEyebrow',
-      title: 'Show FAQ eyebrow?',
-      type: 'boolean',
-      group: 'sections',
-      fieldset: 'sectionsFs',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'faqEyebrow',
-      title: 'FAQ eyebrow',
-      type: 'string',
-      group: 'sections',
-      fieldset: 'sectionsFs',
-      hidden: ({ parent }) => !parent?.showFaqEyebrow,
-    }),
-    defineField({
-      name: 'faqHeading',
-      title: 'FAQ heading',
-      type: 'string',
-      group: 'sections',
-      fieldset: 'sectionsFs',
-      description: 'Heading for this destination\'s FAQ section. The questions are separate FAQ documents scoped to this destination.',
-    }),
-    defineField({
-      name: 'showBoatsEyebrow',
-      title: 'Show boats eyebrow?',
-      type: 'boolean',
-      group: 'sections',
-      fieldset: 'sectionsFs',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'boatsEyebrow',
-      title: 'Boats eyebrow',
-      type: 'string',
-      group: 'sections',
-      fieldset: 'sectionsFs',
-      hidden: ({ parent }) => !parent?.showBoatsEyebrow,
-    }),
-    defineField({
-      name: 'boatsHeading',
-      title: 'Boats heading',
-      type: 'string',
-      group: 'sections',
-      fieldset: 'sectionsFs',
-      description: 'Heading for the "About the boats" section. The boat cards come from boat documents.',
-    }),
-    defineField({
-      name: 'showArticlesEyebrow',
-      title: 'Show articles eyebrow?',
-      type: 'boolean',
-      group: 'sections',
-      fieldset: 'sectionsFs',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'articlesEyebrow',
-      title: 'Articles eyebrow',
-      type: 'string',
-      group: 'sections',
-      fieldset: 'sectionsFs',
-      hidden: ({ parent }) => !parent?.showArticlesEyebrow,
-    }),
-    defineField({
-      name: 'articlesHeading',
-      title: 'Articles heading',
-      type: 'string',
-      group: 'sections',
-      fieldset: 'sectionsFs',
-      description: 'Heading for the "Latest articles" section. The article cards come from blog posts referencing this destination.',
     }),
 
     defineField({ name: 'seo', type: 'seo', group: 'seo', fieldset: 'seoFs' }),

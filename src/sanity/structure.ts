@@ -2,7 +2,7 @@ import type { StructureResolver } from 'sanity/structure'
 
 // Singletons are enforced here (fixed document ID), not via a schema option —
 // see sanity-best-practices skill's studio-structure.md.
-const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage']
+const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage', 'destinationDefaults', 'cta']
 // Pinned single-instance `page` documents (About, Private Charters) — schema type is still the
 // generic `page` (Private Charters' dedicated-vs-generic decision isn't locked, About never
 // needed its own type), but each gets a fixed sidebar slot by document ID so they're easy to
@@ -50,7 +50,20 @@ export const structure: StructureResolver = (S) =>
       // --- Main Page Content ---
       singleton(S, 'homePage', 'Homepage'),
 
-      S.documentTypeListItem('destination').title('Destinations'),
+      // Destinations nested folder: the list of destination docs + the shared "Destination
+      // Defaults" singleton (edit-once eyebrows/headings with a {destination} token), same nesting
+      // pattern as Boats. Keeps the two destination-related things under one entry instead of
+      // stacking two top-level pages (Adinda's ask 2026-07-16).
+      S.listItem()
+        .title('Destinations')
+        .child(
+          S.list()
+            .title('Destinations')
+            .items([
+              S.documentTypeListItem('destination').title('Destinations'),
+              singleton(S, 'destinationDefaults', 'Destination Defaults'),
+            ])
+        ),
 
       // Nested under one "Boats" entry rather than 3 top-level items — cabinType/cabin only
       // make sense in relation to a boat, same reasoning as not giving them their own root-level
@@ -103,6 +116,9 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem('whyUsItem').title('Why Us Items'),
       S.documentTypeListItem('faq').title('FAQ'),
       S.documentTypeListItem('testimonial').title('Testimonials'),
+      // Shared two-card CTA section (Private Charter / Shared Trip) reused across pages — a
+      // singleton, placed here with the other shared components per Adinda's ask 2026-07-16.
+      singleton(S, 'cta', 'CTA Section'),
 
       S.divider(),
 
