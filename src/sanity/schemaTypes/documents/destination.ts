@@ -27,6 +27,8 @@ export const destinationType = defineType({
     { name: 'overview', title: 'Overview' },
     { name: 'gallery', title: 'Gallery' },
     { name: 'itineraries', title: 'Itineraries' },
+    { name: 'upcomingTrips', title: 'Upcoming Trips' },
+    { name: 'sections', title: 'Section Headings' },
     { name: 'seo', title: 'SEO' },
   ],
   fields: [
@@ -170,7 +172,22 @@ export const destinationType = defineType({
     }),
 
     // Itineraries — the cards themselves come from `itinerary` documents referencing this
-    // destination; this is just the heading/intro block above the carousel + schedule embed.
+    // destination; this is just the heading block above the carousel. The booking/availability
+    // widget is its own section below ("Upcoming Trips"), not part of this one.
+    defineField({
+      name: 'showItinerariesEyebrow',
+      title: 'Show eyebrow?',
+      type: 'boolean',
+      group: 'itineraries',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'itinerariesEyebrow',
+      title: 'Itineraries eyebrow',
+      type: 'string',
+      group: 'itineraries',
+      hidden: ({ parent }) => !parent?.showItinerariesEyebrow,
+    }),
     defineField({
       name: 'itinerariesHeading',
       type: 'string',
@@ -180,6 +197,107 @@ export const destinationType = defineType({
       name: 'itinerariesIntro',
       type: 'richTextBasic',
       group: 'itineraries',
+      description: 'Optional intro line under the heading, above the itinerary cards.',
+    }),
+
+    // Upcoming Trips — the live availability/booking widget (the scheduling-partner embed). The
+    // widget itself is the ONE global embed, reused from Schedule & Rates and rendered by the
+    // frontend — NOT a per-destination field, because the mockup's widget lists every route with
+    // its own date/route filters. Only this section's eyebrow/heading/intro are editable here. If
+    // per-destination filtering is ever needed, revisit an override embed (flagged in MANAGER.md,
+    // not built speculatively).
+    defineField({
+      name: 'showUpcomingTripsEyebrow',
+      title: 'Show eyebrow?',
+      type: 'boolean',
+      group: 'upcomingTrips',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'upcomingTripsEyebrow',
+      title: 'Upcoming Trips eyebrow',
+      type: 'string',
+      group: 'upcomingTrips',
+      hidden: ({ parent }) => !parent?.showUpcomingTripsEyebrow,
+    }),
+    defineField({
+      name: 'upcomingTripsHeading',
+      type: 'string',
+      group: 'upcomingTrips',
+    }),
+    defineField({
+      name: 'upcomingTripsIntro',
+      title: 'Upcoming Trips intro',
+      type: 'richTextBasic',
+      group: 'upcomingTrips',
+      description: 'Short line shown above the availability widget.',
+    }),
+
+    // Section Headings — these sections render their CONTENT automatically (FAQ items, boats, and
+    // blog articles are all separate documents queried by reference/scope), but their section
+    // eyebrow + heading are editable page chrome, per the "every heading is editable" rule.
+    defineField({
+      name: 'showFaqEyebrow',
+      title: 'Show FAQ eyebrow?',
+      type: 'boolean',
+      group: 'sections',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'faqEyebrow',
+      title: 'FAQ eyebrow',
+      type: 'string',
+      group: 'sections',
+      hidden: ({ parent }) => !parent?.showFaqEyebrow,
+    }),
+    defineField({
+      name: 'faqHeading',
+      title: 'FAQ heading',
+      type: 'string',
+      group: 'sections',
+      description: 'Heading for this destination\'s FAQ section. The questions are separate FAQ documents scoped to this destination.',
+    }),
+    defineField({
+      name: 'showBoatsEyebrow',
+      title: 'Show boats eyebrow?',
+      type: 'boolean',
+      group: 'sections',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'boatsEyebrow',
+      title: 'Boats eyebrow',
+      type: 'string',
+      group: 'sections',
+      hidden: ({ parent }) => !parent?.showBoatsEyebrow,
+    }),
+    defineField({
+      name: 'boatsHeading',
+      title: 'Boats heading',
+      type: 'string',
+      group: 'sections',
+      description: 'Heading for the "About the boats" section. The boat cards come from boat documents.',
+    }),
+    defineField({
+      name: 'showArticlesEyebrow',
+      title: 'Show articles eyebrow?',
+      type: 'boolean',
+      group: 'sections',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'articlesEyebrow',
+      title: 'Articles eyebrow',
+      type: 'string',
+      group: 'sections',
+      hidden: ({ parent }) => !parent?.showArticlesEyebrow,
+    }),
+    defineField({
+      name: 'articlesHeading',
+      title: 'Articles heading',
+      type: 'string',
+      group: 'sections',
+      description: 'Heading for the "Latest articles" section. The article cards come from blog posts referencing this destination.',
     }),
 
     defineField({ name: 'seo', type: 'seo', group: 'seo' }),

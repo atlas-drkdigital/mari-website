@@ -69,6 +69,23 @@ handoffs reconciled to Done:
 **All 5 `_handoff/*.md` files reconciled** (drk-website, atlas-website, mari-website, mari-project to Done;
 figma.md untouched — it's Figma-file syncs, a separate track, still Pending).
 
+### Destination schema pass — done 2026-07-16 (against the real mockup)
+Adinda gave the actual Figma frame — **`778:8608` (`Page/Destination`)**, newer + more detailed than the
+`675-2363` the docs referenced. Built the `destination` type out from a shell against it (tsc ✓, eslint ✓,
+`sanity schema validate` 0 errors/0 warnings). What the mockup resolved + added:
+- **CTA confirmed shared** (generic two-card, no destination urgency line) → no CTA override field. **Booking
+  widget confirmed one global embed** ("scheduling partner", lists all routes with its own filters) → no
+  per-destination embed field.
+- **Added:** an "Upcoming Trips" section group (eyebrow/heading/intro; the widget itself is the global
+  embed, frontend-rendered); a "Section Headings" group with editable eyebrow+heading for the three
+  auto-content sections (FAQ, About the Boats, Latest Articles); an itineraries eyebrow toggle.
+- **Still 🟡 draft** — needs Adinda's Studio review (reload Studio, open a Destination doc, walk the form).
+- **Flag (not fixed — belongs to the FAQ pass):** the mockup's destination FAQ categories are
+  **Diving / Traveling / General Information**, but `faq.ts` lists the 3rd as `"The Liveaboard"`. The proper
+  general-vs-destination category split is still pending (atlas-website). Fix during the FAQ pass, not now.
+- **Flag (Figma drift, queued in `_handoff/figma.md`):** hero breadcrumb reads "Boats" not "Destinations";
+  destination node refs in the skills should update `675-2363` → `778:8608`.
+
 ### Next session (not this one)
 - **Tier 4 shell review** — still the real build-side priority; every shell is 🟡 unreviewed (see the
   Tier 4 checkpoint below). This skills round was infrastructure, not build progress.
