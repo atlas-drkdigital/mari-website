@@ -1,14 +1,11 @@
 import { defineField, defineType } from 'sanity'
 
-// Built as a real shell (not a bare stub) per Adinda's explicit ask 2026-07-15/16, so the shape
-// is visible in Studio for review — but the taxonomy is NOT locked. MANAGER.md's standing
-// decision: build FAQ scope on one real page first, test it, refine, then carry the refined
-// pattern forward. Treat every field below as a first pass, not a final spec.
-//
-// `category` list matches the three groupings already locked in the Destination Page spec
-// (mari-project skill's references/website.md) — "Traveling to [Destination]" / "Diving" /
-// "The Liveaboard" — reused here rather than invented, since that's the one place this taxonomy
-// was actually designed against real content.
+// Two taxonomies, split by `scope` (the "generalCategory vs destinationCategory" model from
+// atlas-website): the general FAQ HUB (and the boat page's filtered FAQ) uses a 5-category set;
+// each DESTINATION page's FAQ uses a separate 3-category set — Diving / Traveling / General
+// Information (matches the Figma destination mockup 778:8608 and atlas-website). The right category
+// field shows based on `scope`. One document type, one place to manage — no duplicated structure.
+// Still first-pass, not locked; refine as the FAQ page gets built on a real page.
 export const faqType = defineType({
   name: 'faq',
   title: 'FAQ',
@@ -24,18 +21,10 @@ export const faqType = defineType({
       type: 'richTextBasic',
     }),
     defineField({
-      name: 'category',
-      type: 'string',
-      description: 'Topic grouping used for tabs/accordion groups on FAQ hub pages.',
-      options: {
-        list: ['Traveling', 'Diving', 'The Liveaboard'],
-      },
-    }),
-    defineField({
       name: 'scope',
       title: 'Applies to',
       type: 'string',
-      description: 'What this question is about — controls whether it shows on the general FAQ hub or a specific destination/boat page.',
+      description: 'What this question is about — controls whether it shows on the general FAQ hub or a specific destination/boat page, and which category set applies.',
       options: {
         list: [
           { title: 'General', value: 'general' },
@@ -45,6 +34,32 @@ export const faqType = defineType({
         layout: 'radio',
       },
       initialValue: 'general',
+    }),
+    defineField({
+      name: 'generalCategory',
+      title: 'Category',
+      type: 'string',
+      description: 'Topic grouping for the FAQ hub and the boat page.',
+      options: {
+        list: [
+          'General',
+          'Boat & Diving',
+          'Booking & Payment',
+          "What's Included",
+          'Travel & Documents',
+        ],
+      },
+      hidden: ({ parent }) => parent?.scope === 'destination',
+    }),
+    defineField({
+      name: 'destinationCategory',
+      title: 'Category',
+      type: 'string',
+      description: 'Topic grouping shown on the destination page FAQ.',
+      options: {
+        list: ['Diving', 'Traveling', 'General Information'],
+      },
+      hidden: ({ parent }) => parent?.scope !== 'destination',
     }),
     defineField({
       name: 'destination',
@@ -62,6 +77,6 @@ export const faqType = defineType({
     }),
   ],
   preview: {
-    select: { title: 'question', subtitle: 'category' },
+    select: { title: 'question', subtitle: 'scope' },
   },
 })

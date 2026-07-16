@@ -158,11 +158,48 @@ eyebrow is editable" rule above) — **not a retrofit task**: `page` and `schedu
 currently have an eyebrow field at all, so there's nothing to add the toggle to yet. Apply this the
 moment either of those (or any new type) actually gets an eyebrow field, not before.
 
+## Build approach — skeleton-first, THEN vertical slices per page (locked 2026-07-16)
+Refines the earlier strict phase-gate (all schema, then all frontend). Two phases:
+1. **Skeleton-first (done):** every planned document type scaffolded into the Studio sidebar so the whole
+   system is visible at once — it doubles as Adinda's checklist of what exists. This phase has served its
+   purpose; all Tier 4 types are in the sidebar.
+2. **Vertical slices (now):** go page by page — for each page, build the schema to full depth AND build the
+   frontend AND load content, reviewing the real rendered page, not an abstract Studio form. Adinda's call
+   2026-07-16: abstract schema review had hit its limit ("feels so abstract, I'm not going to say anything
+   about it") — seeing the real page with real content is what makes her judgment meaningful and lets her
+   approve definitively instead of hedging on empty forms.
+   - **Guardrail against rabbit-holing (Adinda's own concern):** build each slice to "structurally matches
+     the mockup + functional," and defer all purely-cosmetic polish to `_POLISH-BACKLOG.md` — burned down
+     later in one polish block, not mid-slice. Flag immediately if a slice overruns its timebox.
+   - **Migration risk is acceptable, confirmed:** a cross-page learning that forces a shared-field rename
+     after content exists needs a migration — but during the build our Sanity content is re-seedable
+     placeholder data (rename = re-run the seed, not a real migration), and Adinda is standardizing field
+     conventions so renames stay rare. Renaming has been cheap in practice.
+   - Suggested slice order: **homepage first** (its frontend already exists — wire it to Sanity, lowest
+     churn), then destination, then the rest. Lock shared types (`imageWithAlt`, rich-text tiers, `seo`,
+     gallery object) before leaning on them cross-page.
+Skill-wide (Adinda's ask) — queued for `drk-website`'s `references/workflow.md` (refines its Phase 6→7 order).
+
+## Studio form section headers — every group gets a matching titled fieldset (site-wide, locked 2026-07-16)
+Distinct from "editor-organization deferred to last" below (that's field titles/descriptions/sidebar polish
+— still deferrable). This one IS applied as each type is built: every document type pairs its `groups`
+(tabs) with a matching set of `fieldsets` (titled sections), and every field declares BOTH its `group` and
+its `fieldset`. Reason: groups only separate tabs, but **fieldsets render as visible section headers even in
+the flat "All Fields" view** — without them an editor can't tell which section they're in. `siteSettings`
+already did this; `destination` done 2026-07-16; **retrofit `boat`/`homePage`/`page`/`scheduleRates` and
+every new type.** Skill-wide — queued for `drk-website`.
+
+## Load real/placeholder content into every schema so it's reviewable (locked 2026-07-16)
+An empty form is too abstract to judge. Whenever a document type is built or filled out, populate at least
+one real document with content — pull copy from the mockup where it exists, use clear placeholder (and the
+homepage's own titles/copy) where it doesn't, tag placeholders in `_CONTENT-STATUS.md`. Pairs with the
+vertical-slice approach: real content + real rendered page = meaningful review. Applies to every type.
+
 ## Sanity Studio editor-organization — defer to last, confirmed safe
 Field `title`/`description`/tab-grouping and the Structure Builder (sidebar navigation/grouping) are presentational metadata — changing them later costs no data migration. What needs to be reasonably right from the schema-pass itself: the actual field `name` keys and document type `name`s, since renaming those after real content exists needs a migration script. Polish the editor experience last, once every type exists and the full picture is visible — don't front-load it.
 
 ## Doc split (replicate the static-build pattern — see `drk-website/references/claude-code.md`)
-This file = prose rules + active decisions. `MANAGER.md` (session/decision log, created 2026-07-14) and `COMPONENTS.md` (reusable component specs, **not yet created** — ports from the static build's `COMPONENTS.md` at first use, not up front) follow the same convention as the old repo. Check `MANAGER.md` for today's active task scope and session history before re-deriving it. `_SCHEMA-SPECS.md` (created 2026-07-15) is a fourth doc in this split — a flat, checkable field-by-field spec per Sanity page type, distinct from MANAGER.md's dated log: Adinda marks fields approved there as they're tested in a real build, without re-reading history to find "did we settle this." Update it alongside any schema change, same habit as the other docs. `_CONTENT-STATUS.md` (created 2026-07-15) is the fifth — tracks whether the *value* in a field is real vs. placeholder (Figma-sourced copy preferred by default, stock/Pexels fallback for images Figma doesn't have enough of), a different axis from _SCHEMA-SPECS.md's field-existence tracking. Zero remaining 🔴 rows in it is a hard pre-launch gate, same weight as the other pre-launch checks already in this file. `_QA-CHECKLIST.md` (created 2026-07-15) is the sixth — for an external human reviewer's click-through pass, distinct from both: open design decisions worth a second opinion (e.g. eyebrow-toggle placement), not field approval or content-placeholder tracking.
+This file = prose rules + active decisions. `MANAGER.md` (session/decision log, created 2026-07-14) and `COMPONENTS.md` (reusable component specs, **not yet created** — ports from the static build's `COMPONENTS.md` at first use, not up front) follow the same convention as the old repo. Check `MANAGER.md` for today's active task scope and session history before re-deriving it. `_SCHEMA-SPECS.md` (created 2026-07-15) is a fourth doc in this split — a flat, checkable field-by-field spec per Sanity page type, distinct from MANAGER.md's dated log: Adinda marks fields approved there as they're tested in a real build, without re-reading history to find "did we settle this." Update it alongside any schema change, same habit as the other docs. `_CONTENT-STATUS.md` (created 2026-07-15) is the fifth — tracks whether the *value* in a field is real vs. placeholder (Figma-sourced copy preferred by default, stock/Pexels fallback for images Figma doesn't have enough of), a different axis from _SCHEMA-SPECS.md's field-existence tracking. Zero remaining 🔴 rows in it is a hard pre-launch gate, same weight as the other pre-launch checks already in this file. `_QA-CHECKLIST.md` (created 2026-07-15) is the sixth — for an external human reviewer's click-through pass, distinct from both: open design decisions worth a second opinion (e.g. eyebrow-toggle placement), not field approval or content-placeholder tracking. `_POLISH-BACKLOG.md` (created 2026-07-16) is the seventh — page-by-page deferred cosmetic/interaction polish from the vertical-slice build (see "Build approach"), burned down later in one polish block; distinct from _QA-CHECKLIST (that's open *decisions* for a reviewer; this is *known* polish we chose to defer).
 
 ## Local-only files — underscore prefix convention, locked 2026-07-15
 Any folder or file that is internal/scratch (not real project output — handoff docs, skill-build packaging, test images, throwaway scripts) gets a leading `_` **at the repo root**. That prefix is the standing signal for "never commit this, not a real working file" — `.gitignore`'s `/_*` rule enforces it automatically. Root-anchored only, deliberately not recursive (`/_*`, not `**/_*`): Next.js App Router uses `_`-prefixed folders inside `src/app/` as a real, committed routing convention (private folders like `_components/`, `_lib/` that opt out of routing) — this rule must never touch those. When creating a new scratch file/folder, default to the `_` prefix rather than inventing a new naming scheme per task.

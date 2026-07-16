@@ -86,6 +86,26 @@ Adinda gave the actual Figma frame — **`778:8608` (`Page/Destination`)**, newe
 - **Flag (Figma drift, queued in `_handoff/figma.md`):** hero breadcrumb reads "Boats" not "Destinations";
   destination node refs in the skills should update `675-2363` → `778:8608`.
 
+### Cover video + FAQ split + hybrid workflow — decided 2026-07-16 (all verified: tsc/eslint/schema-validate 0/0)
+- **Approach shift, locked in CLAUDE.md ("Build approach"):** skeleton-first (done — all types in sidebar,
+  doubles as Adinda's checklist) → THEN **vertical slices per page** (schema depth + frontend + content
+  together, review the real page). Driver: abstract Studio-form review kept hitting "feels so abstract, I'm
+  not going to say anything." Guardrail: build functional-not-polished, defer cosmetics to new
+  `_POLISH-BACKLOG.md`, one polish block later. Migration risk accepted (re-seedable placeholder content +
+  standardizing conventions). Slice order: **homepage first** (frontend exists → wire it), then destination.
+  Skill-wide, queued for `drk-website`.
+- **Two Studio conventions locked (CLAUDE.md, skill-wide):** (1) every group mirrored by a titled `fieldset`
+  so "All Fields" view has section headers (destination done; retrofit boat/homePage/page/scheduleRates);
+  (2) load real/placeholder content into every schema so review isn't abstract.
+- **Cover video → URL, not Sanity upload.** Research (WebSearch): Sanity free tier = 10GB/mo bandwidth, NO
+  overage (blocks); a hero loop can't lazy-load → burns the cap; **Sanity Media Library video CDN is
+  Enterprise-only**. So `destination.coverVideo` is now an object `{ url, playOnMobile }` — editor points at
+  a video CDN (Cloudflare Stream / Bunny for prod; Cloudinary free or /public to test). Specs for a bg loop:
+  <5MB, 5–15s seamless, 720p, MP4/H.264, no audio, mobile→poster. Defaults to cover image until Adinda tests.
+- **FAQ category split done** (`faq.ts`): `generalCategory` (5 hub values) + `destinationCategory` (Diving/
+  Traveling/General Information), shown by `scope`. One type, no duplicated structure. Fixed the old
+  "The Liveaboard" → "General Information" mismatch found against the mockup.
+
 ### Next session (not this one)
 - **Tier 4 shell review** — still the real build-side priority; every shell is 🟡 unreviewed (see the
   Tier 4 checkpoint below). This skills round was infrastructure, not build progress.
