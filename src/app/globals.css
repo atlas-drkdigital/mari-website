@@ -45,13 +45,22 @@
    proven and exactly when someone cares, and tokens nobody ever names cost nobody anything. It also has
    zero big-bang risk — each rename is one token, individually verifiable.
 
-   STILL TO RECONCILE (names inferred from Figma variables, node 413-2, 2026-07-16 — NOT confirmed;
-   confirm the hex with Adinda before renaming any of these):
-     --primitive-cream-10   #fdfcfa  = Figma beige/50?      (inferred: fills the gap)
-     --primitive-cream-50   #f5f0e8  = Figma beige/150?     (inferred)
-     --primitive-cream-70   #ece4d6  = Figma beige/200?     (inferred)
-     --primitive-cream-80   #dbcdb2  = Figma beige/300?     (inferred)
-     --primitive-copper-600 #8f6d51  = Figma chocolate/600? (inferred)
+   ✅ CONFIRMED, RENAME PENDING — hexes read straight off Figma's `beige` variable panel (Adinda's
+   screenshot, 2026-07-17). The NAME is proven; only the edit is outstanding. Renaming was deliberately
+   DEFERRED that day (Adinda: "do not rename until later") — these are mechanical whenever the pass runs:
+     --primitive-cream-10   #fdfcfa  -> beige/50
+     --primitive-cream-50   #f5f0e8  -> beige/150
+     --primitive-cream-70   #ece4d6  -> beige/200
+     --primitive-cream-80   #dbcdb2  -> beige/300
+
+   ✅ THE BEIGE SCALE IS FULLY RECONCILED (2026-07-17). The full Figma scale is 50/100/150/200/250/300/
+   350/400/450/500 and every hex matches ours exactly — the four above fill the gaps, and the six already
+   named (beige-100/250/350/400/450/500) were checked against the same panel and are all correct. **No
+   traps in beige.** Worth noting: beige/100 had been renamed 2026-07-16 off a *rendered screenshot*, not
+   the variable panel — it was right, but this is the first time it was actually confirmed at source.
+
+   STILL TO RECONCILE (names inferred, NOT confirmed — confirm the hex with Adinda before renaming):
+     --primitive-copper-600 #8f6d51  = Figma chocolate/600? (inferred: fills the 550/650 gap)
      --primitive-amber-600  #b58a2d  = Figma amber/600?     (inferred)
      --primitive-navy-900   #1b2a4a  = Figma navy/900?      (inferred)
      --primitive-navy-950   #131d34  = Figma navy/950?      (inferred)
