@@ -3,7 +3,10 @@
 import Image from 'next/image'
 import { useState } from 'react'
 
+import { toPlainText } from '@/components/RichText'
 import { useDragScroll } from '@/lib/useDragScroll'
+import { sanityImageProps } from '@/sanity/lib/image'
+import type { HomePageData } from '@/sanity/queries'
 
 // Ported from ../v1-static-homepage/sections/why-us.html + assets/why-us.js.
 // Figma Home/Section/Why Us 218:1345. Desktop: 4 equal cards, hovering/focusing one expands
@@ -42,7 +45,29 @@ const CARDS = [
   },
 ]
 
-export function WhyUs() {
+type WhyUsCard = {
+  id: string
+  title: string
+  description: string
+  imageProps: ReturnType<typeof sanityImageProps>
+  alt: string
+  objectPosition?: string
+}
+
+export function WhyUs({ home }: { home: HomePageData | null }) {
+  const eyebrow = home?.whyUsEyebrow ?? 'About Us'
+  const heading = home?.whyUsHeading ?? 'Why choose Mari'
+  // Sanity items when present, else the original hardcoded cards.
+  const cards: WhyUsCard[] = home?.whyUsItems?.length
+    ? home.whyUsItems.map((item) => ({
+        id: item._id,
+        title: item.headline ?? '',
+        description: toPlainText(item.description),
+        imageProps: sanityImageProps(item.image, '/assets/why-us-cabin.webp'),
+        alt: item.image?.alt ?? '',
+      }))
+    : CARDS.map((c) => ({ id: c.id, title: c.title, description: c.description, imageProps: { src: c.image }, alt: c.alt, objectPosition: c.objectPosition }))
+
   const [active, setActive] = useState<string | null>(null)
   const trackRef = useDragScroll<HTMLDivElement>()
 
@@ -51,8 +76,8 @@ export function WhyUs() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] [background-size:720px_auto] bg-repeat opacity-20" />
 
       <div data-reveal="left" className="flex max-w-[720px] flex-col items-center gap-32 px-24 text-center">
-        <p className="text-eyebrow uppercase text-action-primary">About Us</p>
-        <h2 id="why-us-heading" className="text-display-h2 text-text-primary">Why choose Mari</h2>
+        <p className="text-eyebrow uppercase text-action-primary">{eyebrow}</p>
+        <h2 id="why-us-heading" className="text-display-h2 text-text-primary">{heading}</h2>
       </div>
 
       <div
@@ -61,7 +86,7 @@ export function WhyUs() {
         data-reveal
         className="mx-auto flex w-full max-w-[1920px] cursor-grab snap-x snap-mandatory gap-16 overflow-x-auto px-24 pb-4 select-none [-ms-overflow-style:none] [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden lg:cursor-auto lg:select-auto lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0"
       >
-        {CARDS.map((card) => {
+        {cards.map((card) => {
           const isActive = active === card.id
           return (
             <article
@@ -77,7 +102,7 @@ export function WhyUs() {
                   actually makes the effect work under next/image. */}
               <div className="absolute inset-0 lg:left-1/2 lg:w-[55vw] lg:max-w-none lg:-translate-x-1/2">
                 <Image
-                  src={card.image}
+                  {...card.imageProps}
                   alt={card.alt}
                   fill
                   loading="eager"

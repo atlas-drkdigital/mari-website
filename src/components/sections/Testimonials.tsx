@@ -4,6 +4,16 @@ import Image from 'next/image'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { useDragScroll } from '@/lib/useDragScroll'
+import type { HomePageData } from '@/sanity/queries'
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+// Deterministic (UTC) — matches the original "28 Jan, 2026" style without a hydration mismatch.
+function formatDate(iso?: string): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ''
+  return `${String(d.getUTCDate()).padStart(2, '0')} ${MONTHS[d.getUTCMonth()]}, ${d.getUTCFullYear()}`
+}
 
 // Ported from ../v1-static-homepage/sections/testimonials.html + assets/testimonials.js.
 // Figma Section/Testimonials 401:1852. Infinite/wrapping carousel (2026-07-15, at Adinda's
@@ -47,7 +57,15 @@ function StarRating() {
   )
 }
 
-export function Testimonials() {
+export function Testimonials({ home }: { home: HomePageData | null }) {
+  const eyebrow = home?.testimonialsEyebrow ?? 'Testimonials'
+  const heading = home?.testimonialsHeading ?? 'What our guests think'
+  const linkText = home?.testimonialsLinkText ?? 'Read More'
+  // Sanity reviews when present, else the original hardcoded set (real + drafts).
+  const reviews = home?.testimonialItems?.length
+    ? home.testimonialItems.map((t) => ({ key: t._id, name: t.name ?? '', date: formatDate(t.date), title: t.title ?? '', text: t.text ?? '' }))
+    : [...REVIEWS, ...DRAFT_REVIEWS_REMOVE_BEFORE_LAUNCH].map((r, i) => ({ key: `${r.name}-${i}`, ...r }))
+
   const trackRef = useDragScroll<HTMLDivElement>()
   const [expanded, setExpanded] = useState<Record<number, boolean>>({})
   const [arrowsVisible, setArrowsVisible] = useState(false)
@@ -151,11 +169,11 @@ export function Testimonials() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] [background-size:720px_auto] bg-repeat opacity-20" />
       <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-[36px] page-gutter-x lg:gap-64">
         <div data-reveal="left" className="flex flex-col gap-24 lg:gap-32">
-          <p className="text-eyebrow uppercase text-action-primary">Testimonials</p>
+          <p className="text-eyebrow uppercase text-action-primary">{eyebrow}</p>
           <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:gap-48">
-            <h2 id="testimonials-heading" className="mr-[40px] max-w-[640px] text-display-h2 text-text-primary lg:mr-0">What our guests think</h2>
+            <h2 id="testimonials-heading" className="mr-[40px] max-w-[640px] text-display-h2 text-text-primary lg:mr-0">{heading}</h2>
             <a href="#" className="group inline-flex h-48 w-fit shrink-0 items-center gap-4 border border-action-primary px-20 py-8 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary/10 lg:ml-auto">
-              Read More
+              {linkText}
               <span aria-hidden="true" className="block size-[12px] shrink-0 bg-action-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
             </a>
           </div>
@@ -163,8 +181,8 @@ export function Testimonials() {
 
         <div className="relative">
           <div ref={trackRef} data-reveal className="flex w-full cursor-grab snap-x snap-mandatory items-start gap-16 overflow-x-auto pb-16 select-none [-ms-overflow-style:none] [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden lg:gap-24">
-            {[...REVIEWS, ...DRAFT_REVIEWS_REMOVE_BEFORE_LAUNCH].map((review, i) => (
-              <article key={review.name} className="group/card w-[84%] shrink-0 snap-center bg-bg-surface p-24 shadow-[0px_4px_10px_rgba(44,37,34,0.2)] md:w-[calc(50%-8px)] md:snap-start lg:w-[calc(25%-18px)]">
+            {reviews.map((review, i) => (
+              <article key={review.key} className="group/card w-[84%] shrink-0 snap-center bg-bg-surface p-24 shadow-[0px_4px_10px_rgba(44,37,34,0.2)] md:w-[calc(50%-8px)] md:snap-start lg:w-[calc(25%-18px)]">
                 <div className="flex items-center gap-8">
                   <Image src="/assets/testimonial-avatar-placeholder.jpg" alt="" aria-hidden="true" width={49} height={49} className="size-[49px] shrink-0 rounded-full object-cover" />
                   <div className="flex flex-col text-text-primary">

@@ -10,7 +10,7 @@ forward — this file is now the live one.
 
 ---
 
-## SESSION CHECKPOINT — 2026-07-16 (evening), homepage vertical slice PART 1 (schema + content foundations) (READ THIS FIRST — supersedes all below)
+## SESSION CHECKPOINT — 2026-07-16 (evening), homepage vertical slice COMPLETE (schema + content + frontend wired) (READ THIS FIRST — supersedes all below)
 
 ### What this session is
 The homepage vertical slice (first real vertical slice per the build-approach shift). Building against the
@@ -52,18 +52,32 @@ schema tasks also queued: required-field markers (done ✓), Boat Defaults (stil
 - Images uploaded to Sanity (not left empty) so the rendered page validates the `urlForImage`/loader
   pipeline end-to-end.
 
-### STILL TO DO (this slice + queued)
-- **Slice (c):** homepage GROQ query + convert `page.tsx` to an async server component that fetches +
-  passes props. NOT started. Frontend still renders the hardcoded homepage (unchanged, works).
-- **Slice (d):** wire each section (Hero, TheBoat, WhyUs, LatestArticles, Faq, Testimonials, Cta, Contact)
-  to the Sanity props. Review checkpoint #2 (rendered page + Studio form) lands after this.
-- **Boat Defaults** (queued schema task) — `boatDefaults` singleton + slim `boat`, same pattern as
-  `destinationDefaults`. NOT started.
-- Cosmetic polish deferred to `_POLISH-BACKLOG.md` per the guardrail. A clickable link on the signpost
-  notes (open the target doc via IntentLink) is a nice-to-have, deferred.
+5. **Frontend wired (slices c + d) — DONE + verified rendering.** `page.tsx` is now an async Server
+   Component: one GROQ query (`src/sanity/queries.ts`, `HOMEPAGE_QUERY`) fetches homePage + shared CTA +
+   latest 3 posts via `sanityFetch`, passes data to each section. `<SanityLive />` added to layout (Studio
+   edits live-refresh the page). All 8 sections wired (Hero, TheBoat, WhyUs, LatestArticles, Faq,
+   Testimonials, Cta, Contact) — each reads Sanity props with a fallback to its original hardcoded copy, so
+   the page never renders blank. Rich text via new shared `<RichText>` (@portabletext/react, installed);
+   plain-text fields via `toPlainText`. Images via `sanityImageProps` + explicit alt (local-asset fallback).
+   Destinations still `@/lib/destinations`; Footer/Nav unchanged. **Verified: `/` returns 200, every content
+   string renders, Sanity CDN images serve WITH working vanity filenames (`…/hero`, `…/why-us-divers`), 0
+   server errors.** tsc/eslint clean.
+   - **Bug caught + fixed by end-to-end verify:** a next/image `loader` *function* can't cross the RSC
+     boundary in Server Components (TheBoat, CTA) → "Functions cannot be passed to Client Components".
+     Removed the per-image loader; Next's own optimizer handles Sanity URLs (via cdn.sanity.io
+     remotePatterns). CDN-side resizing via a global `images.loaderFile` deferred to `_POLISH-BACKLOG.md`.
 
-### Repo state: clean + committed at this checkpoint. Frontend unchanged so the site still renders the
-hardcoded homepage exactly as before; all new work is schema/lib/config/seed. Safe local commit.
+### STILL TO DO (queued)
+- **Boat Defaults** (queued schema task) — `boatDefaults` singleton + slim `boat`, same pattern as
+  `destinationDefaults`. NOT started. Clean boundary — good candidate for a fresh session.
+- **Destinations migration** — homepage still uses `@/lib/destinations`; migrate to real `destination`
+  docs during the destination slice (next page).
+- **Footer/Nav** → wire to siteSettings/navigation in a separate global-chrome slice.
+- Polish backlog (`_POLISH-BACKLOG.md`): Sanity CDN loaderFile, LQIP blur, Why-Us focal point, rich-text in
+  FAQ/Why-Us, testimonial star rating.
+
+### Repo state: homepage vertical slice COMPLETE and committed. The rendered homepage is now Sanity-driven
+and reviewable (checkpoint #2). Frontend falls back to hardcoded copy if any field is empty, so it's safe.
 
 ---
 

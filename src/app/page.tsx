@@ -10,26 +10,33 @@ import { LatestArticles } from '@/components/sections/LatestArticles'
 import { Testimonials } from '@/components/sections/Testimonials'
 import { TheBoat } from '@/components/sections/TheBoat'
 import { WhyUs } from '@/components/sections/WhyUs'
+import { sanityFetch } from '@/sanity/lib/live'
+import { HOMEPAGE_QUERY, type HomePageQueryResult } from '@/sanity/queries'
 
-// Homepage — ported from ../v1-static-homepage (frozen static build) per CLAUDE.md's
-// migration plan. Locked section order: Nav → Hero → The Boat → Why Us → Destinations →
-// Latest Articles → FAQ → Testimonials → CTA → Contact → Footer. Content is still the
-// static build's hardcoded copy (no Sanity wiring yet) — homePage schema doesn't exist as
-// a document type until Tier 4; this pass proves the design system in Next.js first.
-export default function Home() {
+// Homepage — ported from ../v1-static-homepage and now wired to Sanity (homepage vertical slice,
+// 2026-07-16). Async Server Component: fetches the homePage singleton + shared CTA + latest posts
+// in one query and passes the data down to each section. Sections fall back to their original
+// hardcoded copy when a field is empty, so the page never renders blank. Locked section order:
+// Nav → Hero → The Boat → Why Us → Destinations → Latest Articles → FAQ → Testimonials → CTA →
+// Contact → Footer. Destinations still uses @/lib/destinations this slice (migrates to Sanity
+// destination docs in the destination slice); Footer/Nav are global chrome, wired separately.
+export default async function Home() {
+  const { data } = await sanityFetch({ query: HOMEPAGE_QUERY })
+  const { home, cta, latestPosts } = (data ?? {}) as HomePageQueryResult
+
   return (
     <>
       <Nav />
       <main className="flex flex-1 flex-col">
-        <Hero />
-        <TheBoat />
-        <WhyUs />
+        <Hero home={home} />
+        <TheBoat home={home} />
+        <WhyUs home={home} />
         <Destinations />
-        <LatestArticles />
-        <Faq />
-        <Testimonials />
-        <Cta />
-        <Contact />
+        <LatestArticles home={home} posts={latestPosts} />
+        <Faq home={home} />
+        <Testimonials home={home} />
+        <Cta cta={cta} />
+        <Contact home={home} />
       </main>
       <Footer />
       <ScrollReveal />

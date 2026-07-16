@@ -1,5 +1,4 @@
 import { createImageUrlBuilder, type SanityImageSource } from '@sanity/image-url'
-import type { ImageLoader } from 'next/image'
 
 import { dataset, projectId } from '../env'
 
@@ -109,16 +108,25 @@ export function urlForImage(image: SanityImageWithMeta) {
 }
 
 /**
- * `next/image` loader for Sanity-hosted images: lets Sanity's CDN do the per-width resizing and
- * format negotiation instead of Next's optimizer. Pass it ONLY to `<Image>`s whose `src` is a
- * Sanity URL (from `urlForImage(...).url()`); local `/assets/*` images keep the default loader.
- * `auto=format` serves WebP/AVIF when supported; `fit=max` never upscales past the source.
+ * Returns the `src` for a `next/image` from a Sanity image (the vanity-named CDN URL via
+ * `urlForImage`), falling back to a local `/assets` path when the Sanity image is absent (so a page
+ * never breaks if an editor clears an image). Spread onto an `<Image>` alongside an EXPLICIT `alt`
+ * and its own `fill`/`sizes`/`className`:
+ *   `<Image {...sanityImageProps(heroImage, '/assets/hero.webp')} alt={heroImage?.alt ?? '…'} fill />`
+ *
+ * NOTE: we intentionally do NOT return a custom `loader` here. A next/image `loader` is a function,
+ * and functions can't be passed across the RSC boundary into `<Image>` from a Server Component
+ * (TheBoat, CTA are Server Components) — it throws "Functions cannot be passed to Client
+ * Components". So Next's own optimizer handles Sanity URLs (enabled by the `cdn.sanity.io`
+ * remotePatterns in next.config.ts). Letting Sanity's CDN do the resizing instead (via a global
+ * `images.loaderFile`) is a perf optimization deferred to _POLISH-BACKLOG.md.
  */
-export const sanityImageLoader: ImageLoader = ({ src, width, quality }) => {
-  const url = new URL(src)
-  url.searchParams.set('w', String(width))
-  url.searchParams.set('q', String(quality ?? 80))
-  url.searchParams.set('auto', 'format')
-  url.searchParams.set('fit', 'max')
-  return url.toString()
+export function sanityImageProps(
+  image: SanityImageWithMeta | null | undefined,
+  fallbackSrc: string,
+): { src: string } {
+  if (image?.asset?._ref) {
+    return { src: urlForImage(image).url() }
+  }
+  return { src: fallbackSrc }
 }

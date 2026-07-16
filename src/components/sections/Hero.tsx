@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
 import { DESTINATIONS } from '@/lib/destinations'
+import { sanityImageProps } from '@/sanity/lib/image'
+import type { HomePageData } from '@/sanity/queries'
 
 // Ported from ../v1-static-homepage/sections/hero.html + assets/search.js. Figma 218:1901.
 // Full-bleed hero (does not use the centered container). MOBILE (<lg): no mobile Figma frame
@@ -18,7 +20,13 @@ function filterDestinations(query: string) {
   return DESTINATIONS.filter((d) => d.name.toLowerCase().includes(q))
 }
 
-export function Hero() {
+export function Hero({ home }: { home: HomePageData | null }) {
+  const eyebrow = home?.heroEyebrow ?? 'Liveaboard Diving Expeditions · Indonesia'
+  const headingAccent = home?.heroHeadingAccent ?? 'Mari Liveaboard'
+  const headingMain = home?.heroHeadingMain ?? 'Indonesia'
+  const subheading = home?.heroSubheading ?? "Premium Phinisi liveaboard sailing Indonesia’s best dive destinations."
+  const searchPlaceholder = home?.heroSearchPlaceholder ?? 'Where would you like to dive?'
+
   const [query, setQuery] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileQuery, setMobileQuery] = useState('')
@@ -60,8 +68,8 @@ export function Hero() {
       <section id="hero" aria-labelledby="hero-heading" className="relative isolate z-10 min-h-dvh w-full">
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <Image
-            src="/assets/hero.webp"
-            alt="Mari phinisi liveaboard sailing in Indonesia"
+            {...sanityImageProps(home?.heroImage, '/assets/hero.webp')}
+            alt={home?.heroImage?.alt ?? 'Mari phinisi liveaboard sailing in Indonesia'}
             fill
             priority
             sizes="100vw"
@@ -73,13 +81,13 @@ export function Hero() {
         <div className="flex min-h-dvh flex-col justify-center page-gutter-x py-32">
           <div data-reveal="left" className="mx-auto flex w-full max-w-[400px] flex-col items-center gap-24 text-center lg:mx-0 lg:items-start lg:gap-48 lg:text-left">
             <div className="flex flex-col gap-16">
-              <p className="text-eyebrow uppercase text-accent-ondark-primary">Liveaboard Diving Expeditions &middot; Indonesia</p>
+              <p className="text-eyebrow uppercase text-accent-ondark-primary">{eyebrow}</p>
               <h1 id="hero-heading" className="flex flex-col text-text-ondark-primary">
-                <span className="text-display-accent">Mari Liveaboard</span>
-                <span className="text-display-h1">Indonesia</span>
+                <span className="text-display-accent">{headingAccent}</span>
+                <span className="text-display-h1">{headingMain}</span>
               </h1>
               <p className="max-w-[400px] text-body-medium text-text-ondark-muted lg:text-body-large">
-                Premium Phinisi liveaboard sailing Indonesia&rsquo;s best dive destinations.
+                {subheading}
               </p>
             </div>
 
@@ -95,7 +103,7 @@ export function Hero() {
                   autoComplete="off"
                   aria-label="Where would you like to dive?"
                   aria-haspopup="dialog"
-                  placeholder="Where would you like to dive?"
+                  placeholder={searchPlaceholder}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onFocus={handleHeroInputFocus}
@@ -162,7 +170,7 @@ export function Hero() {
               type="search"
               autoComplete="off"
               aria-label="Where would you like to dive?"
-              placeholder="Where would you like to dive?"
+              placeholder={searchPlaceholder}
               value={mobileQuery}
               onChange={(e) => setMobileQuery(e.target.value)}
               className="min-w-0 flex-1 bg-transparent text-[16px] text-text-primary placeholder:text-text-secondary focus:outline-none"

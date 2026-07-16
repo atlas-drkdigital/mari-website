@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 
+import { toPlainText } from '@/components/RichText'
+import type { HomePageData } from '@/sanity/queries'
+
 // Ported from ../v1-static-homepage/sections/faq.html + assets/faq.js. Figma Section/FAQ
 // 401:1774. Only one item open at a time; clicking the open item closes it. Two STABLE
 // HTML columns (not CSS `columns-2`) — a multi-column layout re-balances items by height on
@@ -54,7 +57,18 @@ function FaqColumn({ items, openId, onToggle, columnOffset }: { items: typeof CO
   )
 }
 
-export function Faq() {
+export function Faq({ home }: { home: HomePageData | null }) {
+  const eyebrow = home?.faqEyebrow ?? 'Good to Know'
+  const heading = home?.faqHeading ?? 'Frequently asked questions'
+  const linkText = home?.faqLinkText ?? 'Read More'
+  // Sanity questions when present (flattened to {q,a}), else the original two hardcoded columns.
+  const allItems: { q: string; a: string }[] = home?.faqItems?.length
+    ? home.faqItems.map((f) => ({ q: f.question ?? '', a: toPlainText(f.answer) }))
+    : [...COLUMN_1, ...COLUMN_2]
+  const splitAt = Math.ceil(allItems.length / 2)
+  const col1 = allItems.slice(0, splitAt)
+  const col2 = allItems.slice(splitAt)
+
   const [openId, setOpenId] = useState<string | null>('faq-7')
   const toggle = (id: string) => setOpenId((prev) => (prev === id ? null : id))
 
@@ -63,19 +77,19 @@ export function Faq() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-dark)] bg-cover bg-center" />
       <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-[36px] page-gutter-x lg:gap-64">
         <div data-reveal="left" className="flex flex-col gap-24 lg:gap-32">
-          <p className="text-eyebrow uppercase text-accent-ondark-primary">Good to Know</p>
+          <p className="text-eyebrow uppercase text-accent-ondark-primary">{eyebrow}</p>
           <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:gap-48">
-            <h2 id="faq-heading" className="mr-[40px] max-w-[640px] text-display-h2 text-text-ondark-primary lg:mr-0">Frequently asked questions</h2>
+            <h2 id="faq-heading" className="mr-[40px] max-w-[640px] text-display-h2 text-text-ondark-primary lg:mr-0">{heading}</h2>
             <a href="#" className="group inline-flex h-48 w-fit shrink-0 items-center gap-4 border border-border-onimage-primary px-20 py-8 text-button-small uppercase text-text-ondark-primary transition-colors duration-300 ease-in-out hover:bg-text-ondark-primary/10 lg:ml-auto">
-              Read More
+              {linkText}
               <span aria-hidden="true" className="block size-[12px] shrink-0 bg-text-ondark-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
             </a>
           </div>
         </div>
 
         <div data-reveal className="flex flex-col gap-8 lg:flex-row lg:gap-80">
-          <FaqColumn items={COLUMN_1} openId={openId} onToggle={toggle} columnOffset={0} />
-          <FaqColumn items={COLUMN_2} openId={openId} onToggle={toggle} columnOffset={4} />
+          <FaqColumn items={col1} openId={openId} onToggle={toggle} columnOffset={0} />
+          <FaqColumn items={col2} openId={openId} onToggle={toggle} columnOffset={col1.length} />
         </div>
       </div>
     </section>

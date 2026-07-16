@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { DESTINATIONS } from '@/lib/destinations'
 import { MultiSelect } from '@/components/MultiSelect'
+import type { HomePageData } from '@/sanity/queries'
 
 // Ported from ../v1-static-homepage/sections/contact.html + assets/contact.js. Figma
 // Section/ContactUs 401:3397. Static/backend-less placeholder — no submit endpoint exists
@@ -25,7 +26,11 @@ function rollingMonths() {
 
 const GUEST_OPTIONS = [...Array.from({ length: 14 }, (_, i) => String(i + 1)), '14+']
 
-export function Contact() {
+export function Contact({ home }: { home: HomePageData | null }) {
+  const eyebrow = home?.contactEyebrow ?? 'Contact Us'
+  const heading = home?.contactHeading ?? 'Talk to us'
+  const intro = home?.contactIntro ?? 'Questions about routes, availability, or dive requirements? Send us a message.'
+
   const [submitted, setSubmitted] = useState(false)
   const [guests, setGuests] = useState('')
 
@@ -35,10 +40,10 @@ export function Contact() {
       <div className="mx-auto flex w-full max-w-[800px] flex-col items-center gap-[28px] lg:gap-48">
         <div data-reveal className="flex w-full flex-col gap-16">
           <div className="flex flex-col gap-32">
-            <p className="text-eyebrow uppercase text-action-primary">Contact Us</p>
-            <h2 id="contact-heading" className="max-w-[560px] text-display-h2 text-text-primary">Talk to us</h2>
+            <p className="text-eyebrow uppercase text-action-primary">{eyebrow}</p>
+            <h2 id="contact-heading" className="max-w-[560px] text-display-h2 text-text-primary">{heading}</h2>
           </div>
-          <p className="text-body-large text-text-primary">Questions about routes, availability, or dive requirements? Send us a message.</p>
+          <p className="text-body-large text-text-primary">{intro}</p>
         </div>
 
         <form
