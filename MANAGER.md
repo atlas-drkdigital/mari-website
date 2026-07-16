@@ -52,12 +52,29 @@ illustrative "Mari" mentions remain in the skill (acceptable, incident reference
    (if descriptive, skip `IMG_`/`DSC_` junk) → `alt` → omit. Applied to Mari's CLAUDE.md AND skill-wide.
    The `urlFor()` helper that implements it is still unbuilt (no components consume Sanity images yet).
 
-### Still in flight / next
-- **atlas-website** — Adinda installing now; payload ready; its handoff NOT yet reconciled (do after install).
-  Sequencing note baked in: atlas depends on the just-updated drk-website conventions.
-- **mari-website + mari-project** payloads — prepping next.
-- Tracked commit-ready: only markdown changed this session (CLAUDE.md, MANAGER.md tracked; `_handoff/*`
-  gitignored) — no code touched, repo clean.
+### Round COMPLETE — all 4 skills done (2026-07-16)
+All four skills ported chat-side, re-exported, installed, verified against the freshly-installed files,
+archived (canonical + dated snapshot in `OneDrive/Desktop/claude/drk-skills/`), Downloads cleaned, and
+handoffs reconciled to Done:
+- **drk-website** v0.10 — the big one (workflow/session conventions, gallery, image-alt correction, Next 16
+  stack, QA patterns, new troubleshooting + image-editing reference files). Two corrections caught pre-install.
+- **atlas-website** v0.6 — Testimonials hub (new file) + destination/boat/blog/faq/contact updates; homepage
+  as compare-and-flag; held items correctly not built.
+- **mari-website** v1.5 — announcement bar final spec, FAQ destination taxonomy, footer newsletter copy.
+- **mari-project** — status/sprint/skills-infra refreshed; scope items folded; contract set to Aug 10.
+
+**`is_featured` — DROPPED for v1** (Adinda confirmed 2026-07-16). Stopgap-edited into the installed
+`mari-website` faq.md; queued in `_handoff/mari-website.md` to persist chat-side next round.
+
+**All 5 `_handoff/*.md` files reconciled** (drk-website, atlas-website, mari-website, mari-project to Done;
+figma.md untouched — it's Figma-file syncs, a separate track, still Pending).
+
+### Next session (not this one)
+- **Tier 4 shell review** — still the real build-side priority; every shell is 🟡 unreviewed (see the
+  Tier 4 checkpoint below). This skills round was infrastructure, not build progress.
+- Open slugs/URL confirms (Private Charters, Schedule & Rates, `/boats/mari`), `author.bio`, required-field
+  markers — all still open from the Tier 4 session.
+- `_handoff/figma.md` drift-syncs (Figma-file edits) whenever a Figma session happens.
 
 ---
 
@@ -1150,6 +1167,7 @@ ones.
 | 2026-07-14 | Sanity schema pass + Studio branding + theme.css port | ~2h15–2h30 | First full backend session on this build — established schema/Studio/branding conventions from scratch. Expect meaningfully faster on similar future sessions now that the patterns exist. |
 | 2026-07-15 | Full homepage QA pass (every section, desktop + mobile) + fixes | **~2h** (Adinda's own tracked estimate, rounded up from ~1h48m measured mid-session) | **~1h of this was a false-alarm chase** (see below), not real QA/bug-fixing time. Once resolved, the actual QA pass covered all 11 sections (Nav, Hero, The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials, CTA, Contact, Footer) and turned up ~10 real bugs total, all fixed same session. **Calibration takeaway, revises the 2026-07-14 row's own assumption:** that earlier entry expected future sessions to be "meaningfully faster... now that the patterns exist" — true for *coding* patterns, but a full QA pass has its own largely-fixed cost regardless of how established the code conventions are, because QA time is dominated by *discovering* each section's specific bugs, not by applying known patterns. Budget a full single-homepage QA pass at **~2h** even on a well-patterned codebase, not scaled down just because earlier sessions established good conventions. Sub-note: a "barely any content on mobile" report that looked like a WebKit/iOS bug turned out to be `allowedDevOrigins` (dev server blocking LAN-IP requests), unrelated to any browser engine — see `references/troubleshooting.md`'s localhost-vs-LAN-IP check, which exists specifically to prevent this cost recurring. |
 | 2026-07-15 (later, same day) | Boat page full schema build + gallery redesign (3 iterations) + content-model changes (Full Rich Text Block extraction, alt-rule correction) + new tracking docs (`_SCHEMA-SPECS.md`/`_CONTENT-STATUS.md`/`_QA-CHECKLIST.md`) | **~4h30m elapsed, but Adinda estimates only ~70% (~3h10m) was active desk time** — ~30% was her doing other things (learning Japanese, cooking) while background tasks (dev server restarts, Sanity scripts) ran, not actively reviewing/responding. | **New calibration point, distinct from the 2026-07-14 row's caution:** elapsed time and active time diverge meaningfully when a session has real background-task latency (dev server restarts, `sanity exec` scripts, Perplexity/web research) — Adinda could step away during those. **Track both going forward**, not just one figure — elapsed matters for calendar/deadline planning, active time matters for comparing actual effort across sessions. This session's scope was large (full boat schema + 3 gallery redesign iterations + several corrected mistakes), so the ~3h10m active figure is the more honest "how much work was this" number. |
+| 2026-07-16 | Session-bookend protocol locked into CLAUDE.md + first full chat-side skills-update round: all 4 skills (drk-website, atlas-website, mari-website, mari-project) ported, installed, verified, archived, handoffs reconciled | **~1h elapsed (Adinda's estimate); active time notably lower** — she finished her kanji reviews in between, so this is an elapsed figure, not active. | **Calibration for skills-update rounds specifically:** a full 4-skill update round is heavily parallelizable with the user's other tasks. The heavy lifting was Claude-side (assembling self-contained payloads, verification greps, install/archive/reconcile), so Adinda's active involvement was mostly the chat-side paste + re-export + Downloads steps — she could step away during payload prep and Claude-side install/verify. Good template for future rounds: elapsed ≈ 1h for 4 skills, active user time a fraction of that. Distinct from the build-session rows above (those need active review/response). |
 
 ---
 
