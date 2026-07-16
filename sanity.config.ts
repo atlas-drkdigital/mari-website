@@ -31,9 +31,11 @@ const theme = buildLegacyTheme({
   // 350). The hex is what matters here, but the palette names have diverged from Figma since the port —
   // flagged 2026-07-16, worth a proper reconcile before anyone matches tokens by NAME across the two.
   '--brand-primary': '#cfbbaa', // Figma: chocolate/300 · our theme.css: primitive-copper-300
-  // Deliberately NOT changed to match --brand-primary: a pale button with Sanity's derived text risks
-  // the mirror-image of the bug we just fixed. Kept dark.
-  '--default-button-primary-color': '#8f6d51', // primitive-copper-600
+  // MUST move together with --brand-primary. Verified via DOM inspect 2026-07-16: the selected list row's
+  // `--card-bg-color` / `--card-border-color` derive from THIS token, not from --brand-primary. Leaving it
+  // dark while --brand-primary went light changed nothing visible — the exact symptom that cost a round of
+  // guessing. They were both #8f6d51 originally; they are one brand colour, so keep them in sync.
+  '--default-button-primary-color': '#cfbbaa', // Figma: chocolate/300
   '--focus-color': '#b58a2d', // primitive-amber-600
   '--component-text-color': '#1b2a4a', // primitive-navy-900, same as the website's --color-text-primary
   // --font-bricolage-grotesque is set by next/font/google on the <html> element in
