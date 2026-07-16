@@ -100,9 +100,16 @@ alt (and title/caption) are recommended-not-required everywhere.
 Alt matters for two reasons beyond accessibility: Sanity's CDN URLs are hash-based and can't be made
 descriptive at upload, but Sanity supports "vanity filenames" — a descriptive name appended after the
 hash (`.../{hash}-{w}x{h}.{ext}/{seo-name}.{ext}`), confirmed against Sanity's own docs. The
-`src/sanity/lib/image.ts` `urlFor()` helper should slugify from `alt` and append it as the vanity
-filename once image-rendering gets wired to Sanity (not built yet — no components consume Sanity
-images today). When alt is present it improves SEO; when blank the helper just falls back gracefully.
+`src/sanity/lib/image.ts` `urlFor()` helper should derive that vanity segment from a **fallback chain**
+(decided 2026-07-16, corrects the earlier "slugify from alt" default — that was a soft default, never a
+rigorous lock; alt is a full descriptive sentence and makes a poor filename):
+1. an optional editor-set **`seoImageName`** field, if filled (clean kebab-case control when wanted);
+2. else the asset's **`originalFilename`** (`asset->originalFilename`, which Sanity retains), if it looks
+   descriptive — skip it if it matches a junk pattern (`IMG_\d+`, `DSC\d+`, `photo\d+`, etc.);
+3. else the **`alt`** text slugified, as a last resort;
+4. else **omit** the vanity segment entirely (the image still serves fine, just no SEO name).
+Not built yet — no components consume Sanity images today. Skill-wide, not Mari-only (queued for
+`drk-website` via `_handoff/drk-website.md`).
 
 **Known follow-up:** `seo.ts`'s `ogImage`/`twitterImage`/`siteSettings` social images are still bare
 `type: 'image'` without an alt field — technically an exception to "every image has editable alt."
@@ -213,6 +220,50 @@ this decision if that ever changes** (a push-to-remote habit, the repo going pub
 
 Skill-wide for all DRK sites (Adinda's explicit ask) — queued for `drk-website`'s `references/workflow.md`
 via `_handoff/drk-website.md`, generalized (drop the Mari-specific file names).
+
+## Session bookend protocol — skills-backlog check + model + task-proposal format, locked 2026-07-16
+Standing procedure that runs at BOTH triggers, every time, not on request: (a) the start of a session
+when Adinda asks for a recap / "good morning", and (b) the natural end of every session. Adinda's explicit
+ask so it isn't reinvented per session. Order matters — do the skills-backlog check FIRST, before proposing
+or planning any work.
+
+### 1. Skills-backlog check — FIRST, before any work is proposed
+The skills live in the chat-side containers; there is **no live bridge** from this repo to them (see
+`_handoff/drk-website.md`'s own explanation), so merging a handoff into a skill happens manually, in chat.
+Procedure:
+- Check `_handoff/*.md` for content queued into the skills but not yet merged.
+- If there's a backlog, ask: **"Would you like to update those skills now in chat?"**
+- If yes: hand off **one skill at a time**. For each skill give (a) a ready-to-paste prompt for the
+  chat-side skill-update session, and (b) pointers to the exact handoff document(s)/sections that feed it.
+  Finish one skill fully, then move to the next — don't dump all skills at once (there are often several).
+- After the last skill: remind her — **"Don't forget to drop the updated skills into your Downloads folder
+  when they're done, and I'll install them."** She updates + downloads in chat; the packages land in
+  Downloads; Claude installs from there (per the skill install/update procedure).
+- Once she confirms they're updated/installed (or says they're already done): **clean up the handoff docs**
+  — strip the now-merged content out of `_handoff/*.md` and any MANAGER.md staging so the backlog doesn't
+  accumulate. (Verify what actually landed before cutting anything — same care as the existing handoff
+  reconciliation habit.)
+
+### 2. State the current model
+Every recap and every task proposal names the model Adinda is currently on.
+
+### 3. Task-proposal format — three things, always
+Every suggested task/plan carries all three, never just the plan: (a) the plan, (b) estimated hours,
+(c) recommended model + effort per the locked model logic (no Haiku/Fable; **Sonnet-high = default**;
+Sonnet-medium for menial tasks; **Opus for architecture-tier decisions**).
+
+### 4. Ask available time, then adapt
+Ask how much time / how many work blocks she has today. Adapt the proposed work to fit, and **flag
+explicitly if the available time changes the sprint substantially** — never let a sprint-impacting cut pass
+silently.
+
+### 5. Granular breakdown after agreement
+Once she agrees on a task, break it into a step-by-step subtask list, each subtask carrying its own hour
+estimate, small enough to start immediately. (A short note of reasoning is fine on a subtask where it
+genuinely matters; otherwise keep it to the step + estimate.)
+
+Generalized (non-Mari) version queued for `drk-website`'s `references/workflow.md` via
+`_handoff/drk-website.md`, alongside the daily-recap-template + commit-cadence workflow conventions.
 
 ## Review requests must always call out mobile explicitly, locked 2026-07-15
 Whenever Claude asks Adinda to review/QA something in a browser, the ask must name checking the **mobile

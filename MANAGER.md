@@ -10,7 +10,58 @@ forward — this file is now the live one.
 
 ---
 
-## SESSION CHECKPOINT — 2026-07-16, Tier 4 shell pass (READ THIS FIRST — supersedes all checkpoints below)
+## SESSION CHECKPOINT — 2026-07-16 (later), skills-update round + session-bookend protocol (READ THIS FIRST — supersedes all below)
+
+### What this session was
+Not a build session — a process/skills-infrastructure session. Two things: (1) locked a new standing
+**session-bookend protocol**, (2) ran the first real **chat-side skills-update round** off the accumulated
+`_handoff/*.md` backlog.
+
+### New standing protocol — locked into CLAUDE.md ("Session bookend protocol")
+Runs at BOTH session start (recap/"good morning") AND session end, every time. Order: (1) **skills-backlog
+check FIRST** — check `_handoff/*.md`, if there's a backlog ask "update skills now in chat?", hand off ONE
+skill at a time (paste-prompt + full content), remind to drop the re-export in Downloads, install, then
+clean the handoff docs; (2) **state the current model**; (3) every task proposal carries **plan + est.
+hours + recommended model/effort** (no Haiku/Fable; Sonnet-high default; Sonnet-medium menial; Opus
+architecture-tier); (4) **ask available work-blocks**, adapt, flag sprint impact; (5) after agreement,
+**granular subtask breakdown with per-task hours**. Generalized version ported to `drk-website`'s
+`workflow.md` this same session.
+
+### Key mechanism learned — payloads must INLINE local-only content
+The chat-side skill session **cannot see the local installed skill copy** (`.claude/skills/...`). Several
+drk-website handoff items said "landed in LOCAL copy" — that drafted text is invisible to chat. So a
+skills-update handoff must **lift and inline** any local-only reference content, not just point at it. Built
+self-contained payload files for this: `_handoff/_drk-website-chat-payload.md` (done) and
+`_handoff/_atlas-website-chat-payload.md` (ready). Each = every pending item + all local drafted content,
+generalized, organized by target reference file, with a matching paste-prompt.
+
+### drk-website — UPDATED + INSTALLED + ARCHIVED + reconciled
+Adinda updated it in chat from the payload, re-exported, Claude installed from Downloads. Verified against
+the freshly-installed files (not the changelog): new `troubleshooting.md` + `image-editing.md` exist;
+`workflow.md`/`sanity-cms.md`/`components.md`/`stack.md`/`pre-launch.md`/`claude-code.md` all grew. Archived
+to `OneDrive/Desktop/claude/drk-skills/` (canonical + dated snapshot), Downloads copy deleted.
+`_handoff/drk-website.md` reconciled — everything moved to a dated Done section; only the named-component
+catalog stays open (needs Mari's `COMPONENTS.md`, which doesn't exist as a file yet). Minor: ~13
+illustrative "Mari" mentions remain in the skill (acceptable, incident references).
+
+### Two corrections caught BEFORE install (would have regressed the skill)
+1. **Alt is `recommended-not-required`, never `Rule.required()`** — the old local `components.md` draft
+   still had the wrong required version.
+2. **Vanity filenames use a fallback chain**, decided this session, replacing the old "slugify from alt"
+   default (alt is a full sentence, poor filename): `seoImageName` (optional editor field) → `originalFilename`
+   (if descriptive, skip `IMG_`/`DSC_` junk) → `alt` → omit. Applied to Mari's CLAUDE.md AND skill-wide.
+   The `urlFor()` helper that implements it is still unbuilt (no components consume Sanity images yet).
+
+### Still in flight / next
+- **atlas-website** — Adinda installing now; payload ready; its handoff NOT yet reconciled (do after install).
+  Sequencing note baked in: atlas depends on the just-updated drk-website conventions.
+- **mari-website + mari-project** payloads — prepping next.
+- Tracked commit-ready: only markdown changed this session (CLAUDE.md, MANAGER.md tracked; `_handoff/*`
+  gitignored) — no code touched, repo clean.
+
+---
+
+## SESSION CHECKPOINT — 2026-07-16, Tier 4 shell pass (superseded by the checkpoint above)
 
 ### State of the repo right now
 Clean and verified: `tsc`, `eslint`, fresh dev server restart (all node processes killed first, `.next`
