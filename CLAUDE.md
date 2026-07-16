@@ -195,6 +195,38 @@ one real document with content — pull copy from the mockup where it exists, us
 homepage's own titles/copy) where it doesn't, tag placeholders in `_CONTENT-STATUS.md`. Pairs with the
 vertical-slice approach: real content + real rendered page = meaningful review. Applies to every type.
 
+## Decluttering the editing form — separate fields by how often they're touched (locked 2026-07-16)
+Principle Adinda likes: keep the primary content front-and-center; move rarely-touched fields out of the
+way, chosen by WHY they're rarely touched.
+- **Shared across many instances** → a `[Type] Defaults` singleton, off the page entirely, edited once
+  (with a `{token}` for the per-instance part, e.g. `{destination}`). Use ONLY for template-based page
+  types with **multiple** instances (Destinations ✓; Boats *once there's a 2nd boat*). **Never for
+  single-instance/singleton pages** — there's nothing to share, it just adds indirection.
+- **Rarely touched but instance-specific** → keep it on the doc but tuck it away: a collapsible/collapsed
+  `fieldset` (`options: { collapsible: true, collapsed: true }`) and/or a dedicated **"Advanced" tab**
+  (group). These **compose** — an Advanced tab can hold collapsed fieldsets; a collapsed fieldset can also
+  sit inside the main tab. (Fieldsets = titled sections visible in "All Fields"; groups = tabs; a field can
+  declare both.) This is how single-instance pages (homepage, about, T&C) declutter, since they can't use a
+  Defaults singleton.
+Skill-wide (Adinda's ask) — queued for `drk-website`.
+
+## Localization Studio UX — fix the "which language is this doc?" list problem AT i18n-build time (documented 2026-07-16)
+Not now (i18n is a deferred paid add-on) — but capture the solution so we implement it when localization is
+turned on. When document-level i18n is on, full-page types (`destination`, `boat`, `blogPost`, `page`,
+`homePage`) get **one document per language**, which raises a real list-UX concern (Adinda's, 2026-07-16):
+you can't tell which list row is which language. The fix, applied then:
+- Set each localized type's `preview` (subtitle / `prepare()`) to show the language → the list reads
+  "Mari (EN)" / "Mari (DE)", never a blind click. `@sanity/document-internationalization` also adds its own
+  language badge.
+- In Structure Builder, **filter/split lists by language** — a document list is just a GROQ filter on the
+  `language` field (`*[_type==$t && language==$lang]`), so "English ▸ Destinations" / "German ▸
+  Destinations" as separate lists, or group translations under one entry with an in-document language
+  switcher.
+- **Singletons** (`siteSettings`, `destinationDefaults`, `cta`) use **field-level** i18n → stay ONE doc, so
+  they have no list problem at all.
+This is presentational Studio config, no schema change — and the Defaults+token pattern actively *helps*
+(translate shared chrome once per language, not per instance). Skill-wide — queued for `drk-website`.
+
 ## Sanity Studio editor-organization — defer to last, confirmed safe
 Field `title`/`description`/tab-grouping and the Structure Builder (sidebar navigation/grouping) are presentational metadata — changing them later costs no data migration. What needs to be reasonably right from the schema-pass itself: the actual field `name` keys and document type `name`s, since renaming those after real content exists needs a migration script. Polish the editor experience last, once every type exists and the full picture is visible — don't front-load it.
 
