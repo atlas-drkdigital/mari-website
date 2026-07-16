@@ -112,6 +112,38 @@ export const destinationType = defineType({
       rows: 2,
       group: 'basicInfo',
       fieldset: 'basicInfoFs',
+      description: 'The short punchy line shown under the name on cards and the homepage carousel.',
+    }),
+    // seasonNights + excerpt + order added 2026-07-16 for the homepage Destinations carousel
+    // (which reads real destination docs now, not a hardcoded list). INTERIM: seasonNights is a
+    // preformatted string for now; it overlaps with the `stats` Season/Duration values and may be
+    // derived from them (or from itineraries) when the destination page slice is built. `order`
+    // is a simple manual sort key — a proper orderable-list plugin can replace it later. Both are
+    // cheap, re-seedable placeholders per the vertical-slice approach.
+    defineField({
+      name: 'seasonNights',
+      title: 'Season · nights (card line)',
+      type: 'string',
+      group: 'basicInfo',
+      fieldset: 'basicInfoFs',
+      description: 'Short season/duration line shown on cards and the homepage carousel, e.g. “May–September · 12 Nights”.',
+    }),
+    defineField({
+      name: 'excerpt',
+      title: 'Card summary',
+      type: 'text',
+      rows: 3,
+      group: 'basicInfo',
+      fieldset: 'basicInfoFs',
+      description: 'A few sentences summarising this destination, shown on the homepage carousel and destination cards.',
+    }),
+    defineField({
+      name: 'order',
+      title: 'Sort order',
+      type: 'number',
+      group: 'basicInfo',
+      fieldset: 'basicInfoFs',
+      description: 'Controls the order destinations appear in lists and the homepage carousel (lower first).',
     }),
     defineField({
       name: 'stats',

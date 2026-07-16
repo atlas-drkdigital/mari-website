@@ -2,9 +2,8 @@
 
 import { useState } from 'react'
 
-import { DESTINATIONS } from '@/lib/destinations'
 import { MultiSelect } from '@/components/MultiSelect'
-import type { HomePageData } from '@/sanity/queries'
+import type { DestinationCardData, SiteSettingsContact } from '@/sanity/queries'
 
 // Ported from ../v1-static-homepage/sections/contact.html + assets/contact.js. Figma
 // Section/ContactUs 401:3397. Static/backend-less placeholder — no submit endpoint exists
@@ -26,10 +25,10 @@ function rollingMonths() {
 
 const GUEST_OPTIONS = [...Array.from({ length: 14 }, (_, i) => String(i + 1)), '14+']
 
-export function Contact({ home }: { home: HomePageData | null }) {
-  const eyebrow = home?.contactEyebrow ?? 'Contact Us'
-  const heading = home?.contactHeading ?? 'Talk to us'
-  const intro = home?.contactIntro ?? 'Questions about routes, availability, or dive requirements? Send us a message.'
+export function Contact({ settings, destinations }: { settings: SiteSettingsContact | null; destinations: DestinationCardData[] }) {
+  const eyebrow = settings?.contactEyebrow ?? ''
+  const heading = settings?.contactHeading ?? ''
+  const intro = settings?.contactIntro ?? ''
 
   const [submitted, setSubmitted] = useState(false)
   const [guests, setGuests] = useState('')
@@ -94,7 +93,7 @@ export function Contact({ home }: { home: HomePageData | null }) {
               </div>
             </div>
             <div className="flex flex-col gap-24 md:flex-row md:gap-32">
-              <MultiSelect id="contact-destinations" label="Preferred Destination (Optional)" placeholder="Select destinations" name="destinations" options={[...DESTINATIONS.map((d) => d.name), 'Not sure']} />
+              <MultiSelect id="contact-destinations" label="Preferred Destination (Optional)" placeholder="Select destinations" name="destinations" options={[...destinations.map((d) => d.name ?? '').filter(Boolean), 'Not sure']} />
               <MultiSelect id="contact-departure" label="Preferred Departure Month (Optional)" placeholder="Select months" name="departure_month" options={rollingMonths()} />
             </div>
             <div className="flex flex-col gap-12">

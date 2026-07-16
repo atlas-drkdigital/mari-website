@@ -3,29 +3,29 @@
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
-import { DESTINATIONS } from '@/lib/destinations'
 import { sanityImageProps } from '@/sanity/lib/image'
-import type { HomePageData } from '@/sanity/queries'
+import type { DestinationCardData, HomePageData } from '@/sanity/queries'
 
 // Ported from ../v1-static-homepage/sections/hero.html + assets/search.js. Figma 218:1901.
 // Full-bleed hero (does not use the centered container). MOBILE (<lg): no mobile Figma frame
 // exists — full-viewport height, all content centered; destination search opens a full-screen
 // takeover instead of the inline dropdown. Desktop (>=lg): CSS :focus-within reveals the
-// inline dropdown; typing filters it.
+// inline dropdown; typing filters it. The search list is built from real `destination` docs
+// (full-wire slice, 2026-07-16).
 const MOBILE_QUERY = '(max-width: 1023.98px)'
 
-function filterDestinations(query: string) {
+function filterDestinations(destinations: DestinationCardData[], query: string) {
   const q = query.trim().toLowerCase()
-  if (!q) return DESTINATIONS
-  return DESTINATIONS.filter((d) => d.name.toLowerCase().includes(q))
+  if (!q) return destinations
+  return destinations.filter((d) => (d.name ?? '').toLowerCase().includes(q))
 }
 
-export function Hero({ home }: { home: HomePageData | null }) {
-  const eyebrow = home?.heroEyebrow ?? 'Liveaboard Diving Expeditions · Indonesia'
-  const headingAccent = home?.heroHeadingAccent ?? 'Mari Liveaboard'
-  const headingMain = home?.heroHeadingMain ?? 'Indonesia'
-  const subheading = home?.heroSubheading ?? "Premium Phinisi liveaboard sailing Indonesia’s best dive destinations."
-  const searchPlaceholder = home?.heroSearchPlaceholder ?? 'Where would you like to dive?'
+export function Hero({ home, destinations }: { home: HomePageData | null; destinations: DestinationCardData[] }) {
+  const eyebrow = home?.heroEyebrow ?? ''
+  const headingAccent = home?.heroHeadingAccent ?? ''
+  const headingMain = home?.heroHeadingMain ?? ''
+  const subheading = home?.heroSubheading ?? ''
+  const searchPlaceholder = home?.heroSearchPlaceholder ?? ''
 
   const [query, setQuery] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -69,7 +69,7 @@ export function Hero({ home }: { home: HomePageData | null }) {
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <Image
             {...sanityImageProps(home?.heroImage, '/assets/hero.webp')}
-            alt={home?.heroImage?.alt ?? 'Mari phinisi liveaboard sailing in Indonesia'}
+            alt={home?.heroImage?.alt ?? ''}
             fill
             priority
             sizes="100vw"
@@ -115,12 +115,12 @@ export function Hero({ home }: { home: HomePageData | null }) {
               {/* destinations dropdown — desktop only, revealed on focus via CSS focus-within */}
               <div className="absolute inset-x-0 top-full z-20 mt-4 hidden overflow-hidden rounded-md bg-background-ondark-muted shadow-card lg:group-focus-within:block">
                 <ul aria-label="Destinations" className="flex flex-col divide-y divide-text-ondark-primary/10 py-8">
-                  {filterDestinations(query).map((dest) => (
-                    <li key={dest.id}>
+                  {filterDestinations(destinations, query).map((dest) => (
+                    <li key={dest._id}>
                       <button
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => selectDestination(dest.name)}
+                        onClick={() => selectDestination(dest.name ?? '')}
                         className="flex w-full items-baseline gap-8 px-24 py-12 text-left transition-colors duration-300 ease-in-out hover:bg-text-ondark-primary/5"
                       >
                         <span className="shrink-0 whitespace-nowrap text-body-medium text-text-ondark-primary">{dest.name}</span>
@@ -183,9 +183,9 @@ export function Hero({ home }: { home: HomePageData | null }) {
         </div>
 
         <ul aria-label="Destinations" className="flex min-h-0 flex-1 flex-col overflow-y-auto divide-y divide-border-default page-gutter-x">
-          {filterDestinations(mobileQuery).map((dest) => (
-            <li key={dest.id}>
-              <button type="button" onClick={() => selectMobileDestination(dest.name)} className="flex w-full items-baseline gap-8 py-16 text-left">
+          {filterDestinations(destinations, mobileQuery).map((dest) => (
+            <li key={dest._id}>
+              <button type="button" onClick={() => selectMobileDestination(dest.name ?? '')} className="flex w-full items-baseline gap-8 py-16 text-left">
                 <span className="shrink-0 whitespace-nowrap text-body-medium text-text-primary">{dest.name}</span>
                 <span className="min-w-0 truncate text-caption-label text-text-secondary">{dest.tagline}</span>
               </button>

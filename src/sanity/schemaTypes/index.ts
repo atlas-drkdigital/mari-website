@@ -29,6 +29,7 @@ import { ctaType } from './documents/cta'
 import { itineraryType } from './documents/itinerary'
 import { testimonialType } from './documents/testimonial'
 import { faqType } from './documents/faq'
+import { faqGeneralType } from './documents/faqGeneral'
 import { blogPostType } from './documents/blogPost'
 import { blogCategoryType } from './documents/blogCategory'
 import { authorType } from './documents/author'
@@ -68,6 +69,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     itineraryType,
     testimonialType,
     faqType,
+    faqGeneralType,
     blogPostType,
     blogCategoryType,
     authorType,

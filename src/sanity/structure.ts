@@ -2,7 +2,7 @@ import type { StructureResolver } from 'sanity/structure'
 
 // Singletons are enforced here (fixed document ID), not via a schema option —
 // see sanity-best-practices skill's studio-structure.md.
-const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage', 'destinationDefaults', 'cta']
+const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage', 'destinationDefaults', 'cta', 'faqGeneral']
 // Pinned single-instance `page` documents (About, Private Charters) — schema type is still the
 // generic `page` (Private Charters' dedicated-vs-generic decision isn't locked, About never
 // needed its own type), but each gets a fixed sidebar slot by document ID so they're easy to
@@ -25,6 +25,7 @@ const PLACED_TYPES = [
   'itinerary',
   'testimonial',
   'faq',
+  'faqGeneral',
   'blogPost',
   'blogCategory',
   'author',
@@ -115,7 +116,11 @@ export const structure: StructureResolver = (S) =>
         .title('Announcements')
         .child(S.documentTypeList('announcementBar').title('Announcements')),
       S.documentTypeListItem('whyUsItem').title('Why Us Items'),
-      S.documentTypeListItem('faq').title('FAQ'),
+      // General FAQ = a single inline-array document (categories → questions), edited in place — NOT a
+      // pile of reference docs (see CLAUDE.md editor-experience principle + FAQ remodel). Destination-
+      // specific FAQs are the separate `faq` documents below, clearly labelled so the split is obvious.
+      singleton(S, 'faqGeneral', 'FAQ (General)'),
+      S.documentTypeListItem('faq').title('FAQ (Destination-specific)'),
       S.documentTypeListItem('testimonial').title('Testimonials'),
       // Crew members (shown on the About page) — a repeatable shared component, placed here per
       // Adinda's ask 2026-07-16.

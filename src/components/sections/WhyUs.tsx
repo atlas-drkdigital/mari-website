@@ -12,39 +12,8 @@ import type { HomePageData } from '@/sanity/queries'
 // Figma Home/Section/Why Us 218:1345. Desktop: 4 equal cards, hovering/focusing one expands
 // it (~50%) and fades in its description; leaving the track clears the active state entirely
 // (no default-active card, per Adinda's 2026-07-07 correction). Mobile: horizontal
-// peek-carousel (scroll-snap + drag-to-scroll).
-const CARDS = [
-  {
-    id: 'divers',
-    title: 'Built for Divers',
-    description: 'Spacious dive deck, Nitrox, 3 dedicated tenders, and experienced local dive guides.',
-    image: '/assets/why-us-divers.webp',
-    alt: 'Aerial view of divers in wetsuits preparing their gear on the dive deck of the Mari phinisi',
-    objectPosition: '58% center',
-  },
-  {
-    id: 'dining',
-    title: 'Premium Comfort',
-    description: '7 sea-view ensuite cabins, 50 sqm al fresco dining with bar and 270° sea views, sundeck, and shaded lounge deck.',
-    image: '/assets/why-us-dining.webp',
-    alt: "Long communal dining table set with fresh fruit and drinks in the boat's al fresco saloon",
-  },
-  {
-    id: 'cabin',
-    title: 'Exceptional Value',
-    description: 'Premium amenities and personal service at a fraction of comparable liveaboard rates.',
-    image: '/assets/why-us-cabin.webp',
-    alt: 'Guest cabin with a made bed beside a curtained window',
-  },
-  {
-    id: 'crew',
-    title: '1:1 Crew to Guest Ratio',
-    description: '14 crew for 14 guests, including a 4:1 diver-to-guide ratio, ensuring attentive service throughout.',
-    image: '/assets/why-us-crew.webp',
-    alt: 'Mari crew standing on the bowsprit of the phinisi under a clear blue sky',
-  },
-]
-
+// peek-carousel (scroll-snap + drag-to-scroll). Cards come from the referenced `whyUsItem` docs
+// (full-wire slice, 2026-07-16) — no hardcoded fallback.
 type WhyUsCard = {
   id: string
   title: string
@@ -55,18 +24,15 @@ type WhyUsCard = {
 }
 
 export function WhyUs({ home }: { home: HomePageData | null }) {
-  const eyebrow = home?.whyUsEyebrow ?? 'About Us'
-  const heading = home?.whyUsHeading ?? 'Why choose Mari'
-  // Sanity items when present, else the original hardcoded cards.
-  const cards: WhyUsCard[] = home?.whyUsItems?.length
-    ? home.whyUsItems.map((item) => ({
-        id: item._id,
-        title: item.headline ?? '',
-        description: toPlainText(item.description),
-        imageProps: sanityImageProps(item.image, '/assets/why-us-cabin.webp'),
-        alt: item.image?.alt ?? '',
-      }))
-    : CARDS.map((c) => ({ id: c.id, title: c.title, description: c.description, imageProps: { src: c.image }, alt: c.alt, objectPosition: c.objectPosition }))
+  const eyebrow = home?.whyUsEyebrow ?? ''
+  const heading = home?.whyUsHeading ?? ''
+  const cards: WhyUsCard[] = (home?.whyUsItems ?? []).map((item) => ({
+    id: item._id,
+    title: item.headline ?? '',
+    description: toPlainText(item.description),
+    imageProps: sanityImageProps(item.image, '/assets/why-us-cabin.webp'),
+    alt: item.image?.alt ?? '',
+  }))
 
   const [active, setActive] = useState<string | null>(null)
   const trackRef = useDragScroll<HTMLDivElement>()

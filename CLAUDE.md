@@ -23,6 +23,23 @@ deferrable and costs nothing to change later, want to do it now or move on?" —
 complying either way. This is a "surface it and let Adinda decide" rule, every time it comes up, not
 a judgment call to make quietly on her behalf.
 
+## Guiding principle — the CMS/admin experience is a product surface, not just the front end (locked 2026-07-16)
+Adinda's explicit standing correction: build for TWO kinds of user, not one. The site visitor (front end) AND
+the non-technical admin/owner editing content in Studio (back end). The editor is a real user; an intuitive,
+self-explanatory CMS is a **selling point** for DRK, not an afterthought. **Decision rule: when a
+"cleaner-in-code" model (normalization, references, developer convenience) conflicts with the model a
+non-technical owner would find obvious (inline arrays they can see + drag + edit in place, drag-order over
+manual numbers, content where they'd expect it, labels that explain themselves), editor-intuitiveness WINS —
+unless there is a real technical reason (genuine cross-page reuse, data integrity, performance).** This is the
+thread already behind the required-field markers, section-label tabs, fieldset headers, form decluttering, and
+evergreen-field-description rules — now made explicit. **Standing behavior:** proactively FLAG whenever
+developer-convenience and editor-intuitiveness diverge (e.g. "the normalized model is references, but the
+editor-friendly model is an inline array — here's the tradeoff") and let Adinda decide, rather than silently
+optimizing for the code. Precedent: the FAQ remodel 2026-07-16 (reference documents → inline array) was chosen
+on exactly this basis — the reference pile forced editors to open a whole document per Q&A and hand-manage a
+display cap, which is unintuitive; an inline array is what a non-dev expects. Skill-wide (DRK philosophy) —
+queued for `drk-website` via `_handoff/drk-website.md`.
+
 ## Skills to load this session
 - `mari-project` — engagement status, active workstreams, what's next
 - `drk-website` — stack conventions (this file adds only what's Mari-specific)
@@ -178,7 +195,31 @@ Refines the earlier strict phase-gate (all schema, then all frontend). Two phase
    - Suggested slice order: **homepage first** (its frontend already exists — wire it to Sanity, lowest
      churn), then destination, then the rest. Lock shared types (`imageWithAlt`, rich-text tiers, `seo`,
      gallery object) before leaning on them cross-page.
+   - **A slice is FULLY wired — no leftover hardcoded content — in one pass (locked 2026-07-16, Adinda; UNDER
+     TEST, confirm at end of build).** When a page is sliced, EVERY content element on it that is *supposed*
+     to be editable must be wired to Sanity in that same pass — do NOT leave a section reading hardcoded copy
+     "for now," and do NOT ship the `?? 'hardcoded fallback'` pattern that silently substitutes the original
+     strings when a field is empty (that pattern *sabotages review* — Adinda can't tell wired-and-working
+     from unwired-showing-old-copy). Where real content doesn't exist yet, **seed placeholder** (literal
+     `"placeholder"` / lorem ipsum / a stock image) so the section renders from Sanity, never blank — the
+     content being incomplete is fine, the wiring being incomplete is not. Then a page reviews as the *actual*
+     Sanity-driven page, and the only end-of-build check is "which fields are still placeholder" (tracked in
+     `_CONTENT-STATUS.md`), never "which components were never connected." **Carve-out:** genuinely global
+     chrome (Nav, Footer, global contact details) is NOT page content — it belongs to `siteSettings`/
+     `navigation` and is wired in a dedicated global-chrome slice, so it may stay hardcoded on a page slice
+     until that slice runs. The render must still degrade gracefully (empty reference array → section hides,
+     never throws) even though placeholder seeding means it shouldn't happen in practice.
+   - **Nav/Footer links un-hardcode INCREMENTALLY, automatically, per slice (locked 2026-07-16, Adinda).**
+     Standing sub-step of every page slice, not a one-off: when a page slice ships, **update the Nav and
+     Footer link(s) that point to that page to the real route** — so navigation visibly starts working page
+     by page. This is a checklist item baked into the slice, done every time without being re-requested. The
+     nav/footer *structure* stays hardcoded until the dedicated global-chrome slice does the full dynamic
+     wiring (Sanity-driven menu + destinations mega-menu) — only the link targets get fixed incrementally
+     here. (Footer *content* — newsletter/disclaimer/copyright/brand-alias — is its own small siteSettings
+     pass, separate from both.)
 Skill-wide (Adinda's ask) — queued for `drk-website`'s `references/workflow.md` (refines its Phase 6→7 order).
+The full-wire-per-slice rule is ALSO queued for `drk-website` (see `_handoff/drk-website.md`), marked
+under-test until the build confirms it end-to-end.
 
 ## Studio form section headers — every group gets a matching titled fieldset (site-wide, locked 2026-07-16)
 Distinct from "editor-organization deferred to last" below (that's field titles/descriptions/sidebar polish

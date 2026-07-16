@@ -6,36 +6,19 @@ import type { CtaCardData } from '@/sanity/queries'
 // Ported from ../v1-static-homepage/sections/cta.html. Figma Section/CTA 401:2438.
 // Whole card (photo, heading, body, link text) is ONE <a> — not a card with a nested link,
 // per Adinda's explicit "the entire image, as well as Find Out More, should be clickable."
-// Content comes from the shared `cta` singleton (reused across pages); the two cards fall back to
-// the original hardcoded copy/images if the singleton is empty. Background photos stay decorative
-// (alt="", aria-hidden) — the text lives in the DOM alongside them.
-const FALLBACK = [
-  {
-    heading: 'Book a private charter',
-    description:
-      'Charter the entire boat for a private liveaboard adventure in Indonesia. Full itinerary flexibility, exclusive use, up to 14 guests.',
-    buttonText: 'Find Out More',
-    imageSrc: '/assets/cta-private-charter.webp',
-  },
-  {
-    heading: 'Join a shared diving trip',
-    description: 'Join a scheduled dive cruise departure and dive Indonesia’s best waters alongside fellow divers',
-    buttonText: 'Find a Trip',
-    imageSrc: '/assets/cta-shared-trip.webp',
-  },
-]
-
+// Content comes from the shared `cta` singleton (reused across pages) — no hardcoded fallback
+// (full-wire slice, 2026-07-16). Background photos stay decorative (alt="", aria-hidden) — the
+// text lives in the DOM alongside them.
 export function Cta({ cta }: { cta: { cards?: CtaCardData[] } | null }) {
-  const cards = FALLBACK.map((f, i) => {
-    const c = cta?.cards?.[i]
-    return {
-      key: c?._key ?? f.imageSrc,
-      heading: c?.heading ?? f.heading,
-      description: c?.description ?? f.description,
-      buttonText: c?.buttonText ?? f.buttonText,
-      imageProps: sanityImageProps(c?.image, f.imageSrc),
-    }
-  })
+  const cards = (cta?.cards ?? []).map((c) => ({
+    key: c._key,
+    heading: c.heading ?? '',
+    description: c.description ?? '',
+    buttonText: c.buttonText ?? '',
+    imageProps: sanityImageProps(c.image, '/assets/cta-private-charter.webp'),
+  }))
+
+  if (cards.length === 0) return null
 
   return (
     <section id="cta" aria-labelledby="cta-heading" className="w-full">

@@ -27,18 +27,26 @@ export const HOMEPAGE_QUERY = groq`{
     whyUsItems[]->{ _id, headline, description, image${IMAGE} },
     latestArticlesEyebrow, latestArticlesHeading, latestArticlesLinkText,
     faqEyebrow, faqHeading, faqLinkText,
-    faqItems[]->{ _id, question, answer, generalCategory },
     testimonialsEyebrow, testimonialsHeading, testimonialsLinkText,
-    testimonialItems[]->{ _id, name, date, title, text, rating },
-    contactEyebrow, contactHeading, contactIntro
+    testimonialItems[]->{ _id, name, date, title, text, rating }
   },
   "cta": *[_id == "cta"][0]{
     cards[]{ _key, heading, description, buttonText, image${IMAGE} }
+  },
+  "faq": *[_id == "faqGeneral"][0]{
+    "questions": categories[].questions[]{ question, answer }
   },
   "latestPosts": *[_type == "blogPost" && defined(postDate) && defined(slug.current)] | order(postDate desc)[0...3]{
     _id, title, "slug": slug.current, excerpt, postDate,
     "category": category->name,
     coverImage${IMAGE}
+  },
+  "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
+    _id, name, tagline, seasonNights, excerpt, "slug": slug.current,
+    coverImage${IMAGE}
+  },
+  "settings": *[_id == "siteSettings"][0]{
+    contactEyebrow, contactHeading, contactIntro
   }
 }`
 
@@ -51,10 +59,8 @@ export type WhyUsItemData = {
 }
 
 export type FaqItemData = {
-  _id: string
   question?: string
   answer?: PortableTextBlock[]
-  generalCategory?: string
 }
 
 export type TestimonialData = {
@@ -84,6 +90,22 @@ export type LatestPostData = {
   coverImage?: SanityImageWithMeta
 }
 
+export type DestinationCardData = {
+  _id: string
+  name?: string
+  tagline?: string
+  seasonNights?: string
+  excerpt?: string
+  slug?: string
+  coverImage?: SanityImageWithMeta
+}
+
+export type SiteSettingsContact = {
+  contactEyebrow?: string
+  contactHeading?: string
+  contactIntro?: string
+}
+
 export type HomePageData = {
   heroEyebrow?: string
   heroHeadingAccent?: string
@@ -105,18 +127,17 @@ export type HomePageData = {
   faqEyebrow?: string
   faqHeading?: string
   faqLinkText?: string
-  faqItems?: FaqItemData[]
   testimonialsEyebrow?: string
   testimonialsHeading?: string
   testimonialsLinkText?: string
   testimonialItems?: TestimonialData[]
-  contactEyebrow?: string
-  contactHeading?: string
-  contactIntro?: string
 }
 
 export type HomePageQueryResult = {
   home: HomePageData | null
   cta: { cards?: CtaCardData[] } | null
   latestPosts: LatestPostData[]
+  destinations: DestinationCardData[]
+  settings: SiteSettingsContact | null
+  faq: { questions?: FaqItemData[] } | null
 }

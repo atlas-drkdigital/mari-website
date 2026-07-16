@@ -10,7 +10,65 @@ forward — this file is now the live one.
 
 ---
 
-## SESSION CHECKPOINT — 2026-07-16 (evening), homepage vertical slice COMPLETE (schema + content + frontend wired) (READ THIS FIRST — supersedes all below)
+## SESSION CHECKPOINT — 2026-07-16 (late), homepage FULL-WIRE + FAQ inline-array remodel (READ THIS FIRST — supersedes all below)
+
+### What this session did
+Took the homepage from "wired-with-hardcoded-fallbacks" to **fully Sanity-driven, no hardcoded content
+fallbacks** (Adinda's call — the `?? 'hardcoded'` pattern sabotaged review; see CLAUDE.md "A slice is FULLY
+wired"), plus several content-model decisions. Model: Opus throughout. Verified clean end-to-end
+(tsc + eslint + `sanity schema validate` + GROQ query-back + `/` and `/studio` 200 after clean restart).
+
+### DONE + verified
+1. **Stripped ALL hardcoded fallbacks** from the 10 sections (Hero, TheBoat, WhyUs, Destinations,
+   LatestArticles, Faq, Testimonials, Cta, Contact) — each now reads from Sanity, degrades gracefully to
+   empty (never throws), and the real copy was **saved INTO Sanity** (not left in the components).
+2. **Destinations wired to real docs.** Seeded **9 `destination` docs** (partial: name, tagline,
+   seasonNights, excerpt, order, coverImage — data pulled from the built carousel + mari-core; flores/bali/
+   n-sulawesi/halmahera excerpts are placeholder). Carousel + Hero search + Contact destination picker all
+   read real docs now. **Added 3 interim `destination` fields** (`seasonNights`, `excerpt`, `order`) — flagged
+   to reconcile in the destination slice (seasonNights overlaps `stats`; `order` may become an orderable-list
+   plugin). Komodo patched (kept its full copy).
+3. **Contact section copy moved off homePage → `siteSettings` ("Contact Section": eyebrow/heading/intro)** —
+   it's global/near-everywhere, only labels are editable (Adinda's call). Form fields stay code; submission =
+   Resend (future). Contact detail (`info@` etc.) → siteSettings in the global-chrome slice.
+4. **Testimonials:** the 4 AI-draft demo reviews moved from hardcoded → seeded `testimonial` docs (titles
+   keep "[DRAFT]", REMOVE-before-launch); homepage shows 8.
+5. **FAQ REMODEL — reference docs → inline array (intuitive-CMS decision).** New **`faqGeneral` singleton**
+   = one array of **categories → questions** ({title} → [{question, answer}]), drag-reorder both levels, add
+   inline. Homepage shows the general FAQs **automatically** (first `HOMEPAGE_FAQ_LIMIT`=10; the "Read More"
+   link covers the rest on the future FAQ page) — no hand-picking, no reference array, no max-items confusion.
+   Deleted the 8 obsolete general `faq` docs. **Destination FAQs kept** as `faq` docs, relabeled in Studio
+   **"FAQ (Destination-specific)"** vs the new **"FAQ (General)"** singleton, so the split is obvious.
+
+### New STANDING rules locked this session (all in CLAUDE.md; DRK-wide ones queued in _handoff/drk-website.md)
+- **Full-wire-per-slice** (no hardcoded fallbacks; seed placeholder; UNDER TEST, confirm at end of build).
+- **Guiding principle: the CMS/admin experience is a product surface** — editor-intuitiveness beats
+  developer-clean modeling unless there's a real technical reason; FLAG divergences. (Also a memory.)
+- **Nav/Footer links un-hardcode incrementally per slice** (automatic slice sub-step); footer *content*
+  (newsletter/disclaimer/copyright/brand-alias) = a small siteSettings pass; "By Atlas" = HARDCODE, link
+  `atlas@drkdigital.studio`. Full footer field list captured in "STILL TO DO" below.
+- **Workflow retro (next projects):** build ONE real slice first, THEN scaffold the skeleton (skeleton-first
+  drifted speculative; ~18h on skeleton+homepage). Queued for drk-website.
+
+### STILL TO DO / open (nothing broken — all logged)
+- **Theme tweak (near-term, NOT the Jul polish block):** primary bg → `beige/100` (too white); accent color
+  must stay readable vs BOTH light + dark font (grey caption was unreadable on it). In `_POLISH-BACKLOG.md`.
+- **FAQ page frontend** — only the *homepage* FAQ is wired; the dedicated FAQ page (renders faqGeneral
+  categories as sections) isn't built. Homepage "Read More" link → `#` until then.
+- **Destination FAQ remodel** — destination FAQs are still `faq` docs; move to inline arrays on destination
+  docs + retire the `faq` type in the destination slice (kept now for scope discipline).
+- **Interim destination fields** (`seasonNights`/`excerpt`/`order`) — reconcile when the destination page is built.
+- **Global-chrome slice** (Footer/Nav): fields captured in the queued list below; newsletter + contact
+  details + copyright + brand alias all → siteSettings.
+- **Homepage FAQ "Read More"** is the link-to-FAQ-page interpretation, NOT an inline expand — confirm that's
+  what Adinda meant (she said "first 10, rest in Read More").
+- Red-asterisk-color deferred (not cheap — Sanity title is string-only). Plain asterisk kept (approved).
+
+### Repo state: clean + committed (full-wire + FAQ remodel folded into ONE commit, Adinda's ask). Reviewable.
+
+---
+
+## SESSION CHECKPOINT — 2026-07-16 (evening), homepage vertical slice COMPLETE (schema + content + frontend wired) (superseded by the checkpoint above)
 
 ### What this session is
 The homepage vertical slice (first real vertical slice per the build-approach shift). Building against the
@@ -72,7 +130,22 @@ schema tasks also queued: required-field markers (done ✓), Boat Defaults (stil
   `destinationDefaults`. NOT started. Clean boundary — good candidate for a fresh session.
 - **Destinations migration** — homepage still uses `@/lib/destinations`; migrate to real `destination`
   docs during the destination slice (next page).
-- **Footer/Nav** → wire to siteSettings/navigation in a separate global-chrome slice.
+- **Footer/Nav → dedicated global-chrome slice** (siteSettings/navigation), NOT homepage fields. Footer
+  content requirements captured from Adinda 2026-07-16 (build these when the slice runs):
+  - **Brand alias / "also known as"** — e.g. "also known as Mari Dive Cruise" (editable string). No field yet.
+  - **Newsletter block** — heading ("Join our newsletter"), subscribe/button text, description. **Decision:
+    content lives in `siteSettings` (renders in footer, edited in Settings — global content is edited in
+    Settings, not scattered).** Submission = a backend integration (Resend / newsletter provider), separate
+    task, NOT content.
+  - **Disclaimer / warning text** — "The Mari Dive Cruise is no longer owned and run by the legal owner of the
+    Mari vessel." Editable (`text` or basic rich text). Label it e.g. `footerDisclaimer`.
+  - **Copyright line** — auto-composed at render: `© {currentYear} {brandName}` from editable siteSettings
+    fields (brand name, legal company name, website); year is dynamic (computed), never typed.
+  - **Agency credit ("By Atlas")** — DECISION 2026-07-16: **HARDCODE** in the footer component (not a Sanity
+    field). Rationale confirmed by Adinda: it lives in code, so only DRK can change it and the client can't
+    touch/remove it — exactly the "I control it, not them" outcome she wanted (a `readOnly` field would still
+    expose it to them). **Link target = `atlas@drkdigital.studio`** (the studio), NOT her personal
+    `adinda.patty@gmail.com` (explicitly rejected). Ties to the "Atlas credit is desired branding" convention.
 - Polish backlog (`_POLISH-BACKLOG.md`): Sanity CDN loaderFile, LQIP blur, Why-Us focal point, rich-text in
   FAQ/Why-Us, testimonial star rating.
 

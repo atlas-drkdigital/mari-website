@@ -18,6 +18,9 @@ import { sharedComponentNote } from '../../components/SharedComponentNote'
 //    Testimonials → Testimonials; Latest Articles → Blog Posts.
 //  - Footer and Nav are global chrome (every page), so they are NOT modeled here — they belong to
 //    siteSettings/navigation, wired in a separate slice.
+//  - The Contact SECTION copy (eyebrow/heading/intro) is likewise NOT here: the contact block
+//    appears near-everywhere and only its labels are editable, so it lives in siteSettings
+//    ("Contact Section"), edited once globally (Adinda's call 2026-07-16). Moved out of homePage.
 export const homePageType = defineType({
   name: 'homePage',
   title: 'Homepage',
@@ -32,7 +35,6 @@ export const homePageType = defineType({
     { name: 'faq', title: 'FAQ' },
     { name: 'testimonials', title: 'Testimonials' },
     { name: 'cta', title: 'CTA' },
-    { name: 'contact', title: 'Contact' },
     { name: 'sectionLabels', title: 'Section Labels' },
     { name: 'seo', title: 'SEO' },
   ],
@@ -45,7 +47,6 @@ export const homePageType = defineType({
     { name: 'faqFs', title: 'FAQ' },
     { name: 'testimonialsFs', title: 'Testimonials' },
     { name: 'ctaFs', title: 'CTA' },
-    { name: 'contactFs', title: 'Contact' },
     { name: 'sectionLabelsFs', title: 'Section Labels — the small kicker text above each section heading' },
     { name: 'seoFs', title: 'SEO' },
   ],
@@ -200,23 +201,13 @@ export const homePageType = defineType({
       fieldset: 'faqFs',
       description: 'Text of the link to the full FAQ page.',
     }),
-    defineField({
-      name: 'faqItems',
-      title: 'Questions',
-      type: 'array',
-      group: 'faq',
-      fieldset: 'faqFs',
-      description: 'Choose which questions appear on the homepage, and in what order.',
-      of: [defineArrayMember({ type: 'reference', to: [{ type: 'faq' }] })],
-      validation: (Rule) => Rule.max(8),
-    }),
     sharedComponentNote({
       name: 'faqNote',
       title: 'Where this content lives',
       group: 'faq',
       fieldset: 'faqFs',
       message:
-        'Questions and answers are written under “FAQ” in Shared Components. Above you only choose which of them appear on the homepage.',
+        'Your general FAQ questions appear here automatically (the first several) — you don’t pick them one by one. Write and reorder them under “FAQ (General)” in Shared Components; the homepage follows that order.',
     }),
 
     // ----- Testimonials -----
@@ -264,23 +255,7 @@ export const homePageType = defineType({
         'The two-card call-to-action (Private Charter / Shared Trip) is edited under “CTA Section” in Shared Components. It is reused across pages, so there is nothing to edit for it here.',
     }),
 
-    // ----- Contact -----
-    defineField({
-      name: 'contactHeading',
-      title: 'Heading',
-      type: 'string',
-      group: 'contact',
-      fieldset: 'contactFs',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'contactIntro',
-      title: 'Intro',
-      type: 'text',
-      rows: 2,
-      group: 'contact',
-      fieldset: 'contactFs',
-    }),
+    // Contact section copy moved to siteSettings ("Contact Section") — global, not homepage-owned.
 
     // ----- Section Labels (all eyebrows in one place) -----
     defineField({
@@ -333,13 +308,7 @@ export const homePageType = defineType({
       group: 'sectionLabels',
       fieldset: 'sectionLabelsFs',
     }),
-    defineField({
-      name: 'contactEyebrow',
-      title: 'Contact eyebrow',
-      type: 'string',
-      group: 'sectionLabels',
-      fieldset: 'sectionLabelsFs',
-    }),
+    // (Contact eyebrow lives in siteSettings "Contact Section", not here.)
 
     // ----- SEO -----
     defineField({ name: 'seo', type: 'seo', group: 'seo', fieldset: 'seoFs' }),

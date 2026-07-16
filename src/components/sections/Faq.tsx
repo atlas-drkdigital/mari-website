@@ -3,30 +3,22 @@
 import { useState } from 'react'
 
 import { toPlainText } from '@/components/RichText'
-import type { HomePageData } from '@/sanity/queries'
+import type { FaqItemData, HomePageData } from '@/sanity/queries'
+
+// The homepage shows the first N general FAQs (in the order set on the FAQ document); the "Read More"
+// link goes to the full FAQ page for the rest. Kept simple per the "don't over-engineer" guidance —
+// no inline expand; the existing link is the "more" affordance.
+const HOMEPAGE_FAQ_LIMIT = 10
 
 // Ported from ../v1-static-homepage/sections/faq.html + assets/faq.js. Figma Section/FAQ
 // 401:1774. Only one item open at a time; clicking the open item closes it. Two STABLE
 // HTML columns (not CSS `columns-2`) — a multi-column layout re-balances items by height on
 // every reflow, which would visibly shift OTHER items when one expands (a real bug Adinda
-// caught in the original build, not just a style preference). Content sourced from mari-core
-// (boat.md, commercial.md) — dive requirements, inclusions/exclusions, Nitrox pricing, crew
-// ratio, payment/cancellation terms.
-const COLUMN_1 = [
-  { q: 'Who is Mari suitable for?', a: 'Mari welcomes certified divers with an Open Water certification and at least 30 logged dives, as well as non-diving guests joining for the scenery and onboard experience. All diving guests must carry valid dive insurance including medical evacuation cover.' },
-  { q: 'Is there Nitrox on board?', a: 'Yes, via an onboard NRC membrane system, available to certified Nitrox divers at an additional cost.' },
-  { q: "What's included in the price?", a: 'Airport or hotel transfers, cabin accommodation with ensuite bathroom and A/C, a fully crewed vessel, all meals, drinking water and hot drinks, all guided dives in the regular program, tank and weight rental, and land excursions as described in the itinerary.' },
-  { q: "What's not included?", a: 'Flights, visas, and airport taxes; national park, conservation, and port fees; fuel surcharge; alcohol and soft drinks; Nitrox fills; dive courses and certifications; dive gear rental; diving and travel insurance; and crew gratuities.' },
-]
+// caught in the original build, not just a style preference). Questions come from the referenced
+// general `faq` docs (full-wire slice, 2026-07-16) — no hardcoded fallback.
+type FaqItem = { q: string; a: string }
 
-const COLUMN_2 = [
-  { q: "What's the minimum diving experience required?", a: 'An Open Water certification plus at least 30 logged dives is required for all cruises.' },
-  { q: 'Is there a discount for group or full-boat bookings?', a: 'Yes -- full-boat charters and larger group bookings receive preferential rates. Get in touch for a custom quote.' },
-  { q: "What's the crew-to-guest ratio?", a: '14 crew for 14 guests, a full 1:1 ratio, including 4 dedicated dive staff for up to a 4:1 diver-to-guide ratio.' },
-  { q: "How do I pay, and what's the cancellation policy?", a: 'A 30% deposit is due within 7 days of booking, with the balance due 90 days before departure. Cancellations 91+ days out incur a 25% penalty, 90-61 days out 50%, and 60 days or less 100% of the cruise rate.' },
-]
-
-function FaqColumn({ items, openId, onToggle, columnOffset }: { items: typeof COLUMN_1; openId: string | null; onToggle: (id: string) => void; columnOffset: number }) {
+function FaqColumn({ items, openId, onToggle, columnOffset }: { items: FaqItem[]; openId: string | null; onToggle: (id: string) => void; columnOffset: number }) {
   return (
     <div className="flex flex-1 flex-col">
       {items.map((item, i) => {
@@ -57,14 +49,13 @@ function FaqColumn({ items, openId, onToggle, columnOffset }: { items: typeof CO
   )
 }
 
-export function Faq({ home }: { home: HomePageData | null }) {
-  const eyebrow = home?.faqEyebrow ?? 'Good to Know'
-  const heading = home?.faqHeading ?? 'Frequently asked questions'
-  const linkText = home?.faqLinkText ?? 'Read More'
-  // Sanity questions when present (flattened to {q,a}), else the original two hardcoded columns.
-  const allItems: { q: string; a: string }[] = home?.faqItems?.length
-    ? home.faqItems.map((f) => ({ q: f.question ?? '', a: toPlainText(f.answer) }))
-    : [...COLUMN_1, ...COLUMN_2]
+export function Faq({ home, faq }: { home: HomePageData | null; faq: { questions?: FaqItemData[] } | null }) {
+  const eyebrow = home?.faqEyebrow ?? ''
+  const heading = home?.faqHeading ?? ''
+  const linkText = home?.faqLinkText ?? ''
+  const allItems: FaqItem[] = (faq?.questions ?? [])
+    .slice(0, HOMEPAGE_FAQ_LIMIT)
+    .map((f) => ({ q: f.question ?? '', a: toPlainText(f.answer) }))
   const splitAt = Math.ceil(allItems.length / 2)
   const col1 = allItems.slice(0, splitAt)
   const col2 = allItems.slice(splitAt)

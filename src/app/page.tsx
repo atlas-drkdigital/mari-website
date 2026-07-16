@@ -13,30 +13,31 @@ import { WhyUs } from '@/components/sections/WhyUs'
 import { sanityFetch } from '@/sanity/lib/live'
 import { HOMEPAGE_QUERY, type HomePageQueryResult } from '@/sanity/queries'
 
-// Homepage — ported from ../v1-static-homepage and now wired to Sanity (homepage vertical slice,
-// 2026-07-16). Async Server Component: fetches the homePage singleton + shared CTA + latest posts
-// in one query and passes the data down to each section. Sections fall back to their original
-// hardcoded copy when a field is empty, so the page never renders blank. Locked section order:
-// Nav → Hero → The Boat → Why Us → Destinations → Latest Articles → FAQ → Testimonials → CTA →
-// Contact → Footer. Destinations still uses @/lib/destinations this slice (migrates to Sanity
-// destination docs in the destination slice); Footer/Nav are global chrome, wired separately.
+// Homepage — ported from ../v1-static-homepage and now FULLY wired to Sanity (homepage vertical
+// slice, 2026-07-16). Async Server Component: one query fetches the homePage singleton + shared CTA
+// + latest posts + all destination docs + siteSettings contact copy, and passes the data down to
+// each section. No hardcoded content fallbacks — every section reads from Sanity (the content is
+// seeded, so nothing renders blank; sections degrade gracefully to empty, never throw). Locked
+// section order: Nav → Hero → The Boat → Why Us → Destinations → Latest Articles → FAQ →
+// Testimonials → CTA → Contact → Footer. Footer/Nav are global chrome, wired in a separate slice.
 export default async function Home() {
   const { data } = await sanityFetch({ query: HOMEPAGE_QUERY })
-  const { home, cta, latestPosts } = (data ?? {}) as HomePageQueryResult
+  const { home, cta, latestPosts, destinations, settings, faq } = (data ?? {}) as HomePageQueryResult
+  const dests = destinations ?? []
 
   return (
     <>
       <Nav />
       <main className="flex flex-1 flex-col">
-        <Hero home={home} />
+        <Hero home={home} destinations={dests} />
         <TheBoat home={home} />
         <WhyUs home={home} />
-        <Destinations />
+        <Destinations destinations={dests} />
         <LatestArticles home={home} posts={latestPosts} />
-        <Faq home={home} />
+        <Faq home={home} faq={faq} />
         <Testimonials home={home} />
         <Cta cta={cta} />
-        <Contact home={home} />
+        <Contact settings={settings} destinations={dests} />
       </main>
       <Footer />
       <ScrollReveal />

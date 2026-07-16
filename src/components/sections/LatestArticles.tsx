@@ -16,46 +16,20 @@ function formatDate(iso?: string): string {
 }
 
 // Ported from ../v1-static-homepage/sections/latest-articles.html + assets/latest-articles.js.
-// Figma Section/LatestArticles 400:733. Copy is Figma's own placeholder blog content, carried
-// over literally — swap for real posts whenever the content pass happens.
-const ARTICLES = [
-  {
-    image: '/assets/blog-raja-ampat-guide.webp',
-    alt: 'Aerial view of turquoise lagoons and forested limestone islands in Raja Ampat',
-    category: 'Travel Guide',
-    date: '1/8/2021',
-    title: 'Complete Guide to Diving in Raja Ampat',
-  },
-  {
-    image: '/assets/blog-bali-komodo-specials.webp',
-    alt: 'Traditional outrigger boat moored beside a Balinese water temple at sunrise',
-    category: 'Specials',
-    date: '1/8/2021',
-    title: 'Summer Specials: Bali & Komodo',
-  },
-  {
-    image: '/assets/blog-raja-ampat-beyond-diving.webp',
-    alt: 'Monochrome view of palm trees along a coastline at dusk',
-    category: 'Travel Guide',
-    date: '1/8/2021',
-    title: 'Best Things to Do in Raja Ampat: Beyond Diving',
-  },
-]
-
+// Figma Section/LatestArticles 400:733. The three most recent blog posts are pulled from Sanity
+// (full-wire slice, 2026-07-16) — no hardcoded fallback.
 export function LatestArticles({ home, posts }: { home: HomePageData | null; posts: LatestPostData[] }) {
-  const eyebrow = home?.latestArticlesEyebrow ?? 'Our Journal'
-  const heading = home?.latestArticlesHeading ?? 'Latest news & deals'
-  const linkText = home?.latestArticlesLinkText ?? 'Read More'
-  const articles = posts?.length
-    ? posts.map((p) => ({
-        key: p._id,
-        imageProps: sanityImageProps(p.coverImage, '/assets/blog-raja-ampat-guide.webp'),
-        alt: p.coverImage?.alt ?? '',
-        category: p.category ?? '',
-        date: formatDate(p.postDate),
-        title: p.title ?? '',
-      }))
-    : ARTICLES.map((a) => ({ key: a.title, imageProps: { src: a.image }, alt: a.alt, category: a.category, date: a.date, title: a.title }))
+  const eyebrow = home?.latestArticlesEyebrow ?? ''
+  const heading = home?.latestArticlesHeading ?? ''
+  const linkText = home?.latestArticlesLinkText ?? ''
+  const articles = (posts ?? []).map((p) => ({
+    key: p._id,
+    imageProps: sanityImageProps(p.coverImage, '/assets/blog-raja-ampat-guide.webp'),
+    alt: p.coverImage?.alt ?? '',
+    category: p.category ?? '',
+    date: formatDate(p.postDate),
+    title: p.title ?? '',
+  }))
 
   const trackRef = useDragScroll<HTMLDivElement>()
 

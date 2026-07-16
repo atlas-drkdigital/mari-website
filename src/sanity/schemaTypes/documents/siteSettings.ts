@@ -18,6 +18,7 @@ export const siteSettingsType = defineType({
   fieldsets: [
     { name: 'siteBasics', title: 'Site Basics' },
     { name: 'contact', title: 'Contact & Social' },
+    { name: 'contactSection', title: 'Contact Section (heading & intro shown on the contact form)' },
     { name: 'assetsFieldset', title: 'Assets' },
     { name: 'seoDefaults', title: 'Default SEO' },
     { name: 'tracking', title: 'Tracking & Verification' },
@@ -71,6 +72,33 @@ export const siteSettingsType = defineType({
       group: 'general',
       fieldset: 'contact',
       description: 'Shown in the footer (and header, if the design calls for it).',
+    }),
+    // Contact SECTION copy (eyebrow/heading/intro) — the editorial text on the contact form, which
+    // appears near-everywhere, so it's edited once here rather than per page (moved out of homePage
+    // 2026-07-16, Adinda's call). The form fields themselves are UI (in code); only this copy is
+    // content. The contact EMAILS/phones/socials above are the actual contact details.
+    defineField({
+      name: 'contactEyebrow',
+      title: 'Eyebrow',
+      type: 'string',
+      group: 'general',
+      fieldset: 'contactSection',
+      description: 'Small kicker above the contact heading, e.g. “Contact Us”.',
+    }),
+    defineField({
+      name: 'contactHeading',
+      title: 'Heading',
+      type: 'string',
+      group: 'general',
+      fieldset: 'contactSection',
+    }),
+    defineField({
+      name: 'contactIntro',
+      title: 'Intro',
+      type: 'text',
+      rows: 2,
+      group: 'general',
+      fieldset: 'contactSection',
     }),
     defineField({
       name: 'logo',

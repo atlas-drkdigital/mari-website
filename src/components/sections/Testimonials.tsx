@@ -22,31 +22,13 @@ function formatDate(iso?: string): string {
 // goes to the first, and vice versa) rather than disabling. Not a seamless clone-based
 // infinite scroll (cards don't visually continue past the real last/first) — a discrete wrap
 // on arrow click, which is what was actually asked for.
-// Only the 4 real reviews are ported — the original had 4 additional explicit TEST-ONLY
-// placeholder cards (added solely to verify scroll-overflow behavior with more cards),
-// deliberately not carried into this build since they were never real content.
 // `text` is ONE continuous review — not a separate "excerpt" + "more" pair. The card shows it
 // truncated (CSS line-clamp, 3 lines + ellipsis) by default; "Read more" removes the clamp to
 // reveal the same paragraph in full, it does not append a second block of text below it.
-const REVIEWS = [
-  { name: 'Bruce H', date: '28 Jan, 2026', title: 'Top value for money', text: "We took an 11 day trip to Misool and Dampier. The crew and dive guides led by Ungke were very friendly and absolutely went out of their way to find the best sites for our group's interests, from mantas to muck diving. Food was fantastic, cabins were comfortable, and the whole trip felt like incredible value for what we experienced. Would book with Mari again in a heartbeat." },
-  { name: 'Kerstin W', date: '28 May, 2024', title: 'Best crew ever for an amazing dive adventure', text: 'Very knowledgeable dive guides for all the different dive sites, with time for photo enthusiasts to get the shots they wanted without holding up the group. Briefings were thorough and the whole crew felt like family by the end of the trip. Highly recommend for anyone serious about their diving.' },
-  { name: 'aline W', date: '02 Oct, 2019', title: 'Superb Komodo Cruise', text: "The dives were all more incredible than the last. The boat is in very good condition; nothing is missing. The crew is really attentive and clearly passionate about diving themselves, which made every briefing exciting. Meals were varied and delicious, and the itinerary hit all the highlights Komodo is famous for. Can't wait to sail with them again." },
-  { name: 'Doralysa N', date: '07 Oct, 2023', title: 'Everything was just perfect', text: 'The staff was amazing—very professional and concerned about diving safety. The boat has all the dive amenities you could ask for, and the cabins were spotless and comfortable after long dive days. Every detail felt thought through, from the dive briefings to the food. This trip exceeded all my expectations.' },
-]
-
-// DRAFT — added 2026-07-15 at Adinda's request, replacing the earlier TEST-ONLY placeholder
-// cards. AI-drafted, NOT real guest submissions — written to be realistic enough to show Stefan
-// what an 8-card carousel looks like ahead of launch, not to be mistaken for genuine reviews.
-// The "[DRAFT]" prefix on each title is the tracking marker: MUST be removed (either deleted
-// outright or replaced with real guest reviews) before public launch — see MANAGER.md.
-const DRAFT_REVIEWS_REMOVE_BEFORE_LAUNCH: typeof REVIEWS = [
-  { name: 'Mara J', date: '14 Feb, 2026', title: '[DRAFT] Incredible dive planning, spotless cabin', text: 'The crew read every dive site perfectly, from the strong current at Castle Rock to the calmer muck dives near Rinca. The cabin was spotless, the food never repeated itself over eleven nights, and the Cruise Director briefed each site in enough detail that we always knew what to expect underwater.' },
-  { name: 'Tomas B', date: '02 Mar, 2026', title: '[DRAFT] Manta encounters we will not forget', text: 'The manta encounters at Manta Sandy were the highlight, but what stayed with me was how organized everything was above water too. Nitrox fills were fast, rinse stations were always ready, and the dive guides split the group so nobody felt rushed.' },
-  { name: 'Priya N', date: '19 Apr, 2026', title: '[DRAFT] Personal service on an intimate boat', text: 'Seven cabins meant the boat never felt crowded, and the deck layout gave everyone space to log dives or just watch the water. The crew learned our names and preferences within a day, which made the trip feel personal rather than like a standard charter.' },
-  { name: 'Julian F', date: '30 May, 2026', title: '[DRAFT] Banda Sea route worth every night', text: 'Twelve nights is a serious commitment and Mari earned it. The route covered sites we could not have reached any other way, the boat handled the long crossings smoothly, and the galley kept up a standard I did not expect this far from anywhere.' },
-]
-
+// Reviews come from the referenced `testimonial` docs (full-wire slice, 2026-07-16) — no
+// hardcoded fallback. The 4 AI-drafted demo reviews (titles prefixed "[DRAFT]", MUST be removed
+// or replaced with real guest reviews before launch — see MANAGER.md/_CONTENT-STATUS.md) now
+// live as testimonial documents alongside the 4 real ones, not as hardcoded constants here.
 function StarRating() {
   return (
     <div className="mt-16 flex items-center gap-2">
@@ -58,13 +40,10 @@ function StarRating() {
 }
 
 export function Testimonials({ home }: { home: HomePageData | null }) {
-  const eyebrow = home?.testimonialsEyebrow ?? 'Testimonials'
-  const heading = home?.testimonialsHeading ?? 'What our guests think'
-  const linkText = home?.testimonialsLinkText ?? 'Read More'
-  // Sanity reviews when present, else the original hardcoded set (real + drafts).
-  const reviews = home?.testimonialItems?.length
-    ? home.testimonialItems.map((t) => ({ key: t._id, name: t.name ?? '', date: formatDate(t.date), title: t.title ?? '', text: t.text ?? '' }))
-    : [...REVIEWS, ...DRAFT_REVIEWS_REMOVE_BEFORE_LAUNCH].map((r, i) => ({ key: `${r.name}-${i}`, ...r }))
+  const eyebrow = home?.testimonialsEyebrow ?? ''
+  const heading = home?.testimonialsHeading ?? ''
+  const linkText = home?.testimonialsLinkText ?? ''
+  const reviews = (home?.testimonialItems ?? []).map((t) => ({ key: t._id, name: t.name ?? '', date: formatDate(t.date), title: t.title ?? '', text: t.text ?? '' }))
 
   const trackRef = useDragScroll<HTMLDivElement>()
   const [expanded, setExpanded] = useState<Record<number, boolean>>({})
