@@ -47,6 +47,21 @@ here rather than waiting for a chat-side skill-update round, because this file l
      Prevention for future builds queued in `_handoff/drk-website.md`.
 2. **`boatDefaults` singleton** — **~20–30min. MUST come BEFORE the boat page slice, not after.** See the
    dedicated note below.
+2b. **Testimonials PAGE** (Adinda, 2026-07-16 — flagged for tomorrow). ⚠️ **NOT in the skill's sprint page
+   table at all** — it's an addition, so it pushes the day; see the sprint-impact note below.
+   - **The gap:** we have `testimonial` documents but **no Testimonials page**. Same realization as the FAQ
+     ("a thing with SEO + page settings is a page, not a component"). The `atlas-website` skill already
+     specs a Testimonials hub; it was never added to the page inventory or the sprint.
+   - **Shape — mirror `faqGeneral`, the pattern is already settled:** a **`testimonialsPage` singleton**
+     (eyebrow / heading / intro + `seo` + a signpost note) placed in **Main Page Content**. The frontend
+     auto-lists the `testimonial` docs. **The `testimonial` docs STAY in Shared Components** — unlike the
+     FAQ they are genuinely cross-page (Home + About), so this is a real component + a page that lists it,
+     not a page that owns its content.
+   - No mockup exists ("simple, not designed yet"); copy needs writing. Adinda expects it to be quick.
+   - **⚠️ Blind spot worth remembering:** `_STUDIO-ORGANIZATION-AUDIT.md` checked every EXISTING type for
+     "page or component?" — it could never surface a page that doesn't exist yet. When auditing structure,
+     also ask what's MISSING, not just what's misplaced. Check the rest of the page inventory for the same
+     gap (does anything else have documents but no page?).
 
 **Estimating note (Adinda's correction, 2026-07-16 — worth not repeating):** the first pass at these was
 padded to "3–4h" and "1–1.5h". She pushed back correctly — `destinationDefaults` took ~15 min, and
@@ -105,10 +120,15 @@ bindings in the same pass — a rename desyncs them otherwise, so it is NOT a co
 sets must be identical. (63 distinct hexes, identical across the first two renames.)
 
 ### Known deviations from the skill's sprint (don't "fix" these back)
-- The skill's day-by-day has **Jul 17 = Boat + Destination start (4–5h)** and does **not contain** toggles+
-  theme or `boatDefaults` at all. Reality: those come first, so Jul 17 realistically holds toggles+theme
-  (~1–1.5h) + boatDefaults (~0.5h) + boat page (3–4h) ≈ **5.5–6h**, and the destination start slips.
-  **Flag the slip honestly; don't absorb it silently.**
+- The skill's day-by-day has **Jul 17 = Boat + Destination start (4–5h)** and does **not contain** the
+  auto-hide work, `boatDefaults`, or the **Testimonials page** — none of them exist in the sprint. Reality
+  for Jul 17: auto-hide + FAQ min-height (~0.5h) + boatDefaults (~0.5h) + boat page (3–4h) ≈ **4–5h, which
+  fits** — but **Destination start slips to Jul 20**, and Jul 20 already carries Destination + Komodo +
+  Private Charters. **Testimonials page (~1–1.5h) does not fit Jul 17 on top of that** — it needs a slot,
+  and the honest candidates are Jul 22 (already About + FAQ page, i.e. the other danger day) or trading it
+  against something. **Raise this with Adinda; don't silently absorb it.**
+- **The Testimonials page is a NEW page in the inventory**, not a re-order. The page count for the Jul 24
+  staging push went up by one. The skill's page table needs it added at the next skill-update round.
 - The skill's sprint still lists **SEO as a separate QA-Pass-1 (Jul 24) + Content pass (Jul 28–29)**. That
   is superseded: SEO structure + the image pipeline now fold **per-slice**, leaving only a light final
   review. (Pre-existing flag, restated here so it's in one place.)
