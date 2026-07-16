@@ -117,30 +117,30 @@ specced and confirmed earlier the same day, then Adinda pulled them back: they'r
 
 **Adinda still wants to review the Studio organization/section structure** before any of this is revisited.
 
-### 🔁 OPEN TO-DO — finish the colour-token rename. Pre-launch IF time, else POST-LAUNCH. (Adinda, 2026-07-16)
-**Raise this alongside the section-toggles question at the end of work blocks.** Not urgent, not dropped.
+### ✅ CLOSED 2026-07-17 — the colour-token rename is DONE. One item is owed BY ADINDA (Figma side).
+Was "2 of 10 done, pre-launch if time." **Finished in one morning instead** — all 11 remaining tokens
+confirmed from Figma's variable panels (Adinda pasted 6 screenshots, ~15 min) then renamed in one
+mechanical pass (~15 min). Zero `--primitive-*` tokens remain; the served css emitted an identical set of
+54 hexes before and after. Commit `1b56add`. Full record + the final map: `src/app/globals.css` header.
 
-**Why it matters — the argument that changed the decision.** Claude initially recommended declining the
-rename on the grounds that "the cost doesn't grow over time." **That was wrong, and Adinda caught it:** it's
-true *within Mari*, but **Mari is the pilot/template for every future Atlas + DRK build.** A half-drifted
-palette doesn't sit still — it gets **copied into every project based on this one**, traps and all. The cost
-compounds *across projects*, which is the axis that was being ignored. Mari's structure has to be right
-because other projects will inherit it, not because Mari itself is suffering.
+**What flipped the decision, worth keeping:** the whole case for dripping it out opportunistically rested
+on *"a big-bang rename would have to GUESS at the unconfirmed names."* The moment Adinda offered to paste
+the variable panels, **confirmation stopped being expensive and the objection evaporated.** The strategy
+had silently assumed the designer was a scarce resource and never tested it. All three traps turned out
+REAL (stone→500 not 400, red→700 not 600, and `teal` was a family that never existed in Figma — invented
+at port time). Corrections queued for `drk-website` in `_handoff/drk-website.md`.
 
-**State:** the palette lives under two naming generations (Figma renamed cream→beige, copper→chocolate after
-the port). **2 of 10 done** — `beige/100` and `chocolate/300` renamed 2026-07-16 once Adinda confirmed their
-hexes. 8 remain with *inferred* names + **3 traps** where the obvious target already exists with a different
-hex. Full record: `src/app/globals.css` primitives header.
-
-**Meanwhile, opportunistic reconciliation runs continuously** (CLAUDE.md rule): whenever Adinda names a
-colour, confirm the hex, and rename that token then and there. This shrinks whatever's left for the final
-pass — the two done so far came free that way.
-
-**When the pass happens:** confirm the ~8 inferred names against Figma (Adinda can read display names;
-Claude's MCP returns code-syntax instead), handle the 3 traps deliberately, and update Figma's code-syntax
-bindings in the same pass — a rename desyncs them otherwise, so it is NOT a code-side-only job.
-**Per-token safety net, proven 2026-07-16:** snapshot every hex the SERVED css emits before and after; the
-sets must be identical. (63 distinct hexes, identical across the first two renames.)
+### 🔴 OWED BY ADINDA — update Figma's code-syntax bindings. NOT code work; Claude cannot do it.
+**Mark this into the next round.** A palette rename is a **two-sided job** and only the code side shipped.
+Figma's code-syntax field on each renamed variable still says `--primitive-…` — **names that no longer
+exist** — which is why Figma's MCP hands back `var(--primitive-cream-10)`.
+- **Until it's fixed:** treat ANY CSS custom-property name returned by the Figma MCP as **STALE**, and
+  resolve it through the map in `src/app/globals.css`'s primitives header. Don't trust it in a component.
+- **Full mapping table + the three traps:** `_handoff/figma.md` Pending (top item).
+- **When doing it: match each variable BY HEX, never by its old name** — three are traps where the obvious
+  target name belongs to a genuinely different colour.
+- Not blocking any build work. It costs nothing until someone reads a token name out of Figma — at which
+  point it costs exactly what this whole episode cost.
 
 ### 📅 DAY PLAN to the Jul 24 staging push — Adinda's re-shuffle 2026-07-16. Overrides the skill's day-by-day.
 **Jul 20 = DESTINATION ONLY, a deliberately BLOCKED day (Adinda's explicit call).** Private Charters was
