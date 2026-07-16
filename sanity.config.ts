@@ -31,8 +31,8 @@ const theme = buildLegacyTheme({
   // nothing visible, which is exactly what cost a round of guessing here.
   //
   // Also drives primary buttons, so re-check a Publish button in a browser after changing it.
-  '--brand-primary': '#c6ae9a', // Figma chocolate/350 = our --chocolate-350
-  '--default-button-primary-color': '#c6ae9a', // Figma chocolate/350 = our --chocolate-350
+  '--brand-primary': '#bca18a', // Figma chocolate/400 = our --chocolate-400
+  '--default-button-primary-color': '#bca18a', // Figma chocolate/400 = our --chocolate-400
   '--focus-color': '#b58a2d', // primitive-amber-600
   '--component-text-color': '#1b2a4a', // primitive-navy-900, same as the website's --color-text-primary
   // --font-bricolage-grotesque is set by next/font/google on the <html> element in
