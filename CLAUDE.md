@@ -40,6 +40,16 @@ on exactly this basis — the reference pile forced editors to open a whole docu
 display cap, which is unintuitive; an inline array is what a non-dev expects. Skill-wide (DRK philosophy) —
 queued for `drk-website` via `_handoff/drk-website.md`.
 
+## MANAGER.md's ACTIVE QUEUE overrides the skill's sprint — locked 2026-07-16
+`mari-project`'s `working/sprint.md` is a **planning artifact that drifts**: it can't know about work queued
+after it was written, and there's no live bridge from this repo to the chat-side skills. **MANAGER.md's
+"🔴 ACTIVE QUEUE" section is authoritative for what to do next and in what order** — read it before planning
+any session, and where it and the skill's sprint disagree, the queue wins. Adinda's explicit call: log sprint
+deviations in MANAGER.md immediately rather than waiting for a skill-update round, because this file and
+MANAGER.md load first. **This does not make the sprint useless** — it's still the source for the launch
+timeline, the QA-pass scopes, and the page inventory. It's specifically the *day-by-day ordering* that goes
+stale. When a deviation pushes a dated sprint item, **say so explicitly** rather than quietly absorbing it.
+
 ## Skills to load this session
 - `mari-project` — engagement status, active workstreams, what's next
 - `drk-website` — stack conventions (this file adds only what's Mari-specific)

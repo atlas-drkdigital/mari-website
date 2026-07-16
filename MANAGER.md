@@ -10,6 +10,68 @@ forward — this file is now the live one.
 
 ---
 
+## 🔴 ACTIVE QUEUE — AUTHORITATIVE, OVERRIDES THE `mari-project` SKILL'S SPRINT (set 2026-07-16, Adinda)
+
+**Read this before planning any session.** The sprint in `mari-project`'s `working/sprint.md` is a
+*planning artifact that has drifted* — it does not know about work Adinda queued after it was written.
+Where the two disagree, **this list wins**. Adinda's explicit call 2026-07-16: capture sprint deviations
+here rather than waiting for a chat-side skill-update round, because this file loads first.
+
+### Order of work (next sessions)
+1. **Section toggles + auto-hide + theme tweak** — `_handoff/_NEXT-SESSION-toggles-theme.md`. **~3–4h**
+   (not a quick job: 8 per-section toggles, auto-hide guards, FAQ min-height vs Figma 778-8603, plus the
+   theme tokens). Its two quick fixes are already DONE in the FAQ commit — skip them.
+2. **`boatDefaults` singleton** — **~1–1.5h. MUST come BEFORE the boat page slice, not after.** See the
+   dedicated note below.
+3. **Boat page slice** — 3–4h (sprint's Jul 17 item).
+4. **Destination page slice** — where the destination FAQ *render* composition + the stable-key cross-page
+   pull get built.
+5. **Global-chrome slice** (Nav/Footer/newsletter/contact details/copyright/"By Atlas").
+
+### Known deviations from the skill's sprint (don't "fix" these back)
+- The skill's day-by-day has **Jul 17 = Boat + Destination start (4–5h)** and does **not contain** toggles+
+  theme or `boatDefaults` at all. Reality: those come first, so Jul 17 realistically holds theme +
+  boatDefaults + boat page (~6h) and the destination start slips. **Flag the slip honestly; don't absorb
+  it silently.**
+- The skill's sprint still lists **SEO as a separate QA-Pass-1 (Jul 24) + Content pass (Jul 28–29)**. That
+  is superseded: SEO structure + the image pipeline now fold **per-slice**, leaving only a light final
+  review. (Pre-existing flag, restated here so it's in one place.)
+- The skill's `references/pages/faq.md` (via `mari-website`) is **stale 3 ways** after the FAQ restructure —
+  see `_handoff/mari-website.md`. Don't plan FAQ work off it.
+
+---
+
+## 📌 `boatDefaults` — DECIDED long ago, NEVER SCHEDULED. Do it BEFORE the boat page. (logged 2026-07-16)
+
+Adinda raised this 2026-07-16: "I need boat defaults just like there are destination defaults, same logic."
+**She is right, and this was already locked** — CLAUDE.md's decluttering rule says the test is whether a type
+is *designed* to hold many instances (not the current count) and explicitly names "**Boats (pending build)**".
+It simply fell through the cracks; it was never reasoned away. `destinationDefaults` exists, `boatDefaults`
+does not.
+
+**Why the ordering is load-bearing:** the boat page frontend doesn't exist yet, so moving these fields costs
+nothing today. Build the boat page first and this becomes a rewire of a page we just shipped. Same logic as
+folding SEO into each slice — cheap while the page is fresh.
+
+**Scope (~1–1.5h), mirroring `destinationDefaults` exactly:**
+- MOVE to the singleton (shared chrome): `overviewEyebrow`, `cabinsEyebrow`, `cabinsHeading`, `galleryEyebrow`,
+  `galleryTitle`, `specificationsEyebrow`, `specificationsHeading`, `keyFeaturesHeading`. Add a `{boat}` token
+  (same mechanism as `{destination}`).
+- STAY on each `boat` (bespoke per boat): `overviewHeading`, `cabinsIntro`, and all real content.
+- Structure: nest **Boat Defaults** under the existing "Boats" folder, beside Boats / Cabin Types / Cabins.
+
+**Two open decisions to put to Adinda when building (both small):**
+1. `boat` uses **toggle-to-reveal** eyebrows (`showOverviewEyebrow` etc.); `destinationDefaults` has **no
+   toggles at all**. The two patterns disagree. Once an eyebrow lives in a shared singleton, an empty field
+   simply doesn't render, so the toggle may stop earning its keep. Reconcile so both types behave the same.
+2. Is `keyFeaturesHeading` genuinely shared chrome, or a per-boat line?
+
+**Correction on the record:** `cabinType` / `cabin` do **not** have their own pages — they're data feeding the
+boat page's Cabins section. There are no cabin pages in the page inventory. They're grouped under "Boats" only
+because they make no sense apart from a boat, which is the same reason Boat Defaults belongs there.
+
+---
+
 ## ⏳ SEO + IMAGE PIPELINE — now FOLDED PER-SLICE (decision updated 2026-07-16, Adinda)
 **UPDATE:** originally flagged as separate unscheduled pre-launch passes; Adinda's call is to **fold SEO
 structure + the image pipeline INTO each page slice** (cheap while the page is fresh + most photos are final),
