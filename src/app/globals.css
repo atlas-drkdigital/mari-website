@@ -21,7 +21,51 @@
 
 @import "tailwindcss";
 
-/* ---------- LAYER 1 | PRIMITIVES (raw palette; not utilities; aliased by semantics) ---------- */
+/* ---------- LAYER 1 | PRIMITIVES (raw palette; not utilities; aliased by semantics) ----------
+
+   ⚠️ NAME DRIFT vs FIGMA — flagged 2026-07-16. RENAME DELIBERATELY DECLINED (Adinda). Read before
+   touching any colour name.
+
+   WHAT'S ACTUALLY GOING ON: this is ONE palette half-ported twice. The `--primitive-*` tokens are an
+   OLDER naming generation (cream/copper) of the SAME scales as the `--beige-*` / `--chocolate-*` tokens
+   below (Figma's current names). Every `--primitive-*` value fills a MISSING number in its new-name
+   scale — that's the tell, and it's how the table below was derived.
+
+   WHY WE DIDN'T RENAME (don't re-litigate without new information): zero user impact (pure naming), and
+   the cost does NOT grow over time — primitives are consumed by the semantic layer in this file plus a
+   few refs in Footer.tsx, and components use semantic tokens. So it's equally cheap whenever. Renaming
+   working code for naming taste, close to launch, is the wrong trade. Verified mapping table below, so
+   whenever it IS done it's mechanical, not investigative.
+
+   AUTHORITATIVE MAPPING (read from Figma variables, node 413-2, 2026-07-16):
+     --primitive-cream-10   #fdfcfa  = Figma beige/50      (inferred: fills the gap)
+     --primitive-cream-30   #fbf8f2  = Figma beige/100     (CONFIRMED by Adinda)
+     --primitive-cream-50   #f5f0e8  = Figma beige/150     (inferred)
+     --primitive-cream-70   #ece4d6  = Figma beige/200     (inferred)
+     --primitive-cream-80   #dbcdb2  = Figma beige/300     (inferred)
+     --primitive-copper-300 #cfbbaa  = Figma chocolate/300 (CONFIRMED by Adinda)
+     --primitive-copper-600 #8f6d51  = Figma chocolate/600 (inferred)
+     --primitive-amber-600  #b58a2d  = Figma amber/600     (inferred)
+     --primitive-navy-900   #1b2a4a  = Figma navy/900      (inferred)
+     --primitive-navy-950   #131d34  = Figma navy/950      (inferred)
+
+   ☠️ THREE TRAPS — a naive "strip the primitive- prefix, keep the number" rename SILENTLY SWAPS COLOURS,
+   because the target name already exists with a DIFFERENT hex:
+     --primitive-stone-400  #7c7469 -> NOT --stone-400 (that's #a19a91!) -> correct target --stone-500
+     --primitive-red-600    #c10007 -> NOT --red-600   (that's #e7000b!) -> correct target --red-700
+     --primitive-teal-600   #008236 -> "teal" is also a colour-family rename ("green" in Figma) and the
+                                       exact Figma name is UNCONFIRMED. Ask Adinda; do not guess.
+
+   IF/WHEN RENAMING: verify by snapshotting every hex the compiled CSS emits BEFORE and AFTER — the two
+   sets must be byte-identical. A rename that changes any rendered value is a bug, and that diff is the
+   only check that actually catches it.
+
+   ALSO: Figma has code-syntax bindings pointing at these CURRENT names (that's why the MCP returns e.g.
+   "var(--primitive-cream-30)" instead of "beige/100" for some variables). Renaming here desyncs Figma
+   unless its code syntax is updated in the same pass. Not just a code-side job.
+
+   RULE, meanwhile: NEVER match a Figma token to one of these by NAME. Match by HEX, or ask.
+   ---------------------------------------------------------------------------------------------- */
 :root {
   --primitive-cream-10: #fdfcfa;
   --primitive-cream-30: #fbf8f2;
@@ -99,7 +143,10 @@
 
   /* ---------- LAYER 2 | SEMANTIC COLORS (utilities: bg- / text- / border-) ---------- */
   /* aliased to a primitive where a unique match exists; translucent/unmatched keep raw value */
-  --color-bg-page: var(--primitive-cream-10);
+  /* Was --primitive-cream-10 (#fdfcfa) until 2026-07-16 — read too white. Adinda's pick from Figma,
+     where this swatch is now named beige/100; our ported names predate that rename. See the palette
+     name-drift note at the top of this file. */
+  --color-bg-page: var(--primitive-cream-30); /* Figma: beige/100 */
   --color-bg-surface: var(--white);
   --color-bg-accent: var(--primitive-cream-50);
   --color-text-primary: var(--primitive-navy-900);

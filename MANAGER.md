@@ -26,12 +26,25 @@ here rather than waiting for a chat-side skill-update round, because this file l
    - **MANUAL SECTION TOGGLES ARE DROPPED for now** (Adinda, 2026-07-16) — see the standing to-do below.
 2. **Theme — SPLIT INTO TWO, they are not the same task** (corrected 2026-07-16 after Adinda's screenshot):
    - **(a) Website:** primary background → `beige/100` (`globals.css`). Real frontend work.
-   - **(b) STUDIO, not the website:** the "accent unreadable against muted text" issue is a **Sanity Studio**
-     list row, themed by `--brand-primary: #8f6d51` (`primitive-copper-600`) in **`sanity.config.ts`**, NOT
-     by `globals.css`. The handoff had these bundled as one frontend task; fixing `globals.css` would have
-     changed nothing. **`buildLegacyTheme` derives the title/subtitle colours from `--brand-primary` — we
-     cannot set them.** So the only lever is picking a `--brand-primary` whose derived text stays readable
-     (or migrating off the deprecated `buildLegacyTheme`). Adinda is choosing a swatch in Figma.
+   - **(a) DONE 2026-07-16:** `--color-bg-page` is now `--primitive-cream-30` (#fbf8f2, Figma **beige/100**),
+     was `--primitive-cream-10` (#fdfcfa, read too white). Verified in the SERVED css, not just the source.
+   - **(b) STUDIO, not the website — ⚠️ UNRESOLVED, needs a browser inspect.** The "accent unreadable against
+     muted text" issue is a **Sanity Studio** list row, themed from `sanity.config.ts`, NOT `globals.css`.
+     The handoff had these bundled as one frontend task; fixing `globals.css` would have changed nothing.
+     **Status:** `--brand-primary` changed #8f6d51 → **#cfbbaa** (Figma **chocolate/300**, Adinda's pick) and
+     **verified present in the served Studio bundle** — but Adinda reports **no visible change**. So the
+     working assumption was WRONG: `--brand-primary` is not what paints that row. **Next step: inspect the
+     row in a browser** (computed `background-color` + which CSS var it resolves from), then re-point the fix.
+     Claude cannot do this — no browser available; see the verification-ritual rule in CLAUDE.md.
+     **Also still true:** `buildLegacyTheme` DERIVES the title/subtitle colours and we can't set them, so
+     whatever token turns out to drive the row, the lever is the background, not the text. `buildLegacyTheme`
+     is deprecated — if contrast can't be solved within it, migrating to the v3 theme API is the real answer.
+   - **Palette name drift (Figma vs our CSS) — rename DECLINED, mapping table banked.** Figma renamed the
+     colour families (cream→beige, copper→chocolate); our CSS kept the old names, so one palette now lives
+     under two naming generations. Rename declined by Adinda: zero user impact, and the cost does NOT grow
+     over time. The verified Figma→CSS mapping (plus **3 traps** where a naive rename silently swaps colours)
+     is written into `globals.css`'s primitives header. **Rule: match tokens by HEX, never by NAME.**
+     Prevention for future builds queued in `_handoff/drk-website.md`.
 2. **`boatDefaults` singleton** — **~20–30min. MUST come BEFORE the boat page slice, not after.** See the
    dedicated note below.
 
