@@ -10,6 +10,33 @@ forward — this file is now the live one.
 
 ---
 
+## ⏳ SEO + IMAGE PIPELINE — now FOLDED PER-SLICE (decision updated 2026-07-16, Adinda)
+**UPDATE:** originally flagged as separate unscheduled pre-launch passes; Adinda's call is to **fold SEO
+structure + the image pipeline INTO each page slice** (cheap while the page is fresh + most photos are final),
+keeping only a **light final SEO review**. See CLAUDE.md "SEO + image pipeline fold INTO each slice" +
+`_SCHEMA-SPECS.md` FAQ SEO/AEO decision record. **Sprint reconciliation flag:** the installed `mari-project`
+sprint still has SEO as a separate QA-Pass-1 (Jul 24) + a Content pass (Jul 28–29) — update it to per-slice
++ light-review when the skill is next re-updated. Homepage retroactive application (it's already built): SEO
+structure (JSON-LD, semantic FAQ, `seo` fields) + verify/tighten the heavier design images (halmahera 667KB,
+flores 495KB, sumbawa 482KB — but these are placeholder, real photos get the full pipeline). Below kept for
+history:
+1. **Full SEO/AEO content pass (site-wide).** Infra partly exists (robots.ts, `seo` object, per-page SEO
+   fields, AI-crawler policy stub) but the CONTENT execution isn't done: real SEO titles/descriptions/OG per
+   page, JSON-LD structured data (Organization + FAQPage etc.), keyword/intent alignment, AEO-readiness. The
+   FAQ `seo` field + FAQ structured data we're adding in the FAQ remodel is PART of this — do the FAQ piece
+   once, but the whole-site pass is separate. Cross-check `drk-seo` skill. Consider a Perplexity verify on
+   current FAQ SEO/AEO practice (prompt drafted in chat 2026-07-16).
+2. **Image pipeline pass (before real photos are uploaded to Sanity).** Two linked tasks:
+   - **Descriptive file renaming** — the uploaded filename is the basis for the Sanity CDN vanity URL
+     (`urlForImage` chain: `seoImageName` → `originalFilename` → `alt`). Real content photos must be renamed
+     to descriptive kebab-case (or `seoImageName` set) BEFORE upload, or they serve with junk vanity names.
+   - **Compression + resizing** — optimize source images before upload (perf + the Sanity free-tier 10GB/mo
+     bandwidth cap noted earlier). Sanity CDN + Next optimizer resize on delivery, but oversized sources
+     still cost storage/bandwidth and slow the content pass.
+   Both are per-image content-pass work, distinct from the built `urlForImage` system (which is done).
+
+---
+
 ## SESSION CHECKPOINT — 2026-07-16 (late), homepage FULL-WIRE + FAQ inline-array remodel (READ THIS FIRST — supersedes all below)
 
 ### What this session did

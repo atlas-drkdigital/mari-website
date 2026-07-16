@@ -220,6 +220,19 @@ Refines the earlier strict phase-gate (all schema, then all frontend). Two phase
 Skill-wide (Adinda's ask) — queued for `drk-website`'s `references/workflow.md` (refines its Phase 6→7 order).
 The full-wire-per-slice rule is ALSO queued for `drk-website` (see `_handoff/drk-website.md`), marked
 under-test until the build confirms it end-to-end.
+   - **SEO + image pipeline fold INTO each slice, not a separate end-pass (locked 2026-07-16, Adinda).**
+     Every page slice also does, in-slice: (a) **SEO structure** — fill the `seo` field, emit page-scoped
+     `FAQPage`/`Organization`/etc. JSON-LD, use semantic HTML (`<details>/<summary>` + heading per question,
+     answer-first copy), stable `#anchor` per Q&A; (b) **image pipeline** — rename real photos to descriptive
+     kebab-case (the Sanity CDN vanity URL derives from the filename) AND compress/resize BEFORE upload (perf
+     + the Sanity 10GB/mo free-tier bandwidth cap). Rationale (Adinda): cheap while the page is fresh + most
+     photos are final (not wasted), vs. a painful, error-prone manual end-pass. Keep ONLY a **light final SEO
+     review** (holistic keyword/cannibalization check, structured-data validation, sitemap completeness) — not
+     a from-scratch content pass. Same principle as full-wire-per-slice. FAQ SEO/AEO specifics (verified via
+     Perplexity 2026-07-16, cross-check `drk-seo`): `FAQPage` JSON-LD is still worth emitting for AEO/AI-answer
+     citability even though Google dropped FAQ rich results for commercial sites in 2023; hybrid model
+     (embedded per-page FAQ + central `/faq` hub) is the recommended structure — which is exactly our
+     composition model. Skill-wide — queued for `drk-website`.
 
 ## Studio form section headers — every group gets a matching titled fieldset (site-wide, locked 2026-07-16)
 Distinct from "editor-organization deferred to last" below (that's field titles/descriptions/sidebar polish
