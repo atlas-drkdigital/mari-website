@@ -13,6 +13,7 @@ import {structureTool} from 'sanity/structure'
 import {apiVersion, dataset, projectId} from './src/sanity/env'
 import {schema} from './src/sanity/schemaTypes'
 import {structure} from './src/sanity/structure'
+import {RequiredFieldMarker} from './src/sanity/components/RequiredFieldMarker'
 
 // Brand colors from theme.css (../v1-static-homepage, Figma TKjkHpjqPVn5yL5TnpuWAt).
 // buildLegacyTheme is Sanity's own currently-supported (if deprecated, "will be removed in an
@@ -36,6 +37,13 @@ export default defineConfig({
   theme,
   // Add and edit the content schema in the './sanity/schemaTypes' folder
   schema,
+  // Site-wide "required" marker on every required field's label, shown upfront (before the
+  // editor fills the form) — see src/sanity/components/RequiredFieldMarker.tsx.
+  form: {
+    components: {
+      field: RequiredFieldMarker,
+    },
+  },
   plugins: [
     structureTool({structure}),
     // Vision is for querying with GROQ from inside the Studio

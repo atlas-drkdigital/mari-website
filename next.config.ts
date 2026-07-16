@@ -14,6 +14,17 @@ const nextConfig: NextConfig = {
   // response header. Standard practice regardless, and one less thing to check off the
   // no-build-traces requirement in CLAUDE.md.
   poweredByHeader: false,
+
+  images: {
+    // Sanity CDN is the source for all editor-managed images. `images.domains` is deprecated in
+    // Next 16 — use remotePatterns. Sanity-sourced <Image>s pass a custom loader (see
+    // src/sanity/lib/image.ts) so the CDN does the resizing, but this is still required for any
+    // Sanity image rendered through Next's default optimizer.
+    remotePatterns: [{ protocol: "https", hostname: "cdn.sanity.io" }],
+    // Next 16's default is `[75]` only. The static-build performance pass uses ~80 for
+    // photographic hero images, so allow both or Next silently coerces 80 -> 75 (CLAUDE.md).
+    qualities: [75, 80],
+  },
 };
 
 export default nextConfig;

@@ -10,7 +10,64 @@ forward — this file is now the live one.
 
 ---
 
-## SESSION CHECKPOINT — 2026-07-16 (later), skills-update round + session-bookend protocol (READ THIS FIRST — supersedes all below)
+## SESSION CHECKPOINT — 2026-07-16 (evening), homepage vertical slice PART 1 (schema + content foundations) (READ THIS FIRST — supersedes all below)
+
+### What this session is
+The homepage vertical slice (first real vertical slice per the build-approach shift). Building against the
+**already-built homepage** (`src/app/page.tsx` + `src/components/sections/*`) as the source of truth, NOT
+the Figma mockup (Adinda's call). Model: all Opus (Adinda's call for now — no Sonnet downshift). Two pending
+schema tasks also queued: required-field markers (done ✓), Boat Defaults (still pending).
+
+### DONE + verified this session (tsc / eslint / `sanity schema validate` all 0-errors throughout)
+1. **Required-field markers (global Studio component)** — `src/sanity/components/RequiredFieldMarker.tsx`,
+   wired in `sanity.config.ts` (`form.components.field`). Shows a `*` on every required field's label
+   upfront (Sanity 6.4 shows none by default). Detects required via the compiled validation rules
+   (`_rules`/`isRequired()`, verified against `@sanity/types`). **Adinda's repeated #1 ask — now done.**
+2. **Image helper (slice a)** — `src/sanity/lib/image.ts`: `urlForImage()` with the full vanity-filename
+   fallback chain (`seoImageName` → `originalFilename` (junk-name filtered) → `alt` → omit), using the
+   builder's own `.vanityName()`; plus `sanityImageLoader` (a next/image loader — Sanity CDN does the
+   resizing, pass only to Sanity-sourced `<Image>`). `next.config.ts` got `cdn.sanity.io` remotePatterns +
+   `qualities:[75,80]`. Vanity logic unit-tested (14 cases, all pass).
+3. **homePage schema depth (slice b)** — full rewrite of `homePage.ts` against the built page. Per-section
+   tabs (Hero, The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials, CTA, Contact) each
+   mirrored by a titled fieldset. **Dedicated "Section Labels" tab** holds every eyebrow (Adinda's ask —
+   findable, not buried). **Shared-component signpost notes** (`SharedComponentNote.tsx` + `sharedComponentNote()`
+   helper) tell the editor where borrowed content lives (CTA→CTA Section, Why Us→Why Us Items, FAQ→FAQ,
+   Testimonials→Testimonials, Latest Articles→Blog Posts). Why Us/FAQ/Testimonials use reference arrays
+   (editor picks which items show); Latest Articles auto-pulls latest 3 posts. Legacy `ctaHeading`/`ctaSubline`
+   removed (no data to migrate — homePage doc was empty).
+4. **Content seeded + verified** (`_scripts/seed-homepage.ts`, run via `sanity exec --with-user-token`):
+   homePage singleton + 4 `whyUsItem` + 8 general `faq` + 4 `testimonial` docs, **11 images uploaded** to
+   Sanity (hero, the-boat, 4 why-us, 2 cta, 3 blog covers), cta re-seeded with images, 3 blog posts patched
+   with cover images. Copy lifted verbatim from the built components; 2 brand-voice fixes applied in-flight
+   (a "--" → period, an em dash → comma). Stray empty homePage + blog drafts deleted. GROQ query-back
+   confirms all content + images + references resolve. Tracked in `_CONTENT-STATUS.md` (new homePage section,
+   all 🟡 design-sourced).
+
+### Design decisions made this slice (flagged to Adinda, cheap to change — homePage content is re-seedable)
+- **Footer + Nav = global chrome, NOT homePage fields** → deferred to a separate siteSettings/navigation
+  slice; still hardcoded for now (avoids scope balloon).
+- **Destinations carousel keeps `@/lib/destinations`** (built-in 9-destination list) for THIS slice →
+  migrates to real `destination` docs in the destination slice (next page). Mega-menu stays title-only.
+- Images uploaded to Sanity (not left empty) so the rendered page validates the `urlForImage`/loader
+  pipeline end-to-end.
+
+### STILL TO DO (this slice + queued)
+- **Slice (c):** homepage GROQ query + convert `page.tsx` to an async server component that fetches +
+  passes props. NOT started. Frontend still renders the hardcoded homepage (unchanged, works).
+- **Slice (d):** wire each section (Hero, TheBoat, WhyUs, LatestArticles, Faq, Testimonials, Cta, Contact)
+  to the Sanity props. Review checkpoint #2 (rendered page + Studio form) lands after this.
+- **Boat Defaults** (queued schema task) — `boatDefaults` singleton + slim `boat`, same pattern as
+  `destinationDefaults`. NOT started.
+- Cosmetic polish deferred to `_POLISH-BACKLOG.md` per the guardrail. A clickable link on the signpost
+  notes (open the target doc via IntentLink) is a nice-to-have, deferred.
+
+### Repo state: clean + committed at this checkpoint. Frontend unchanged so the site still renders the
+hardcoded homepage exactly as before; all new work is schema/lib/config/seed. Safe local commit.
+
+---
+
+## SESSION CHECKPOINT — 2026-07-16 (later), skills-update round + session-bookend protocol (superseded by the checkpoint above)
 
 ### What this session was
 Not a build session — a process/skills-infrastructure session. Two things: (1) locked a new standing
