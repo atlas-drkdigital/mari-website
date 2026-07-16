@@ -198,16 +198,39 @@ vertical-slice approach: real content + real rendered page = meaningful review. 
 ## Decluttering the editing form — separate fields by how often they're touched (locked 2026-07-16)
 Principle Adinda likes: keep the primary content front-and-center; move rarely-touched fields out of the
 way, chosen by WHY they're rarely touched.
-- **Shared across many instances** → a `[Type] Defaults` singleton, off the page entirely, edited once
-  (with a `{token}` for the per-instance part, e.g. `{destination}`). Use ONLY for template-based page
-  types with **multiple** instances (Destinations ✓; Boats *once there's a 2nd boat*). **Never for
-  single-instance/singleton pages** — there's nothing to share, it just adds indirection.
-- **Rarely touched but instance-specific** → keep it on the doc but tuck it away: a collapsible/collapsed
-  `fieldset` (`options: { collapsible: true, collapsed: true }`) and/or a dedicated **"Advanced" tab**
-  (group). These **compose** — an Advanced tab can hold collapsed fieldsets; a collapsed fieldset can also
-  sit inside the main tab. (Fieldsets = titled sections visible in "All Fields"; groups = tabs; a field can
-  declare both.) This is how single-instance pages (homepage, about, T&C) declutter, since they can't use a
-  Defaults singleton.
+- **Shared across instances of a type DESIGNED to hold many** → a `[Type] Defaults` singleton, off the page
+  entirely, edited once (with a `{token}` for the per-instance part, e.g. `{destination}`). **The test is
+  whether the type is a template/collection (designed for many instances), NOT the current count** —
+  corrected 2026-07-16 (Adinda): `boat` is *designed* to hold multiple boats, so it gets a `Boat Defaults`
+  even though only one exists today. Applies to **Destinations ✓** and **Boats (pending build)**. **Never
+  for single-instance/singleton page types** (homepage, about, T&C, schedule) — designed as one, nothing to
+  share; those declutter with the dedicated tab below.
+- **Rarely touched but instance-specific, OR the section-labels of a singleton page** → keep on the doc but
+  give it a **dedicated, explicitly-labeled tab** (a group titled e.g. **"Section Labels"** or "Defaults")
+  and/or a collapsible/collapsed `fieldset`. **Adinda's requirement 2026-07-16: it must be an explicit,
+  findable dedicated section — an editor has to clearly see where to edit the eyebrows/labels, not have them
+  buried.** For singleton pages (homepage, about, private charters) the eyebrows/section-labels go in such a
+  "Section Labels" tab (they can't use a Defaults singleton). Fieldsets = titled sections visible in "All
+  Fields"; groups = tabs; a field can declare both, and they compose.
+
+## Required fields must show an upfront marker — site-wide, locked 2026-07-16 (Adinda, repeated ask)
+Every required field must display a **visual "required" marker** (asterisk or "(required)") that an editor
+sees **before** filling the form — NOT only a validation error on save (editors miss those and think the
+backend is broken). Implement **once, site-wide** via a global custom field component
+(`sanity.config.ts` → `form: { components: { field } }`) that detects required validation and renders the
+marker — not by hand-editing every field title. **Status: NOT built yet — top pending task** (it's been
+asked more than once; do it early next session). Verify first whether current Studio shows any default
+indicator, then add the global component if not.
+
+## Studio staleness — restart clean + verify BEFORE asking Adinda to review, locked 2026-07-16
+After a batch of schema/structure/content changes, **HMR does not reliably reflect them** — the running
+Studio goes stale (new document types, Structure Builder nesting, and freshly-seeded content especially).
+A browser hard-refresh does NOT fix a stale *server*. Standing rule: before telling Adinda to review Studio
+after such changes, **(1) restart the dev server clean** (kill the `:3000` process, `rm -rf .next`, restart),
+**(2) verify** — curl `/studio` 200 + a GROQ query-back confirming the content is queryable — **(3) then**
+tell her to hard-reload. Don't ask her to review off a server that's had heavy schema edits without a clean
+restart first. (This caused a full round of "why is everything empty / missing" on 2026-07-16 — all content
+was present; the server was just stale.)
 Skill-wide (Adinda's ask) — queued for `drk-website`.
 
 ## Localization Studio UX — fix the "which language is this doc?" list problem AT i18n-build time (documented 2026-07-16)
