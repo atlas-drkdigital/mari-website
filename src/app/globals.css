@@ -45,7 +45,7 @@
    proven and exactly when someone cares, and tokens nobody ever names cost nobody anything. It also has
    zero big-bang risk — each rename is one token, individually verifiable.
 
-   ✅ CONFIRMED, RENAME PENDING — 6 of the 11 remaining. Hexes read straight off Figma's variable panels
+   ✅ CONFIRMED, RENAME PENDING — 9 of the 11 remaining. Hexes read straight off Figma's variable panels
    (Adinda's screenshots, 2026-07-17). The NAME is proven; only the edit is outstanding. Renaming was
    deliberately DEFERRED that day (Adinda: "do not rename until later") — these are now mechanical:
      --primitive-cream-10   #fdfcfa  -> beige/50
@@ -54,7 +54,10 @@
      --primitive-cream-80   #dbcdb2  -> beige/300
      --primitive-copper-600 #8f6d51  -> chocolate/600   (gap: we have 550 + 650, no 600)
      --primitive-amber-600  #b58a2d  -> amber/600       (gap: we have ...500 + 550, no 600)
-   All 6 verified collision-free: none of those target names already exists at a different hex.
+     --primitive-navy-900   #1b2a4a  -> navy/900        (gap: we have 600/700/800)
+     --primitive-navy-950   #131d34  -> navy/950        (gap)
+     --primitive-stone-400  #7c7469  -> stone/500  ☠️ NOT stone/400 — see the trap note below
+   All 9 verified collision-free AGAINST THE PANEL: every target name is a genuine gap in its scale.
 
    ✅ BEIGE, CHOCOLATE AND AMBER ARE ALL FULLY RECONCILED (2026-07-17) — the three families that carry the
    brand. Every hex on every step was matched against the Figma panel, not just the unknown ones:
@@ -73,19 +76,35 @@
        `--primitive-amber-600` -> `--amber-600` is a pure prefix drop, same family, same name.
    So the port wasn't only stale — it was PARTIAL, and its leftovers have two unrelated causes.
 
+   ✅ NAVY AND STONE ALSO FULLY RECONCILED (2026-07-17), every step matched against the panel:
+     navy   Figma 600..950 (5 steps)   — 600/700/800 match; 900 + 950 fill its gaps
+     stone  Figma 100..950 (10 steps)  — all 9 existing tokens match; primitive-stone-400 fills the 500 gap
+
+   ☠️☠️ THE STONE TRAP WAS REAL — CONFIRMED AT SOURCE 2026-07-17, and it is the worked example for why
+   rule 2 ("match by HEX, never by NAME") exists. `--primitive-stone-400` is #7c7469, which is Figma's
+   **stone/500**. Our `--stone-400` (#a19a91) is a DIFFERENT colour and is already CORRECT — it matches
+   Figma's stone/400 exactly. So the "obvious" rename (just drop the `--primitive-` prefix) would have
+   overwritten a correct token with a different grey, in a diff that looks like pure renaming. The old
+   token's own NAME was simply wrong; only its hex was ever trustworthy. Our stone scale has a gap at
+   exactly 500, which is the tell — same pattern as every other primitive-* token.
+
    STILL TO RECONCILE (names inferred, NOT confirmed — confirm the hex with Adinda before renaming):
-     --primitive-navy-900   #1b2a4a  = Figma navy/900?      (inferred; gap — we have 600/700/800)
-     --primitive-navy-950   #131d34  = Figma navy/950?      (inferred; gap)
+     (see the two remaining traps below — red-600 and teal-600)
 
    DONE (confirmed by Adinda + renamed 2026-07-16): beige/100 (was --primitive-cream-30) ·
    chocolate/300 (was --primitive-copper-300).
 
-   ☠️ THREE TRAPS — for these, the "obvious" target name ALREADY EXISTS with a DIFFERENT hex, so a naive
-   rename SILENTLY SWAPS COLOURS. Never rename these on autopilot:
-     --primitive-stone-400  #7c7469 -> NOT --stone-400 (that's #a19a91!) -> likely --stone-500
-     --primitive-red-600    #c10007 -> NOT --red-600   (that's #e7000b!) -> likely --red-700
-     --primitive-teal-600   #008236 -> "teal" is also a colour-FAMILY rename ("green" in Figma) and the
-                                       exact Figma name is UNCONFIRMED. Ask Adinda; do not guess.
+   ☠️ TRAPS — the "obvious" target name ALREADY EXISTS with a DIFFERENT hex, so a naive rename SILENTLY
+   SWAPS COLOURS. Never rename these on autopilot. **1 of 3 resolved; 2 remain, both UNCONFIRMED:**
+     ✅ --primitive-stone-400 #7c7469 -> stone/500. CONFIRMED at source 2026-07-17 (see the trap note
+                                        above). The inference was right, but it still needed the panel.
+     ⚠️ --primitive-red-600   #c10007 -> NOT --red-600 (that's #e7000b!) -> likely --red-700 (we have
+                                        red-600 + red-800 and nothing at 700 — the usual gap tell).
+     ⚠️ --primitive-teal-600  #008236 -> "teal" looks like a FAMILY rename: there is no --teal-* family
+                                        in this file at all, but there IS a `--green-800: #0d542b`. So
+                                        this is almost certainly Figma's `green` scale, and the "teal"
+                                        name is a port-time invention. Exact step UNCONFIRMED. Ask
+                                        Adinda for the green panel; do not guess the step.
 
    PER-RENAME SAFETY NET (do this every time): snapshot every hex the SERVED css emits before and after —
    the two sets must be identical. A rename that changes a rendered value is a bug, and that diff is the
