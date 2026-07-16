@@ -51,8 +51,13 @@ here rather than waiting for a chat-side skill-update round, because this file l
      Prevention for future builds queued in `_handoff/drk-website.md`.
 2. **`boatDefaults` singleton** — **~20–30min. MUST come BEFORE the boat page slice, not after.** See the
    dedicated note below.
-2b. **Testimonials PAGE** (Adinda, 2026-07-16 — flagged for tomorrow). ⚠️ **NOT in the skill's sprint page
-   table at all** — it's an addition, so it pushes the day; see the sprint-impact note below.
+2b. **Testimonials PAGE — SCHEDULED 2026-07-17 (Adinda): build it IN PARALLEL WITH THE FAQ PAGE, same
+   slot (Jul 23). It does NOT get its own slot.** Her reasoning: the two pages are near-identical in shape
+   (a singleton with eyebrow/heading/intro + `seo`, auto-listing docs the frontend already has components
+   for), so doing them back-to-back while the pattern is loaded costs far less than a separate slot.
+   **This closes the "Testimonials has no slot" gap** that had been pushing Jul 23 over capacity — it is
+   no longer additive. Still ⚠️ **NOT in the `mari-project` skill's sprint page table** — that's a
+   skill-round item (already queued in `_handoff/mari-project.md`), not a scheduling one.
    - **The gap:** we have `testimonial` documents but **no Testimonials page**. Same realization as the FAQ
      ("a thing with SEO + page settings is a page, not a component"). The `atlas-website` skill already
      specs a Testimonials hub; it was never added to the page inventory or the sprint.
@@ -72,7 +77,21 @@ padded to "3–4h" and "1–1.5h". She pushed back correctly — `destinationDef
 `boatDefaults` is the same job. The padding came from folding verify+docs+commit into the build number and
 then rounding up again; that overhead is real but it's ~20 min, not a doubling. **Estimate the build, add
 the overhead once, and don't price the user's own review time as build time.**
-3. **Boat page slice** — 3–4h (sprint's Jul 17 item).
+3. **Boat page slice — PLAN LOCKED 2026-07-17 (Adinda). Build in this order; the order is load-bearing.**
+   1. **`boatDefaults`** (~0.5h) — schema before frontend. Moving these fields is free now, a rewire later.
+      Field list approved below; **`keyFeaturesHeading` → singleton is Claude's recommendation, NOT yet
+      confirmed by Adinda** — ask before building it.
+   2. **Boat page sections** (3–4h).
+   3. **Compact nav + sticky sub-nav** (2.5–3.5h) — LAST, because it needs the section anchors to exist
+      before it can jump between them.
+   **Adinda's explicit call: "if it takes two days, then it takes two days."** She chose to build the
+   sub-nav properly today rather than ship the boat page without it and retrofit (which would cut against
+   full-wire-per-slice). ~6–8h of work against ~5h remaining, so **1–3h spills into Mon Jul 20** — accepted
+   knowingly, not an overrun. **Do not re-litigate this to save the calendar.**
+   **The consolation is real:** the sub-nav is the SAME component on destination, so Monday's destination
+   slice inherits it free. Today's spill buys down Monday rather than only deferring it.
+   - **REMINDER OWED (Adinda's ask 2026-07-17): when the boat page starts, remind her to send the Figma
+     colour-variable screenshots.** She'll do them as we go, opportunistically, not as a batch.
 4. **Destination page slice** — where the destination FAQ *render* composition + the stable-key cross-page
    pull get built.
 5. **Global-chrome slice** (Nav/Footer/newsletter/contact details/copyright/"By Atlas").
@@ -130,14 +149,25 @@ sharing it in the skill's sprint — **she rejected that outright**: Destination
 `seasonNights`/`excerpt`/`order` fields) and **she expects it to bleed through the day.** Do not re-pack it.
 If it finishes early she may pull the next day's work forward — that direction only, never the reverse.
 
+**Re-cut 2026-07-17 AM** after (a) the sub-nav turning out to be a real build, (b) Adinda folding
+Testimonials into the FAQ slot. Capacity on Jul 17 was ~5h after the morning block.
+
 | Day | Work | Est. |
 |---|---|---|
-| **Fri Jul 17** | auto-hide + FAQ min-height (0.5h) · `boatDefaults` (0.5h) · **Boat page** (3–4h) | 4–5h ✅ fits |
-| **Mon Jul 20** | **Destination template + Komodo — BLOCKED, nothing else** | 4–5h + bleed |
+| ~~**Fri Jul 17**~~ | ~~auto-hide + FAQ min-height (0.5h)~~ ✅ **DONE** · `boatDefaults` (0.5h) · **Boat page** (3–4h) · **compact nav + sticky sub-nav** (2.5–3.5h) | **6–8h vs ~5h → 1–3h spills to Mon, accepted** |
+| **Mon Jul 20** | Boat spillover (1–3h) · **Destination template + Komodo** (4–5h + bleed) | **⚠️ THE PRESSURE POINT** |
 | **Tue Jul 21** | Private Charters (2–3h) · Schedule & Rates (1–2h) · T&C (~1h) | 4–6h |
 | **Wed Jul 22** | Announcement bar (1–1.5h) · Sanity schema review (1–2h) · **About** (2–3h, copy from scratch) | 4–6.5h |
-| **Thu Jul 23** | FAQ page (2–3h) · **Testimonials page** (1–1.5h) · Blog listing (1.5–2h) · Blog post (1–1.5h) | **5.5–8h ⚠️ OVER** |
+| **Thu Jul 23** | **FAQ page + Testimonials page, same slot in parallel** (3–4h combined) · Blog listing (1.5–2h) · Blog post (1–1.5h) | 5.5–7.5h |
 | **Fri Jul 24** | Push to staging + QA Pass 1 | 5–6h |
+
+**Mon Jul 20 is now the honest risk, not Jul 23.** Destination was ALREADY a deliberately-blocked day
+expected to bleed (Adinda: *"she expects it to bleed through the day"*) — and it now also carries the boat
+spillover. **Do not silently absorb this on Monday morning; say it out loud and re-cut then, with the real
+number in hand rather than today's guess.** Partial offset: destination inherits the sub-nav component
+built on Friday, so some of Monday's original scope is already paid for.
+Jul 23 improved — Testimonials is no longer additive (see 2b above), so the earlier "5.5–8h ⚠️ OVER" is
+now ~5.5–7.5h. Still no real slack anywhere before the staging push; the cut order below still stands.
 
 ### ⚠️ SCHEDULE HONESTY — the Jul 23 buffer is GONE. Say this out loud; do not absorb it.
 Jul 21–23 now carries **~14–21.5h into ~15–18h of capacity**. It fits at the optimistic end and **does not
@@ -193,11 +223,30 @@ folding SEO into each slice — cheap while the page is fresh.
 - STAY on each `boat` (bespoke per boat): `overviewHeading`, `cabinsIntro`, and all real content.
 - Structure: nest **Boat Defaults** under the existing "Boats" folder, beside Boats / Cabin Types / Cabins.
 
-**Two open decisions to put to Adinda when building (both small):**
-1. `boat` uses **toggle-to-reveal** eyebrows (`showOverviewEyebrow` etc.); `destinationDefaults` has **no
-   toggles at all**. The two patterns disagree. Once an eyebrow lives in a shared singleton, an empty field
-   simply doesn't render, so the toggle may stop earning its keep. Reconcile so both types behave the same.
-2. Is `keyFeaturesHeading` genuinely shared chrome, or a per-boat line?
+**SETTLED 2026-07-17 — option A, the singleton** (not a "Section Labels" tab on `boat`). Adinda: *"it's
+inside boat defaults, it's cleaner because most of the time it won't be touched, but having it editable by
+admins or SEOs is very important."* The deciding argument was an asymmetry: pick A and be wrong → 30 min
+plus one extra Studio doc; pick B and be wrong → rewire a boat page we already shipped. Cheapest moment is
+now, before the boat frontend exists.
+
+**Approved field list (verified against `boat.ts` 2026-07-17):**
+- **MOVE to `boatDefaults`** (boat-agnostic labels; add a `{boat}` token, same mechanism as `{destination}`):
+  `overviewEyebrow` · `cabinsEyebrow` · `cabinsHeading` ("Cabins") · `galleryEyebrow` · `galleryTitle`
+  ("Gallery") · `specificationsEyebrow` · `specificationsHeading` ("Layout and specifications").
+- **STAYS on each `boat`** (bespoke): `overviewHeading` ("Traditional phinisi liveaboard for serious
+  divers") · `cabinsIntro` · `galleryDescription` · and all real content (name, pageTitle, slug,
+  coverImage, tagline, stats, brochurePdf, keyFeatures, keyFeaturesImage, overviewBody, gallery,
+  layoutDiagrams, specifications, faqSections, seo).
+- **DROP the four `showXEyebrow` toggles** (`showOverviewEyebrow`/`showCabinsEyebrow`/`showGalleryEyebrow`/
+  `showSpecificationsEyebrow`). Resolved by option A: in a shared singleton an empty eyebrow field simply
+  doesn't render, so the toggle stops earning its keep — and `destinationDefaults` has none, so this
+  reconciles the two types onto one pattern.
+- **Structure:** nest **Boat Defaults** under the existing "Boats" folder, beside Boats / Cabin Types /
+  Cabins. Set `.id()` explicitly (duplicate-list-item-ID prevention).
+
+**STILL OPEN — ask before building:** is `keyFeaturesHeading` ("Key features") shared chrome or a per-boat
+line? **Claude recommends the singleton** (it's a generic label, not an editorial choice) but Adinda has
+NOT confirmed it — she locked the plan before answering. One-line move either way.
 
 **Correction on the record:** `cabinType` / `cabin` do **not** have their own pages — they're data feeding the
 boat page's Cabins section. There are no cabin pages in the page inventory. They're grouped under "Boats" only
