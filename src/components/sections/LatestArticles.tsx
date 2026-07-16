@@ -33,6 +33,11 @@ export function LatestArticles({ home, posts }: { home: HomePageData | null; pos
 
   const trackRef = useDragScroll<HTMLDivElement>()
 
+  // No published posts means no section — hide it rather than render a heading over an empty track
+  // (graceful degradation; seeded content means this shouldn't happen in practice). Must sit below
+  // the hook above — an early return before it would change hook order between renders.
+  if (articles.length === 0) return null
+
   return (
     <section id="latest-articles" aria-labelledby="latest-articles-heading" className="w-full bg-bg-page pt-80 pb-80 lg:pt-160 lg:pb-160">
       <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-[36px] page-gutter-x lg:gap-64">

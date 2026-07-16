@@ -37,6 +37,11 @@ export function WhyUs({ home }: { home: HomePageData | null }) {
   const [active, setActive] = useState<string | null>(null)
   const trackRef = useDragScroll<HTMLDivElement>()
 
+  // No cards means no section — hide it rather than render a heading over an empty track (graceful
+  // degradation; seeded content means this shouldn't happen in practice). Must sit below the hooks
+  // above — an early return before them would change hook order between renders.
+  if (cards.length === 0) return null
+
   return (
     <section id="why-us" aria-labelledby="why-us-heading" className="relative isolate flex w-full flex-col items-center gap-[28px] bg-bg-page pt-80 pb-80 lg:gap-48 lg:pb-160">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] [background-size:720px_auto] bg-repeat opacity-20" />

@@ -109,6 +109,12 @@ export function Testimonials({ home }: { home: HomePageData | null }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // No reviews means no section — hide it rather than render a heading over an empty carousel
+  // (graceful degradation; seeded content means this shouldn't happen in practice). Must sit below
+  // every hook above, including the measuring useLayoutEffect/useEffect — an early return before
+  // them would change hook order between renders.
+  if (reviews.length === 0) return null
+
   const goTo = (dir: 1 | -1) => {
     const track = trackRef.current
     if (!track) return

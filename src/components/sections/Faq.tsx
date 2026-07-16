@@ -61,11 +61,29 @@ export function Faq({ home, faq }: { home: HomePageData | null; faq: { questions
   const col1 = allItems.slice(0, splitAt)
   const col2 = allItems.slice(splitAt)
 
-  const [openId, setOpenId] = useState<string | null>('faq-7')
+  // First item open on load (locked 2026-07-17, Adinda): one expanded item shows the rest are
+  // clickable — a column of headings otherwise reads as static text. No SEO/AEO angle either way,
+  // since every answer is in the DOM regardless (the collapse is visual only, via grid-template-rows).
+  // MUST be the FIRST item, not a fixed index: this was hardcoded to 'faq-7' from the static build,
+  // which silently opened NOTHING once the questions came from Sanity and fewer than 8 were featured.
+  // 'faq-0' exists for any non-empty list.
+  const [openId, setOpenId] = useState<string | null>('faq-0')
   const toggle = (id: string) => setOpenId((prev) => (prev === id ? null : id))
 
+  // Nothing FEATURED means nothing to show — hide the section rather than render a heading over an
+  // empty accordion. The empty test is "0 featured questions", not "0 questions": HOMEPAGE_QUERY
+  // already filters to `isFeatured == true`, so a site full of FAQs with nothing featured correctly
+  // renders nothing here. Must sit below the hooks above — an early return before them would change
+  // hook order between renders.
+  if (allItems.length === 0) return null
+
+  // Section min-height is one viewport MINUS the sticky nav (70px), locked 2026-07-17 (Adinda) —
+  // it should fill the screen under the nav once scrolled to, not overflow it by the nav's height.
+  // No floor: an earlier max(600px, ...) was dropped deliberately, so the section always tracks the
+  // viewport rather than jumping to a fixed 600px on short windows. Desktop only (`lg:`) — mobile
+  // has no minimum height at all, by design.
   return (
-    <section id="faq" aria-labelledby="faq-heading" className="relative isolate w-full pt-80 pb-80 lg:min-h-[600px] lg:pt-[144px] lg:pb-160">
+    <section id="faq" aria-labelledby="faq-heading" className="relative isolate w-full pt-80 pb-80 lg:min-h-[calc(100dvh-70px)] lg:pt-[144px] lg:pb-160">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-dark)] bg-cover bg-center" />
       <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-[36px] page-gutter-x lg:gap-64">
         <div data-reveal="left" className="flex flex-col gap-24 lg:gap-32">

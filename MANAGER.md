@@ -18,12 +18,14 @@ Where the two disagree, **this list wins**. Adinda's explicit call 2026-07-16: c
 here rather than waiting for a chat-side skill-update round, because this file loads first.
 
 ### Order of work (next sessions)
-1. **FIRST THING TOMORROW — auto-hide guards + FAQ min-height.** Small, do it before any bigger pass
-   (Adinda's call 2026-07-16). ~30min. Auto-hide: Latest Articles / FAQ / Testimonials / Why Us hide when
-   empty (Destinations ✓ and CTA ✓ already do). **FAQ's empty test is "0 FEATURED questions", not "0
-   questions"** — the homepage keys off the `isFeatured` toggle now, so a site full of FAQs with nothing
-   featured correctly renders nothing. FAQ min-height ~viewport minus nav via `dvh` (check Figma 778-8603).
+1. ~~**auto-hide guards + FAQ min-height.**~~ ✅ **DONE 2026-07-17** — see the 2026-07-17 checkpoint below.
+   Guards on Why Us / Latest Articles / FAQ / Testimonials (Destinations ✓ CTA ✓ already had them);
+   FAQ's empty test is "0 FEATURED questions" and needed no extra logic (HOMEPAGE_QUERY already filters
+   `isFeatured == true`). Min-height locked at `lg:min-h-[calc(100dvh-70px)]` — **the max(600px, ...)
+   floor was dropped on Adinda's call**, and mobile deliberately has no minimum at all. Verified by
+   actually emptying the dataset and watching each section vanish, not by inspection.
    - **MANUAL SECTION TOGGLES ARE DROPPED for now** (Adinda, 2026-07-16) — see the standing to-do below.
+     Re-confirmed 2026-07-17: *"we're not doing that now."* Auto-hide was always the real requirement.
 2. **Theme — SPLIT INTO TWO, they are not the same task** (corrected 2026-07-16 after Adinda's screenshot):
    - **(a) Website:** primary background → `beige/100` (`globals.css`). Real frontend work.
    - **(a) DONE 2026-07-16:** `--color-bg-page` is now `--primitive-cream-30` (#fbf8f2, Figma **beige/100**),
@@ -130,7 +132,7 @@ If it finishes early she may pull the next day's work forward — that direction
 
 | Day | Work | Est. |
 |---|---|---|
-| **Thu Jul 17** | auto-hide + FAQ min-height (0.5h) · `boatDefaults` (0.5h) · **Boat page** (3–4h) | 4–5h ✅ fits |
+| **Fri Jul 17** | auto-hide + FAQ min-height (0.5h) · `boatDefaults` (0.5h) · **Boat page** (3–4h) | 4–5h ✅ fits |
 | **Mon Jul 20** | **Destination template + Komodo — BLOCKED, nothing else** | 4–5h + bleed |
 | **Tue Jul 21** | Private Charters (2–3h) · Schedule & Rates (1–2h) · T&C (~1h) | 4–6h |
 | **Wed Jul 22** | Announcement bar (1–1.5h) · Sanity schema review (1–2h) · **About** (2–3h, copy from scratch) | 4–6.5h |
@@ -230,7 +232,69 @@ history:
 
 ---
 
-## SESSION CHECKPOINT — 2026-07-16, FAQ RESTRUCTURE v2 (READ THIS FIRST — supersedes all below)
+## SESSION CHECKPOINT — 2026-07-17 AM, auto-hide + a real data rescue (READ THIS FIRST)
+
+Model: **Opus 4.8 (1M context)**. Verified clean: tsc + eslint + `/` 200, after every change below.
+
+### DONE + verified
+1. **Auto-hide guards** on Why Us / Latest Articles / FAQ / Testimonials. Each is `if (x.length === 0)
+   return null` **below the hooks** (an early return above them changes hook order). FAQ needed no special
+   "0 featured" logic — HOMEPAGE_QUERY already filters `isFeatured == true`, so "0 items" *is* the test.
+2. **FAQ min-height** → `lg:min-h-[calc(100dvh-70px)]`, no floor, desktop-only (Adinda, 2026-07-17).
+3. **FAQ first item opens on load** — was hardcoded `'faq-7'` from the static build, which silently opened
+   NOTHING once fewer than 8 questions were featured. Now `'faq-0'`, which exists for any non-empty list.
+   Decided on UX (one open item signals the rest are clickable); **no SEO angle either way** — every answer
+   is in the DOM regardless, the collapse is visual only.
+4. **`language-en`**: draft (`tag: "en-US"` + a fallback) discarded; published `tag: "en"` stands. `en-US`
+   would mis-signal **US targeting** for a EUR-priced Indonesian operator selling to international divers.
+   Only use a region subtag when separate regional variants actually exist.
+5. **Dataset cleanup**: 6 orphan drafts deleted (all Studio "create new" residue from Jul 14–15, holding
+   only schema `initialValue` defaults — the `scheduleRates` one had a half-typed `"schedu"` slug). Only 4
+   legitimate drafts remain: `boat-mari`, `faqGeneral`, `homePage`, `navigation`.
+
+### 🔴 THE IMPORTANT ONE — 4 gallery images + the boat slug were nearly deleted
+`drafts.boatPage-mari` survived the 2026-07-16 `boatPage` → `boat` rename. It was written off as a ghost of
+a deleted type and queued for deletion. **Adinda attached a condition — "assuming we don't lose any content
+we've uploaded for the boat" — and that condition is the only reason the content still exists.**
+
+It held **`gallery` (4 uploaded images)** and **`slug`**, neither of which `boat-mari` had. Cause: the rename
+migrated only the **published** doc; those four images were uploaded in Studio and **never published**, so
+they lived only in the draft — which was then orphaned when the type was deleted. Salvaged onto `boat-mari`
+(verified: `slug=mari`, 4/4 image assets resolve), then the ghost was deleted. **The missing slug would also
+have blocked the boat route later the same day.**
+- **The rule (queued for `drk-website`): a document-type rename must migrate DRAFTS too — that is where
+  unpublished work lives.** Migrating only published silently discards it.
+- **Second-order lesson:** "draft-only" ≠ "empty". The first emptiness check counted any non-meta key as
+  content and kept 5 docs that were pure defaults; the fix is to inspect **values**, not key presence.
+
+### Bug found in this session's own tooling (worth keeping — cost a false conclusion)
+**`*[_type == "homePage"][0]` resolves to the DRAFT, not the published doc** — GROQ orders by `_id` and
+`"drafts.homePage"` sorts before `"homePage"`. The first auto-hide demo patched only drafts, so the page
+kept rendering and the guards looked broken *when they were fine*. **The app itself is clean** — every
+singleton in `queries.ts` is selected by explicit `_id`. Audited. Queued for `drk-website`.
+
+### Decisions taken
+- **`isFeatured` is STANDARD + ON BY DEFAULT** (Adinda) — supersedes "only add it when a surface consumes
+  it". Cheap to add, nothing gained by removing, an editor who doesn't want it doesn't tick it. Corrected in
+  `_handoff/drk-website.md` + `_handoff/atlas-website.md` before the skill round could install the old rule.
+- **`boatDefaults` = the singleton (option A)**, eyebrow toggles dropped to match `destinationDefaults`.
+- **Sub-nav spec (Adinda, 2026-07-17)** — floating sticky sub-nav on boat AND destination, same component
+  and behaviour, different section lists. Today's nav is 2 rows (logo+CTA / menu items); stacking a sub-nav
+  under it would make 3. So the main nav needs a **compact one-row variant** (logo LEFT, CTA RIGHT, home/
+  email/WhatsApp icons dropped) with the sticky sub-nav below it = 2 rows total. **Not yet estimated — it is
+  a real addition to the boat slice, not absorbed.**
+- **Jul 17 is a FRIDAY.** The day-plan table said "Thu Jul 17"; every other day label was correct.
+
+### Still open
+- The 70px nav offset used by the FAQ min-height came from the Destinations section, **not** Figma —
+  worth confirming against `778-8603`. In `_POLISH-BACKLOG.md`.
+- `navigation` has **no published doc** (both copies are drafts, one a 1-item stub, one empty and now
+  deleted). Nothing to publish — the nav content is hardcoded in the frontend. The global-chrome slice
+  authors it. **Not an issue, do not re-flag.**
+
+---
+
+## SESSION CHECKPOINT — 2026-07-16, FAQ RESTRUCTURE v2
 
 ### What this session did
 Executed the locked FAQ restructure brief (`_handoff/_NEXT-SESSION-faq.md`) end to end. Model: **Opus
