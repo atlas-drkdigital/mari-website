@@ -45,25 +45,37 @@
    proven and exactly when someone cares, and tokens nobody ever names cost nobody anything. It also has
    zero big-bang risk — each rename is one token, individually verifiable.
 
-   ✅ CONFIRMED, RENAME PENDING — hexes read straight off Figma's `beige` variable panel (Adinda's
-   screenshot, 2026-07-17). The NAME is proven; only the edit is outstanding. Renaming was deliberately
-   DEFERRED that day (Adinda: "do not rename until later") — these are mechanical whenever the pass runs:
+   ✅ CONFIRMED, RENAME PENDING — 6 of the 11 remaining. Hexes read straight off Figma's variable panels
+   (Adinda's screenshots, 2026-07-17). The NAME is proven; only the edit is outstanding. Renaming was
+   deliberately DEFERRED that day (Adinda: "do not rename until later") — these are now mechanical:
      --primitive-cream-10   #fdfcfa  -> beige/50
      --primitive-cream-50   #f5f0e8  -> beige/150
      --primitive-cream-70   #ece4d6  -> beige/200
      --primitive-cream-80   #dbcdb2  -> beige/300
+     --primitive-copper-600 #8f6d51  -> chocolate/600   (gap: we have 550 + 650, no 600)
+     --primitive-amber-600  #b58a2d  -> amber/600       (gap: we have ...500 + 550, no 600)
+   All 6 verified collision-free: none of those target names already exists at a different hex.
 
-   ✅ THE BEIGE SCALE IS FULLY RECONCILED (2026-07-17). The full Figma scale is 50/100/150/200/250/300/
-   350/400/450/500 and every hex matches ours exactly — the four above fill the gaps, and the six already
-   named (beige-100/250/350/400/450/500) were checked against the same panel and are all correct. **No
-   traps in beige.** Worth noting: beige/100 had been renamed 2026-07-16 off a *rendered screenshot*, not
-   the variable panel — it was right, but this is the first time it was actually confirmed at source.
+   ✅ BEIGE, CHOCOLATE AND AMBER ARE ALL FULLY RECONCILED (2026-07-17) — the three families that carry the
+   brand. Every hex on every step was matched against the Figma panel, not just the unknown ones:
+     beige      Figma 50..500 (10 steps)  — all match; the 4 above fill its gaps
+     chocolate  Figma 50..700 (14 steps)  — all 13 existing tokens match; copper-600 fills its gap
+     amber      Figma 100..600 (7 steps)  — all 6 existing tokens match; amber-600 fills its gap
+   **No traps in any of the three.** Adinda's call to do these BEFORE the stone/red/teal traps was right:
+   the traps are riskier per-token, but chocolate and amber are the accents people actually NAME in
+   conversation, and naming is exactly when the drift bites (see rule 1 above). Fix what gets talked about.
+   Also worth noting: beige/100 was renamed 2026-07-16 off a *rendered screenshot*, never the variable
+   panel — it was right, but 2026-07-17 is the first time it was confirmed at source.
+
+   ⚠️ TWO DIFFERENT PROBLEMS wear the same `--primitive-` prefix — don't assume every one is a rename:
+     - cream -> beige and copper -> chocolate are genuine FAMILY renames (Figma renamed them).
+     - amber and navy were NEVER renamed. Those tokens are just leftovers the port never de-prefixed:
+       `--primitive-amber-600` -> `--amber-600` is a pure prefix drop, same family, same name.
+   So the port wasn't only stale — it was PARTIAL, and its leftovers have two unrelated causes.
 
    STILL TO RECONCILE (names inferred, NOT confirmed — confirm the hex with Adinda before renaming):
-     --primitive-copper-600 #8f6d51  = Figma chocolate/600? (inferred: fills the 550/650 gap)
-     --primitive-amber-600  #b58a2d  = Figma amber/600?     (inferred)
-     --primitive-navy-900   #1b2a4a  = Figma navy/900?      (inferred)
-     --primitive-navy-950   #131d34  = Figma navy/950?      (inferred)
+     --primitive-navy-900   #1b2a4a  = Figma navy/900?      (inferred; gap — we have 600/700/800)
+     --primitive-navy-950   #131d34  = Figma navy/950?      (inferred; gap)
 
    DONE (confirmed by Adinda + renamed 2026-07-16): beige/100 (was --primitive-cream-30) ·
    chocolate/300 (was --primitive-copper-300).
