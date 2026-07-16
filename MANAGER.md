@@ -28,17 +28,19 @@ here rather than waiting for a chat-side skill-update round, because this file l
    - **(a) Website:** primary background → `beige/100` (`globals.css`). Real frontend work.
    - **(a) DONE 2026-07-16:** `--color-bg-page` is now `--primitive-cream-30` (#fbf8f2, Figma **beige/100**),
      was `--primitive-cream-10` (#fdfcfa, read too white). Verified in the SERVED css, not just the source.
-   - **(b) STUDIO, not the website — ⚠️ UNRESOLVED, needs a browser inspect.** The "accent unreadable against
-     muted text" issue is a **Sanity Studio** list row, themed from `sanity.config.ts`, NOT `globals.css`.
-     The handoff had these bundled as one frontend task; fixing `globals.css` would have changed nothing.
-     **Status:** `--brand-primary` changed #8f6d51 → **#cfbbaa** (Figma **chocolate/300**, Adinda's pick) and
-     **verified present in the served Studio bundle** — but Adinda reports **no visible change**. So the
-     working assumption was WRONG: `--brand-primary` is not what paints that row. **Next step: inspect the
-     row in a browser** (computed `background-color` + which CSS var it resolves from), then re-point the fix.
-     Claude cannot do this — no browser available; see the verification-ritual rule in CLAUDE.md.
-     **Also still true:** `buildLegacyTheme` DERIVES the title/subtitle colours and we can't set them, so
-     whatever token turns out to drive the row, the lever is the background, not the text. `buildLegacyTheme`
-     is deprecated — if contrast can't be solved within it, migrating to the v3 theme API is the real answer.
+   - **(b) STUDIO, not the website — ✅ DONE + CONFIRMED BY ADINDA 2026-07-16.** Final value: **#bca18a**
+     (Figma **chocolate/400**). Set on **BOTH** `--brand-primary` AND `--default-button-primary-color` in
+     `sanity.config.ts` — they are one brand colour and must move together. Adinda confirmed the list row
+     reads correctly **and the Publish button is fine**, which was the open risk (same token drives both).
+     Background colour left as-is; she called further tuning overkill. **Closed.**
+     **What it cost, and the lesson:** the task was logged as frontend `globals.css` work — the actual
+     surface was a Studio row, so `globals.css` would have fixed nothing. Then a round was lost changing
+     only `--brand-primary` (nothing visible happened) on the assumption it painted the row; a DOM inspect
+     showed the row's `--card-bg-color` derives from `--default-button-primary-color`. **Adinda's one
+     screenshot settled what Claude could not.**
+     **Still true for any future contrast work:** `buildLegacyTheme` DERIVES the title/subtitle colours and
+     we cannot set them, so the only lever is the background. It's deprecated — if contrast ever can't be
+     solved within it, migrate to the v3 theme API rather than fight it.
    - **Palette name drift (Figma vs our CSS) — rename DECLINED, mapping table banked.** Figma renamed the
      colour families (cream→beige, copper→chocolate); our CSS kept the old names, so one palette now lives
      under two naming generations. Rename declined by Adinda: zero user impact, and the cost does NOT grow
