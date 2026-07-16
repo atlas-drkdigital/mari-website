@@ -231,6 +231,22 @@ after such changes, **(1) restart the dev server clean** (kill the `:3000` proce
 tell her to hard-reload. Don't ask her to review off a server that's had heavy schema edits without a clean
 restart first. (This caused a full round of "why is everything empty / missing" on 2026-07-16 — all content
 was present; the server was just stale.)
+
+## Session length — offer a fresh session at block boundaries when it's grown long, locked 2026-07-16
+Standing rule (Adinda's ask): **at the end of each work block — never mid-task — check whether to start a
+fresh conversation, and proactively OFFER it (with a handoff note)** when EITHER trigger holds:
+1. **The next block is a distinct task** that wouldn't need the last ~20 messages — the "would this prompt
+   make sense in a brand-new terminal?" test (Claude Code's own primary signal). Independent task → fresh
+   session.
+2. **The session has clearly grown long** — many completed blocks, lots of files read, conversation very
+   long. Claude Code guidance: checkpoint around **~60% context** (not 90%) and keep a focused session under
+   **~120k input tokens**. Claude can't read an exact context %, so use these as the *spirit* — lean on the
+   heuristics + the task-boundary test above.
+**Always pair the offer with a written handoff note** (like `_handoff/_NEXT-SESSION-*.md`) — a deliberate
+handoff captures the decisions/state precisely, which is strictly better than riding Claude Code's lossy
+auto-compact. Only offer at a clean, committed boundary, not mid-arc. Composes with the session-bookend
+protocol (which covers session *end*); this adds the mid-session length check. Skill-wide — queued for
+`drk-website`.
 Skill-wide (Adinda's ask) — queued for `drk-website`.
 
 ## Localization Studio UX — fix the "which language is this doc?" list problem AT i18n-build time (documented 2026-07-16)
