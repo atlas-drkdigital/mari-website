@@ -242,9 +242,11 @@ fresh conversation, and proactively OFFER it (with a handoff note)** when EITHER
    long. Claude Code guidance: checkpoint around **~60% context** (not 90%) and keep a focused session under
    **~120k input tokens**. Claude can't read an exact context %, so use these as the *spirit* — lean on the
    heuristics + the task-boundary test above.
-**Always pair the offer with a written handoff note** (like `_handoff/_NEXT-SESSION-*.md`) — a deliberate
-handoff captures the decisions/state precisely, which is strictly better than riding Claude Code's lossy
-auto-compact. Only offer at a clean, committed boundary, not mid-arc. Composes with the session-bookend
+**Always pair the offer with (a) a written handoff note** (like `_handoff/_NEXT-SESSION-*.md`) **AND (b) a
+ready-to-paste kickoff prompt** for the new conversation — skills to load, first steps (restart-clean +
+verify), and the task — so the fresh session starts in a single paste (Adinda's ask 2026-07-16). Not just
+the note. A deliberate handoff captures decisions/state precisely, which is strictly better than riding
+Claude Code's lossy auto-compact. Only offer at a clean, committed boundary, not mid-arc. Composes with the session-bookend
 protocol (which covers session *end*); this adds the mid-session length check. Skill-wide — queued for
 `drk-website`.
 Skill-wide (Adinda's ask) — queued for `drk-website`.
