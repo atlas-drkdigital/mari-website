@@ -38,16 +38,14 @@
         usages: the semantic layer below, plus any direct `var(--primitive-*)` refs in components).
         ~2 min. Then delete its row from the table below.
 
-   WHY NOT A SINGLE RENAME PASS (considered and declined, don't re-litigate without new information):
-   a big-bang rename would have to GUESS at the still-unconfirmed names below, and a wrong-but-new name is
-   worse than a known-stale one. Doing nothing leaves a papercut that recurs forever. Opportunistic
-   reconciliation makes confirmation a byproduct of normal work: tokens get fixed exactly when they're
-   proven and exactly when someone cares, and tokens nobody ever names cost nobody anything. It also has
-   zero big-bang risk — each rename is one token, individually verifiable.
+   🎉 RECONCILIATION IS COMPLETE (2026-07-17). ALL 11 remaining tokens are CONFIRMED at source, against
+   Figma's own variable panels. **NOTHING is inferred any more. There are no unresolved traps.** The
+   opportunistic policy above did its job and is now spent — what's left is a purely MECHANICAL rename.
 
-   ✅ CONFIRMED, RENAME PENDING — 9 of the 11 remaining. Hexes read straight off Figma's variable panels
-   (Adinda's screenshots, 2026-07-17). The NAME is proven; only the edit is outstanding. Renaming was
-   deliberately DEFERRED that day (Adinda: "do not rename until later") — these are now mechanical:
+   ✅ THE COMPLETE, CONFIRMED MAP — every target name verified collision-free (each is a genuine gap in
+   its scale). Renaming was DEFERRED by Adinda on 2026-07-17 ("do not rename until later") while the boat
+   page had priority — **that deferral was decided when these were still guesses; the guessing risk is now
+   gone, so it is worth re-asking rather than assuming the answer still holds:**
      --primitive-cream-10   #fdfcfa  -> beige/50
      --primitive-cream-50   #f5f0e8  -> beige/150
      --primitive-cream-70   #ece4d6  -> beige/200
@@ -56,8 +54,18 @@
      --primitive-amber-600  #b58a2d  -> amber/600       (gap: we have ...500 + 550, no 600)
      --primitive-navy-900   #1b2a4a  -> navy/900        (gap: we have 600/700/800)
      --primitive-navy-950   #131d34  -> navy/950        (gap)
-     --primitive-stone-400  #7c7469  -> stone/500  ☠️ NOT stone/400 — see the trap note below
-   All 9 verified collision-free AGAINST THE PANEL: every target name is a genuine gap in its scale.
+     --primitive-stone-400  #7c7469  -> stone/500  ☠️ NOT stone-400 (#a19a91, already correct) — trap
+     --primitive-red-600    #c10007  -> red/700    ☠️ NOT red-600   (#e7000b, already correct) — trap
+     --primitive-teal-600   #008236  -> green/600  ☠️ FAMILY rename: `teal` does not exist in Figma
+   After the rename, ZERO `--primitive-*` tokens should remain. That is the completion test.
+
+   THE ORIGINAL ARGUMENT AGAINST A BIG-BANG RENAME IS NOW DEAD — recorded so nobody re-runs it from
+   memory. It was: *"a big-bang rename would have to GUESS at the unconfirmed names, and a wrong-but-new
+   name is worse than a known-stale one."* That was correct while names were inferred. **Every name is now
+   proven, so there is nothing left to guess and the objection no longer applies.** What made this cheap:
+   Adinda pasted 6 variable-panel screenshots in ~15 minutes and every token was matched BY HEX. The
+   opportunistic drip was the right call when confirmation was expensive; it stopped being expensive the
+   moment the panels were on screen.
 
    ✅ BEIGE, CHOCOLATE AND AMBER ARE ALL FULLY RECONCILED (2026-07-17) — the three families that carry the
    brand. Every hex on every step was matched against the Figma panel, not just the unknown ones:
@@ -88,23 +96,22 @@
    token's own NAME was simply wrong; only its hex was ever trustworthy. Our stone scale has a gap at
    exactly 500, which is the tell — same pattern as every other primitive-* token.
 
-   STILL TO RECONCILE (names inferred, NOT confirmed — confirm the hex with Adinda before renaming):
-     (see the two remaining traps below — red-600 and teal-600)
-
    DONE (confirmed by Adinda + renamed 2026-07-16): beige/100 (was --primitive-cream-30) ·
    chocolate/300 (was --primitive-copper-300).
 
-   ☠️ TRAPS — the "obvious" target name ALREADY EXISTS with a DIFFERENT hex, so a naive rename SILENTLY
-   SWAPS COLOURS. Never rename these on autopilot. **1 of 3 resolved; 2 remain, both UNCONFIRMED:**
-     ✅ --primitive-stone-400 #7c7469 -> stone/500. CONFIRMED at source 2026-07-17 (see the trap note
-                                        above). The inference was right, but it still needed the panel.
-     ⚠️ --primitive-red-600   #c10007 -> NOT --red-600 (that's #e7000b!) -> likely --red-700 (we have
-                                        red-600 + red-800 and nothing at 700 — the usual gap tell).
-     ⚠️ --primitive-teal-600  #008236 -> "teal" looks like a FAMILY rename: there is no --teal-* family
-                                        in this file at all, but there IS a `--green-800: #0d542b`. So
-                                        this is almost certainly Figma's `green` scale, and the "teal"
-                                        name is a port-time invention. Exact step UNCONFIRMED. Ask
-                                        Adinda for the green panel; do not guess the step.
+   ☠️ ALL THREE TRAPS RESOLVED 2026-07-17 — all three confirmed REAL, and all three would have silently
+   swapped a rendered colour under an "obvious" prefix-drop rename:
+     ✅ --primitive-stone-400 #7c7469 -> stone/500.  --stone-400 (#a19a91) already exists and is CORRECT.
+     ✅ --primitive-red-600   #c10007 -> red/700.    --red-600   (#e7000b) already exists and is CORRECT.
+     ✅ --primitive-teal-600  #008236 -> green/600.  There is NO `teal` family in Figma at all — the name
+        was invented at port time. The STEP (600) was right; only the FAMILY was wrong. Note the shape of
+        this one: a plausible, self-consistent name (`--primitive-teal-600`) for a family that never
+        existed. Nothing about the token itself could reveal that — only the source could.
+
+   WHAT THE THREE TRAPS HAVE IN COMMON (the general lesson): in every case the old token's own NAME was
+   simply WRONG, while its HEX was always right. Two had the correct family and a wrong step; one had the
+   right step and a fabricated family. **A stale token name is not a lagging version of the truth — it can
+   be an outright fiction.** This is the whole justification for rule 1: only the hex ever carried meaning.
 
    PER-RENAME SAFETY NET (do this every time): snapshot every hex the SERVED css emits before and after —
    the two sets must be identical. A rename that changes a rendered value is a bug, and that diff is the
