@@ -23,118 +23,71 @@
 
 /* ---------- LAYER 1 | PRIMITIVES (raw palette; not utilities; aliased by semantics) ----------
 
-   ⚠️ NAME DRIFT vs FIGMA — being reconciled OPPORTUNISTICALLY, not in one pass. Read this before
-   touching any colour name. Policy locked 2026-07-16 (Adinda) — also in CLAUDE.md.
+   ✅ NAME DRIFT vs FIGMA — FULLY RESOLVED 2026-07-17. Kept as the record; nothing here is outstanding
+   except the Figma-side item flagged at the bottom. Read before touching any colour name.
 
-   WHAT'S GOING ON: this is ONE palette half-ported twice. The remaining `--primitive-*` tokens are an
-   OLDER naming generation (cream/copper) of the SAME scales as the `--beige-*` / `--chocolate-*` tokens
-   below (Figma's current names). Every `--primitive-*` value fills a MISSING number in its new-name
-   scale — that's the tell, and it's how the mapping below was derived.
+   WHAT HAPPENED: the palette was hand-ported from Figma once (2026-07-14) and never re-synced. Figma
+   later renamed two families (cream->beige, copper->chocolate) and the port went stale. Worse, it had
+   been PARTIAL — so one palette lived under two naming generations, and 11 legacy `--primitive-*` tokens
+   each filled a MISSING step in its modern scale. Nobody noticed until a colour was named out loud and
+   design and code meant different things.
 
-   THE POLICY — two rules that compose (the first is what makes the second safe):
-     1. When Adinda names a colour without a hex, ASK HER TO CONFIRM THE HEX. Never resolve a Figma name
-        to a token BY NAME — the names disagree. Match by HEX, always.
-     2. The moment a mapping is confirmed by (1), RENAME THAT TOKEN THEN AND THERE (declaration + its
-        usages: the semantic layer below, plus any direct `var(--primitive-*)` refs in components).
-        ~2 min. Then delete its row from the table below.
+   FIXED IN TWO STEPS: all 11 confirmed at source against Figma's variable panels (6 screenshots, ~15 min),
+   then renamed in one mechanical pass. **Zero `--primitive-*` tokens remain — that is the completion
+   test, and it passes.** The served stylesheet emitted an IDENTICAL set of 54 hexes before and after.
 
-   🎉 RECONCILIATION IS COMPLETE (2026-07-17). ALL 11 remaining tokens are CONFIRMED at source, against
-   Figma's own variable panels. **NOTHING is inferred any more. There are no unresolved traps.** The
-   opportunistic policy above did its job and is now spent — what's left is a purely MECHANICAL rename.
+   THE FINAL MAP (historical record — do not re-derive):
+     --primitive-cream-10   #fdfcfa -> --beige-50        --primitive-navy-900  #1b2a4a -> --navy-900
+     --primitive-cream-50   #f5f0e8 -> --beige-150       --primitive-navy-950  #131d34 -> --navy-950
+     --primitive-cream-70   #ece4d6 -> --beige-200       --primitive-stone-400 #7c7469 -> --stone-500 ☠️
+     --primitive-cream-80   #dbcdb2 -> --beige-300       --primitive-red-600   #c10007 -> --red-700   ☠️
+     --primitive-copper-600 #8f6d51 -> --chocolate-600   --primitive-teal-600  #008236 -> --green-600  ☠️
+     --primitive-amber-600  #b58a2d -> --amber-600
+   Earlier, 2026-07-16: --primitive-cream-30 -> --beige-100 · --primitive-copper-300 -> --chocolate-300.
 
-   ✅ THE COMPLETE, CONFIRMED MAP — every target name verified collision-free (each is a genuine gap in
-   its scale). Renaming was DEFERRED by Adinda on 2026-07-17 ("do not rename until later") while the boat
-   page had priority — **that deferral was decided when these were still guesses; the guessing risk is now
-   gone, so it is worth re-asking rather than assuming the answer still holds:**
-     --primitive-cream-10   #fdfcfa  -> beige/50
-     --primitive-cream-50   #f5f0e8  -> beige/150
-     --primitive-cream-70   #ece4d6  -> beige/200
-     --primitive-cream-80   #dbcdb2  -> beige/300
-     --primitive-copper-600 #8f6d51  -> chocolate/600   (gap: we have 550 + 650, no 600)
-     --primitive-amber-600  #b58a2d  -> amber/600       (gap: we have ...500 + 550, no 600)
-     --primitive-navy-900   #1b2a4a  -> navy/900        (gap: we have 600/700/800)
-     --primitive-navy-950   #131d34  -> navy/950        (gap)
-     --primitive-stone-400  #7c7469  -> stone/500  ☠️ NOT stone-400 (#a19a91, already correct) — trap
-     --primitive-red-600    #c10007  -> red/700    ☠️ NOT red-600   (#e7000b, already correct) — trap
-     --primitive-teal-600   #008236  -> green/600  ☠️ FAMILY rename: `teal` does not exist in Figma
-   After the rename, ZERO `--primitive-*` tokens should remain. That is the completion test.
+   ☠️ THE THREE TRAPS WERE ALL REAL — each would have silently swapped a RENDERED colour under an
+   "obvious" prefix-drop rename. This is why the hex-diff safety net is mandatory, not ceremonial:
+     --primitive-stone-400 was Figma stone/500; --stone-400 (#a19a91) already exists and is CORRECT.
+     --primitive-red-600   was Figma red/700;   --red-600   (#e7000b) already exists and is CORRECT.
+     --primitive-teal-600  was Figma green/600. There is NO `teal` family in Figma AT ALL — the name was
+       invented at port time. Right step, fabricated family.
 
-   THE ORIGINAL ARGUMENT AGAINST A BIG-BANG RENAME IS NOW DEAD — recorded so nobody re-runs it from
-   memory. It was: *"a big-bang rename would have to GUESS at the unconfirmed names, and a wrong-but-new
-   name is worse than a known-stale one."* That was correct while names were inferred. **Every name is now
-   proven, so there is nothing left to guess and the objection no longer applies.** What made this cheap:
-   Adinda pasted 6 variable-panel screenshots in ~15 minutes and every token was matched BY HEX. The
-   opportunistic drip was the right call when confirmation was expensive; it stopped being expensive the
-   moment the panels were on screen.
+   THE LESSONS THAT OUTLIVE THIS FILE (all four earned, none theoretical):
+     1. MATCH BY HEX, NEVER BY NAME. In all three traps the NAME was wrong and the HEX was always right.
+        A stale token name is not a lagging version of the truth — it can be outright FICTION. Nothing
+        inside the codebase could reveal `teal`; only the source could.
+     2. GENERATE, DON'T HAND-COPY. A copy is stale the moment a designer renames anything, and nothing
+        tells you. This whole episode is one hand-transcription.
+     3. NEVER PARTIALLY PORT, AND NEVER INVENT A NAME. A partial port is worse than none: it looks
+        finished. If the source has no name for a value, do not make one up.
+     4. VERIFY THE TOKENS YOU BELIEVE ARE ALREADY RIGHT. --beige-100 had been "confirmed" off a rendered
+        screenshot, not the panel (it was right — but nobody actually knew); --stone-400 had to be checked
+        to prove the trap beside it. A right guess and a wrong guess look identical until the source says.
 
-   ✅ BEIGE, CHOCOLATE AND AMBER ARE ALL FULLY RECONCILED (2026-07-17) — the three families that carry the
-   brand. Every hex on every step was matched against the Figma panel, not just the unknown ones:
-     beige      Figma 50..500 (10 steps)  — all match; the 4 above fill its gaps
-     chocolate  Figma 50..700 (14 steps)  — all 13 existing tokens match; copper-600 fills its gap
-     amber      Figma 100..600 (7 steps)  — all 6 existing tokens match; amber-600 fills its gap
-   **No traps in any of the three.** Adinda's call to do these BEFORE the stone/red/teal traps was right:
-   the traps are riskier per-token, but chocolate and amber are the accents people actually NAME in
-   conversation, and naming is exactly when the drift bites (see rule 1 above). Fix what gets talked about.
-   Also worth noting: beige/100 was renamed 2026-07-16 off a *rendered screenshot*, never the variable
-   panel — it was right, but 2026-07-17 is the first time it was confirmed at source.
+   SAFETY NET FOR ANY FUTURE RENAME (mandatory): snapshot every hex the SERVED css emits, before and
+   after. The sets must be identical — a rename that changes a rendered value is a bug, and that diff is
+   the only check that catches it. Grepping source is NOT enough; comments contain hexes too.
 
-   ⚠️ TWO DIFFERENT PROBLEMS wear the same `--primitive-` prefix — don't assume every one is a rename:
-     - cream -> beige and copper -> chocolate are genuine FAMILY renames (Figma renamed them).
-     - amber and navy were NEVER renamed. Those tokens are just leftovers the port never de-prefixed:
-       `--primitive-amber-600` -> `--amber-600` is a pure prefix drop, same family, same name.
-   So the port wasn't only stale — it was PARTIAL, and its leftovers have two unrelated causes.
-
-   ✅ NAVY AND STONE ALSO FULLY RECONCILED (2026-07-17), every step matched against the panel:
-     navy   Figma 600..950 (5 steps)   — 600/700/800 match; 900 + 950 fill its gaps
-     stone  Figma 100..950 (10 steps)  — all 9 existing tokens match; primitive-stone-400 fills the 500 gap
-
-   ☠️☠️ THE STONE TRAP WAS REAL — CONFIRMED AT SOURCE 2026-07-17, and it is the worked example for why
-   rule 2 ("match by HEX, never by NAME") exists. `--primitive-stone-400` is #7c7469, which is Figma's
-   **stone/500**. Our `--stone-400` (#a19a91) is a DIFFERENT colour and is already CORRECT — it matches
-   Figma's stone/400 exactly. So the "obvious" rename (just drop the `--primitive-` prefix) would have
-   overwritten a correct token with a different grey, in a diff that looks like pure renaming. The old
-   token's own NAME was simply wrong; only its hex was ever trustworthy. Our stone scale has a gap at
-   exactly 500, which is the tell — same pattern as every other primitive-* token.
-
-   DONE (confirmed by Adinda + renamed 2026-07-16): beige/100 (was --primitive-cream-30) ·
-   chocolate/300 (was --primitive-copper-300).
-
-   ☠️ ALL THREE TRAPS RESOLVED 2026-07-17 — all three confirmed REAL, and all three would have silently
-   swapped a rendered colour under an "obvious" prefix-drop rename:
-     ✅ --primitive-stone-400 #7c7469 -> stone/500.  --stone-400 (#a19a91) already exists and is CORRECT.
-     ✅ --primitive-red-600   #c10007 -> red/700.    --red-600   (#e7000b) already exists and is CORRECT.
-     ✅ --primitive-teal-600  #008236 -> green/600.  There is NO `teal` family in Figma at all — the name
-        was invented at port time. The STEP (600) was right; only the FAMILY was wrong. Note the shape of
-        this one: a plausible, self-consistent name (`--primitive-teal-600`) for a family that never
-        existed. Nothing about the token itself could reveal that — only the source could.
-
-   WHAT THE THREE TRAPS HAVE IN COMMON (the general lesson): in every case the old token's own NAME was
-   simply WRONG, while its HEX was always right. Two had the correct family and a wrong step; one had the
-   right step and a fabricated family. **A stale token name is not a lagging version of the truth — it can
-   be an outright fiction.** This is the whole justification for rule 1: only the hex ever carried meaning.
-
-   PER-RENAME SAFETY NET (do this every time): snapshot every hex the SERVED css emits before and after —
-   the two sets must be identical. A rename that changes a rendered value is a bug, and that diff is the
-   only check that actually catches it. (Grepping the source is not enough; comments contain hexes too.)
-
-   ALSO: Figma has code-syntax bindings pointing at these CSS names, which is why its MCP returns e.g.
-   "var(--primitive-cream-10)" rather than the display name for some variables. A rename desyncs Figma
-   unless its code syntax is updated in the same pass — this is not a code-side-only job.
+   🔴 OUTSTANDING — FIGMA SIDE, NOT CODE. Figma's code-syntax bindings still point at the OLD
+   `--primitive-*` names, which is why its MCP returns e.g. "var(--primitive-cream-10)". Those names NO
+   LONGER EXIST as of 2026-07-17. A rename is a TWO-SIDED job and only the code side is done — the Figma
+   bindings must be updated to the new names by someone with Figma access. Until then, treat any CSS name
+   returned by the Figma MCP as STALE and resolve it through the map above. Tracked in _handoff/figma.md.
    ---------------------------------------------------------------------------------------------- */
 :root {
-  --primitive-cream-10: #fdfcfa;
+  --beige-50: #fdfcfa;
   --beige-100: #fbf8f2;
-  --primitive-cream-50: #f5f0e8;
-  --primitive-cream-70: #ece4d6;
-  --primitive-cream-80: #dbcdb2;
+  --beige-150: #f5f0e8;
+  --beige-200: #ece4d6;
+  --beige-300: #dbcdb2;
   --chocolate-300: #cfbbaa;
-  --primitive-copper-600: #8f6d51;
-  --primitive-amber-600: #b58a2d;
-  --primitive-navy-900: #1b2a4a;
-  --primitive-navy-950: #131d34;
-  --primitive-stone-400: #7c7469;
-  --primitive-red-600: #c10007;
-  --primitive-teal-600: #008236;
+  --chocolate-600: #8f6d51;
+  --amber-600: #b58a2d;
+  --navy-900: #1b2a4a;
+  --navy-950: #131d34;
+  --stone-500: #7c7469;
+  --red-700: #c10007;
+  --green-600: #008236;
   --white: #ffffff;
   --beige-250: #e4d8c4;
   --beige-350: #d3c1a1;
@@ -198,53 +151,53 @@
 
   /* ---------- LAYER 2 | SEMANTIC COLORS (utilities: bg- / text- / border-) ---------- */
   /* aliased to a primitive where a unique match exists; translucent/unmatched keep raw value */
-  /* Was --primitive-cream-10 (#fdfcfa) until 2026-07-16 — read too white. Adinda's pick from Figma,
+  /* Was --beige-50 (#fdfcfa) until 2026-07-16 — read too white. Adinda's pick from Figma,
      where this swatch is now named beige/100; our ported names predate that rename. See the palette
      name-drift note at the top of this file. */
   --color-bg-page: var(--beige-100); /* Figma: beige/100 */
   --color-bg-surface: var(--white);
-  --color-bg-accent: var(--primitive-cream-50);
-  --color-text-primary: var(--primitive-navy-900);
+  --color-bg-accent: var(--beige-150);
+  --color-text-primary: var(--navy-900);
   --color-text-secondary: var(--stone-400);
-  --color-border-default: var(--primitive-cream-80);
+  --color-border-default: var(--beige-300);
   --color-border-input: var(--beige-400);
-  --color-action-primary: var(--primitive-copper-600);
-  --color-action-primary-text: var(--primitive-cream-10);
-  --color-status-limited: var(--primitive-red-600);
+  --color-action-primary: var(--chocolate-600);
+  --color-action-primary-text: var(--beige-50);
+  --color-status-limited: var(--red-700);
   --color-status-available: #016630; /* no primitive match */
-  --color-background-ondark-muted: var(--primitive-navy-950);
-  --color-background-ondark-page: var(--primitive-navy-900);
+  --color-background-ondark-muted: var(--navy-950);
+  --color-background-ondark-page: var(--navy-900);
   --color-background-ondark-surface: #fdfcfa0a; /* translucent (baked alpha) */
-  --color-background-onimage-surface: var(--primitive-navy-900);
-  --color-text-eyebrow: var(--primitive-copper-600);
-  --color-text-link: var(--primitive-copper-600);
+  --color-background-onimage-surface: var(--navy-900);
+  --color-text-eyebrow: var(--chocolate-600);
+  --color-text-link: var(--chocolate-600);
   --color-text-linkhover: var(--chocolate-500);
   --color-text-muted: var(--stone-300);
   --color-text-ondark-eyebrow: var(--amber-500);
-  --color-text-ondark-link: var(--primitive-cream-50);
+  --color-text-ondark-link: var(--beige-150);
   --color-text-ondark-linkhover: var(--beige-250);
   --color-text-ondark-muted: #fdfcfab2; /* translucent (baked alpha) */
-  --color-text-ondark-primary: var(--primitive-cream-10);
-  --color-text-ondark-secondary: var(--primitive-cream-80);
-  --color-text-onimage-eyebrow: var(--primitive-cream-10);
+  --color-text-ondark-primary: var(--beige-50);
+  --color-text-ondark-secondary: var(--beige-300);
+  --color-text-onimage-eyebrow: var(--beige-50);
   --color-border-ondark-input: var(--beige-500);
-  --color-border-ondark-inputactive: var(--primitive-cream-80);
+  --color-border-ondark-inputactive: var(--beige-300);
   --color-border-ondark-muted: #fdfcfa66; /* translucent (baked alpha) */
   --color-border-ondark-subtle: #fdfcfa33; /* translucent (baked alpha) */
   --color-border-onimage-input: #fdfcfacc; /* translucent (baked alpha) */
-  --color-border-onimage-inputactive: var(--primitive-cream-10);
-  --color-border-onimage-primary: var(--primitive-cream-10);
+  --color-border-onimage-inputactive: var(--beige-50);
+  --color-border-onimage-primary: var(--beige-50);
   --color-accent-muted: var(--chocolate-500);
   --color-accent-subtle: var(--beige-400);
-  --color-accent-ondark-muted: var(--primitive-amber-600);
-  --color-accent-ondark-onprimary: var(--primitive-cream-10);
+  --color-accent-ondark-muted: var(--amber-600);
+  --color-accent-ondark-onprimary: var(--beige-50);
   --color-accent-ondark-onprimarymuted: var(--amber-200);
   --color-accent-ondark-primary: var(--amber-500);
   --color-accent-ondark-subtle: #fdfcfacc; /* translucent (baked alpha) */
   --color-accent-onimage-muted: #fdfcfacc; /* translucent (baked alpha) */
   --color-accent-onimage-onprimary: var(--amber-500);
-  --color-accent-onimage-onprimarymuted: var(--primitive-amber-600);
-  --color-accent-onimage-primary: var(--primitive-cream-10);
+  --color-accent-onimage-onprimarymuted: var(--amber-600);
+  --color-accent-onimage-primary: var(--beige-50);
   --color-accent-onimage-subtle: #fdfcfa66; /* translucent (baked alpha) */
 
   /* ---------- SPACING (name = px value) ---------- */
