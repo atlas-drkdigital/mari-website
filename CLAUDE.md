@@ -476,6 +476,31 @@ trailer's mere existence. Git history isn't part of the deployed build and isn't
 made public, never given to the client or the client's other vendors as a collaborator.** If that condition
 would ever change (repo goes public, client asks for repo access, etc.), revisit this decision first.
 
+## Colour names: ALWAYS confirm the hex, and rename opportunistically — locked 2026-07-16 (Adinda)
+Figma renamed the colour families (cream→beige, copper→chocolate) after they were ported; our CSS kept the
+old names, so one palette lives under two naming generations. Full mapping, the 3 traps, and the reasoning
+live in `src/app/globals.css`'s primitives header — **read it before touching a colour name.**
+
+**Two standing rules, Adinda's design (they compose — the first is what makes the second safe):**
+1. **When Adinda names a colour without giving a hex, ASK HER TO CONFIRM THE HEX.** Never resolve a Figma
+   name to a token by name — the names disagree. Always match by hex.
+2. **The moment a mapping is confirmed by (1), rename that token then and there** — the declaration plus
+   its usages (the semantic layer in `globals.css`, plus any direct `var(--primitive-*)` refs in
+   components). ~2 minutes per token.
+
+**Why this beats both alternatives** (a full rename pass was considered and DECLINED): a big-bang rename
+would have to guess at ~8 unconfirmed names, which is worse than a known-stale name. Doing nothing leaves a
+papercut that recurs forever. This makes confirmation a **byproduct of normal work** — tokens get fixed
+exactly when they're proven and exactly when someone cares, and tokens nobody ever names cost nobody
+anything. No audit, no guessing, no half-finished migration to remember.
+
+**Per-rename safety net:** the served CSS must emit the identical set of hex values before and after. A
+rename that changes a rendered value is a bug — that diff is the only check that catches it (see the
+verification rule below). Also update the mapping table in `globals.css`: move the entry from inferred to
+confirmed, or delete it once renamed.
+
+Skill-wide (the opportunistic-reconciliation pattern generalizes) — queued for `drk-website`.
+
 ## Check the docs BEFORE debugging — locked 2026-07-16 (Adinda)
 When ANY bug appears, **first check whether it's already documented**, before experimenting: this file,
 `MANAGER.md`, `_handoff/*.md`, and `drk-website`'s `references/troubleshooting.md`. Trying things out when

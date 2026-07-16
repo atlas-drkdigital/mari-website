@@ -79,6 +79,31 @@ specced and confirmed earlier the same day, then Adinda pulled them back: they'r
 
 **Adinda still wants to review the Studio organization/section structure** before any of this is revisited.
 
+### 🔁 OPEN TO-DO — finish the colour-token rename. Pre-launch IF time, else POST-LAUNCH. (Adinda, 2026-07-16)
+**Raise this alongside the section-toggles question at the end of work blocks.** Not urgent, not dropped.
+
+**Why it matters — the argument that changed the decision.** Claude initially recommended declining the
+rename on the grounds that "the cost doesn't grow over time." **That was wrong, and Adinda caught it:** it's
+true *within Mari*, but **Mari is the pilot/template for every future Atlas + DRK build.** A half-drifted
+palette doesn't sit still — it gets **copied into every project based on this one**, traps and all. The cost
+compounds *across projects*, which is the axis that was being ignored. Mari's structure has to be right
+because other projects will inherit it, not because Mari itself is suffering.
+
+**State:** the palette lives under two naming generations (Figma renamed cream→beige, copper→chocolate after
+the port). **2 of 10 done** — `beige/100` and `chocolate/300` renamed 2026-07-16 once Adinda confirmed their
+hexes. 8 remain with *inferred* names + **3 traps** where the obvious target already exists with a different
+hex. Full record: `src/app/globals.css` primitives header.
+
+**Meanwhile, opportunistic reconciliation runs continuously** (CLAUDE.md rule): whenever Adinda names a
+colour, confirm the hex, and rename that token then and there. This shrinks whatever's left for the final
+pass — the two done so far came free that way.
+
+**When the pass happens:** confirm the ~8 inferred names against Figma (Adinda can read display names;
+Claude's MCP returns code-syntax instead), handle the 3 traps deliberately, and update Figma's code-syntax
+bindings in the same pass — a rename desyncs them otherwise, so it is NOT a code-side-only job.
+**Per-token safety net, proven 2026-07-16:** snapshot every hex the SERVED css emits before and after; the
+sets must be identical. (63 distinct hexes, identical across the first two renames.)
+
 ### Known deviations from the skill's sprint (don't "fix" these back)
 - The skill's day-by-day has **Jul 17 = Boat + Destination start (4–5h)** and does **not contain** toggles+
   theme or `boatDefaults` at all. Reality: those come first, so Jul 17 realistically holds toggles+theme

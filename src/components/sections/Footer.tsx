@@ -98,8 +98,8 @@ export function Footer() {
 
       <div className="w-full border-t border-white/10 bg-background-ondark-muted">
         <div className="mx-auto flex w-full max-w-[1400px] flex-col items-center gap-4 px-24 py-12 text-center lg:flex-row lg:justify-between lg:px-64 lg:text-left">
-          <p className="text-caption-label text-[var(--primitive-copper-300)]">&copy; 2026 Mari Liveaboard by PT Wisata Laut Indah</p>
-          <p className="text-caption-label text-[var(--primitive-copper-300)]">Website by ATLAS</p>
+          <p className="text-caption-label text-[var(--chocolate-300)]">&copy; 2026 Mari Liveaboard by PT Wisata Laut Indah</p>
+          <p className="text-caption-label text-[var(--chocolate-300)]">Website by ATLAS</p>
         </div>
       </div>
     </footer>
