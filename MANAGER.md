@@ -64,6 +64,29 @@ wired"), plus several content-model decisions. Model: Opus throughout. Verified 
   what Adinda meant (she said "first 10, rest in Read More").
 - Red-asterisk-color deferred (not cheap — Sanity title is string-only). Plain asterisk kept (approved).
 
+### REQUESTED NEXT — section visibility: auto-hide empty + manual on/off toggles (Adinda, 2026-07-16 late)
+New batch, NOT in the commit above — the next task. Two distinct mechanisms per homepage section:
+1. **Auto-hide when there's no content (automatic, graceful).** Section disappears if its content is empty:
+   - **Latest Articles** → hide if 0 blog posts (min 1 required to show).
+   - **Destinations** → hide if 0 destinations ✓ (already returns null); also a destination with no content
+     shouldn't render. "No destination anywhere it's called → section doesn't appear."
+   - **FAQ** → hide if 0 questions. **BUT keep a MIN-HEIGHT when shown** — Adinda wants ~one viewport height
+     minus the (sticky/fixed) nav bar, matching the mockup's FAQ section height. Confirm exact value vs mockup.
+   - **Testimonials** → hide if none.
+   - **CTA** → hide if 0 cards ✓ (done). **Why Us** → add the same 0-items guard.
+2. **Manual on/off toggle per section (editor-controlled boolean on homePage).** Turn a whole section OFF
+   even if it has content. Named by Adinda: **Blog/Latest Articles, Why Us ("queue"?), Testimonials, CTA,
+   Contact form.** Likely also Destinations / The Boat / FAQ — CONFIRM the full set. Implement as `showX`
+   booleans (consistent with the eyebrow toggle-to-reveal pattern), page.tsx respects them.
+   - "queue" in her note is likely a dictation slip for "Why Us" (or "each section") — confirm.
+   These two compose: a section shows only if (toggle ON) AND (has content). This generalizes the full-wire
+   graceful-degradation rule into an explicit, editor-visible feature. Skill-relevant (likely drk-website).
+   **CONFIRMED (Adinda) — toggle set:** The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials,
+   CTA, Contact (Hero always on). "queue" = Why Us; "Destinations and the boat need to be there" = they get
+   toggles too. **FAQ min-height when shown** = ~viewport minus nav via `dvh` (verify Figma node 778-8603).
+   **Also:** `homePage.whyUsItems` min 2→1 (Adinda's catch). Read More = link to FAQ page (built). Bundle
+   with the theme tweak in ONE pass. FULL confirmed brief → `_handoff/_NEXT-SESSION-toggles-theme.md`.
+
 ### Repo state: clean + committed (full-wire + FAQ remodel folded into ONE commit, Adinda's ask). Reviewable.
 
 ---
