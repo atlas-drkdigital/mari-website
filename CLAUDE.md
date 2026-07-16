@@ -476,6 +476,27 @@ trailer's mere existence. Git history isn't part of the deployed build and isn't
 made public, never given to the client or the client's other vendors as a collaborator.** If that condition
 would ever change (repo goes public, client asks for repo access, etc.), revisit this decision first.
 
+## Check the docs BEFORE debugging — locked 2026-07-16 (Adinda)
+When ANY bug appears, **first check whether it's already documented**, before experimenting: this file,
+`MANAGER.md`, `_handoff/*.md`, and `drk-website`'s `references/troubleshooting.md`. Trying things out when
+the answer is already written down wastes the session and risks re-introducing a fix we already know is
+wrong. This is the read half of a habit we've only been doing the write half of — the troubleshooting file
+is only worth keeping if it's consulted first, not just appended to. Skill-wide — queued for `drk-website`.
+
+**Corollary — write BOTH halves down.** When a bug is logged, record how to *fix* it AND how to *avoid
+re-introducing* it. Precedent: the Studio "List items with same ID found" bug (2026-07-16) — the fix was
+deleting a duplicate, but the prevention was setting `.id()` explicitly in `structure.ts`, which is what
+actually stops it recurring. See `_handoff/drk-website.md`.
+
+## A verification ritual only counts if it can actually fail — locked 2026-07-16
+The "restart clean + curl `/studio` 200 + GROQ query-back" ritual **does not verify Structure Builder
+changes.** Studio resolves structure client-side, so `curl` returns 200 on a completely broken sidebar, and
+`tsc`/`eslint`/`sanity schema validate` all pass (it isn't a schema error). A fully broken Studio was
+handed to Adinda for review on 2026-07-16 having "passed" every check. **For structure changes, either load
+Studio in a real browser or state plainly that Adinda's reload is the only real test — never report it as
+verified.** Generalize the principle: before claiming something is verified, ask what the check would do if
+the thing were broken. If the answer is "pass", it isn't a check.
+
 ## Session discipline (carried over from the static build, still applies)
 - Verify by reading actual compiled CSS/build output, not by trusting a class or config name's apparent meaning
 - Tag reusable rules `[DRK]` as they emerge — don't defer to a batch audit

@@ -206,7 +206,7 @@ export const homePageType = defineType({
       group: 'faq',
       fieldset: 'faqFs',
       message:
-        'This section shows the questions you have marked “Feature on homepage”. Turn that switch on for any question under “General FAQ” in Shared Components, or on a boat. The link above goes to the full FAQ page for everything else.',
+        'This section shows the questions you have marked “Feature on homepage”. Turn that switch on for any question on the FAQ page, or on a boat. The link above goes to the full FAQ page for everything else.',
     }),
 
     // ----- Testimonials -----

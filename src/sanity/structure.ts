@@ -32,14 +32,21 @@ const PLACED_TYPES = [
   'crewMember',
 ]
 
+// NOTE — `.id()` is set EXPLICITLY on purpose, do not remove it. Without it, Sanity derives a list
+// item's id from its TITLE, so two items whose titles happen to match anywhere in the same list blow
+// up the whole sidebar with "List items with same ID found" — the Studio shell still returns 200, so
+// only a browser catches it. Deriving the id from the type name instead makes that structurally
+// impossible. (Cost us a broken sidebar on 2026-07-16 when two items were briefly titled "General FAQ".)
 function singleton(S: Parameters<StructureResolver>[0], typeName: string, title: string) {
   return S.listItem()
+    .id(typeName)
     .title(title)
     .child(S.document().schemaType(typeName).documentId(typeName).title(title))
 }
 
 function pinnedPage(S: Parameters<StructureResolver>[0], id: string, title: string) {
   return S.listItem()
+    .id(id)
     .title(title)
     .child(S.document().schemaType('page').documentId(id).title(title))
 }
@@ -90,12 +97,14 @@ export const structure: StructureResolver = (S) =>
 
       S.documentTypeListItem('itinerary').title('Itineraries'),
 
-      // The General FAQ is a PAGE, not a shared component — moved here from the shared-components
-      // section 2026-07-16 (Adinda's call). It backs the /faq hub, carries its own `seo`, and will
-      // carry page-level section toggles (contact form, CTA), so it describes a page rather than a
+      // The FAQ is a PAGE, not a shared component — moved here from the shared-components section
+      // 2026-07-16 (Adinda's call). It backs the /faq hub, carries its own `seo`, and will carry
+      // page-level section toggles (contact form, CTA), so it describes a page rather than a
       // reusable content item. Destination/boat pages PULLING categories from it doesn't make it a
       // component: the homepage pulls Destinations and Blog Posts, which live here too.
-      singleton(S, 'faqGeneral', 'General FAQ'),
+      // Labelled "FAQ", not "General FAQ": every neighbour here is named after the page it IS, and
+      // "General" only ever described how it differed from a sibling list that no longer exists.
+      singleton(S, 'faqGeneral', 'FAQ'),
 
       // Generic `page` catch-all (T&C, Onboard Prices, and anything else not pinned above) goes
       // LAST in this section, per Adinda's explicit ordering ask 2026-07-16.
@@ -122,11 +131,9 @@ export const structure: StructureResolver = (S) =>
         .title('Announcements')
         .child(S.documentTypeList('announcementBar').title('Announcements')),
       S.documentTypeListItem('whyUsItem').title('Why Us Items'),
-      // ONE FAQ entry. The General FAQ holds only the cross-cutting questions (and backs the /faq
-      // hub); destination- and boat-specific questions are inline `faqSections` arrays on those
-      // documents, edited where the editor is already working, not in a separate pile of reference
-      // docs (see CLAUDE.md editor-experience principle + the 2026-07-16 FAQ restructure).
-      singleton(S, 'faqGeneral', 'General FAQ'),
+      // FAQ is NOT here — it moved up to Main Page Content (it has `seo` and page-level settings, so
+      // it describes a page, not a shared component). Destination- and boat-specific questions are
+      // inline `faqSections` arrays on those documents.
       S.documentTypeListItem('testimonial').title('Testimonials'),
       // Crew members (shown on the About page) — a repeatable shared component, placed here per
       // Adinda's ask 2026-07-16.

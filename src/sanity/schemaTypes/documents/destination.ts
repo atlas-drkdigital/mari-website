@@ -232,7 +232,7 @@ export const destinationType = defineType({
       name: 'faqNote',
       title: 'About this section',
       message:
-        'Add the questions that are specific to this destination. The page also shows shared questions that apply to every trip — those are edited under General FAQ, not here.',
+        'Add the questions that are specific to this destination. The page also shows shared questions that apply to every trip — those are edited on the FAQ page, not here.',
       group: 'faq',
       fieldset: 'faqFs',
     }),

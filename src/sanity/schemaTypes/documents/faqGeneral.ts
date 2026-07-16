@@ -15,7 +15,7 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 // locking the taxonomy in code (same approach as boat's `specifications`).
 export const faqGeneralType = defineType({
   name: 'faqGeneral',
-  title: 'General FAQ',
+  title: 'FAQ',
   type: 'document',
   icon: HelpCircleIcon,
   groups: [
@@ -29,7 +29,7 @@ export const faqGeneralType = defineType({
       type: 'array',
       group: 'content',
       description:
-        'Each category is one section on the FAQ page. Drag to reorder the categories and the questions inside them. Only add questions here that apply to every trip. Questions about a single destination or a single boat are edited on that destination or boat.',
+        'Each category is one section on this page. Drag to reorder the categories and the questions inside them. Only add questions here that apply to every trip. Questions about a single destination or a single boat are edited on that destination or boat.',
       of: [defineArrayMember({ type: 'faqSection' })],
       initialValue: [
         { _type: 'faqSection', title: 'Payment & Booking', questions: [] },
@@ -39,5 +39,5 @@ export const faqGeneralType = defineType({
     }),
     defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
   ],
-  preview: { prepare: () => ({ title: 'General FAQ' }) },
+  preview: { prepare: () => ({ title: 'FAQ' }) },
 })

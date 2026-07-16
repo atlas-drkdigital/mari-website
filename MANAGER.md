@@ -18,11 +18,20 @@ Where the two disagree, **this list wins**. Adinda's explicit call 2026-07-16: c
 here rather than waiting for a chat-side skill-update round, because this file loads first.
 
 ### Order of work (next sessions)
-1. **Section toggles + auto-hide + theme tweak** — `_handoff/_NEXT-SESSION-toggles-theme.md`. **~1–1.5h**
-   (8 booleans + a Sections group ~15min, page.tsx respecting them ~10min, 4 auto-hide guards ~10min, FAQ
-   min-height ~5min + a Figma check, theme tokens ~15min, plus verify/trackers ~20min). Its two quick fixes
-   are already DONE in the FAQ commit — skip them. **The only real unknown is the accent-contrast call**,
-   which needs Adinda's eyes and may take a review round or two — that's her time, not build time.
+1. **FIRST THING TOMORROW — auto-hide guards + FAQ min-height.** Small, do it before any bigger pass
+   (Adinda's call 2026-07-16). ~30min. Auto-hide: Latest Articles / FAQ / Testimonials / Why Us hide when
+   empty (Destinations ✓ and CTA ✓ already do). **FAQ's empty test is "0 FEATURED questions", not "0
+   questions"** — the homepage keys off the `isFeatured` toggle now, so a site full of FAQs with nothing
+   featured correctly renders nothing. FAQ min-height ~viewport minus nav via `dvh` (check Figma 778-8603).
+   - **MANUAL SECTION TOGGLES ARE DROPPED for now** (Adinda, 2026-07-16) — see the standing to-do below.
+2. **Theme — SPLIT INTO TWO, they are not the same task** (corrected 2026-07-16 after Adinda's screenshot):
+   - **(a) Website:** primary background → `beige/100` (`globals.css`). Real frontend work.
+   - **(b) STUDIO, not the website:** the "accent unreadable against muted text" issue is a **Sanity Studio**
+     list row, themed by `--brand-primary: #8f6d51` (`primitive-copper-600`) in **`sanity.config.ts`**, NOT
+     by `globals.css`. The handoff had these bundled as one frontend task; fixing `globals.css` would have
+     changed nothing. **`buildLegacyTheme` derives the title/subtitle colours from `--brand-primary` — we
+     cannot set them.** So the only lever is picking a `--brand-primary` whose derived text stays readable
+     (or migrating off the deprecated `buildLegacyTheme`). Adinda is choosing a swatch in Figma.
 2. **`boatDefaults` singleton** — **~20–30min. MUST come BEFORE the boat page slice, not after.** See the
    dedicated note below.
 
@@ -35,6 +44,27 @@ the overhead once, and don't price the user's own review time as build time.**
 4. **Destination page slice** — where the destination FAQ *render* composition + the stable-key cross-page
    pull get built.
 5. **Global-chrome slice** (Nav/Footer/newsletter/contact details/copyright/"By Atlas").
+
+### 🔁 STANDING TO-DO — ask Adinda at the end of every work block: "do we want manual section toggles yet?"
+Her explicit ask 2026-07-16: **don't let this evaporate, and don't build it speculatively.** Raise it as a
+question at the end of each block/session, not as a plan.
+
+**Decision so far — DROPPED, not rejected.** Per-section on/off booleans (`showTheBoat`, `showWhyUs`, …) were
+specced and confirmed earlier the same day, then Adinda pulled them back: they're a **nice-to-have** and they
+"introduce risk in terms of reviews and organization." **The auto-hide logic was always the real requirement.**
+
+**The reasoning, so it isn't re-litigated from scratch:**
+- Two overlapping ways to hide a section means that when one disappears, an editor has to work out *which*
+  mechanism did it. That's worse than either alone.
+- Nobody has yet asked to hide a section that **has** content. Building 8 booleans (× 8 page types later) for
+  a hypothetical is the **exact `isFeatured` mistake already made once on 2026-07-16** — specced, dropped as
+  speculative, reinstated hours later once a real surface existed. Same rule applies: **build it when a
+  concrete need shows up.**
+- It also defuses the "toggles get invented twice, differently" risk flagged in
+  `_STUDIO-ORGANIZATION-AUDIT.md` (the FAQ page wants contact-form/CTA toggles; the homepage wanted its own).
+  If/when toggles ARE built, settle ONE convention across all page types in the same pass.
+
+**Adinda still wants to review the Studio organization/section structure** before any of this is revisited.
 
 ### Known deviations from the skill's sprint (don't "fix" these back)
 - The skill's day-by-day has **Jul 17 = Boat + Destination start (4–5h)** and does **not contain** toggles+
