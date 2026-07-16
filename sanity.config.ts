@@ -20,22 +20,19 @@ import {RequiredFieldMarker} from './src/sanity/components/RequiredFieldMarker'
 // upcoming major version" per its own JSDoc) simple theming API — revisit when v6/v7 ships its
 // replacement, don't assume this stays valid indefinitely.
 const theme = buildLegacyTheme({
-  // Changed from #8f6d51 2026-07-16 (Adinda's pick from Figma). The old value sat in a dead zone:
-  // Sanity DERIVES the title/subtitle colours on a selected list row from this value and we cannot set
-  // them, and its derived muted-grey subtitle was unreadable on it. This value is light enough that the
-  // derived text should go dark. NOTE it is not scoped to that row — it also drives primary buttons and
-  // other brand surfaces, so re-check those in a browser after changing it.
+  // Brand colour, changed from #8f6d51 2026-07-16 (Adinda's pick from Figma). The old value sat in a
+  // dead zone: Sanity DERIVES the title/subtitle colours on a selected list row from this and we cannot
+  // set them, so its derived muted-grey subtitle was unreadable on it. A lighter brand colour makes the
+  // derived text go dark instead.
   //
-  // ⚠️ NAME DRIFT: Figma calls this **chocolate/300**; our ported globals.css calls the same hex
-  // `--primitive-copper-300`, and has no `chocolate-300` at all (our chocolate scale skips from 250 to
-  // 350). The hex is what matters here, but the palette names have diverged from Figma since the port —
-  // flagged 2026-07-16, worth a proper reconcile before anyone matches tokens by NAME across the two.
-  '--brand-primary': '#cfbbaa', // Figma: chocolate/300 · our theme.css: primitive-copper-300
-  // MUST move together with --brand-primary. Verified via DOM inspect 2026-07-16: the selected list row's
-  // `--card-bg-color` / `--card-border-color` derive from THIS token, not from --brand-primary. Leaving it
-  // dark while --brand-primary went light changed nothing visible — the exact symptom that cost a round of
-  // guessing. They were both #8f6d51 originally; they are one brand colour, so keep them in sync.
-  '--default-button-primary-color': '#cfbbaa', // Figma: chocolate/300
+  // These two MUST move together — they are one brand colour (both were #8f6d51). Verified by DOM
+  // inspect: the selected list row's `--card-bg-color` / `--card-border-color` derive from
+  // --default-button-primary-color, NOT from --brand-primary. Changing only --brand-primary changes
+  // nothing visible, which is exactly what cost a round of guessing here.
+  //
+  // Also drives primary buttons, so re-check a Publish button in a browser after changing it.
+  '--brand-primary': '#c6ae9a', // Figma chocolate/350 = our --chocolate-350
+  '--default-button-primary-color': '#c6ae9a', // Figma chocolate/350 = our --chocolate-350
   '--focus-color': '#b58a2d', // primitive-amber-600
   '--component-text-color': '#1b2a4a', // primitive-navy-900, same as the website's --color-text-primary
   // --font-bricolage-grotesque is set by next/font/google on the <html> element in
