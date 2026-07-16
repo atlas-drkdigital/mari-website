@@ -243,6 +243,13 @@ the flat "All Fields" view** — without them an editor can't tell which section
 already did this; `destination` done 2026-07-16; **retrofit `boat`/`homePage`/`page`/`scheduleRates` and
 every new type.** Skill-wide — queued for `drk-website`.
 
+**Exception, learned 2026-07-16 (Adinda's SEO double-nesting catch):** this does NOT apply to a group
+holding a **single self-describing field** — there the fieldset is pure duplication. The `seo` group was
+rendering "SEO" (fieldset) → "Seo" (the object field) → the actual fields: three headers for one section.
+Fixed site-wide by dropping the single-field `seoFs` fieldset and giving the `seo` field an explicit
+`title: 'SEO'`, leaving ONE clean header. The rule's *purpose* is a visible section header in the flat
+"All Fields" view — when the field already provides one, adding a fieldset works against that purpose.
+
 ## Load real/placeholder content into every schema so it's reviewable (locked 2026-07-16)
 An empty form is too abstract to judge. Whenever a document type is built or filled out, populate at least
 one real document with content — pull copy from the mockup where it exists, use clear placeholder (and the

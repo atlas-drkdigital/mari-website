@@ -12,6 +12,7 @@ import { richTextBasicType } from './objects/richTextBasic'
 import { richTextFullType } from './objects/richTextFull'
 import { imageWithAltType } from './objects/imageWithAlt'
 import { galleryImageType } from './objects/galleryImage'
+import { faqSectionType } from './objects/faqSection'
 import { redirectType } from './documents/redirect'
 import { languageType } from './documents/language'
 import { navigationType } from './documents/navigation'
@@ -28,7 +29,6 @@ import { destinationDefaultsType } from './documents/destinationDefaults'
 import { ctaType } from './documents/cta'
 import { itineraryType } from './documents/itinerary'
 import { testimonialType } from './documents/testimonial'
-import { faqType } from './documents/faq'
 import { faqGeneralType } from './documents/faqGeneral'
 import { blogPostType } from './documents/blogPost'
 import { blogCategoryType } from './documents/blogCategory'
@@ -51,6 +51,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     richTextFullType,
     imageWithAltType,
     galleryImageType,
+    faqSectionType,
     // documents
     redirectType,
     languageType,
@@ -68,7 +69,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     ctaType,
     itineraryType,
     testimonialType,
-    faqType,
     faqGeneralType,
     blogPostType,
     blogCategoryType,

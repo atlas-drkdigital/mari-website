@@ -48,7 +48,6 @@ export const homePageType = defineType({
     { name: 'testimonialsFs', title: 'Testimonials' },
     { name: 'ctaFs', title: 'CTA' },
     { name: 'sectionLabelsFs', title: 'Section Labels — the small kicker text above each section heading' },
-    { name: 'seoFs', title: 'SEO' },
   ],
   fields: [
     // ----- Hero -----
@@ -135,9 +134,9 @@ export const homePageType = defineType({
       type: 'array',
       group: 'whyUs',
       fieldset: 'whyUsFs',
-      description: 'Choose which items appear, and in what order (2 to 4).',
+      description: 'Choose which items appear, and in what order (1 to 4).',
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'whyUsItem' }] })],
-      validation: (Rule) => Rule.min(2).max(4),
+      validation: (Rule) => Rule.min(1).max(4),
     }),
     sharedComponentNote({
       name: 'whyUsNote',
@@ -207,7 +206,7 @@ export const homePageType = defineType({
       group: 'faq',
       fieldset: 'faqFs',
       message:
-        'Your general FAQ questions appear here automatically (the first several) — you don’t pick them one by one. Write and reorder them under “FAQ (General)” in Shared Components; the homepage follows that order.',
+        'This section shows the questions you have marked “Feature on homepage”. Turn that switch on for any question under “General FAQ” in Shared Components, or on a boat. The link above goes to the full FAQ page for everything else.',
     }),
 
     // ----- Testimonials -----
@@ -311,7 +310,7 @@ export const homePageType = defineType({
     // (Contact eyebrow lives in siteSettings "Contact Section", not here.)
 
     // ----- SEO -----
-    defineField({ name: 'seo', type: 'seo', group: 'seo', fieldset: 'seoFs' }),
+    defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
   ],
   preview: {
     prepare: () => ({ title: 'Homepage' }),

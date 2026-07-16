@@ -1,71 +1,43 @@
 import { HelpCircleIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
-// General FAQ (singleton, id "faqGeneral"). INLINE-ARRAY model, chosen 2026-07-16 over separate `faq`
-// reference documents: for a non-technical editor, an inline array they can SEE, drag-reorder, and edit
-// in place is far more intuitive than a pile of referenced documents opened one at a time (see CLAUDE.md
-// "Guiding principle — the CMS/admin experience is a product surface"). One array per category, each
-// rendered as a section on the FAQ page; the homepage shows these general questions automatically (first
-// N + Read More), no hand-picking. Destination-specific FAQs are SEPARATE — they live on each Destination
-// page (the `faq` document type / destination slice), NOT here; the field description says so, so editors
-// never wonder where a question belongs. Categories are dynamic (add/reorder them yourself) — kept simple
-// for the first pass; richer category management (icons, descriptions) can come later if it earns its keep.
+// General FAQ (singleton, id "faqGeneral") — the cross-cutting questions that aren't tied to one
+// destination or one boat, and the content behind the /faq hub page. Categories are an inline array
+// of the shared `faqSection` object, the same shape destinations and boats use.
+//
+// Scope rule this type exists to enforce: only put a question here if it's true regardless of which
+// trip or boat the guest books. Destination-specific questions live on the destination; boat-specific
+// ones live on the boat. Pages compose the two (a destination page also shows What's Included from
+// here), so a question written once shows everywhere it's relevant without being duplicated.
+//
+// The seeded category titles are defaults, not a fixed list — editors can rename, reorder, add, and
+// remove them. Seeding via initialValue gives a new document a sensible starting structure without
+// locking the taxonomy in code (same approach as boat's `specifications`).
 export const faqGeneralType = defineType({
   name: 'faqGeneral',
-  title: 'FAQ',
+  title: 'General FAQ',
   type: 'document',
   icon: HelpCircleIcon,
+  groups: [
+    { name: 'content', title: 'FAQ Content', default: true },
+    { name: 'seo', title: 'SEO' },
+  ],
   fields: [
     defineField({
       name: 'categories',
       title: 'FAQ categories',
       type: 'array',
+      group: 'content',
       description:
-        'Each category is one section on the FAQ page. Drag to reorder the categories and the questions inside them. These general FAQs also appear on the homepage (the first several). Destination-specific FAQs are managed on each Destination page, not here.',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          name: 'faqCategory',
-          title: 'Category',
-          fields: [
-            defineField({
-              name: 'title',
-              title: 'Category title',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'questions',
-              title: 'Questions',
-              type: 'array',
-              of: [
-                defineArrayMember({
-                  type: 'object',
-                  name: 'faqItem',
-                  title: 'Question',
-                  fields: [
-                    defineField({
-                      name: 'question',
-                      type: 'string',
-                      validation: (Rule) => Rule.required(),
-                    }),
-                    defineField({ name: 'answer', type: 'richTextBasic' }),
-                  ],
-                  preview: { select: { title: 'question' } },
-                }),
-              ],
-            }),
-          ],
-          preview: {
-            select: { title: 'title', questions: 'questions' },
-            prepare({ title, questions }) {
-              const n = Array.isArray(questions) ? questions.length : 0
-              return { title: title || 'Untitled category', subtitle: `${n} question${n === 1 ? '' : 's'}` }
-            },
-          },
-        }),
+        'Each category is one section on the FAQ page. Drag to reorder the categories and the questions inside them. Only add questions here that apply to every trip. Questions about a single destination or a single boat are edited on that destination or boat.',
+      of: [defineArrayMember({ type: 'faqSection' })],
+      initialValue: [
+        { _type: 'faqSection', title: 'Payment & Booking', questions: [] },
+        { _type: 'faqSection', title: "What's Included", questions: [] },
+        { _type: 'faqSection', title: 'Others', questions: [] },
       ],
     }),
+    defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
   ],
-  preview: { prepare: () => ({ title: 'FAQ' }) },
+  preview: { prepare: () => ({ title: 'General FAQ' }) },
 })

@@ -33,8 +33,15 @@ export const HOMEPAGE_QUERY = groq`{
   "cta": *[_id == "cta"][0]{
     cards[]{ _key, heading, description, buttonText, image${IMAGE} }
   },
-  "faq": *[_id == "faqGeneral"][0]{
-    "questions": categories[].questions[]{ question, answer }
+  // Homepage FAQ = the questions an editor marked "Feature on homepage", pulled from the General FAQ
+  // and from every boat (destinations deliberately don't feed the homepage — see faqSection.ts).
+  // General first, then boats, so the cross-cutting questions lead.
+  // Each side is coalesced to []: GROQ's `+` yields null if EITHER operand is null, so an absent
+  // faqGeneral would otherwise silently discard the boats' featured questions too (verified against
+  // the real dataset, not assumed).
+  "faq": {
+    "questions": coalesce(*[_id == "faqGeneral"][0].categories[].questions[isFeatured == true]{ question, answer }, [])
+      + coalesce(*[_type == "boat"].faqSections[].questions[isFeatured == true]{ question, answer }, [])
   },
   "latestPosts": *[_type == "blogPost" && defined(postDate) && defined(slug.current)] | order(postDate desc)[0...3]{
     _id, title, "slug": slug.current, excerpt, postDate,

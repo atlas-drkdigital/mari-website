@@ -24,7 +24,6 @@ const PLACED_TYPES = [
   'destination',
   'itinerary',
   'testimonial',
-  'faq',
   'faqGeneral',
   'blogPost',
   'blogCategory',
@@ -108,19 +107,19 @@ export const structure: StructureResolver = (S) =>
 
       // --- Shared / cross-page components — repeatable content that isn't a page itself but can
       // appear across multiple pages/page types (e.g. Testimonials shows on both Home and About;
-      // Why Us items are a repeatable component that may be reused on a different page; FAQ items
-      // are reused by scope) ---
+      // Why Us items are a repeatable component that may be reused on a different page; the General
+      // FAQ's categories are composed into destination and boat pages) ---
       // Gallery is NOT here — it lives as a flat array directly on each page (boat.gallery,
       // destination.gallery) so editors get native multi-file batch upload, not a document type.
       S.listItem()
         .title('Announcements')
         .child(S.documentTypeList('announcementBar').title('Announcements')),
       S.documentTypeListItem('whyUsItem').title('Why Us Items'),
-      // General FAQ = a single inline-array document (categories → questions), edited in place — NOT a
-      // pile of reference docs (see CLAUDE.md editor-experience principle + FAQ remodel). Destination-
-      // specific FAQs are the separate `faq` documents below, clearly labelled so the split is obvious.
-      singleton(S, 'faqGeneral', 'FAQ (General)'),
-      S.documentTypeListItem('faq').title('FAQ (Destination-specific)'),
+      // ONE FAQ entry. The General FAQ holds only the cross-cutting questions (and backs the /faq
+      // hub); destination- and boat-specific questions are inline `faqSections` arrays on those
+      // documents, edited where the editor is already working, not in a separate pile of reference
+      // docs (see CLAUDE.md editor-experience principle + the 2026-07-16 FAQ restructure).
+      singleton(S, 'faqGeneral', 'General FAQ'),
       S.documentTypeListItem('testimonial').title('Testimonials'),
       // Crew members (shown on the About page) — a repeatable shared component, placed here per
       // Adinda's ask 2026-07-16.

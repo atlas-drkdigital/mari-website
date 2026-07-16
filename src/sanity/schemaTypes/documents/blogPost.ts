@@ -15,7 +15,6 @@ export const blogPostType = defineType({
   ],
   fieldsets: [
     { name: 'contentFs', title: 'Content' },
-    { name: 'seoFs', title: 'SEO' },
   ],
   fields: [
     defineField({ name: 'title', type: 'string', group: 'content', fieldset: 'contentFs', validation: (Rule) => Rule.required() }),
@@ -44,7 +43,7 @@ export const blogPostType = defineType({
     }),
     defineField({ name: 'postDate', type: 'datetime', group: 'content', fieldset: 'contentFs' }),
     defineField({ name: 'lastUpdatedAt', title: 'Last updated', type: 'datetime', group: 'content', fieldset: 'contentFs' }),
-    defineField({ name: 'seo', type: 'seo', group: 'seo', fieldset: 'seoFs' }),
+    defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
   ],
   preview: {
     select: { title: 'title', subtitle: 'category.name', media: 'coverImage' },

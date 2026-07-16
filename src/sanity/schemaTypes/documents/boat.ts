@@ -1,6 +1,7 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { AutoSlugInput } from '../../components/AutoSlugInput'
+import { sharedComponentNote } from '../../components/SharedComponentNote'
 
 // Renamed from `boatPage` to `boat` 2026-07-16 — the "Page" suffix wasn't an actual convention
 // (scheduleRates/blogPost don't have it either), so it added nothing. Migrated the one real
@@ -30,6 +31,7 @@ export const boatType = defineType({
     { name: 'cabins', title: 'Cabins' },
     { name: 'gallery', title: 'Gallery' },
     { name: 'specifications', title: 'Specifications' },
+    { name: 'faq', title: 'FAQ' },
     { name: 'seo', title: 'SEO' },
   ],
   // Fieldsets mirror the groups 1:1 so section headers show even in the flat "All Fields" view
@@ -40,7 +42,7 @@ export const boatType = defineType({
     { name: 'cabinsFs', title: 'Cabins' },
     { name: 'galleryFs', title: 'Gallery' },
     { name: 'specificationsFs', title: 'Specifications' },
-    { name: 'seoFs', title: 'SEO' },
+    { name: 'faqFs', title: 'FAQ' },
   ],
   fields: [
     // Basic Info — order locked 2026-07-15 (short name, then full title, then slug, WordPress-
@@ -357,7 +359,28 @@ export const boatType = defineType({
       ],
     }),
 
-    defineField({ name: 'seo', type: 'seo', group: 'seo', fieldset: 'seoFs' }),
+    // FAQ — this boat's own questions. The page also shows shared categories pulled from the General
+    // FAQ (see the signpost note). Questions marked "Feature on homepage" surface in the homepage FAQ
+    // section alongside the featured General FAQ ones.
+    sharedComponentNote({
+      name: 'faqNote',
+      title: 'About this section',
+      message:
+        'Add the questions that are specific to this boat. The page also shows shared questions that apply to every trip — those are edited under General FAQ, not here.',
+      group: 'faq',
+      fieldset: 'faqFs',
+    }),
+    defineField({
+      name: 'faqSections',
+      title: 'FAQ categories',
+      type: 'array',
+      group: 'faq',
+      fieldset: 'faqFs',
+      of: [defineArrayMember({ type: 'faqSection' })],
+      initialValue: [{ _type: 'faqSection', title: 'General Information', questions: [] }],
+    }),
+
+    defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
   ],
   preview: {
     select: { title: 'name', media: 'coverImage' },

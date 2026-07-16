@@ -14,7 +14,6 @@ export const scheduleRatesType = defineType({
   ],
   fieldsets: [
     { name: 'contentFs', title: 'Content' },
-    { name: 'seoFs', title: 'SEO' },
   ],
   fields: [
     defineField({ name: 'title', type: 'string', group: 'content', fieldset: 'contentFs' }),
@@ -36,6 +35,6 @@ export const scheduleRatesType = defineType({
       group: 'content',
       fieldset: 'contentFs',
     }),
-    defineField({ name: 'seo', type: 'seo', group: 'seo', fieldset: 'seoFs' }),
+    defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
   ],
 })

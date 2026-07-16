@@ -16,7 +16,6 @@ export const pageType = defineType({
   ],
   fieldsets: [
     { name: 'contentFs', title: 'Content' },
-    { name: 'seoFs', title: 'SEO' },
   ],
   fields: [
     defineField({ name: 'title', type: 'string', group: 'content', fieldset: 'contentFs' }),
@@ -38,7 +37,7 @@ export const pageType = defineType({
       group: 'content',
       fieldset: 'contentFs',
     }),
-    defineField({ name: 'seo', type: 'seo', group: 'seo', fieldset: 'seoFs' }),
+    defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
     // Localization prep — inert until the document-internationalization plugin is installed.
     defineField({ name: 'language', type: 'string', readOnly: true, hidden: true, group: 'content', fieldset: 'contentFs' }),
   ],

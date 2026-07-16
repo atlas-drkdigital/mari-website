@@ -5,17 +5,18 @@ import { useState } from 'react'
 import { toPlainText } from '@/components/RichText'
 import type { FaqItemData, HomePageData } from '@/sanity/queries'
 
-// The homepage shows the first N general FAQs (in the order set on the FAQ document); the "Read More"
-// link goes to the full FAQ page for the rest. Kept simple per the "don't over-engineer" guidance —
-// no inline expand; the existing link is the "more" affordance.
+// The homepage shows the questions editors marked "Feature on homepage", drawn from the General FAQ
+// and from boats (see HOMEPAGE_QUERY). The cap is a safety net against an editor featuring everything,
+// not the selection mechanism — the selection is the toggle. The "Read More" link goes to the full FAQ
+// page for the rest; no inline expand, per the locked decision.
 const HOMEPAGE_FAQ_LIMIT = 10
 
 // Ported from ../v1-static-homepage/sections/faq.html + assets/faq.js. Figma Section/FAQ
 // 401:1774. Only one item open at a time; clicking the open item closes it. Two STABLE
 // HTML columns (not CSS `columns-2`) — a multi-column layout re-balances items by height on
 // every reflow, which would visibly shift OTHER items when one expands (a real bug Adinda
-// caught in the original build, not just a style preference). Questions come from the referenced
-// general `faq` docs (full-wire slice, 2026-07-16) — no hardcoded fallback.
+// caught in the original build, not just a style preference). Questions come from Sanity
+// (full-wire slice, 2026-07-16) — no hardcoded fallback.
 type FaqItem = { q: string; a: string }
 
 function FaqColumn({ items, openId, onToggle, columnOffset }: { items: FaqItem[]; openId: string | null; onToggle: (id: string) => void; columnOffset: number }) {

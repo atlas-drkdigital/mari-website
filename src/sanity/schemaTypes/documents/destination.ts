@@ -1,6 +1,7 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { AutoSlugInput } from '../../components/AutoSlugInput'
+import { sharedComponentNote } from '../../components/SharedComponentNote'
 
 // Named `destination`, not `destinationPage` — the "Page" suffix wasn't an actual convention here
 // (scheduleRates/blogPost don't have it either). Free rename 2026-07-16 (no content existed yet).
@@ -15,9 +16,11 @@ import { AutoSlugInput } from '../../components/AutoSlugInput'
 // tagline, stats values, gallery images, cover, slug, SEO.
 //
 // Auto-queried / shared sections are not fields here: itinerary cards (from `itinerary` docs
-// referencing this destination), FAQ items (`faq` docs scoped to this destination), boats-on-route
-// (from `boat` docs), articles (from `blogPost` docs), the booking widget (the one global
-// scheduling embed), and CTA/Contact/Footer (shared components — CTA is now the `cta` singleton).
+// referencing this destination), boats-on-route (from `boat` docs), articles (from `blogPost` docs),
+// the booking widget (the one global scheduling embed), and CTA/Contact/Footer (shared components —
+// CTA is now the `cta` singleton). FAQs are a hybrid: this destination's own questions are the
+// inline `faqSections` field below, and the page additionally pulls shared categories from the
+// General FAQ singleton at render time.
 //
 // Groups mirrored by titled fieldsets (site-wide convention) so section headers show in "All
 // Fields"; every field declares both.
@@ -29,13 +32,14 @@ export const destinationType = defineType({
     { name: 'basicInfo', title: 'Basic Info', default: true },
     { name: 'overview', title: 'Overview' },
     { name: 'gallery', title: 'Gallery' },
+    { name: 'faq', title: 'FAQ' },
     { name: 'seo', title: 'SEO' },
   ],
   fieldsets: [
     { name: 'basicInfoFs', title: 'Basic Info' },
     { name: 'overviewFs', title: 'Overview' },
     { name: 'galleryFs', title: 'Gallery' },
-    { name: 'seoFs', title: 'SEO' },
+    { name: 'faqFs', title: 'FAQ' },
   ],
   fields: [
     // Basic Info — same short name / full title / slug order locked across every page type.
@@ -221,7 +225,32 @@ export const destinationType = defineType({
       description: 'Drop or select many images at once — they upload straight onto this list.',
     }),
 
-    defineField({ name: 'seo', type: 'seo', group: 'seo', fieldset: 'seoFs' }),
+    // FAQ — this destination's own questions. The page also shows shared categories pulled from the
+    // General FAQ (see the signpost note), so cross-cutting questions are written once, not repeated
+    // on every destination.
+    sharedComponentNote({
+      name: 'faqNote',
+      title: 'About this section',
+      message:
+        'Add the questions that are specific to this destination. The page also shows shared questions that apply to every trip — those are edited under General FAQ, not here.',
+      group: 'faq',
+      fieldset: 'faqFs',
+    }),
+    defineField({
+      name: 'faqSections',
+      title: 'FAQ categories',
+      type: 'array',
+      group: 'faq',
+      fieldset: 'faqFs',
+      of: [defineArrayMember({ type: 'faqSection' })],
+      initialValue: [
+        { _type: 'faqSection', title: 'Diving', questions: [] },
+        { _type: 'faqSection', title: 'Travel', questions: [] },
+        { _type: 'faqSection', title: 'Others', questions: [] },
+      ],
+    }),
+
+    defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
   ],
   preview: {
     select: { title: 'name', media: 'coverImage' },

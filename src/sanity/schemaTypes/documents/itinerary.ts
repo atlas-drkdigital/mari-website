@@ -15,7 +15,6 @@ export const itineraryType = defineType({
   ],
   fieldsets: [
     { name: 'contentFs', title: 'Content' },
-    { name: 'seoFs', title: 'SEO' },
   ],
   fields: [
     defineField({
@@ -45,7 +44,7 @@ export const itineraryType = defineType({
       fieldset: 'contentFs',
     }),
     defineField({ name: 'summary', type: 'text', rows: 3, group: 'content', fieldset: 'contentFs' }),
-    defineField({ name: 'seo', type: 'seo', group: 'seo', fieldset: 'seoFs' }),
+    defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
   ],
   preview: {
     select: { title: 'title', subtitle: 'duration' },

@@ -37,7 +37,63 @@ history:
 
 ---
 
-## SESSION CHECKPOINT — 2026-07-16 (late), homepage FULL-WIRE + FAQ inline-array remodel (READ THIS FIRST — supersedes all below)
+## SESSION CHECKPOINT — 2026-07-16, FAQ RESTRUCTURE v2 (READ THIS FIRST — supersedes all below)
+
+### What this session did
+Executed the locked FAQ restructure brief (`_handoff/_NEXT-SESSION-faq.md`) end to end. Model: **Opus
+throughout** (Adinda's call). Verified clean: tsc + eslint + `sanity schema validate` (0 errors/0 warnings)
++ GROQ query-back + `/` and `/studio` 200 after a clean restart, with the homepage confirmed rendering
+featured questions from both sources. Field-level detail lives in `_SCHEMA-SPECS.md` — this is the log.
+
+### DONE + verified
+1. **`faqSection` — one reusable object** (`title` + `questions[]` of question/answer/`isFeatured`), used
+   inline by `faqGeneral`, `destination`, and `boat`. All three now edit FAQs identically.
+2. **General FAQ** = `faqGeneral` singleton, sidebar label **"General FAQ"**, categories **Payment & Booking
+   / What's Included / Others**, `seo` field added. Cross-cutting questions only.
+3. **Inline `faqSections` on `destination`** (Diving/Travel/Others) **and `boat`** (General Information),
+   each with a signpost note pointing at the General FAQ for shared questions.
+4. **`isFeatured` drives the homepage** — 8 featured across General + boat, General first. Hidden on
+   destinations (they don't feed the homepage). Replaces the old auto-first-N logic.
+5. **`faq` document type RETIRED** — Komodo's 6 FAQs migrated to `destination-komodo.faqSections`, all 7
+   docs deleted, type removed from schema index + structure, file deleted. Sidebar has ONE FAQ entry.
+6. **Re-seeded answer-first** from `mari-core` (General 11 Qs, boat 7 Qs, Komodo 6 migrated), voice rules
+   applied (no em dashes, "premium", metric-first). Seed: `_scripts/seed-faq.ts` (idempotent).
+7. **Quick fixes folded in:** `whyUsItems` min 2→1; **SEO double-nesting fixed site-wide** (dropped the
+   single-field `seoFs` fieldset + explicit `title: 'SEO'` on the field, across 8 types).
+
+### Decisions + findings worth keeping
+- **`isFeatured` was REINSTATED after being dropped** — and the installed `mari-website` skill still says
+  "dropped, do not add to schema." Caught by reading the skill against the brief. The drop was correct when
+  made (no consuming UI); the homepage FAQ section is now that UI. **Generalized into `_handoff/drk-website.md`
+  as a DRK-wide pattern + decision rule** (Adinda's ask): a featured flag is only worth adding when a concrete
+  surface consumes it; and hide a shared object's field in contexts where it has no effect rather than
+  showing it inert.
+- **GROQ `+` is null-poisoning** — `a + b` yields null if EITHER side is null, so an absent `faqGeneral`
+  would have silently discarded the boats' featured questions too. Each side is now `coalesce(..., [])`.
+  Found by testing the missing-source case against the real dataset, not by assuming. Queued for `drk-website`.
+- **Fieldset convention nuance:** "every group gets a matching fieldset" exists so headers show in "All
+  Fields" — it does NOT apply to a group holding one self-describing field (that's the SEO double-nesting
+  Adinda flagged). Recorded in `_SCHEMA-SPECS.md`.
+- **Category titles are editor-editable defaults** seeded via `initialValue`, not a fixed code list (same
+  approach as `boat.specifications`). Adinda approved.
+
+### Open / flagged (nothing broken)
+- **⭐ FAQ v2 is ready for Adinda's Studio review** — see `_QA-CHECKLIST.md` for what to look at (incl. mobile).
+- **⚠️ Commercial figures in the FAQ answers are unverified** — deposit/cancellation/park+fuel fees/single
+  supplement come from `mari-core`'s self-declared non-evergreen `commercial.md` (last verified 2026-06-09).
+  Wrong terms on a public page is a real problem. Verify with Serge before launch — see `_CONTENT-STATUS.md`.
+- **Komodo's "What is included in a Mari trip?" duplicates** the What's Included the destination page will
+  pull from General FAQ. Migrated per the brief; decide in the destination slice.
+- **Stable identity for cross-page pulls** — still deferred to the destination slice, per the brief.
+- `faqGeneral.seo` is empty; the `/faq` page frontend still doesn't exist, so homepage "Read More" → `#`.
+- **Skills backlog grew:** `mari-website` (FAQ file stale 3 ways), `atlas-website` (two-taxonomy FAQ spec
+  superseded), `drk-website` (2 new items). Adinda runs the chat-side round.
+
+### Repo state: clean + committed. Reviewable.
+
+---
+
+## SESSION CHECKPOINT — 2026-07-16 (late), homepage FULL-WIRE + FAQ inline-array remodel (SUPERSEDED by the FAQ restructure above)
 
 ### What this session did
 Took the homepage from "wired-with-hardcoded-fallbacks" to **fully Sanity-driven, no hardcoded content
