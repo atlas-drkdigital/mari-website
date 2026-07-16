@@ -29,6 +29,7 @@ const PLACED_TYPES = [
   'blogCategory',
   'author',
   'whyUsItem',
+  'crewMember',
 ]
 
 function singleton(S: Parameters<StructureResolver>[0], typeName: string, title: string) {
@@ -116,6 +117,9 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem('whyUsItem').title('Why Us Items'),
       S.documentTypeListItem('faq').title('FAQ'),
       S.documentTypeListItem('testimonial').title('Testimonials'),
+      // Crew members (shown on the About page) — a repeatable shared component, placed here per
+      // Adinda's ask 2026-07-16.
+      S.documentTypeListItem('crewMember').title('Crew Members'),
       // Shared two-card CTA section (Private Charter / Shared Trip) reused across pages — a
       // singleton, placed here with the other shared components per Adinda's ask 2026-07-16.
       singleton(S, 'cta', 'CTA Section'),

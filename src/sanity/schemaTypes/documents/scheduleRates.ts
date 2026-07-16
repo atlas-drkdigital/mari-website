@@ -3,7 +3,7 @@ import { defineField, defineType } from 'sanity'
 import { AutoSlugInput } from '../../components/AutoSlugInput'
 
 // INSEANQ is a copy-paste embed, not a real integration — see MANAGER.md.
-// Sidebar layout question deliberately deprioritized; ship the simple layout.
+// Groups mirrored by titled fieldsets (site-wide convention).
 export const scheduleRatesType = defineType({
   name: 'scheduleRates',
   title: 'Schedule & Rates',
@@ -12,16 +12,20 @@ export const scheduleRatesType = defineType({
     { name: 'content', title: 'Content', default: true },
     { name: 'seo', title: 'SEO' },
   ],
+  fieldsets: [
+    { name: 'contentFs', title: 'Content' },
+    { name: 'seoFs', title: 'SEO' },
+  ],
   fields: [
-    defineField({ name: 'title', type: 'string', group: 'content' }),
-    // Slug order locked 2026-07-15: title, then slug immediately after — same order for every
-    // page type.
+    defineField({ name: 'title', type: 'string', group: 'content', fieldset: 'contentFs' }),
+    // Slug order locked: title, then slug immediately after — same for every page type.
     defineField({
       name: 'slug',
       type: 'slug',
       options: { source: 'title' },
       components: { input: AutoSlugInput },
       group: 'content',
+      fieldset: 'contentFs',
       description: 'URL path for this page.',
     }),
     defineField({
@@ -30,7 +34,8 @@ export const scheduleRatesType = defineType({
       type: 'text',
       rows: 8,
       group: 'content',
+      fieldset: 'contentFs',
     }),
-    defineField({ name: 'seo', type: 'seo', group: 'seo' }),
+    defineField({ name: 'seo', type: 'seo', group: 'seo', fieldset: 'seoFs' }),
   ],
 })

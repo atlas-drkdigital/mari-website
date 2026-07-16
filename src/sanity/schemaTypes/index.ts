@@ -33,6 +33,7 @@ import { blogPostType } from './documents/blogPost'
 import { blogCategoryType } from './documents/blogCategory'
 import { authorType } from './documents/author'
 import { whyUsItemType } from './documents/whyUsItem'
+import { crewMemberType } from './documents/crewMember'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -71,5 +72,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     blogCategoryType,
     authorType,
     whyUsItemType,
+    crewMemberType,
   ],
 }
