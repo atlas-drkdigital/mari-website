@@ -19,7 +19,7 @@ export function BoatFaq({ boat }: { boat: BoatData }) {
   if (!sections.length) return null
 
   return (
-    <section id="faq" aria-labelledby="boat-faq-heading" className="w-full bg-bg-page py-120">
+    <section id="faq" aria-labelledby="boat-faq-heading" className="w-full bg-bg-page py-[120px]">
       <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-48 page-gutter-x">
         <h2 id="boat-faq-heading" className="text-display-h2 text-text-primary">
           Frequently asked questions
@@ -34,7 +34,7 @@ export function BoatFaq({ boat }: { boat: BoatData }) {
               {(section.questions ?? []).map((q, i) => {
                 const anchor = slugifyQuestion(q.question) || `q-${i}`
                 return (
-                  <details key={anchor} id={anchor} className="group border-t border-beige-200">
+                  <details key={anchor} id={anchor} className="group border-b-[0.75px] border-accent-subtle">
                     <summary className="flex cursor-pointer list-none items-center justify-between gap-16 py-24 marker:hidden">
                       <h4 className="text-body-large text-text-primary">{q.question}</h4>
                       <span

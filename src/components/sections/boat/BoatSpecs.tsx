@@ -27,7 +27,7 @@ export function BoatSpecs({
   if (!specs.length && !diagrams.length) return null
 
   return (
-    <section id="layout-and-specs" aria-labelledby="boat-specs-heading" className="w-full bg-bg-page py-120">
+    <section id="layout-and-specs" aria-labelledby="boat-specs-heading" className="w-full bg-bg-page py-[120px]">
       <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-48 page-gutter-x lg:flex-row lg:gap-64">
         <div className="flex flex-1 flex-col gap-32">
           <div className="flex flex-col gap-24">
@@ -42,7 +42,7 @@ export function BoatSpecs({
           {specs.length ? (
             <div className="flex flex-col">
               {specs.map((spec) => (
-                <details key={spec._key} className="group border-t border-beige-200">
+                <details key={spec._key} className="group border-b-[0.75px] border-accent-subtle">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-16 py-24 text-body-large text-text-primary marker:hidden">
                     {spec.category}
                     <span

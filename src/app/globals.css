@@ -151,15 +151,38 @@
 
   /* ---------- LAYER 2 | SEMANTIC COLORS (utilities: bg- / text- / border-) ---------- */
   /* aliased to a primitive where a unique match exists; translucent/unmatched keep raw value */
-  /* Was --beige-50 (#fdfcfa) until 2026-07-16 — read too white. Adinda's pick from Figma,
-     where this swatch is now named beige/100; our ported names predate that rename. See the palette
-     name-drift note at the top of this file. */
-  --color-bg-page: var(--beige-100); /* Figma: beige/100 */
+  /* 🔴 REVERTED TO --beige-50 on 2026-07-17 (Adinda: "bg-page is supposed to be beige-50, I never
+     decided to change it"). READ THIS BEFORE TOUCHING IT AGAIN — it has been wrong once already.
+
+     What happened: 8d5dc53 (2026-07-16) moved this #fdfcfa -> #fbf8f2 and justified it as "Adinda's
+     pick from Figma". What Adinda actually confirmed in that session was a NAME->HEX MAPPING
+     (`--primitive-cream-30 #fbf8f2 = Figma beige/100`). She never approved repointing bg-page AT
+     that colour. A mapping confirmation was silently upgraded into a value change, and her name was
+     attached to it — which is why nobody questioned it for a day.
+
+     Figma agrees with the revert, and this is the check that settles it: `Section/LayoutAndSpecs`
+     (778:8878) paints its background `--primitive-cream-10` = #fdfcfa. So Figma's PAGE background is
+     beige-50. #fbf8f2 (cream-30/beige-100) is what `Section/Cabins` (778:8762) uses — a step AWAY
+     from the page, not the page itself. That's `bg-accent-secondary` below.
+
+     THE LESSON, and it generalises: confirming what a colour is NAMED is not the same as approving
+     what a token POINTS AT. Never let the first become evidence for the second. */
+  --color-bg-page: var(--beige-50); /* Figma: cream-10 / beige-50 — the page ground */
   --color-bg-surface: var(--white);
+  /* The "secondary accent background" (Adinda, 2026-07-17): one step warmer than the page, used to
+     lift a whole section off it — Section/Cabins (778:8762) is the first consumer. Distinct from
+     `bg-accent` (beige-150), which is a step further again. Figma has NO semantic name for this, only
+     the raw primitive, so the name here is Adinda's own words, not invented. */
+  --color-bg-accent-secondary: var(--beige-100); /* Figma: cream-30 / beige-100 */
   --color-bg-accent: var(--beige-150);
   --color-text-primary: var(--navy-900);
   --color-text-secondary: var(--stone-400);
   --color-border-default: var(--beige-300);
+  /* Lighter divider than border-default, for rules INSIDE a content block (spec rows, FAQ/accordion
+     separators) rather than around a component. Added 2026-07-17: Figma uses #ece4d6 for these and
+     no semantic token resolved to it, so three sections had reached for the unexposed `beige-200`
+     primitive and silently rendered no border at all. Adinda's call to name it rather than hardcode. */
+  --color-border-subtle: var(--beige-200);
   --color-border-input: var(--beige-400);
   --color-action-primary: var(--chocolate-600);
   --color-action-primary-text: var(--beige-50);

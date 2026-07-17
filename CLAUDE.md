@@ -128,6 +128,43 @@ will be there, so you don't have to make things up and guess."**
 over photos, `data-reveal`, arbitrary values for off-scale spacing, the measure-then-animate collapse, and
 the mask-based fade. Read one before starting a new section.
 
+## 🔴 ESTABLISHED CONVENTIONS ALWAYS SUPERSEDE FIGMA — locked 2026-07-17 (Adinda, explicit, site-wide)
+**When a Figma node disagrees with a convention this codebase has already established, THE CONVENTION
+WINS. Every time. Do not "match the mockup" against a token, a scale step, or a spacing rhythm we have
+already settled.** Figma is authoritative for **structure and intent** (what elements exist, what order,
+what the section *is*). The codebase is authoritative for **how it's expressed** — type ramp, spacing
+scale, colour tokens, gutters, responsive behaviour.
+
+**Why this is a hard rule and not a preference.** Figma drifts continuously and *silently*, and this repo
+already has four proven instances where following the node would have shipped a regression:
+1. **Spacing (2026-07-17, the one that prompted this lock).** Cabins' Figma says `gap-8` between the
+   section heading and its description. Every homepage section uses **`gap-24`** (`TheBoat.tsx`). Built
+   from Figma, the boat page would be visibly out of rhythm with the homepage — on a page a visitor
+   reaches *from* the homepage.
+2. **Background (2026-07-17).** `Section/LayoutAndSpecs` (778:8878) says `#fdfcfa` (`beige-50`). But
+   `bg-page` was deliberately moved OFF `beige-50` ONTO `beige-100 #fbf8f2` on 2026-07-16 because
+   beige-50 "read too white" — Adinda's own call. Figma never got the memo. **Keep `bg-bg-page`.**
+3. **Colour names.** Figma's code-syntax bindings still emit `var(--primitive-cream-30)`. Those names
+   **no longer exist**. Any CSS name from the Figma MCP is STALE by default — resolve it through the map
+   in `globals.css`, never paste it.
+4. **Gutters.** Figma emits flat `px-[160px]` / `px-[24px]`. We have **`page-gutter-x`** (24/48/80
+   responsive). A flat pixel gutter is a mobile bug waiting to happen.
+
+**The practical test, before writing any value off a node:** *"Do we already have a name for this?"*
+- A spacing gap → is it on the scale, and what do sibling sections use? **Check a homepage section first.**
+- A colour → resolve the hex through `globals.css`'s map. Never trust the Figma name.
+- A type size → find the ramp entry (`display-*` vs `editorial-*`), don't set a px size.
+- A gutter → `page-gutter-x`, essentially always.
+- **Only when we genuinely have NO name for it** does the Figma value win — and then it's an arbitrary
+  value (`gap-[34px]`), never a rounded guess. (See the off-scale rule below: there is no 40 and no 120.)
+
+**This does NOT license ignoring Figma.** The 2026-07-17 boat-page rebuild happened because a section was
+built from node *names* and guesses instead of `get_design_context`. **Still pull the node, every time.**
+The rule is about which side wins a *conflict*, not about skipping the pull. And when you override Figma,
+**say so in a code comment naming both values** — otherwise the next session "fixes" it back.
+
+Skill-wide (Adinda's explicit ask, 2026-07-17) — queued for `drk-website` via `_handoff/_payload/drk-website.md`.
+
 ## Tailwind: THE CLASS NAME MUST EXIST. Verify against `globals.css` — locked 2026-07-17
 **Tailwind emits nothing for a class it doesn't recognise. It does not warn, does not error, does not
 fail the build.** An invented utility is invisible in `tsc`, `eslint`, and a `curl` 200 — it shows up only
@@ -231,34 +268,78 @@ off a doc, not synthesised. Re-measure before overriding; don't re-derive from t
 it indefinitely, keyed on the exact URL string.
 
 ### Why pre-compressing is actively wrong (both halves of the old rationale failed)
-- **Bandwidth**: the quota counts **outgoing/served** bytes, not stored. A 12MB master served as a 52KB
-  thumbnail costs 52KB. Uploading big masters is bandwidth-free. The "10GB/mo cap" rationale was backwards.
+- **Bandwidth** [INFERENCE — not explicitly documented, flagged 2026-07-17]: the quota is defined as
+  *"total **outgoing** bandwidth"* (plans-and-payments), and outgoing = what's served, so a 12MB master
+  served as a 52KB thumbnail should cost 52KB. **Sanity has NO page that states quota = served-not-stored
+  in so many words** — a Perplexity pass over the official docs specifically failed to confirm it. Treat
+  as well-founded but unproven; if a bill ever looks wrong, this assumption is the first suspect. Either
+  way the old "10GB/mo cap ⇒ pre-compress" rationale doesn't follow: pre-compressing shrinks the *stored*
+  file, and nothing suggests stored size is what's billed.
 - **Perf**: the CDN already beats best-practice targets by ~3× unaided (numbers below). There is nothing
   left to win, and pre-compressing destroys the archival master permanently.
 - Sanity's own docs agree: *"Content managers are advised to upload full-resolution assets"* and *"You
   don't need to optimize images before uploading."*
 
-### Measured output — 1600×1200 photographic source
-| Request | Served | Size |
+### Measured output — `w=1296&q=80&auto=format`, TWO sources, and the gap between them IS the lesson
+| Source | Cold (1st hit) | Warm |
 |---|---|---|
-| `w=1296&q=80&auto=format` (Chrome) | **AVIF** | **52.3 KB** |
-| `w=1296&q=80&fm=webp` | WebP | 69.2 KB |
-| `w=1296&q=80&fm=jpg` | JPEG | 118.2 KB |
-| `w=648&q=80&auto=format` | AVIF | 25.8 KB |
-| `w=1296&q=75&auto=format` (q default) | — | 54.7 KB |
-| `w=1296&q=100&auto=format` | — | **264.3 KB** |
-| `w=1296&q=1&auto=format` | — | 10.8 KB |
+| `destination-bali.webp` 1600×1200 — **already a crushed WebP** | WebP 69.2 KB | AVIF **52.3 KB** |
+| `mari-key-features-smoketest.jpg` 1535×1024 — **real JPEG** | WebP 207 KB | AVIF **179 KB** |
+**3.4× apart on the same pipeline.** The WebP source looks "better" only because it was already
+degraded before upload — that is the generational-loss problem showing up as a flattering number, not a
+win. **Benchmark against a JPEG source; a WebP-source measurement will lie to you.**
+
+`q` sweep, JPEG source at `w=1296` (bytes): q1 → 34,698 WebP · q50 → 128,660 · q70 → 159,654 ·
+**q75 → 169,378** · **q80 → 206,546** · q90 → 306,568 · q100 → 561,850 (still lossy). Note the
+**q75→q80 knee: +22% bytes for one notch.**
 
 - **It does NOT always serve WebP — it serves AVIF.** `auto=format` negotiates on the `Accept` header
-  (`Vary: origin, accept`): AVIF → modern Chrome, WebP → WebP-only, JPEG → old browsers. Correct fallback,
-  no work needed.
-- **`fm=avif` returns HTTP 400.** AVIF is reachable ONLY via `auto=format`, never explicitly. So
-  `.auto('format')` is not a convenience — it is the only path to the best format. Always set it.
-- **`q=80` is the call. `q=100` costs ~4× for no visible gain.** `q` has no floor (q=1 → 10.8KB), so a
-  typo'd low q silently ships mush. Default is 75.
-- **First request to a cold URL may serve WebP before AVIF warms** — observed once, then AVIF consistently
-  on 3/3 repeats. Don't conclude "no AVIF" from a single cold measurement (this nearly went in as a
-  wrong finding).
+  only (`Vary: origin, accept`): AVIF → modern Chrome, WebP → WebP-only, JPEG → old browsers.
+- **`fm=avif` returns HTTP 400** — exact error: `Parameter "fm" must be one of: "jpg", "pjpg", "png",
+  "webp", "gif" or "json"`. AVIF is reachable ONLY via `auto=format`. `.format()`'s TS union is
+  `'jpg' | 'pjpg' | 'png' | 'webp'` (`@sanity/image-url@2.1.1`), so `gif`/`json` are URL-reachable but
+  untyped, and AVIF is reachable via neither. **Always set `.auto('format')`** — it is the only path to
+  the best format.
+- 🔴 **AVIF IS ASYNC, PER-URL — the first visitor to EVERY distinct URL gets WebP.** **This is DOCUMENTED
+  behaviour, not a discovery** — `sanity.io/docs/help/avif` says the first few requests return "the second
+  best option" (WebP) with AVIF appearing after a short delay, and that older cached objects keep serving
+  non-AVIF until they expire. It's also *why* `fm=avif` 400s: AVIF is generated asynchronously, so it
+  can't be demanded synchronously. Measured repeatedly here too (`w=777` never converted within 25s). A
+  5-width srcset × DPR ≈ 10 URLs, each
+  needing its own warm-up, so **real traffic gets a WebP/AVIF mix and the cold path is the one to design
+  for.** Two consequences: (a) never benchmark image bytes cold — it understates by ~15% and is why two
+  measurements of the same URL disagreed this session; (b) **quality must be chosen against the COLD WebP
+  path, not the warm AVIF one.**
+- **USE `q=75`, NOT `q=80`** — corrected 2026-07-17 after measurement; an earlier draft of this section
+  said q=80 and was wrong. Against Chrome's 1.33 bits/px flag line (1296×865 = 1.12MP → ceiling ≈187KB):
+  AVIF q80 = 179KB (0.159 B/px ✅) but **cold WebP q80 = 207KB (0.184 B/px ❌ FLAGGED)**. q75 stays under
+  in *both* paths (WebP 169KB / 0.151 B/px ✅). q=80 only passes if you assume the warm path, which most
+  first-time visitors don't get.
+- **`q` is applied LITERALLY to whichever encoder `auto=format` picks — no cross-format normalisation.**
+  q=80 → 254,282 JPEG / 206,546 WebP / 178,755 AVIF from one source. Since WebP q80 ≈ JPEG q67
+  perceptually (scales are offset), **one `q` silently means three different qualities across visitors.**
+  Nothing to do about it; just don't assume `q` is a perceptual constant.
+- **No lossless path.** q=100 still re-encodes; `lossless=true` is **silently ignored**; `q=0` silently
+  ignored → default. `q=101`/`q=-5` → 400. `q` has no floor (q=1 → 34,698 B), so a typo'd low q ships
+  mush with no error.
+- **Docs are WRONG twice — trust these measurements over the doc pages:**
+  (a) docs say *"Defaults are 75 for JPG and WebP"* — measured **JPEG default is 80** (`fm=jpg` with no q
+  ≡ `q=80`); WebP default is 75 ✓.
+  (b) docs say a bare asset URL serves *"the original asset"* — **false for JPEG and WebP**: bare URL
+  re-encodes (JPEG 721,218 → 323,501 B, −55%; WebP 134,572 → 113,702, −15%). **PNG alone is byte-exact.**
+  So `<img src={asset.url}>` ships ~323KB not 721KB (better than feared) — but **the archival original is
+  NOT retrievable through the CDN for JPEG/WebP.** Keep masters outside Sanity if they matter.
+- ⚠️ **PNG + `w=` without `auto=format` INFLATES the file** — a 2,529,858 B PNG at `w=1296` returned
+  **3,167,020 B, larger than the source.** Always pair PNG with `auto=format`.
+- ⚠️ **It upscales happily past the source and will not stop you** — `w=3000&q=100&fm=jpg` from a 1535px
+  source → **3,465,195 B** of upscaled mush. **`fit('max')` is the ONLY guard.** Mandatory on lightbox.
+- **EXIF/ICC are stripped at every quality; chroma subsampling is locked 4:2:0 even at q=100**, with no
+  param to change it. Output is sRGB; `cs` is the only colour control. Fine for reef photography, would
+  matter for wide-gamut work.
+- **The "Sanity is Imgix under the hood" claim (common in blogs) looks FALSE** — headers show `X-Varnish-Age`
+  (Imgix uses Fastly) and `x-sanity-asset-storage: gcs-default`; errors are Boom-format JSON, not Imgix's.
+  The *param vocabulary* is Imgix-inspired, which is likely what those blogs pattern-matched. Actual
+  encoder: **not documented.** Don't repeat the Imgix claim.
 
 ### Frontend rules that make or break the above
 - **Use the `next-sanity/image` loader, NOT bare `next/image`.** Bare `next/image` proxies through
@@ -266,23 +347,46 @@ it indefinitely, keyed on the exact URL string.
   Exactly one system may own format negotiation, and it must be Sanity's CDN.
 - **`sizes` is mandatory on any image not at 100vw.** Omitting it makes the browser assume 100vw and
   download ~2×. For the boat gallery (~45vw): `sizes="(max-width: 768px) 100vw, 45vw"`.
-- **`next.config.ts`'s `images.qualities: [75, 80]` is DEAD CODE** under a Sanity loader — quality is `q`
-  in the Sanity URL. Harmless, but the CLAUDE.md note that explains it is misleading. Don't tune it.
+- 🔴 **NONE OF THE ABOVE IS WIRED UP TODAY — verified by reading the code 2026-07-17.**
+  `sanityImageProps()` (`src/sanity/lib/image.ts`) returns `urlForImage(image).url()` — **a bare URL with
+  no `.width()`, no `.quality()`, no `.auto('format')`.** So right now: no `q=75`, no AVIF negotiation, no
+  `fit('max')` guard, and **hotspot cannot work** (the builder needs width/height before Sanity applies it
+  — this is the root cause of the hotspot bug already logged above). Next's own optimizer does the resizing
+  (enabled by `cdn.sanity.io` in `remotePatterns`), which means **we re-encode what Sanity already
+  re-encoded** — the exact double-pass this section warns against. **Consequence: `images.qualities:
+  [75, 80]` is NOT dead code today — it is the only quality control actually in effect.** It only becomes
+  dead once we move to a Sanity loader. Don't delete it before then.
+  **The fix is `images.loaderFile` in `next.config.ts`**, NOT a per-`<Image>` `loader` prop — the code
+  comment in `image.ts` correctly notes a `loader` function can't cross the RSC boundary from a Server
+  Component, but a *global* `loaderFile` is config, not a prop, so it sidesteps that entirely. Deferred to
+  `_POLISH-BACKLOG.md`. **Until it lands, everything above is theory.**
 - **Centralise `urlFor()` in one helper.** The CDN cache key is the exact URL string; inconsistent param
   order across components = cache misses + repeated transform cost.
 - `fit('crop')` is what honours the editor's hotspot — and requires querying `hotspot`/`crop` alongside
   the asset. `fit('max')` for lightbox so it never upscales past the master.
 
-### Upload source format — JPEG/TIFF/PNG, never WebP
-Sanity's docs list archival upload types as **JPG, SVG, PNG, GIF, TIFF** — WebP appears only as a
-*delivery* target. Transforms re-encode from the stored original, so a **lossy WebP master makes every
-served variant lossy→lossy**. 🔴 **Known debt: the existing seed already uploaded WebP**
+### Upload source format — JPEG/TIFF/PNG, never WebP (**for quality reasons, NOT support reasons**)
+⚠️ **Corrected 2026-07-17 via Perplexity + doc dates.** An earlier draft said WebP "isn't a supported
+upload, it appears only as a delivery target" — **that was wrong, and it came from a stale page.**
+`studio/image-type` (2026-04-14) lists archival originals as JPG/SVG/PNG/GIF/TIFF, but
+`content-lake/technical-limits` (2026-06-23) and the animated-images changelog both confirm **WebP
+uploads ARE supported.** The image-type page conflicts with newer docs; **trust technical-limits and
+image-urls (2026-06-15) over it.** Where two Sanity pages disagree, take the newer one.
+**The rule survives the correction, on different grounds:** don't upload WebP because it's a *lossy
+source*, not because it's rejected. Transforms re-encode from the stored original, so a lossy WebP master
+makes every served variant **lossy→lossy**. Sanity nowhere states this explicitly — it's inference from
+documented on-demand transform behaviour, but the two-source measurement above is what makes it concrete
+(the WebP-source asset measured 3.4× smaller *because it had already been degraded*).
+🔴 **Known debt: the existing seed already uploaded WebP**
 (`destination-bali.webp`, `why-us-crew.webp`, `destination-halmahera.webp`, …). Placeholder content, so
 low stakes — but do not repeat it for real photos, and re-upload these from JPEG when real assets land.
 
 ### Size targets (sourced: Chrome DevTools `ImageDelivery.ts`, tightened 2.0 → 1.33 bits/px in Lighthouse 13)
 - Gallery thumbnail at 45vw: served **648px @1x / 1296px @2x** (1440 viewport). Ceiling **~46KB @1x,
-  ~183KB @2x**. We measure 26KB / 52KB — comfortably inside.
+  ~187KB @2x**. Measured from a real JPEG source at q75: **169KB cold-WebP / ~150KB warm-AVIF @2x** —
+  inside, but with far less headroom than it first appeared. (An earlier draft claimed "26KB / 52KB
+  comfortably inside" — that was measured off an already-crushed WebP source and was wrong. See the
+  two-source table above.)
 - Lightbox: cap **1920** (`fit('max')`, `q=70`). 2560@2x costs ~600KB and ~14.7MB decode RAM per image.
 - Ladder: **640 / 900 / 1280 / 1600 / 1920**.
 - ⚠️ The widely-repeated **"Google recommends ~200KB per image" rule traces to no Google source** —
@@ -296,11 +400,87 @@ low stakes — but do not repeat it for real photos, and re-upload these from JP
 Every boat-page gallery source in `G:\My Drive\##MARI\02. IMAGES` is **already a web export**: 19 of 25
 are 1535×1024, only 2 are 2400px, and `boat/originals/mari-liveaboard-exterior-001-original.jpeg` is
 1176×784 — *smaller than its own derivative*. So `originals/` is not originals. Consequence: thumbnails
-are fine (1296@2x fits), but the **lightbox caps at ~1500 instead of 1920**. Ask Ayu/Serge for true
-full-res before treating 1535px as final. Seven sources are PNG-encoded photos (up to 7.68MB) — pure
-storage waste, but harmless: the CDN re-encodes on serve, so visitors never pay. Not worth converting.
+are fine (1296@2x fits), but the **lightbox caps at ~1500 instead of 1920**. Seven sources are PNG-encoded
+photos (up to 7.68MB) — pure storage waste, but harmless: the CDN re-encodes on serve, so visitors never
+pay. Not worth converting.
+
+**RESOLVED-AS-FAR-AS-IT-GOES 2026-07-17 — do NOT re-open this looking for masters.** Checked Ayu's shared
+`Mari Liveaboard Photos` folder: it holds the **same files at the same byte sizes** (`Corridor 1` 652,226 ≡
+0.62MB local; `Main Deck` 802,695 ≡ 0.77MB; `Sunset drink on the Sky deck.png` 2,529,858 ≡ 2.41MB). That
+folder **IS** the source of the `##MARI` copies — there is no higher-res tier hiding in Drive, and **Ayu no
+longer works for Mari**, so there's no one to ask there. **1535px is the ceiling; treat it as final and
+ship.** Only two accounts could plausibly hold true originals if they exist at all —
+**`sergedahan@gmail.com`** (owns `mari-liveaboard-deck-003.jpg`) and **`mariliveaboard.marketing@gmail.com`**
+(owns `Sunset drink on the Sky deck.png`). Worth one passing question to Serge someday; **not worth
+blocking on** — thumbnails are unaffected and only the lightbox is mildly compromised. If masters ever
+surface, re-upload is cheap.
+
+**Mine the photographer's ORIGINAL filenames — they carry location facts our renames destroyed.** The
+shared folder names distinguish `Sky Deck` from `Sundeck Main Deck` / `Sundeck 1` / `Long chairs Sundeck
+Main Deck`, and include `Divedeck` and `Lounge Area 1/2`. Whoever shot them treated sky deck and the
+main-deck sundeck as **different spaces** — which is real evidence against `mari-core`'s three-outdoor-space
+inventory (it lists only al fresco dining / sky deck / shaded lounge deck). Our rename to
+`common-006-sundeck-1-sunbeds` dropped "Main Deck" and lost that. **Read the original filename before
+naming a photo.**
 
 Skill-wide — this is DRK-wide, not Mari-specific. Queued for `drk-website` via `_handoff/drk-website.md`.
+
+## Image size targets come from the COMPONENT, never from an assumption — locked 2026-07-17
+**The whole session's image audit was computed twice because the first pass guessed the viewport
+fraction.** "The gallery is ~45% of viewport width" was taken from a passing remark and never checked.
+`BoatGallery.tsx` actually declares `sizes="(min-width: 1024px) 55vw, 100vw"` — **55vw, not 45** — so the
+real 2x target is **1584px, not 1296px**. Every "this image is fine / too small" verdict flipped. **Read
+the component's `sizes` + its aspect box before computing a single number.** The component is the
+authority; a number in a conversation is not.
+
+**The non-obvious rule that fell out of it — in a cover-cropped grid, PORTRAITS are width-bound.**
+The carousel slot is a fixed `aspect-[708/532]` box with `object-cover`, so a portrait is cropped to
+landscape and its **width** is what must clear the target — orientation buys it nothing. Result: our
+landscape shots at 1535px pass, while portraits at 1023–1219px fail by up to 1.55×, *from the same
+source resolution*. **The failures cluster on portraits, and that is not intuitive.** Corollary: a
+portrait passes the LIGHTBOX easily (`object-contain`, height-bound) while failing the carousel — so
+"is this image big enough" has no single answer, only a per-slot one.
+
+## The filename LIES. View the image before naming it — locked 2026-07-17
+Proven twice in one session, on files that had *already been hand-renamed*:
+- `common-004-sundeck-2-beanbags.jpg` is maroon beanbags **under a shade net** — i.e. `mari-core`'s
+  "shaded lounge deck", verbatim. Not a sundeck, not the sky deck. **Wrong twice in one name.**
+- `Corridor 1 - Mari Liveaboard.jpg` is an **exterior side deck** in golden light, not a corridor.
+- `mari-liveaboard-exterior-001-original.jpeg` is **1176×784 — smaller than its own "derivative"**
+  (1264×843). The word "original" was decorative.
+
+**But the photographer's ORIGINAL filenames carry real location facts our renames destroyed** — the
+shared folder distinguishes `Sky Deck` from `Sundeck Main Deck` / `Sundeck 1` / `Long chairs Sundeck
+Main Deck`, plus `Divedeck` and `Lounge Area 1/2`. Whoever shot them treated sky deck and the
+main-deck sundeck as **different spaces**, which is real evidence against `mari-core`'s
+three-outdoor-space inventory. Our rename to `common-006-sundeck-1-sunbeds` dropped "Main Deck".
+**So: read the original filename AND look at the image. Neither alone is enough.**
+
+**Adinda's resolution to the resulting deck-naming mess (2026-07-17), and it's the reusable trick:**
+**name the descriptor after what is IN THE FRAME, never after a claim about which deck it is** —
+`beanbags-under-shade-net`, `bow-sun-mattresses`, `sun-loungers-sea-view`. A filename that makes no
+location claim cannot be wrong when Serge answers, so the naming never blocks on the content question.
+
+## Renaming must NEVER re-encode — preserve the source extension — locked 2026-07-17
+A rename is a copy. `.jpeg` → `.jpg` is fine (extension text only). **`.png` → `.jpg` is not a rename,
+it is a lossy re-encode**, and it contradicts the upload-full-res rule directly. Seven boat-page sources
+are PNG-encoded photographs (up to 7.68MB) — they stay PNG. It costs the visitor nothing (Sanity
+re-encodes on delivery) and preserves the best master we have. **Convention is
+`mari-liveaboard-{category}-{nn}-{2-3 words}.{whatever the source already is}`.**
+
+## Google Drive: "Shared with me" is NOT synced — a shortcut mounts it — locked 2026-07-17
+Drive for Desktop syncs `My Drive` (here `G:\My Drive`) but **not** "Shared with me". A shared folder
+becomes locally readable only after **right-click → Organise → Add shortcut to Drive**, which mounts it
+under `G:\.shortcut-targets-by-id\<id>\`. Until then it is invisible to every local tool.
+**The Drive MCP connector is NOT a substitute** — two hard limits, both hit this session:
+1. `download_file_content` returns **base64 into context** (~350k tokens per MB). Not viable for even
+   one photo, let alone a folder.
+2. **File metadata carries NO pixel dimensions** — only name, bytes, MIME. So "is this file
+   higher-resolution?" is **unanswerable** from the connector. Bytes are a hint, not an answer: a
+   bloated PNG of a small image is indistinguishable from a real master, and this repo already contains
+   that exact trap (see the `-original` file above).
+**So the connector is for FINDING and DECIDING; a synced path is for READING.** Ask for the shortcut
+early — it's ten seconds and it unblocks visual matching, dimension audits, and copying.
 
 ## Galleries — array-on-the-page, grouped by category, for native bulk upload (locked 2026-07-15, EXPERIMENTAL)
 Galleries are a **flat array field directly on the page document** (`boatPage.gallery`, and every future
@@ -402,6 +582,49 @@ under-test until the build confirms it end-to-end.
      citability even though Google dropped FAQ rich results for commercial sites in 2023; hybrid model
      (embedded per-page FAQ + central `/faq` hub) is the recommended structure — which is exactly our
      composition model. Skill-wide — queued for `drk-website`.
+
+## Post-slice SEO pass — run `drk-seo` against every page before the slice is called done (locked 2026-07-17, Adinda)
+**Standing rule, every page, no exceptions.** A slice is not finished when it renders correctly. It is
+finished when a **`drk-seo` pass has been run against the built page** and its findings are fixed or logged.
+
+**This is a DIFFERENT job from the in-slice SEO rule above — do not let one stand in for the other:**
+- **In-slice (the rule above) = AUTHOR.** Fill the `seo` field, emit the JSON-LD, write the alt text,
+  rename the images. Done while the page is being built.
+- **Post-slice (this rule) = VERIFY.** Load `drk-seo`, read the *rendered* page, and check it is
+  structurally/technically built with SEO in mind: **heading hierarchy** (exactly one H1, no skipped
+  levels, `display-*` vs `editorial-*` used per their ramps), **semantic tags** (`<section>` / `<nav>` /
+  `<article>` / `<dl>` / `<details>`, not div soup), **alt text** present and descriptive on every image,
+  **`generateMetadata` actually consuming the `seo` field**, **JSON-LD** emitted and valid, **canonical**
+  set, **internal links resolving** (not `#` or a 404 route).
+
+**Why this is a separate, named step and not just "remember to do SEO."** The in-slice rule has been in this
+file since 2026-07-16 — and the homepage still shipped with **no `generateMetadata` at all** (verified
+2026-07-17, see the gap below). Authoring and verifying are different jobs; the one that was written down is
+the one that silently got skipped. This is the **"a verification ritual only counts if it can actually fail"**
+principle applied to SEO: unless the check is a named step with a skill attached, it evaporates into "we did
+SEO in the slice" — which is exactly what happened. It is also the **"a schema field that nothing renders is
+a promise, not a feature"** rule in its purest form: `seo` is a *field an editor fills in*, and on the
+homepage nothing consumed it.
+
+**Trigger:** after Adinda approves the page's look, before the slice is logged done in MANAGER.md. Cheap
+(minutes, while the page is fresh); the alternative is a from-scratch site-wide audit before launch.
+
+**Retroactive scope, agreed 2026-07-17:** run it on the **boat page once approved**, and on the **homepage**
+(already built, never passed). Every subsequent slice gets it inline.
+
+### 🔴 KNOWN GAP — the homepage's `seo` field is fetched and thrown away. VERIFIED 2026-07-17, not inferred.
+Checked against the served HTML, not by reading the source and assuming:
+- `homePage.ts` **has** a `seo` field (line 313) · `HOMEPAGE_QUERY` **selects** `seo` (line 86) ·
+  `src/app/page.tsx` has **no `generateMetadata`**. The data is queried, typed, and discarded.
+- **Served homepage:** `<title>` = `Mari Liveaboard`, description = the tagline — **both from
+  `layout.tsx`'s hardcoded root metadata**, not from Sanity. **0 JSON-LD blocks. 0 `og:` tags.**
+- **An editor can type a meta title into Studio today and nothing happens.** No error, no warning.
+- **The boat page is the correct reference** — `src/app/boats/[slug]/page.tsx`'s `generateMetadata` resolves
+  `seo.metaTitle || pageTitle || name`, sets canonical + robots + openGraph, and serves 2 JSON-LD blocks.
+  **Copy that shape onto the homepage; don't re-derive it.** (Its `<title>` also reads "Mari Liveaboard" —
+  that is the `pageTitle` fallback working correctly, NOT the same bug. Don't "fix" it.)
+
+Skill-wide (Adinda's ask) — queued for `drk-website` via `_handoff/drk-website.md`.
 
 ## Studio form section headers — every group gets a matching titled fieldset (site-wide, locked 2026-07-16)
 Distinct from "editor-organization deferred to last" below (that's field titles/descriptions/sidebar polish
@@ -636,6 +859,48 @@ Whenever Claude asks Adinda to review/QA something in a browser, the ask must na
 viewport** as its own explicit step, not bundle it into a generic "look at it" — desktop-only review is the
 default failure mode otherwise. Background/full writeup (iframe-`dvh` testing artifact, real-device LAN
 `allowedDevOrigins` incident): `drk-website` skill's `references/troubleshooting.md`.
+
+## Real-device testing: PRIVATE TAB FIRST, before any theorizing — locked 2026-07-17 (cost a session)
+**Standing first move whenever a bug is reported on a REAL phone but not on the desktop browser:** ask
+Adinda to reload in a **Private/Incognito tab** before investigating anything else. If it's fixed there,
+it was the phone's cache and there is no bug. This takes ten seconds and it is now the FIRST question,
+ahead of the `localhost`-vs-LAN check below.
+
+**Why it needs to outrank the existing rule.** On 2026-07-17 "Read more is missing on mobile" was chased
+across most of a session — three wrong theories (a layout bug, `allowedDevOrigins`, Sanity CORS), a
+retracted false reproduction, and a puppeteer harness — and the answer was **the phone's browser cache**.
+Adinda confirmed: *"incognito fixes it."*
+- **A phone cannot be hard-refreshed the way a desktop can.** The existing "restart clean + hard reload"
+  ritual is a DESKTOP ritual; it silently does not cover the device the bug was reported on. So a phone can
+  sit on a days-old bundle while every desktop check passes — which is exactly what happened.
+- **The tell was there and was misread:** she reported BOTH a missing CSS change (an 8px margin) AND a
+  missing JS behaviour (the button). One stale bundle explains both at once; no code bug explains both,
+  because they share no mechanism. **When two symptoms have no common cause in the code, suspect the
+  build the device is actually running, not the code.**
+- **The `localhost`-vs-LAN check below did NOT catch this** and actively misled: localhost (desktop) worked,
+  LAN (phone) failed, which points straight at origin — so two real-but-innocent origin findings turned up
+  and both looked like the culprit. **Confirming a difference between two environments does not identify
+  the cause of it.** Rule out cache first, then trust that signal.
+
+### 🔴 SANITY HAS ITS OWN, SEPARATE CORS ALLOWLIST — not the same thing as `allowedDevOrigins`
+Found 2026-07-17 while chasing the above. **Real, still open, and only Adinda can fix it** (needs Sanity
+project admin). It is NOT the read-more bug — proven: the button and the 8px margin both render correctly
+via the LAN IP with this error firing, because it breaks the live-updates channel, not hydration.
+- **Symptom in `.next/dev/logs/next-development.log`** (never in the browser):
+  `Sanity Live is unable to connect to the Sanity API as the current origin - http://192.168.0.101:3000 -
+  is not in the list of allowed CORS origins`
+- **Consequence:** `sanityFetch`/`defineLive`'s live channel is dead on any LAN device → **content
+  published in Studio will not live-update on the phone.** Everything else renders.
+- **Fix (Adinda, one click, "Allow credentials" ON):**
+  `https://sanity.io/manage/project/kb8eim50/api?cors=add&origin=http%3A%2F%2F192.168.0.101%3A3000`
+- **The generalisable point: there are TWO allowlists with the same class of symptom.** Next's
+  `allowedDevOrigins` (below, in `next.config.ts`) and Sanity's project CORS list (at `manage.sanity.io`).
+  Setting one does nothing for the other. Both need the LAN IP for real-device testing, and **both must be
+  re-added if the Wi-Fi IP changes.**
+- **The dev log is the diagnostic for both** — it is where the 2026-07-15 incident was "sitting the whole
+  time," and it is where this one was too. **Read `.next/dev/logs/next-development.log` before theorizing.**
+
+Skill-wide — queued for `drk-website`'s `references/troubleshooting.md` via `_handoff/drk-website.md`.
 
 ## `allowedDevOrigins` required for real-device LAN testing, locked 2026-07-15
 `next.config.ts` sets `allowedDevOrigins: ["192.168.0.101"]` (Adinda's Wi-Fi IP — update if it changes,
