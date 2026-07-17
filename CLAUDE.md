@@ -106,6 +106,80 @@ Off by default in Next.js; leave it off — do not set `cacheComponents: true` i
 ## Styling
 Tailwind v4 CSS-first `@theme` layer. **Not yet ported** — the static build's `theme.css` (colors, type, spacing, radius, all generated from Figma variables) needs to move into this repo before any section gets built; don't hand-copy values ad hoc per component. Same "no custom CSS classes / no `@apply` / native utilities only" rule as the static build.
 
+## Building a section: ASK FOR THE FIGMA LINK + SCREENSHOT FIRST — locked 2026-07-17 (Adinda)
+**Standing rule, every section, no exceptions.** Before building any page section, **ask Adinda for the
+Figma node link and a screenshot**, then pull `get_design_context` on that node for exact values. Do not
+start from a node NAME, a node ID out of a skill doc, or the section's position in a list.
+
+**Why this is a rule and not a preference — it cost most of a session on 2026-07-17.** The boat page's
+first pass was built from node names and guesses. Two examples of what that produces:
+- `Block/HighlightCard` was assumed to be "a card with text over an image". It is an image with a heading
+  and list **below** it, on the page background. Nothing is overlaid. The name implied a card; the design
+  wasn't one.
+- The bullet was assumed to be an icon asset and faked with a rotated square. It is the **character `✦`**
+  at 18px in `action-primary` — which is *why* no matching SVG exists in `/assets`. Hunting for the "missing
+  icon" was hunting for something that was never supposed to exist.
+`get_design_context` returns the real type ramp, colour token, and spacing for every node. It is cheap.
+Guessing produced ~8 wrong values in one section and a full rebuild. **Adinda's own framing: "the assets
+will be there, so you don't have to make things up and guess."**
+
+**Reference implementations — copy these, don't re-derive:** `BoatHero.tsx` and `BoatOverview.tsx` (built
+2026-07-17, reviewed by Adinda). Between them they demonstrate the scrim recipe, the `*-ondark-*` family
+over photos, `data-reveal`, arbitrary values for off-scale spacing, the measure-then-animate collapse, and
+the mask-based fade. Read one before starting a new section.
+
+## Tailwind: THE CLASS NAME MUST EXIST. Verify against `globals.css` — locked 2026-07-17
+**Tailwind emits nothing for a class it doesn't recognise. It does not warn, does not error, does not
+fail the build.** An invented utility is invisible in `tsc`, `eslint`, and a `curl` 200 — it shows up only
+as a page that looks broken, which is exactly how the 2026-07-17 boat hero shipped with dark navy text on a
+bright photo and a stats strip reading "CabinsGuestsBoat SizeCrew". **A class name that "looks like" the
+design system is the single easiest way to silently break a page here.**
+
+Three specific traps, all hit in one session:
+1. **There is NO `beige-*` / `navy-*` / `chocolate-*` colour utility.** Those are *primitives*
+   (`--beige-100`), deliberately not exposed. The `@theme` layer exposes a **semantic** set only:
+   `text-primary`, `bg-page`, `accent-muted`, `action-primary`, `border-default`, … For text over a photo
+   the family is **`*-ondark-*`** / **`*-onimage-*`** (`text-text-ondark-primary`,
+   `accent-ondark-primary`, `background-ondark-page`). Composes with the hex-not-name rule below: the
+   primitives were renamed, so a plausible primitive name may not exist *or* may be a different colour.
+2. **The spacing scale is `0,2,4,8,12,16,20,24,32,48,64,80,96,128,160`. There is NO 40 and NO 120.**
+   Figma uses both. **Write them as arbitrary values (`gap-[40px]`, `py-[120px]`) — do NOT round to
+   48/128.** Rounding is what makes a build look "nearly right" and drift from the mockup.
+3. **Two heading ramps, not interchangeable — `display-*` vs `editorial-*`.** `display-*` anchors a
+   section (the page H1, a section H2): large, tight leading, negative tracking, always set by a
+   *component*. `editorial-*` is a heading *within body copy* — which is what rich text is. **Any heading
+   an editor types in a rich-text field maps to `editorial-*`.** Picking by number alone (`h3` → whichever
+   ramp) renders a body subheading at section-title scale.
+
+**How to check, before writing the class:** `grep -oE "^\s*--color-[a-z0-9-]+" src/app/globals.css` for
+colours, `--spacing-` for the scale, `--text-` for typography. This is the same "verify by reading the
+actual compiled CSS, not by trusting a name" discipline already in Session discipline below — it just has
+teeth now.
+
+**Corollary — a wrong-looking page is not always OUR bug.** On 2026-07-17 a screenshot of the Overview on a
+black background looked like a broken `bg-bg-page`. Every token resolved correctly; the screenshot was the
+*Figma frame* on a dark canvas, not our render. **The tell was content, not colour** — the image's eyebrow
+read "Liveboard Indonesia Overview" while our page rendered "Premium diving at exceptional value", so it
+could not have been our page. **Check the compiled CSS and the rendered content before "fixing" a report.**
+
+## A schema field that nothing renders is a promise, not a feature — locked 2026-07-17
+Three bugs of the identical shape surfaced in one session on the boat page's first real render. In each,
+Studio offered an editor a control, the schema documented it, and **the frontend silently ignored it** —
+so it appeared to work and did nothing:
+- **`{boat}` / `{destination}` tokens** — the schemas promised "the frontend swaps it in per page" since
+  2026-07-16. No resolver existed. It would have shipped printing `Life aboard {boat}`, braces and all.
+- **Rich-text headings + underline/strike/code/ordered lists** — `richTextFull` offers H1–H6 and five
+  marks; `RichText.tsx` had no `block` styles at all and rendered 3 of 5 marks. An editor applying "H3"
+  saw nothing change.
+- **Sanity `hotspot`** — enabled on every image object, so an editor can drag a focal point. `urlForImage`
+  is called with no width/height, so Sanity never applies it and CSS centre-crops. Still open, deferred to
+  polish.
+**Why all three hid:** nothing had ever *rendered* the field. Schema-before-frontend means a field can sit
+"done" for weeks with no consumer. **So: when a slice first renders a field, verify the field's BEHAVIOUR,
+not just that text appears** — the `{boat}` resolver was proven by seeing "Life aboard Mari" on the page,
+and the heading gap only surfaced once a body containing a real heading was seeded. **Seed content that
+exercises the behaviour, not just content that fills the box.**
+
 ## Content modeling — Portable Text tiers (locked 2026-07-14)
 Not one global rich-text config — three tiers, decide which applies by field:
 1. **Plain string** (headings, labels, CTA text, eyebrows) — no rich text.
@@ -145,6 +219,88 @@ alt there; flagged for review, not yet changed (see _QA-CHECKLIST.md).
 
 **Also queued for the `drk-website` skill** (this is a DRK-wide convention, not Mari-specific) — see
 `_handoff/drk-website.md`.
+
+## Sanity image pipeline — UPLOAD FULL-RES, DO NOT PRE-COMPRESS. Measured 2026-07-17, not assumed.
+**Supersedes the old "compress/resize BEFORE upload" rule, which was wrong.** Every number below was
+measured against our own CDN (`kb8eim50`, asset `1b3c0a0f…-1600x1200`) with real HTTP requests — not read
+off a doc, not synthesised. Re-measure before overriding; don't re-derive from training data.
+
+### The rule
+**Rename → upload the highest-res master you have → let the CDN size and compress it.** Nothing else.
+`urlFor()` is a pure string builder (zero API quota); the CDN generates each variant on demand and caches
+it indefinitely, keyed on the exact URL string.
+
+### Why pre-compressing is actively wrong (both halves of the old rationale failed)
+- **Bandwidth**: the quota counts **outgoing/served** bytes, not stored. A 12MB master served as a 52KB
+  thumbnail costs 52KB. Uploading big masters is bandwidth-free. The "10GB/mo cap" rationale was backwards.
+- **Perf**: the CDN already beats best-practice targets by ~3× unaided (numbers below). There is nothing
+  left to win, and pre-compressing destroys the archival master permanently.
+- Sanity's own docs agree: *"Content managers are advised to upload full-resolution assets"* and *"You
+  don't need to optimize images before uploading."*
+
+### Measured output — 1600×1200 photographic source
+| Request | Served | Size |
+|---|---|---|
+| `w=1296&q=80&auto=format` (Chrome) | **AVIF** | **52.3 KB** |
+| `w=1296&q=80&fm=webp` | WebP | 69.2 KB |
+| `w=1296&q=80&fm=jpg` | JPEG | 118.2 KB |
+| `w=648&q=80&auto=format` | AVIF | 25.8 KB |
+| `w=1296&q=75&auto=format` (q default) | — | 54.7 KB |
+| `w=1296&q=100&auto=format` | — | **264.3 KB** |
+| `w=1296&q=1&auto=format` | — | 10.8 KB |
+
+- **It does NOT always serve WebP — it serves AVIF.** `auto=format` negotiates on the `Accept` header
+  (`Vary: origin, accept`): AVIF → modern Chrome, WebP → WebP-only, JPEG → old browsers. Correct fallback,
+  no work needed.
+- **`fm=avif` returns HTTP 400.** AVIF is reachable ONLY via `auto=format`, never explicitly. So
+  `.auto('format')` is not a convenience — it is the only path to the best format. Always set it.
+- **`q=80` is the call. `q=100` costs ~4× for no visible gain.** `q` has no floor (q=1 → 10.8KB), so a
+  typo'd low q silently ships mush. Default is 75.
+- **First request to a cold URL may serve WebP before AVIF warms** — observed once, then AVIF consistently
+  on 3/3 repeats. Don't conclude "no AVIF" from a single cold measurement (this nearly went in as a
+  wrong finding).
+
+### Frontend rules that make or break the above
+- **Use the `next-sanity/image` loader, NOT bare `next/image`.** Bare `next/image` proxies through
+  `/_next/image` where Sharp RE-ENCODES what Sanity already encoded — two lossy passes, two caches.
+  Exactly one system may own format negotiation, and it must be Sanity's CDN.
+- **`sizes` is mandatory on any image not at 100vw.** Omitting it makes the browser assume 100vw and
+  download ~2×. For the boat gallery (~45vw): `sizes="(max-width: 768px) 100vw, 45vw"`.
+- **`next.config.ts`'s `images.qualities: [75, 80]` is DEAD CODE** under a Sanity loader — quality is `q`
+  in the Sanity URL. Harmless, but the CLAUDE.md note that explains it is misleading. Don't tune it.
+- **Centralise `urlFor()` in one helper.** The CDN cache key is the exact URL string; inconsistent param
+  order across components = cache misses + repeated transform cost.
+- `fit('crop')` is what honours the editor's hotspot — and requires querying `hotspot`/`crop` alongside
+  the asset. `fit('max')` for lightbox so it never upscales past the master.
+
+### Upload source format — JPEG/TIFF/PNG, never WebP
+Sanity's docs list archival upload types as **JPG, SVG, PNG, GIF, TIFF** — WebP appears only as a
+*delivery* target. Transforms re-encode from the stored original, so a **lossy WebP master makes every
+served variant lossy→lossy**. 🔴 **Known debt: the existing seed already uploaded WebP**
+(`destination-bali.webp`, `why-us-crew.webp`, `destination-halmahera.webp`, …). Placeholder content, so
+low stakes — but do not repeat it for real photos, and re-upload these from JPEG when real assets land.
+
+### Size targets (sourced: Chrome DevTools `ImageDelivery.ts`, tightened 2.0 → 1.33 bits/px in Lighthouse 13)
+- Gallery thumbnail at 45vw: served **648px @1x / 1296px @2x** (1440 viewport). Ceiling **~46KB @1x,
+  ~183KB @2x**. We measure 26KB / 52KB — comfortably inside.
+- Lightbox: cap **1920** (`fit('max')`, `q=70`). 2560@2x costs ~600KB and ~14.7MB decode RAM per image.
+- Ladder: **640 / 900 / 1280 / 1600 / 1920**.
+- ⚠️ The widely-repeated **"Google recommends ~200KB per image" rule traces to no Google source** —
+  it is invented. Don't cite it. Real reference point: HTTP Archive 2024 median largest-image-per-page
+  = 135KB (p75 404KB).
+- A 45vw thumbnail **can become the LCP element** (≈280,000px² vs ≈108,000px² for a two-line H1). Escape
+  hatch: below-the-fold elements aren't LCP candidates. If a thumbnail IS above the fold, `priority` on
+  that ONE only; otherwise `loading="lazy"`.
+
+### 🔴 Known gap on this project — we have no masters
+Every boat-page gallery source in `G:\My Drive\##MARI\02. IMAGES` is **already a web export**: 19 of 25
+are 1535×1024, only 2 are 2400px, and `boat/originals/mari-liveaboard-exterior-001-original.jpeg` is
+1176×784 — *smaller than its own derivative*. So `originals/` is not originals. Consequence: thumbnails
+are fine (1296@2x fits), but the **lightbox caps at ~1500 instead of 1920**. Ask Ayu/Serge for true
+full-res before treating 1535px as final. Seven sources are PNG-encoded photos (up to 7.68MB) — pure
+storage waste, but harmless: the CDN re-encodes on serve, so visitors never pay. Not worth converting.
+
+Skill-wide — this is DRK-wide, not Mari-specific. Queued for `drk-website` via `_handoff/drk-website.md`.
 
 ## Galleries — array-on-the-page, grouped by category, for native bulk upload (locked 2026-07-15, EXPERIMENTAL)
 Galleries are a **flat array field directly on the page document** (`boatPage.gallery`, and every future
@@ -234,9 +390,12 @@ under-test until the build confirms it end-to-end.
      Every page slice also does, in-slice: (a) **SEO structure** — fill the `seo` field, emit page-scoped
      `FAQPage`/`Organization`/etc. JSON-LD, use semantic HTML (`<details>/<summary>` + heading per question,
      answer-first copy), stable `#anchor` per Q&A; (b) **image pipeline** — rename real photos to descriptive
-     kebab-case (the Sanity CDN vanity URL derives from the filename) AND compress/resize BEFORE upload (perf
-     + the Sanity 10GB/mo free-tier bandwidth cap). Rationale (Adinda): cheap while the page is fresh + most
-     photos are final (not wasted), vs. a painful, error-prone manual end-pass. Keep ONLY a **light final SEO
+     kebab-case (the Sanity CDN vanity URL derives from the filename) before upload. Rationale (Adinda): cheap
+     while the page is fresh + most photos are final (not wasted), vs. a painful, error-prone manual end-pass.
+     ⚠️ **This rule USED to also say "compress/resize BEFORE upload (perf + the Sanity 10GB/mo bandwidth cap)"
+     — that half was measured WRONG on 2026-07-17 and is deleted. Upload full-res masters; do NOT pre-compress.
+     The bandwidth cap counts SERVED bytes, not stored, so pre-compressing saves nothing and destroys the
+     archival master. See "Sanity image pipeline" below for the measurements. The RENAME half stands.** Keep ONLY a **light final SEO
      review** (holistic keyword/cannibalization check, structured-data validation, sitemap completeness) — not
      a from-scratch content pass. Same principle as full-wire-per-slice. FAQ SEO/AEO specifics (verified via
      Perplexity 2026-07-16, cross-check `drk-seo`): `FAQPage` JSON-LD is still worth emitting for AEO/AI-answer
@@ -377,6 +536,32 @@ Full spec for this format lives here; the generalized (non-Mari) version is queu
 `references/workflow.md` — see `_handoff/drk-website.md`.
 
 ## Commit cadence — commit at every checkpoint + remind at session end, locked 2026-07-16
+### ⚠️ AMENDED 2026-07-17 (Adinda) — read this first, it changes how the preconditions below are read
+**The problem this fixes:** work was piling up uncommitted for long stretches. Cause: the "verified-clean"
+precondition below sets the bar at *typecheck/lint/build actually green* — **a bar nobody clears mid-arc** —
+so the rule meant to protect the repo was preventing the checkpoint. That's backwards. A **local commit is
+not a claim the work is good; it's a checkpoint.** It's free, private and reversible (`reset`, `amend`,
+branch). An **uncommitted working tree is the only genuinely lossy state in the system.**
+
+**So: DEFAULT TO COMMITTING.** The "verified-clean" precondition does **not** gate *whether* to commit — it
+gates **what the message is allowed to CLAIM**. Never write a message implying verification you didn't do.
+`wip: boatDefaults — untested, mid-arc, not reviewed` is strictly better than no commit and is honest.
+A breaking bug is **fine** to commit if the message says it's broken; what's forbidden is a broken state that
+**looks finished in the log**, because a future session reads it and believes it. (This *reinterprets*, and
+does not delete, the "never commit a mid-repair/known-broken state" line below — that rule was always about
+committing broken work **silently**, as if done.)
+
+**The narrow genuine don't-commit cases:** secrets/credentials in the tree · large junk artifacts · a tree
+another process is **actively writing right now** (wait, then commit).
+
+**Parallel sessions — the case that prompted this (2026-07-17).** When several Claude sessions run against
+this one repo, `git status` will show work **this session didn't author** (e.g. `boatDefaults` appeared
+mid-session from a parallel one). **Do NOT commit another session's in-flight work** — not because it's
+unverified, but because **only the session that wrote it knows what the message should honestly say**, and a
+message written by someone who doesn't know what they're describing is the exact thing this rule forbids.
+Instead: **name the files, say plainly they look like another session's, and leave them.** The reminder to
+commit belongs to *that* session. Never phrase it as "shall I commit?" — that implies it's yours to offer.
+
 Adinda's explicit standing instruction (she will forget otherwise, so this is on Claude to drive, not
 her). Two triggers:
 1. **After every MANAGER.md checkpoint is written and confirmed** — commit automatically. This is a
