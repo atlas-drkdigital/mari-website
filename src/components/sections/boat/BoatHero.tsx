@@ -30,7 +30,16 @@ export function BoatHero({ boat }: { boat: BoatData }) {
     <section
       id="boat-hero"
       aria-labelledby="boat-hero-heading"
-      className="relative isolate z-10 flex min-h-dvh w-full flex-col justify-end"
+      // MOBILE: justify-center — the homepage hero's model, which Adinda confirmed reads correctly
+      // ("see how we position texts on mobile for the homepage's hero, we nailed that").
+      // DESKTOP: justify-end — this hero is bottom-anchored by design; the SubNav lands at its
+      // bottom edge in Figma.
+      //
+      // The previous attempt (justify-end everywhere + bigger pb) moved the content DOWN, not up:
+      // once pt + content + pb exceeds min-h-dvh, justify-end has no free space left to distribute,
+      // the section grows past the viewport, and the extra padding just pushes content further
+      // down. Padding cannot lift content in a container that has already overflowed.
+      className="relative isolate z-10 flex min-h-dvh w-full flex-col justify-center lg:justify-end"
     >
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <Image
@@ -54,17 +63,12 @@ export function BoatHero({ boat }: { boat: BoatData }) {
       {/* data-reveal="left" — fade + slide in from the left, same as the homepage hero's content
           block. ScrollReveal (rendered by the page) adds [data-revealed]; the animation itself is
           pure CSS in globals.css, and is skipped entirely under prefers-reduced-motion. */}
-      {/* Mobile bottom padding is 144px, not 96 — lifts the hero content ~48px off the bottom edge
-          (Adinda, 2026-07-17: it sat too low). 144 isn't on the spacing scale (…96,128,160), so
-          it's an arbitrary value rather than rounded to 128 or 160 — the ask was a specific 48px
-          lift, and rounding would under- or overshoot it.
-          NOTE: the homepage hero solves this differently — `justify-center` + py-32, centring the
-          block in the viewport. Not copied here because this hero is bottom-anchored by design (the
-          SubNav lands at its bottom edge in Figma). If the lift still reads wrong, switching mobile
-          to the homepage's centred model is the next thing to try, not more padding. */}
+      {/* Mobile padding mirrors the homepage hero (py-32) — with justify-center doing the work,
+          the padding is only a safety inset, not the positioning mechanism. Desktop keeps the
+          bottom-anchored spacing. */}
       <div
         data-reveal="left"
-        className="flex w-full flex-col gap-32 page-gutter-x pb-[144px] pt-128 lg:gap-48 lg:pb-128"
+        className="flex w-full flex-col gap-32 page-gutter-x py-32 lg:gap-48 lg:pb-128 lg:pt-128"
       >
         <nav aria-label="Breadcrumb">
           <ol className="flex flex-wrap items-center gap-8 text-caption-label uppercase text-text-ondark-muted">

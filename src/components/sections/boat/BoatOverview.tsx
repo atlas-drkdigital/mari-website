@@ -56,11 +56,23 @@ export function BoatOverview({
   // the only way back to collapsed.
   const bodyRef = useRef<HTMLDivElement>(null)
   const [canExpand, setCanExpand] = useState(false)
+  // The expanded height in px. A max-height transition needs a concrete target on BOTH ends —
+  // you cannot animate to `none`, and animating to a huge fixed value makes the easing run against
+  // a distance the content doesn't occupy, which reads as a lurch then a stop. So we measure the
+  // real content height and animate to exactly that.
+  const [fullHeight, setFullHeight] = useState(0)
 
   useEffect(() => {
     const el = bodyRef.current
-    if (!el || expanded) return
-    const measure = () => setCanExpand(el.scrollHeight > el.clientHeight + 1)
+    if (!el) return
+    const measure = () => {
+      // scrollHeight is the full content height regardless of the cap, so this stays correct while
+      // expanded — unlike the clientHeight comparison below.
+      setFullHeight(el.scrollHeight)
+      // Don't re-evaluate "is it clipped?" while open: an expanded body has scrollHeight ===
+      // clientHeight by definition, which would report "no overflow" and hide the only way back.
+      if (!expanded) setCanExpand(el.scrollHeight > el.clientHeight + 1)
+    }
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(el)
@@ -148,15 +160,29 @@ export function BoatOverview({
                     dvh, not vh, so mobile browser chrome doesn't skew it. Values are a starting
                     point for review, not derived from Figma (the mockup shows only one body length).
 
-                    NOTE: no height transition. Animating to/from a clamp() max-height needs a
-                    measured pixel target; deferred to polish rather than faked with a guess. */}
+                    Heights are +64px on Adinda's call (2026-07-17) — the first pass clipped too
+                    tight and left too little of the body visible.
+
+                    TRANSITION (Adinda: "feels very snappy and not lux at all"). The first pass had
+                    NO transition, so it snapped. Now max-height animates over 700ms ease-out —
+                    matching the site's scroll-reveal (globals.css), not the 300ms used for hover
+                    states: 300ms on a large height change reads as a jolt, and this is a content
+                    reveal, not a hover. The expanded target is the MEASURED height (see above), so
+                    the easing runs across exactly the distance the content occupies.
+
+                    FADE (Adinda: fade to 0% at the cut edge so it blends into the background). A
+                    mask-image gradient, not an overlay div: a mask needs no knowledge of the
+                    background colour, so it can't desync from the page background the way a
+                    hardcoded `from-bg-page` overlay would. Applied only while collapsed — a fade on
+                    fully-revealed text would dim the last paragraph for no reason. */}
                 <div
                   ref={bodyRef}
                   id="boat-overview-body"
-                  className={`flex flex-col gap-16 text-body-large text-text-primary ${
+                  style={expanded ? { maxHeight: fullHeight } : undefined}
+                  className={`flex flex-col gap-16 overflow-hidden text-body-large text-text-primary transition-[max-height,mask-image] duration-700 ease-out ${
                     expanded
                       ? ''
-                      : 'max-h-[clamp(180px,45dvh,340px)] overflow-hidden lg:max-h-[clamp(220px,32dvh,420px)]'
+                      : 'max-h-[clamp(244px,45dvh,404px)] [mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_100%)] lg:max-h-[clamp(284px,32dvh,484px)]'
                   }`}
                 >
                   <RichText value={boat.overviewBody!} />
