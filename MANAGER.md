@@ -91,8 +91,13 @@ the overhead once, and don't price the user's own review time as build time.**
    knowingly, not an overrun. **Do not re-litigate this to save the calendar.**
    **The consolation is real:** the sub-nav is the SAME component on destination, so Monday's destination
    slice inherits it free. Today's spill buys down Monday rather than only deferring it.
-   - **REMINDER OWED (Adinda's ask 2026-07-17): when the boat page starts, remind her to send the Figma
-     colour-variable screenshots.** She'll do them as we go, opportunistically, not as a batch.
+   - ~~**REMINDER OWED: send the Figma colour-variable screenshots.**~~ ✅ **OBSOLETE — closed 2026-07-17.**
+     She sent all 6 that morning and the full 11-token rename shipped off them (`1b56add`). This note
+     outlived the thing it was reminding about, and was surfaced stale at the boat page start — Adinda
+     caught it ("we already did the screenshots right?"). **The recall-then-VERIFY rule applies to our own
+     notes, not just to skills:** a reminder is a claim about the present, so check it's still true before
+     delivering it. What IS still owed by Adinda is a *different* Figma item — the code-syntax bindings
+     (see the section above), which the screenshots never touched.
 4. **Destination page slice** — where the destination FAQ *render* composition + the stable-key cross-page
    pull get built.
 5. **Global-chrome slice** (Nav/Footer/newsletter/contact details/copyright/"By Atlas").
@@ -184,15 +189,82 @@ construction (`.id('boatDefaults')` is unique in that list), but that is an argu
 
 **⏭️ NEXT — step 2, boat page sections.** Two things to raise with Adinda first (below).
 
-### 🔴 OPEN — raise BEFORE building the boat page sections
-1. **Figma and the schema disagree on what sections exist.** `mari-website`'s `boat.md` lists **Amenities**
-   (`Section/Boat Page/Amenities`, node `718:5516`, 5 tabs) as a real section — **the `boat` schema has no
-   amenities field at all**. Conversely the schema has a **Gallery** section that Figma's section table
-   doesn't list. One of the two is wrong and it changes the slice's scope. **Not yet raised.**
-   - Amenities' 5 tab labels are also an open `[VERIFY]` owed to Serge, so it may be blocked regardless.
-2. **`/boat/mari` vs `/boat`.** The slug is `mari` but it was never a decision — it's whatever was typed
-   pre-rename, recovered from an orphaned draft. `_SCHEMA-SPECS.md` still flags the URL pattern as
-   unconfirmed. **Confirm before the route ships** (a `redirect` doc fixes it later, but cheaply now).
+### ✅ RESOLVED 2026-07-17 — four boat-page decisions, all locked by Adinda before the sections build
+
+**The authoritative Figma frame is `Page/Boat` = `778:8702`.** The `mari-website` skill's `boat.md` points
+at `715:xxxx` / `718:5516` — **stale**, same drift the destination page had (`675-2363` → `778:8608`).
+Real section list, read from Figma directly: Hero (`778:8706`, **sub-nav `Block/SubNav` `778:8712` already
+in it**) · Overview (`778:8747`) · Cabins (`778:8762`, 2 tabs) · **Amenities (`778:8845`, 5 tabs)** ·
+LayoutAndSpecs (`778:8878`) · FAQ (`778:8902`) · CTA (`778:8903`) · ContactUs (`778:8904`) · Footer
+(`778:8905`). Queued for the skill round.
+
+**1. The `gallery` field IS the Amenities section. Name stays. (Adinda, explicit.)**
+There is **no Gallery section on the boat page** — the schema/Figma "disagreement" was a naming mismatch,
+not a modeling error. `galleryImage.categories` is already `The Boat / Dining / Diving / Relaxation /
+Others` — **exactly the 5 Figma tabs**, and the field comment already said "fixed list from the Figma
+gallery mockup." **This also effectively closes the skill's "5 tab labels unconfirmed — confirm with
+Serge" open item** (they're Figma-derived and in the schema).
+- **Adinda's call: live with the naming for Mari, don't repeat it next project.** Queued as a rethink item,
+  not a rename now.
+- **The full amenities LIST lives under `specifications` ("Amenities & Others"), not here** — this section
+  is the tabbed photo/copy showcase, a different thing.
+- **The flat array is CONFIRMED correct by a new requirement:** there's also an **"all" gallery lightbox
+  showing every image combined**. A flat array gives that for free (it *is* the array); each tab is just a
+  filter on `categories`. Nesting images under tabs would mean flattening five arrays back out. The
+  2026-07-15 flat-array decision holds for a second, independent reason.
+- 🔴 **TWO DIFFERENT IMAGE SOURCES ON ONE SECTION — do not conflate (Adinda, explicit 2026-07-17):**
+  - **Each tab's carousel shows ONLY that category's images** → `gallery[]` filtered by
+    `categories match <tab>`. NOT all images.
+  - **The lightbox shows ALL images combined** → the unfiltered `gallery[]`.
+  One array, two reads. The obvious bug is feeding the carousel the whole array (it would look plausible
+  and be wrong on every tab), so the filter is the thing to verify per tab, not just "images render".
+  An image tagged with several categories appears in each of those carousels — `categories` is multi-select
+  by design.
+- **Empty category → that tab doesn't render** (same auto-hide pattern already shipped on the homepage).
+- **NEW FIELD NEEDED — the one real gap:** each tab has its own heading + paragraph in Figma
+  (`778:8858` / `778:8860`) and **no field existed for it**. `galleryDescription` is whole-gallery,
+  singular. → **`boat.galleryTabs[]`: `{category, heading, body}` × 5, PER BOAT** (Adinda's call — the
+  copy describes *this* boat's spaces, so it isn't shared chrome; a second boat would need its own).
+- **Categories stay HARDCODED in `galleryImage.ts` for now.** Adinda: "fixed for every boat." Making them
+  editor-managed (a list on `boatDefaults`) needs a **custom input component** — Sanity's `options.list`
+  can't read values out of another document. Real work for a list that is by definition fixed. The interim
+  note already in `galleryImage.ts` stands; revisit only if it genuinely needs editing.
+
+**2. Hero meta strip → BOAT STATS.** Figma shows Komodo's Season / Duration / Minimum Skill Level — a
+copy-paste from the destination page. Adinda: "we use the boat stats, so we can actually change those to
+boat stats." → wire to `boat.stats` (Cabins / Guests / Boat Size / Crew, already seeded with confirmed
+mari-core facts). **Closes `mari-website` boat.md open item #7.**
+
+**3. ROUTE: `/boats` (listing) + `/boats/mari` (individual).** Locked on Adinda's own consistency
+principle — "naming should be consistent between boat and destination", and destinations are
+`/destinations` + `/destinations/komodo`. The rejected shape was `/boats` listing + `/boat/mari` child:
+two different segments for one collection, so the listing and its children sit at unrelated paths.
+- ⚠️ **This CONTRADICTS `mari-website`'s `url-structure.md`, which records `/boat`.** Skill-round item.
+- **Free to change right now** — nothing is live, so there are no backlinks to preserve. This was the
+  cheapest moment it will ever be, which is why it was worth settling before the route shipped.
+- **The slug `mari` was never a decision** (leftover text recovered from an orphaned draft) — it is now.
+
+**4. DYNAMIC COLLECTION SEGMENT — DECLINED. Adinda asked; Claude recommended against; she accepted.**
+The ask: make the `/boats/` segment editable in Sanity (defaults or SEO settings) so it could become
+e.g. `/liveaboard-diving/mari` later. **Technically possible** (`src/app/[collection]/[slug]/page.tsx`
+reading the segment from Sanity; static routes like `/about` still resolve first). **Declined because it's
+expensive machinery for a cheap-later problem** — the exact case CLAUDE.md says to flag rather than build:
+- A typo in that field would change **every URL on the site at once** and silently 404 every indexed page,
+  unless we also auto-generate redirects on change — more machinery again.
+- `generateStaticParams`, sitemap, canonicals and breadcrumbs all derive from it → blast radius is the
+  whole SEO surface.
+- It buys a change that happens ~never, and when it does it's a deliberate SEO migration you'd want to
+  plan — not a text box. **Doing it later = rename the folder + add a `redirect` document, ~10 min, once.**
+- **What Adinda actually wanted mostly already exists:** `boat.slug` / `destination.slug` are editable in
+  Studio *today*. Only the collection segment is in code. (A slug change post-launch needs a `redirect`
+  doc so the old URL doesn't 404 — that type exists.)
+- **SEO note:** keywords in the URL are a weak ranking signal; both shapes rank the same. What matters is
+  picking once and not changing it after launch, and plural-collection-then-slug is both the standard
+  convention and what `/destinations` already does. The SEO answer and the IA answer agree.
+
+**Schema naming, for the record (Adinda asked):** it's a **document type** called `boat` (renamed from
+`boatPage` 2026-07-16 — the "Page" suffix wasn't a real convention). `boat-mari` is a **document** of that
+type. Type = `boat`; document = `boat-mari`.
 
 ### 📅 DAY PLAN to the Jul 24 staging push — Adinda's re-shuffle 2026-07-16. Overrides the skill's day-by-day.
 **Jul 20 = DESTINATION ONLY, a deliberately BLOCKED day (Adinda's explicit call).** Private Charters was

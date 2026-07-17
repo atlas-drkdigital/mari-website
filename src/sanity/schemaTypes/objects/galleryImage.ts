@@ -1,5 +1,7 @@
 import { defineField, defineType } from 'sanity'
 
+import { GALLERY_CATEGORIES } from '../galleryCategories'
+
 // Gallery image — an `image` OBJECT (not a document), used as the array member inside a gallery
 // group's `images` array (see boat's gallery field). Being a plain `image` type is exactly
 // what enables native multi-file batch upload: "arrays of images accept batches of files to be
@@ -22,20 +24,20 @@ export const galleryImageType = defineType({
       description: 'Describes the image for screen readers and search engines. Strongly recommended, not required.',
     }),
     defineField({ name: 'caption', title: 'Caption', type: 'string', description: 'Shown in the lightbox.' }),
-    // Fixed list from the Figma gallery mockup (The Boat / Dining / Diving / Relaxation / Others) —
-    // NOT free text (Adinda dislikes the plain-text field). Multi-select: one image can sit under
-    // several tabs. INTERIM: hardcoded here for now. Better long-term options to raise next session —
-    // a centrally-managed, editor-editable category set (its own list, or a field in site settings)
-    // so categories aren't baked into code. See MANAGER.md.
+    // These categories ARE the Amenities section's tabs (Figma node 778:8845). An image tagged
+    // "Dining" appears in the Dining tab's carousel; multi-select is deliberate, so one image can
+    // appear in several tabs. The lightbox shows every image regardless of tag.
+    // List shared with `boat.galleryTabs[].category` via GALLERY_CATEGORIES — see that file for why
+    // it stays hardcoded.
     defineField({
       name: 'categories',
       title: 'Categories',
       type: 'array',
       of: [{ type: 'string' }],
       options: {
-        list: ['The Boat', 'Dining', 'Diving', 'Relaxation', 'Others'],
+        list: [...GALLERY_CATEGORIES],
       },
-      description: 'Optional — one image can belong to several.',
+      description: 'Which tabs this image appears under. Optional — one image can belong to several.',
     }),
   ],
 })

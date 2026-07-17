@@ -2,6 +2,7 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { AutoSlugInput } from '../../components/AutoSlugInput'
 import { sharedComponentNote } from '../../components/SharedComponentNote'
+import { GALLERY_CATEGORIES } from '../galleryCategories'
 
 // Renamed from `boatPage` to `boat` 2026-07-16 — the "Page" suffix wasn't an actual convention
 // (scheduleRates/blogPost don't have it either), so it added nothing. Migrated the one real
@@ -15,6 +16,13 @@ import { sharedComponentNote } from '../../components/SharedComponentNote'
 //
 // Cabin *types* and individual *cabins* are their own document types referencing this one, not
 // inline arrays here — keeps the boat/cabin-type/cabin hierarchy independently queryable.
+//
+// ⚠️ NAMING: the `gallery` group/fields drive the page section Figma calls **Amenities** (node
+// 778:8845) — its 5 tabs ARE `galleryImage.categories`. There is no separate "Gallery" section on
+// the boat page. The name is a leftover from when this was modeled as "a pile of images"; kept
+// deliberately (Adinda, 2026-07-17) because renaming the field costs a migration for zero user
+// impact. Do not "fix" it. The full amenities LIST is a different thing entirely — it lives under
+// `specifications` ("Amenities & Others").
 //
 // Shared section chrome lives on the `boatDefaults` singleton, NOT here (moved 2026-07-17):
 // overviewEyebrow, keyFeaturesHeading, cabinsEyebrow, cabinsHeading, galleryEyebrow, galleryTitle,
@@ -184,9 +192,51 @@ export const boatType = defineType({
       group: 'gallery',
       fieldset: 'galleryFs',
     }),
+    // Per-tab copy for the Amenities section. Each row is one tab; `category` matches the tag on
+    // the images in `gallery` below, which is how a tab finds its own photos.
+    // PER BOAT, not on `boatDefaults` (Adinda's call 2026-07-17): this copy describes THIS boat's
+    // own spaces ("our sundeck", "our dining area"), so it isn't shared chrome — a second boat needs
+    // its own. Only the eyebrow/section heading are shared.
+    // Two places per tab (copy here, images below) is a known intuitiveness cost, accepted for Mari
+    // deliberately: keeping `gallery` a flat array of bare images is what preserves native
+    // multi-file drag-drop, and it's also what makes the combined lightbox free. Queued as a
+    // rethink-next-project item, not a mistake to fix here.
+    defineField({
+      name: 'galleryTabs',
+      title: 'Tab text',
+      type: 'array',
+      group: 'gallery',
+      fieldset: 'galleryFs',
+      description:
+        'The heading and text shown on each tab. The photos themselves go in the Gallery below — tag each photo with a category and it appears under the matching tab.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'galleryTab',
+          fields: [
+            defineField({
+              name: 'category',
+              title: 'Tab',
+              type: 'string',
+              options: { list: [...GALLERY_CATEGORIES] },
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({ name: 'heading', title: 'Heading', type: 'string' }),
+            defineField({ name: 'body', title: 'Text', type: 'richTextBasic' }),
+          ],
+          preview: { select: { title: 'category', subtitle: 'heading' } },
+        }),
+      ],
+      initialValue: GALLERY_CATEGORIES.map((category) => ({ _type: 'galleryTab', category })),
+    }),
     // FLAT array of images — this array's members ARE images, so multi-file drag-drop lands
     // directly on it and uploads (the whole point). Category is a per-image tag field on
     // `galleryImage`, not a grouping level here.
+    //
+    // Frontend requirement, locked 2026-07-17 (Adinda) — TWO different reads of this ONE array:
+    //   - each tab's carousel shows ONLY that tab's images (filter by `categories`)
+    //   - the lightbox shows ALL images combined (no filter)
+    // Feeding the carousel the unfiltered array is the plausible-looking bug here; verify per tab.
     defineField({
       name: 'gallery',
       title: 'Gallery',
@@ -195,7 +245,7 @@ export const boatType = defineType({
       fieldset: 'galleryFs',
       of: [defineArrayMember({ type: 'galleryImage' })],
       description:
-        'Drop or select many images at once — they upload straight onto this list. Recommended: landscape 4:3, at least 1600×1200px (larger than it displays, so it stays sharp on retina/large screens), web-optimized JPEG or WebP, ideally under ~500KB each.',
+        'Drop or select many images at once — they upload straight onto this list. Tag each one with a category to choose which tab it appears under; every image also appears in the lightbox. Recommended: landscape 4:3, at least 1600×1200px (larger than it displays, so it stays sharp on retina/large screens), web-optimized JPEG or WebP, ideally under ~500KB each.',
     }),
 
     // Specifications
