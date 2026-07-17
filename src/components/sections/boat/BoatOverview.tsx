@@ -160,8 +160,12 @@ export function BoatOverview({
                     dvh, not vh, so mobile browser chrome doesn't skew it. Values are a starting
                     point for review, not derived from Figma (the mockup shows only one body length).
 
-                    Heights are +64px on Adinda's call (2026-07-17) — the first pass clipped too
-                    tight and left too little of the body visible.
+                    Cap is max(240px, 60dvh) — Adinda's number, 2026-07-17. ONE value for mobile and
+                    desktop, replacing the earlier per-breakpoint clamps: those carried a px ceiling
+                    (404/484) that silently capped BELOW 60dvh on a tall screen, so the viewport
+                    share never actually applied. max() keeps the 240px floor (so a short viewport
+                    doesn't collapse it to a sliver) and lets 60dvh govern everywhere else.
+                    dvh, not vh, so mobile browser chrome doesn't skew it.
 
                     TRANSITION (Adinda: "feels very snappy and not lux at all"). The first pass had
                     NO transition, so it snapped. Now max-height animates over 700ms ease-out —
@@ -179,10 +183,10 @@ export function BoatOverview({
                   ref={bodyRef}
                   id="boat-overview-body"
                   style={expanded ? { maxHeight: fullHeight } : undefined}
-                  className={`flex flex-col gap-16 overflow-hidden text-body-large text-text-primary transition-[max-height,mask-image] duration-700 ease-out ${
+                  className={`flex flex-col gap-16 overflow-hidden text-body-large text-text-primary transition-[max-height] duration-700 ease-out ${
                     expanded
                       ? ''
-                      : 'max-h-[clamp(244px,45dvh,404px)] [mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_100%)] lg:max-h-[clamp(284px,32dvh,484px)]'
+                      : 'max-h-[max(240px,60dvh)] [mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_100%)]'
                   }`}
                 >
                   <RichText value={boat.overviewBody!} />
