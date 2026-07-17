@@ -189,6 +189,44 @@ construction (`.id('boatDefaults')` is unique in that list), but that is an argu
 
 **⏭️ NEXT — step 2, boat page sections.** Two things to raise with Adinda first (below).
 
+### ✅ CHECKPOINT 2026-07-17 PM (2) — SESSION ENDED HERE. `galleryTabs` + all boat-page decisions locked.
+
+**Model:** Opus 4.8 (1M context). **Repo clean at `e2dc87a`.** Adinda ended the session here (tired) — a
+deliberate stop at a committed boundary, not a mid-arc drop.
+**▶ RESUME FROM `_handoff/_NEXT-SESSION-boat.md` — it OPENS with a ready-to-paste kickoff prompt.**
+
+**Shipped this block:**
+- **`85ef714`** — `boatDefaults` singleton + `boat-mari` gallery cleared on both sides.
+- **`e2dc87a`** — `boat.galleryTabs[]` (per-tab Amenities copy, 5 tabs seeded both sides) +
+  `GALLERY_CATEGORIES` extracted to one shared module (was duplicated; drift would silently empty a tab).
+- **The boat page's SCHEMA IS NOW COMPLETE.** Step 2 is pure frontend.
+
+**Where the time went, honestly.** `boatDefaults` took its estimated ~0.5h. **The decision round after it
+consumed the rest of the Friday block** — Amenities modeling, routes, hero strip. Worth it (all three were
+cheaper to settle before the page exists than after, and the Amenities gap would have blocked section 4
+regardless), but **the Jul 20 spill is now materially bigger than the 1–3h Adinda accepted.**
+🔴 **Say the real number out loud Monday morning. Do not silently absorb it.** Mon Jul 20 was already
+flagged as THE pressure point (boat spillover on top of a destination day expected to bleed).
+
+**Two Claude errors this block, both now rules rather than apologies:**
+1. **Delivered a stale reminder** (Figma colour screenshots — already done that morning; the rename had
+   shipped off them). Adinda caught it. → *A reminder is a claim about the present; verify before
+   delivering it. Write a reminder's expiry when you write the reminder.* Queued for `drk-website`.
+2. **Invented generic eyebrow copy** ("Discover Mari", "Every detail") — exactly the tourist-board filler
+   `mari-core/brand/voice.md` bans. Adinda's correction: **inventing copy is fine (a content pass follows),
+   but pull from `mari-core` / `mari-itineraries` / related skills FIRST** when Figma has no copy or looks
+   like a wrong copy-paste. Redone against the locked positioning. **Standing habit, not a one-off.**
+
+**Still NOT verified (say this, don't let it pass as done):** the Studio sidebar in a browser. `curl
+/studio` 200 and `sanity schema validate` **cannot fail** on a broken sidebar — structure resolves
+client-side. The new "Boat Defaults" entry under Boats is unverified. **Ask Adinda to reload and confirm
+early next session.**
+
+**Uncommitted at session end, deliberately:** `CLAUDE.md` (Adinda's own commit-cadence amendment) and
+`.vscode/` — **not this session's work, so not this session's to commit**, per the amendment's own
+parallel-sessions rule. `_handoff/`, `_SCHEMA-SPECS.md`, `_CONTENT-STATUS.md` are gitignored by `/_*` and
+live on disk only — that's the convention, not a loss.
+
 ### ✅ RESOLVED 2026-07-17 — four boat-page decisions, all locked by Adinda before the sections build
 
 **The authoritative Figma frame is `Page/Boat` = `778:8702`.** The `mari-website` skill's `boat.md` points
