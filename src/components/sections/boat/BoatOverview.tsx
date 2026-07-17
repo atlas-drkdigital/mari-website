@@ -94,7 +94,15 @@ export function BoatOverview({
             reading order for screen readers and keyboard tab order — the flip is purely visual. */}
         {keyFeatures.length || boat.keyFeaturesImage ? (
           <div data-reveal className="order-2 flex w-full flex-col gap-[40px] lg:order-1 lg:w-[480px] lg:shrink-0">
-            <div className="relative aspect-[485/387.2] w-full overflow-hidden">
+            {/* 3:2, NOT Figma's 485/387.2 (≈1.25, nearly 5:4). Adinda's call 2026-07-17 — the
+                mockup's near-square crop reads heavy above the Key Features list. A deliberate
+                divergence from the design file, not a miss.
+                Capping the RATIO rather than a height keeps it responsive: the column is 480px on
+                desktop but full-width on mobile, so a fixed height would crop differently at each
+                width. Note the source image is centre-cropped (see the hotspot item in
+                _POLISH-BACKLOG.md) — a wider ratio crops MORE off the top and bottom, so this may
+                read differently once the hotspot is honoured and real photos land. */}
+            <div className="relative aspect-[3/2] w-full overflow-hidden">
               <Image
                 {...sanityImageProps(boat.keyFeaturesImage, '/assets/placeholder-photo.svg')}
                 alt={boat.keyFeaturesImage?.alt ?? ''}
