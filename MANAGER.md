@@ -101,6 +101,26 @@ the overhead once, and don't price the user's own review time as build time.**
 4. **Destination page slice** — where the destination FAQ *render* composition + the stable-key cross-page
    pull get built.
 5. **Global-chrome slice** (Nav/Footer/newsletter/contact details/copyright/"By Atlas").
+   - **Footer is MORE than links — Adinda's flag 2026-07-17.** The per-slice standing sub-step only
+     un-hardcodes the *link targets*. Footer **content** (newsletter, disclaimer, copyright, brand-alias
+     "By Atlas") is a separate small `siteSettings` pass — already scoped that way in CLAUDE.md, restated
+     here because it read as unresolved. Not forgotten, just not a page-slice job.
+   - 🔵 **NEWSLETTER — needs research BEFORE it's built. Raised by Adinda 2026-07-17; explicitly NOT
+     blocking the boat page.** She wants the capture field to be integration-*ready*, not hardwired to a
+     provider that doesn't exist yet. Her requirements, in her framing:
+     1. There is **no mailing-list service chosen yet** — so the immediate need is simply *don't lose the
+        emails*.
+     2. Prefer a model that can **support multiple integrations** (or at least swap provider without a
+        rewrite) rather than one that hard-codes a single vendor.
+     3. If no service exists: just **capture the list** (Resend? a sheet? a Sanity doc?) and be ready to
+        pipe it somewhere later.
+     **Lead worth checking first — Resend is ALREADY IN THIS STACK** (per the `mari-project` skill's stack
+     line: Next.js + Sanity + Vercel + **Resend** + GitHub) and has a Contacts/Audiences API. So "capture
+     with no provider yet" may need **zero** new services. Check that before evaluating anything else.
+     **Open question, do not assume:** whether Sanity has a native newsletter/subscriber option worth using
+     (Adinda asked; unverified — do not answer from memory).
+     ⚠️ **Do not build speculatively** — this is the `isFeatured` / section-toggles trap. Research, propose,
+     get Adinda's call, then build. A Perplexity prompt was drafted for her on 2026-07-17.
 
 ### 🔁 STANDING TO-DO — ask Adinda at the end of every work block: "do we want manual section toggles yet?"
 Her explicit ask 2026-07-16: **don't let this evaporate, and don't build it speculatively.** Raise it as a
@@ -236,14 +256,31 @@ in it**) · Overview (`778:8747`) · Cabins (`778:8762`, 2 tabs) · **Amenities 
 LayoutAndSpecs (`778:8878`) · FAQ (`778:8902`) · CTA (`778:8903`) · ContactUs (`778:8904`) · Footer
 (`778:8905`). Queued for the skill round.
 
-**1. The `gallery` field IS the Amenities section. Name stays. (Adinda, explicit.)**
-There is **no Gallery section on the boat page** — the schema/Figma "disagreement" was a naming mismatch,
-not a modeling error. `galleryImage.categories` is already `The Boat / Dining / Diving / Relaxation /
-Others` — **exactly the 5 Figma tabs**, and the field comment already said "fixed list from the Figma
-gallery mockup." **This also effectively closes the skill's "5 tab labels unconfirmed — confirm with
-Serge" open item** (they're Figma-derived and in the schema).
-- **Adinda's call: live with the naming for Mari, don't repeat it next project.** Queued as a rethink item,
-  not a rename now.
+**1. The section is called GALLERY everywhere. It's FIGMA that's stale. (Adinda, explicit, AMENDED 2026-07-17 PM.)**
+
+> ⚠️ **This entry previously read "the `gallery` field IS the Amenities section, name stays" — which was
+> misleading and cost a round.** It reads as though the *rendered page* says "Amenities". It does not, and
+> never did. Amended after Adinda re-raised it and the code was actually checked field by field.
+
+`galleryImage.categories` is `The Boat / Dining / Diving / Relaxation / Others` — **exactly the 5 Figma
+tabs**, so the *modeling* was always right. **This closes the skill's "5 tab labels unconfirmed — confirm
+with Serge" open item** (they're Figma-derived and in the schema).
+
+**Verified state 2026-07-17 (every surface checked, not inferred):** field key `gallery` · Studio group +
+fieldset "Gallery" · `boatDefaults.galleryTitle` initialValue **"Gallery"** · `galleryEyebrow` "Life aboard
+{boat}" · `destination`'s equivalent also `gallery`/"Gallery". **There is nothing named "Amenities" in the
+rendered output.** The only real (non-comment) occurrence of the word is `'Amenities & Others'`, a
+`specifications` accordion category — an unrelated thing.
+
+- **The mismatch is between our code and FIGMA, not inside our code.** Figma's frame `778:8845` is labelled
+  Amenities; we render Gallery. **Our code supersedes Figma** (Adinda's standing position: follow Figma
+  where sensible, but what we decide here wins). Relabelling the Figma frame is **optional and undecided** —
+  noted in `_handoff/figma.md`, deliberately NOT a to-do.
+- **Gallery is the better name on the merits, not just the cheaper one:** titling the photo section
+  "Amenities" would put an **Amenities** section and an **Amenities & Others** specs row on the same page.
+  Adinda caught this. There is no rename to do and no migration to pay — it was already correct.
+- **The full amenities LIST lives under `specifications` ("Amenities & Others"), not here** — that section
+  is the tabbed photo/copy showcase, a different thing.
 - **The full amenities LIST lives under `specifications` ("Amenities & Others"), not here** — this section
   is the tabbed photo/copy showcase, a different thing.
 - **The flat array is CONFIRMED correct by a new requirement:** there's also an **"all" gallery lightbox

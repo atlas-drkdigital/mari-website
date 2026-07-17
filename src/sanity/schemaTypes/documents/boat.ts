@@ -17,12 +17,17 @@ import { GALLERY_CATEGORIES } from '../galleryCategories'
 // Cabin *types* and individual *cabins* are their own document types referencing this one, not
 // inline arrays here — keeps the boat/cabin-type/cabin hierarchy independently queryable.
 //
-// ⚠️ NAMING: the `gallery` group/fields drive the page section Figma calls **Amenities** (node
-// 778:8845) — its 5 tabs ARE `galleryImage.categories`. There is no separate "Gallery" section on
-// the boat page. The name is a leftover from when this was modeled as "a pile of images"; kept
-// deliberately (Adinda, 2026-07-17) because renaming the field costs a migration for zero user
-// impact. Do not "fix" it. The full amenities LIST is a different thing entirely — it lives under
-// `specifications` ("Amenities & Others").
+// NAMING: this section is called **Gallery** on every surface — field key, Studio group/fieldset,
+// and the rendered heading (`boatDefaults.galleryTitle` = "Gallery"). Its 5 tabs ARE
+// `galleryImage.categories`.
+//
+// Figma's frame 778:8845 labels it "Amenities". That is FIGMA being stale, not us: our code
+// supersedes Figma here (Adinda, explicit 2026-07-17). Relabelling the Figma frame is optional and
+// undecided — see `_handoff/figma.md`. Do NOT "fix" the code toward Figma.
+//
+// Gallery is also the correct name on the merits: titling this "Amenities" would put an *Amenities*
+// section and an *Amenities & Others* specs row on the same page. The full amenities LIST is that
+// unrelated thing — it lives under `specifications` ("Amenities & Others").
 //
 // Shared section chrome lives on the `boatDefaults` singleton, NOT here (moved 2026-07-17):
 // overviewEyebrow, keyFeaturesHeading, cabinsEyebrow, cabinsHeading, galleryEyebrow, galleryTitle,
