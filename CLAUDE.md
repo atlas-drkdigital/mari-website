@@ -512,6 +512,27 @@ per-image busywork.
 editors actually use it. Reusable beyond Mari (every Atlas liveaboard/destination gallery) — queued for
 the skill in `_handoff/drk-website.md`.
 
+## FAQ section layout variants — `default` / `categorized` (locked 2026-07-17, Adinda)
+The FAQ section repeats site-wide in two shapes, and they are ONE component with a `layout` field, not two
+components. **The field values are `default` and `categorized`** — named for what the variant *does*, not
+what it looks like (rejected: `stacked`/`split`, `fullWidth`/`twoColumn`, both of which describe geometry
+and say nothing about *why* the second variant exists — it exists because there are categories).
+- **`default`** — accordion, full width. The homepage FAQ.
+- **`categorized`** — category list down the left (active = left border bar), Q&A accordion right; on
+  mobile the categories become horizontally draggable chips, same as Destinations. The boat page FAQ.
+**This is a schema field `name`, so it is in the expensive-to-change bucket per the 80/20 rule** — that's
+why it was decided before the field was written rather than after. **Not built yet** (boat FAQ §4 not
+started); apply these exact values when it is. Still open: whether the editor picks the variant per-section
+or it's fixed per page type.
+
+## Gallery has FOUR category tabs, not Figma's five — 'Others' dropped (locked 2026-07-17, Adinda)
+`GALLERY_CATEGORIES` = The Boat / Dining / Diving / Relaxation. **Figma node 778:8845 shows a fifth,
+'Others' — deliberately not built.** The only image that would have filled it is a single sunset-drinks
+shot, which belongs under Relaxation; one image doesn't justify a tab. Instance of "conventions supersede
+Figma" — **do not add it back to match the mockup.** Its drafted copy ("Good to know" — Wi-Fi, the 2
+reverse-osmosis desalinators, hot water) is real `mari-core` fact and still needs a home (Specs or an FAQ
+item); parked in `_handoff/_REVIEW-2026-07-17-boat-sections.md` §2b.
+
 ## Eyebrow fields — toggle-to-reveal pattern, standard going forward (locked 2026-07-15)
 Every eyebrow field on every page type gets a `showXEyebrow` boolean immediately before it
 (`hidden: ({ parent }) => !parent?.showXEyebrow`), same mechanism the `seo` object's `jsonLd`

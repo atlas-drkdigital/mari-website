@@ -3,8 +3,13 @@
 // same list: the frontend matches a tab to its images by comparing these strings, so a drift of one
 // character silently empties a tab.
 //
-// Fixed list from the Figma boat page's Amenities section (node 778:8845 — its 5 tab items are
+// Fixed list from the Figma boat page's Amenities section (node 778:8845 — its tab items are
 // 778:8851-8855). NOT free text (Adinda dislikes the plain-text field).
+//
+// FOUR tabs, not Figma's five: 'Others' was DROPPED 2026-07-17 (Adinda). Figma shows it, but the
+// only image that would have filled it is a single sunset-drinks shot, which belongs under
+// Relaxation — one image does not justify a tab. This is a deliberate override of the node; see
+// CLAUDE.md "established conventions supersede Figma". Do not add it back to match the mockup.
 //
 // Deliberately hardcoded, confirmed 2026-07-17 (Adinda: "the categories will be fixed for every
 // boat"). Making them editor-managed — a list on `boatDefaults` — would need a CUSTOM INPUT
