@@ -122,6 +122,69 @@ the overhead once, and don't price the user's own review time as build time.**
      ⚠️ **Do not build speculatively** — this is the `isFeatured` / section-toggles trap. Research, propose,
      get Adinda's call, then build. A Perplexity prompt was drafted for her on 2026-07-17.
 
+### ✅ CHECKPOINT 2026-07-17 (3) — Overview refinements + the "mobile read-more" bug was CACHE, not code
+**Model:** Opus 4.8 (1M context). `tsc` ✅. Dev server restarted clean; `/` 200 + `/boats/mari` 200.
+⚠️ `eslint` has **4 PRE-EXISTING errors** in `Nav.tsx` + `TheBoat.tsx` — `<a href="/boats/mari/">` instead
+of `<Link>` (drops client-side nav). **Not this session's work and not touched.** Real, small, worth a
+slot — it's the incremental nav-link un-hardcoding done with a plain `<a>`.
+
+**Shipped + approved by Adinda:**
+- **Hero mobile +40px** — `translate-y-[40px] lg:translate-y-0`. A transform, NOT padding: under
+  `justify-center`, 40px of padding moves content only ~20px (padding shrinks the box, centring re-splits
+  the remainder), and moves it none at all once content exceeds `min-h-dvh`. 40 is off-scale → `[40px]`.
+- **Editorial headings get `mt-8 first:mt-0`** (RichText, so site-wide). A margin, not the parent's gap:
+  a gap is symmetric, but a heading belongs to the text BELOW it and needs more space above than below.
+  Verified live: computed `margin-top: 8px`. **Line-height deliberately NOT touched — Adinda's explicit
+  call ("line-height is not it at all").**
+- **Read less now scrolls to the top of its containing section** — new **site-wide pattern**, explicitly
+  **NOT accordions** (closing one FAQ item must not yank the page). Scrolls to the SECTION, which sits
+  above the shrinking content, so the target doesn't move during the 700ms collapse. Honours
+  reduced-motion. **Not yet extracted to a shared component — one consumer today; extract when the
+  destination page needs it, which is the free moment.**
+
+**🔴 THE BIG ONE — "Read more missing on mobile" was the PHONE'S CACHE. There was never a code bug.**
+Adinda confirmed: *"incognito fixes it."* This burned most of the session across three wrong theories.
+Full rule + the two-allowlist finding written into CLAUDE.md ("Real-device testing: PRIVATE TAB FIRST")
+and queued for the skill. The short version:
+- **Private/Incognito tab is now the FIRST question on any real-device bug**, ahead of the
+  localhost-vs-LAN check — a phone can't be hard-refreshed, so our restart-clean ritual never covered it.
+- **The tell was misread:** she reported a missing CSS change AND a missing JS behaviour. One stale bundle
+  explains both; no code bug explains both. **Two symptoms with no shared mechanism ⇒ suspect the build
+  the device is running.**
+- **Claude error worth keeping:** a headless "reproduction" was reported as genuine, then retracted — the
+  390/1440 DOMs were byte-identical because Tailwind is CSS-only, so the DOM never varies by width. It was
+  measuring hydration timing, not viewport. **A real emulated viewport (puppeteer-core + system Chrome,
+  installed in the scratchpad, NOT the repo) proved the component works at 390px:** button present,
+  scrollHeight 1642 vs clientHeight 506. That harness is worth reaching for earlier next time.
+
+**🔴 OWED BY ADINDA — Sanity CORS. Real, open, one click, only she can do it (project admin).**
+`https://sanity.io/manage/project/kb8eim50/api?cors=add&origin=http%3A%2F%2F192.168.0.101%3A3000`
+("Allow credentials" ON). **NOT the read-more bug** — proven: button + margin render fine via the LAN IP
+with this error firing. It kills **Sanity Live**, so published content won't live-update on the phone.
+**Sanity's CORS list is a SECOND allowlist, separate from `allowedDevOrigins`** — setting one does nothing
+for the other, and both need re-adding if the Wi-Fi IP changes.
+
+### 🔁 STANDING TO-DO — run a `drk-seo` pass after EVERY page slice, before logging it done (Adinda, 2026-07-17)
+New standing rule; full spec in CLAUDE.md ("Post-slice SEO pass"). **Authoring SEO in-slice ≠ verifying it** —
+the in-slice rule existed since 2026-07-16 and the homepage still shipped with no `generateMetadata`. From
+now on: page approved → load `drk-seo` → pass over the rendered page (heading hierarchy, semantic tags, alt,
+metadata consuming `seo`, JSON-LD, canonical, links resolving) → fix/log → then log the slice done.
+
+**Two retroactive passes owed — do NOT let these evaporate:**
+1. 🔴 **Homepage — a REAL BUG, not just an unrun check. Verified 2026-07-17 against the served HTML.**
+   `homePage` has a `seo` field, `HOMEPAGE_QUERY` selects it, and `src/app/page.tsx` has **no
+   `generateMetadata`** — so it's fetched and discarded. Served: `<title>`/description come from
+   `layout.tsx`'s hardcoded root metadata, **0 JSON-LD, 0 `og:` tags**. An editor filling in the homepage
+   SEO fields in Studio today changes nothing, silently. **Fix = copy the boat route's `generateMetadata`
+   shape** (`src/app/boats/[slug]/page.tsx:37` — resolves `seo.metaTitle || pageTitle || name`, sets
+   canonical/robots/openGraph, serves 2 JSON-LD blocks). Est. ~0.5h incl. the pass. **Not scheduled yet —
+   needs a slot; flag against the Jul 20 pressure point rather than absorbing it.**
+2. **Boat page** — run once Adinda approves the sections. In-slice, no new slot needed.
+   ⚠️ The boat page's `<title>` also reads "Mari Liveaboard" — that is the `pageTitle` **fallback working
+   correctly**, not the homepage bug. Don't "fix" it.
+
+Skill-wide — queued in `_handoff/drk-website.md` for `references/workflow.md`.
+
 ### 🔁 STANDING TO-DO — ask Adinda at the end of every work block: "do we want manual section toggles yet?"
 Her explicit ask 2026-07-16: **don't let this evaporate, and don't build it speculatively.** Raise it as a
 question at the end of each block/session, not as a plan.

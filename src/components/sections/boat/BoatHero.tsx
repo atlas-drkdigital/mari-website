@@ -65,10 +65,19 @@ export function BoatHero({ boat }: { boat: BoatData }) {
           pure CSS in globals.css, and is skipped entirely under prefers-reduced-motion. */}
       {/* Mobile padding mirrors the homepage hero (py-32) — with justify-center doing the work,
           the padding is only a safety inset, not the positioning mechanism. Desktop keeps the
-          bottom-anchored spacing. */}
+          bottom-anchored spacing.
+
+          translate-y-[40px] on MOBILE ONLY (Adinda, 2026-07-17: justify-center put the content too
+          far up; bring it back down ~40px). A transform, NOT padding: with justify-center the
+          content is centred in the free space, so adding pt-40 would move it down only ~20px (the
+          padding shrinks the content box, and centring re-splits what's left) — and once padding +
+          content exceeds min-h-dvh it stops moving anything at all. A transform shifts the painted
+          result by exactly 40px regardless of the free-space maths, and costs no layout.
+          40 is NOT on the spacing scale (0,2,4,8,12,16,20,24,32,48,64,80,96,128,160), so it must be
+          written as an arbitrary [40px] — `translate-y-40` would emit nothing. */}
       <div
         data-reveal="left"
-        className="flex w-full flex-col gap-32 page-gutter-x py-32 lg:gap-48 lg:pb-128 lg:pt-128"
+        className="flex w-full translate-y-[40px] flex-col gap-32 page-gutter-x py-32 lg:translate-y-0 lg:gap-48 lg:pb-128 lg:pt-128"
       >
         <nav aria-label="Breadcrumb">
           <ol className="flex flex-wrap items-center gap-8 text-caption-label uppercase text-text-ondark-muted">

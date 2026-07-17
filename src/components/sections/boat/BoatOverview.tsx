@@ -55,6 +55,7 @@ export function BoatOverview({
   // by definition, so measuring then would always report "no overflow" and hide the button that is
   // the only way back to collapsed.
   const bodyRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
   const [canExpand, setCanExpand] = useState(false)
   // The expanded height in px. A max-height transition needs a concrete target on BOTH ends —
   // you cannot animate to `none`, and animating to a huge fixed value makes the easing run against
@@ -81,8 +82,44 @@ export function BoatOverview({
     return () => observer.disconnect()
   }, [expanded, boat.overviewBody])
 
+  // 🔵 SITE-WIDE READ MORE / READ LESS PATTERN (Adinda, 2026-07-17) — collapsing returns the reader
+  // to the TOP OF THE CONTAINING SECTION. Applies to every read-more/read-less on the site.
+  // **Explicitly NOT accordions** (FAQ, specs): an accordion item is one of a list and closing it
+  // should leave the list where it is, so yanking the page would lose the reader's place. A
+  // read-more governs the whole section it lives in, which is the difference.
+  //
+  // Why it's needed: expanding can add hundreds of px BELOW the button. Collapsing removes that in
+  // one frame, so the button flies up the viewport and the reader is dumped somewhere in the next
+  // section with no idea what moved. Scrolling to the section top is the only stable target — it
+  // sits ABOVE the shrinking content, so its position doesn't move while the 700ms collapse
+  // animates. (Scrolling to the button itself would chase a moving target.)
+  //
+  // Reads prefers-reduced-motion rather than always smooth-scrolling: a long smooth scroll is
+  // exactly the vestibular trigger that setting exists for. Mirrors globals.css, which already
+  // gates the scroll-reveal animations on the same query.
+  const collapseToSectionTop = () => {
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    sectionRef.current?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
+  }
+
+  const toggle = () => {
+    // Read the CURRENT state and scroll before flipping — a setState updater must stay pure (React
+    // may invoke it twice in StrictMode, which would fire the scroll twice).
+    if (expanded) collapseToSectionTop()
+    setExpanded((open) => !open)
+  }
+
   return (
-    <section id="overview" aria-labelledby="boat-overview-heading" className="w-full bg-bg-page py-64 lg:py-[120px]">
+    // scroll-mt keeps the section heading clear of the FIXED nav (Nav.tsx is `fixed top-0`), which
+    // would otherwise cover it the moment we scroll here. Values track the nav's real height —
+    // ⚠️ these are matched to the mega-menu's `top-[110px]` desktop offset and an estimated 70px
+    // mobile bar; they need Adinda's eye, and the sticky sub-nav (step 3) will change them again.
+    <section
+      ref={sectionRef}
+      id="overview"
+      aria-labelledby="boat-overview-heading"
+      className="w-full scroll-mt-[70px] bg-bg-page py-64 lg:scroll-mt-[110px] lg:py-[120px]"
+    >
       <div className="mx-auto flex w-full max-w-[1280px] flex-col items-start gap-48 page-gutter-x lg:flex-row lg:gap-80">
         {/* Left: image, then Key Features BELOW it on the page background — not overlaid on the
             photo. Hides when there's neither an image nor a feature to show.
@@ -210,7 +247,7 @@ export function BoatOverview({
                 {canExpand ? (
                   <button
                     type="button"
-                    onClick={() => setExpanded((open) => !open)}
+                    onClick={toggle}
                     aria-expanded={expanded}
                     aria-controls="boat-overview-body"
                     className="group inline-flex w-fit items-center gap-4 py-4 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:text-accent-muted"

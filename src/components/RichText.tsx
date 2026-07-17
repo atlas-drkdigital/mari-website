@@ -10,8 +10,17 @@ import { sanityImageProps, type SanityImageWithMeta } from '@/sanity/lib/image'
 //                            annotation, an inline image (size + alignment), and an htmlEmbed
 // A tier-2 field never emits the tier-3 blocks, so one component serves both safely.
 //
-// Layout/spacing is governed by the PARENT (e.g. a flex column with gap), so blocks carry no
-// imposed margins here.
+// Layout/spacing is governed by the PARENT (e.g. a flex column with gap) — blocks carry no imposed
+// margins, with ONE deliberate exception: editorial headings get `mt-8` (see HEADING_SPACING).
+//
+// Why the exception (Adinda, 2026-07-17). A parent `gap` is SYMMETRIC — it puts the same space above
+// a heading as below it. Typographically that's wrong: a heading belongs to the text that FOLLOWS
+// it, so it needs more space above than below, or it floats between two paragraphs looking equally
+// attached to both. A gap alone cannot express that asymmetry; only a margin on the heading can.
+// mt-8 (8px) rides on top of the parent's gap, so in a gap-16 column a heading gets 24px above and
+// 16px below. `first:mt-0` keeps the first block flush — a leading margin would push the whole rich
+// text off its container's top edge and desync it from whatever sits beside it.
+// 8 IS on the spacing scale, so `mt-8` is a real utility (unlike a hypothetical `mt-40`).
 //
 // ⚠️ HEADINGS USE THE **EDITORIAL** RAMP, NOT DISPLAY (Adinda, 2026-07-17). The two are not
 // interchangeable and picking by number alone is the trap:
@@ -75,26 +84,31 @@ type InlineImageValue = SanityImageWithMeta & {
   alignment?: string
 }
 
+// Extra space ABOVE every editorial heading, on top of whatever gap the parent sets. `first:mt-0`
+// so a heading opening a rich-text block stays flush with the container. See the header note for
+// why this is a margin and not the parent's gap.
+const HEADING_SPACING = 'mt-8 first:mt-0'
+
 const components: PortableTextComponents = {
   block: {
     normal: ({ children, value }) => <p className={alignClassOf(value)}>{children}</p>,
     h1: ({ children, value }) => (
-      <h1 className={`text-editorial-h1 text-text-primary ${alignClassOf(value)}`}>{children}</h1>
+      <h1 className={`${HEADING_SPACING} text-editorial-h1 text-text-primary ${alignClassOf(value)}`}>{children}</h1>
     ),
     h2: ({ children, value }) => (
-      <h2 className={`text-editorial-h2 text-text-primary ${alignClassOf(value)}`}>{children}</h2>
+      <h2 className={`${HEADING_SPACING} text-editorial-h2 text-text-primary ${alignClassOf(value)}`}>{children}</h2>
     ),
     h3: ({ children, value }) => (
-      <h3 className={`text-editorial-h3 text-text-primary ${alignClassOf(value)}`}>{children}</h3>
+      <h3 className={`${HEADING_SPACING} text-editorial-h3 text-text-primary ${alignClassOf(value)}`}>{children}</h3>
     ),
     h4: ({ children, value }) => (
-      <h4 className={`text-editorial-h4 text-text-primary ${alignClassOf(value)}`}>{children}</h4>
+      <h4 className={`${HEADING_SPACING} text-editorial-h4 text-text-primary ${alignClassOf(value)}`}>{children}</h4>
     ),
     h5: ({ children, value }) => (
-      <h5 className={`text-editorial-h5 text-text-primary ${alignClassOf(value)}`}>{children}</h5>
+      <h5 className={`${HEADING_SPACING} text-editorial-h5 text-text-primary ${alignClassOf(value)}`}>{children}</h5>
     ),
     h6: ({ children, value }) => (
-      <h6 className={`text-editorial-h6 text-text-primary ${alignClassOf(value)}`}>{children}</h6>
+      <h6 className={`${HEADING_SPACING} text-editorial-h6 text-text-primary ${alignClassOf(value)}`}>{children}</h6>
     ),
     blockquote: ({ children, value }) => (
       <blockquote
