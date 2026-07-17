@@ -1,6 +1,7 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { alignAnnotation } from '../../alignAnnotation'
+import { linkAnnotation } from '../../linkAnnotation'
 
 // Tier 3 of the locked 3-tier content model (CLAUDE.md) — "Full Rich Text Block," named and
 // extracted as a shared type 2026-07-15 so every tier-3 field (T&C body, boat overview body,
@@ -35,7 +36,11 @@ export const richTextFullType = defineType({
           { title: 'Strike', value: 'strike-through' },
           { title: 'Code', value: 'code' },
         ],
-        annotations: [alignAnnotation],
+        // ⚠️ Declaring `annotations` REPLACES Sanity's defaults — it does not merge. `link` is a
+        // default, so listing only alignAnnotation here silently removed the link button from every
+        // tier-3 field (T&C, blog post, boat/destination overview). Fixed 2026-07-17 (Adinda
+        // spotted it). Anything added here must list EVERY annotation the field should have.
+        annotations: [alignAnnotation, linkAnnotation],
       },
     }),
     defineArrayMember({

@@ -1,5 +1,7 @@
 import { defineType } from 'sanity'
 
+import { linkAnnotation } from '../../linkAnnotation'
+
 // Tier 2 of the locked 3-tier content model (CLAUDE.md, revised 2026-07-15 to include bullet
 // lists) — most body copy: overview paragraphs, cabin/gallery descriptions, FAQ answers, spec
 // summaries. Paragraph + bold/italic/link + bullet lists — no heading styles or alignment
@@ -19,14 +21,10 @@ export const richTextBasicType = defineType({
           { title: 'Strong', value: 'strong' },
           { title: 'Italic', value: 'em' },
         ],
-        annotations: [
-          {
-            name: 'link',
-            type: 'object',
-            title: 'Link',
-            fields: [{ name: 'href', type: 'url', title: 'URL' }],
-          },
-        ],
+        // Shared with richTextFull (see linkAnnotation.ts) — one definition, so the two tiers can't
+        // drift into offering editors different link behaviour on different fields. This inline
+        // copy is what tier 3 was missing entirely until 2026-07-17.
+        annotations: [linkAnnotation],
       },
     },
   ],

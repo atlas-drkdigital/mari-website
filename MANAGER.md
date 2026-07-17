@@ -164,6 +164,47 @@ with this error firing. It kills **Sanity Live**, so published content won't liv
 **Sanity's CORS list is a SECOND allowlist, separate from `allowedDevOrigins`** — setting one does nothing
 for the other, and both need re-adding if the Wi-Fi IP changes.
 
+### 🔴 RESOLVED 2026-07-17 (4) — `richTextFull` had NO LINK OPTION. Adinda spotted it. Real bug.
+**Tier 3 — the *fuller* tier — was missing a capability tier 2 had.** An editor could not put a URL in the
+**T&C body, a blog post, the boat overview, or the destination overview** (all four use `richTextFull`).
+
+**Root cause — a Sanity footgun worth never re-learning:** the `block` type ships a `link` annotation **by
+default**, and **declaring `marks.annotations` REPLACES that default array rather than merging into it.**
+`richTextFull` declared `annotations: [alignAnnotation]` to add alignment and **silently deleted link in
+the same stroke.** Nothing errored; the button just wasn't in the toolbar. **The same trap applies to
+`styles`, `lists`, and `decorators` — declare one and you own the whole list.**
+
+**Why it hid for 2 days:** CLAUDE.md's own locked tier-3 spec (2026-07-15) lists "H1-H6 + Normal + Quote,
+bold/italic/underline/strike/code, alignment, inline image, raw HTML embed" — **`link` isn't in the spec
+either.** The spec had the same hole as the code, so reading the spec could never catch it. And
+`RichText.tsx` *does* render a `link` mark, so the frontend looked complete — it was serving tier 2.
+
+**Fix:** extracted `src/sanity/linkAnnotation.ts` — **ONE definition shared by both tiers**, so they can't
+drift into offering different link behaviour on different fields (same reasoning as the
+`GALLERY_CATEGORIES` extraction). Field stays `href` → **no migration**; `RichText.tsx` consumes it as-is.
+
+**Also fixed in the same pass — the mirror-image bug.** `type: 'url'`'s DEFAULT validation allows
+**http/https ONLY**: it rejects relative paths *and* mailto/tel. So an **internal link was impossible to
+enter** — even though `RichText.tsx` has always branched on `external = /^https?:/` and rendered non-http
+hrefs as same-tab internal links. **That branch was unreachable: the frontend was ready for a value the
+schema refused to accept.** Now `Rule.uri({ allowRelative: true, scheme: ['http','https','mailto','tel'] })`
+— a strict superset, so every previously-valid URL still validates and nothing needs migrating.
+- ⚠️ **OPEN, ADINDA'S CALL (in `_ADINDA-TODOS.md` #14):** a *typed* internal path silently 404s if a slug
+  changes. The robust model is a **document picker** (reference → slug resolves automatically, survives
+  renames). Real work; **flagged, not built.** Fine as-is pre-launch.
+
+**The pattern, third instance today:** this is *"a schema field that nothing renders is a promise"* **run
+backwards** — the frontend rendering something the schema can never produce. Both directions are invisible
+to `tsc`, `eslint`, and a 200. **When a slice first renders a field, check the schema can actually EMIT
+every case the component handles — not just that the component handles what the schema emits.**
+
+### ✅ ALSO 2026-07-17 — the 4 pre-existing lint errors are FIXED (Adinda asked)
+`<a href="/boats/mari">` → `<Link>` in `Nav.tsx` (×2: desktop nav + mobile menu) and `TheBoat.tsx` (×2:
+the image link + the CTA). These were the incremental nav-link un-hardcoding done with a plain anchor.
+**Not cosmetic:** a raw `<a>` triggers a full document reload, dropping client-side navigation, the
+router cache, and scroll restoration — on the homepage's two main routes into the boat page. `eslint` now
+**0 errors**, so the repo is genuinely green for the first time this session.
+
 ### 🔁 STANDING TO-DO — run a `drk-seo` pass after EVERY page slice, before logging it done (Adinda, 2026-07-17)
 New standing rule; full spec in CLAUDE.md ("Post-slice SEO pass"). **Authoring SEO in-slice ≠ verifying it** —
 the in-slice rule existed since 2026-07-16 and the homepage still shipped with no `generateMetadata`. From

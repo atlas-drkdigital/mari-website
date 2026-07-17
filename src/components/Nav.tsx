@@ -204,7 +204,7 @@ export function Nav() {
               className="block h-[6px] w-[7px] shrink-0 bg-accent-ondark-onprimary transition-transform duration-300 ease-in-out group-data-[nav=light]/nav:bg-text-primary group-aria-expanded/mt:bg-accent-ondark-muted group-aria-expanded/mt:rotate-180 [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
             />
           </button>
-          <a href="/boats/mari" className="pb-4 text-nav uppercase opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">The Boat</a>
+          <Link href="/boats/mari" className="pb-4 text-nav uppercase opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">The Boat</Link>
           <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">Private Charters</a>
           <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">About</a>
           <button
@@ -428,7 +428,7 @@ export function Nav() {
             </div>
           </div>
 
-          <a href="/boats/mari" onClick={() => setMobileMenuOpen(false)} className="border-b-[0.25px] border-accent-ondark-onprimary/15 py-16 text-nav uppercase text-text-ondark-primary opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">The Boat</a>
+          <Link href="/boats/mari" onClick={() => setMobileMenuOpen(false)} className="border-b-[0.25px] border-accent-ondark-onprimary/15 py-16 text-nav uppercase text-text-ondark-primary opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">The Boat</Link>
           <a href="#" onClick={() => setMobileMenuOpen(false)} className="border-b-[0.25px] border-accent-ondark-onprimary/15 py-16 text-nav uppercase text-text-ondark-primary opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">Private Charters</a>
           <a href="#" onClick={() => setMobileMenuOpen(false)} className="border-b-[0.25px] border-accent-ondark-onprimary/15 py-16 text-nav uppercase text-text-ondark-primary opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">About</a>
 
