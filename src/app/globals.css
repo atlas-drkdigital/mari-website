@@ -277,7 +277,7 @@
   --text-editorial-h3--font-weight: 500;
   --text-editorial-h4: 1.1875rem;   /* was 20px, now 19px */
   --text-editorial-h4--line-height: 1.4;
-  --text-editorial-h4--font-weight: 500;
+  --text-editorial-h4--font-weight: 600; /* was 500 — h4 is only 19px vs body's 16px, so weight is what makes it read as a heading (Adinda 2026-07-17) */
   --text-editorial-h5: 1rem;   /* was 17px, now 16px */
   --text-editorial-h5--line-height: 1.45;
   --text-editorial-h5--font-weight: 600;
@@ -291,10 +291,10 @@
   --text-editorial-quote-cite--line-height: 1.6;
   --text-editorial-quote-cite--font-weight: 500;
   --text-body-large: 1rem;   /* was 17px, now 16px (the scale's new base) */
-  --text-body-large--line-height: 1.65;
+  --text-body-large--line-height: 1.8; /* was 1.65 — drifted from Figma (Body/Large = 1.8), corrected 2026-07-17 */
   --text-body-large--font-weight: 400;
   --text-body-medium: 0.875rem;
-  --text-body-medium--line-height: 1.6;
+  --text-body-medium--line-height: 1.8; /* was 1.6 — drifted from Figma (Body/Medium = 1.8), corrected 2026-07-17 */
   --text-body-medium--font-weight: 500;
   --text-caption-label: 0.75rem;
   --text-caption-label--line-height: 1.5;

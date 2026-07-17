@@ -144,8 +144,13 @@ export function BoatOverview({
               </h2>
             ) : null}
 
+            {/* Body → button gap, Adinda 2026-07-17: 32 read too far. Collapsed 20 (−12);
+                expanded 28 (−4). They differ ON PURPOSE — collapsed, the fade mask dissolves the
+                last line into the background and that dead space reads as part of the gap, so it
+                needs to come in further. Expanded, the text ends on a hard edge and only needs a
+                nudge. 28 isn't on the spacing scale, so it's an arbitrary value. */}
             {hasBody ? (
-              <div className="flex w-full flex-col gap-32">
+              <div className={`flex w-full flex-col ${expanded ? 'gap-[28px]' : 'gap-20'}`}>
                 {/* Collapsed is a max-height cap, not a hidden block or a fixed line count: the
                     full text stays in the DOM either way, so it's always crawlable and findable via
                     in-page search, and the cap adapts to whatever the body actually contains
