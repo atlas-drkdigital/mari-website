@@ -525,13 +525,26 @@ why it was decided before the field was written rather than after. **Not built y
 started); apply these exact values when it is. Still open: whether the editor picks the variant per-section
 or it's fixed per page type.
 
-## Gallery has FOUR category tabs, not Figma's five — 'Others' dropped (locked 2026-07-17, Adinda)
-`GALLERY_CATEGORIES` = The Boat / Dining / Diving / Relaxation. **Figma node 778:8845 shows a fifth,
-'Others' — deliberately not built.** The only image that would have filled it is a single sunset-drinks
-shot, which belongs under Relaxation; one image doesn't justify a tab. Instance of "conventions supersede
-Figma" — **do not add it back to match the mockup.** Its drafted copy ("Good to know" — Wi-Fi, the 2
-reverse-osmosis desalinators, hot water) is real `mari-core` fact and still needs a home (Specs or an FAQ
-item); parked in `_handoff/_REVIEW-2026-07-17-boat-sections.md` §2b.
+## An empty tab/section doesn't render — hide it, don't explain it (locked 2026-07-17, Adinda)
+**A gallery tab with no images tagged to it is not shown to the visitor.** The category list
+(`galleryCategories.ts`) stays fixed and complete; the *render* is what adapts. No category is ever
+special-cased in a component.
+
+**This replaced a worse fix, and the difference is the lesson.** Asked what to do about 'Others' (a
+Figma tab with only one plausible image), the first answer was to delete the category from the schema.
+Adinda's correction: the value is fine — *"as long as it's empty ... we don't need to show that."*
+**Deleting the category solves one instance; hiding empty tabs solves the class** — and it means an
+unused category costs nothing, the editor still sees the row in Studio (so they can tag an image to it),
+and the tab appears by itself the moment one is. **When a piece of content is empty, prefer a general
+"hide what's empty" rule over removing the thing from the model.**
+
+⚠️ **Consequence to remember:** the boat gallery has ZERO images in Sanity today, so the entire gallery
+section currently renders **nothing at all**. That is correct behaviour, not a bug — it resolves as soon
+as images are uploaded and tagged. Don't debug it.
+
+Also note the earlier "an empty tab says so rather than collapsing" comment in `BoatGallery.tsx` was
+removed — it argued the opposite, for the editor's benefit. Studio is where the editor sees the empty
+tab; the public page is not the place to explain the CMS to a visitor.
 
 ## Eyebrow fields — toggle-to-reveal pattern, standard going forward (locked 2026-07-15)
 Every eyebrow field on every page type gets a `showXEyebrow` boolean immediately before it
@@ -992,6 +1005,38 @@ handed to Adinda for review on 2026-07-16 having "passed" every check. **For str
 Studio in a real browser or state plainly that Adinda's reload is the only real test — never report it as
 verified.** Generalize the principle: before claiming something is verified, ask what the check would do if
 the thing were broken. If the answer is "pass", it isn't a check.
+
+## Icons are ASSETS, never font glyphs — and put a KNOWN-GOOD control in every test harness (2026-07-17)
+Two lessons from one bug, both reusable.
+
+**1. A text character is not an icon — and ONE icon file is what makes weight uniform.** The
+cabins/gallery carousel arrows were the character `›` at 18px. Adinda spotted it as "distorted... maybe
+it's a matter of sizing" — but sizing was never the problem: a glyph's shape and weight are whatever the
+typeface decides, and Bricolage Grotesque draws `›` thick and stretched. Now
+`src/components/CarouselChevron.tsx`.
+- 🔴 **The fix is NOT Figma's icon.** `Button/Carousel Arrow-Small` (778:8778) uses a filled Material
+  `arrow_back_ios` path — much heavier than every other chevron on the site. Building that (first
+  attempt) drew a correct-to-Figma chevron that Adinda immediately rejected: **"needs to be uniform in
+  size and thickness as existing ones."** Another instance of conventions superseding Figma — and note
+  the node was followed *faithfully* and still produced the wrong answer.
+- **So `CarouselChevron` reuses `icon-nav-chevron.svg` — the SAME FILE as Nav/Contact/MultiSelect/
+  BoatOverview**, rotated ±90°. Uniform thickness **by construction**, not by a number kept in sync.
+  A second "matching" asset would drift the first time either is touched.
+- ⚠️ **Figma's SVG exports set `preserveAspectRatio="none"`**, so the glyph stretches to fill ANY box
+  and thickens the stroke on one axis. **The box ratio must match the viewBox** (7.91668:6 here). The
+  existing `size-[10px]` usages are 1:1 boxes on a 1.32 glyph — already slightly squashed. Don't copy
+  that; `h-[7.58px] w-[10px]` keeps their scale without the distortion.
+- Figma exports the whole button (circle + shadow + chevron) as ONE flat SVG. Don't use it as-is — it
+  can't hover or recolour. Keep the circle in CSS, mask the chevron.
+
+**2. 🔴 CSS `mask-image` silently does NOT load over `file://` — it renders NOTHING, no error.** A
+headless-Chrome screenshot of a local HTML file will show every masked icon as blank. **Serve the test
+page over HTTP** (`python -m http.server`) or the harness lies to you.
+**The general rule that caught it: every visual test harness needs a KNOWN-GOOD control.** The debug page
+included the nav chevron — which demonstrably works in production. When it came back blank *too*, the
+harness was indicted in one step instead of the new icon being "fixed" for an hour. **When a test fails,
+the test is a suspect, and a control is what makes that cheap to check.** Corollary to "a verification
+ritual only counts if it can actually fail": a ritual that *falsely* fails is just as expensive.
 
 ## Session discipline (carried over from the static build, still applies)
 - Verify by reading actual compiled CSS/build output, not by trusting a class or config name's apparent meaning

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 
+import { CarouselChevron } from '@/components/CarouselChevron'
 import { RichText } from '@/components/RichText'
 import { sanityImageProps } from '@/sanity/lib/image'
 import type { BoatData, GalleryImageData, GalleryTabData } from '@/sanity/queries'
@@ -38,8 +39,21 @@ export function BoatGallery({
   eyebrow?: string
   heading?: string
 }) {
-  const tabs: GalleryTabData[] = useMemo(() => boat.galleryTabs ?? [], [boat.galleryTabs])
   const all: GalleryImageData[] = useMemo(() => boat.gallery ?? [], [boat.gallery])
+
+  // A tab with no images tagged to it is not rendered (Adinda 2026-07-17). The category list stays
+  // fixed in `galleryCategories.ts` — this is what makes an unused one ('Others' today) cost nothing:
+  // the editor sees the row in Studio, the visitor doesn't see an empty tab, and the tab appears on
+  // its own the moment an image is tagged. No category is special-cased. A tab whose `category` is
+  // unset hides for the same reason — it can never match an image.
+  const tabs: GalleryTabData[] = useMemo(
+    () =>
+      (boat.galleryTabs ?? []).filter((tab) => {
+        const category = tab.category
+        return !!category && all.some((img) => (img.categories ?? []).includes(category))
+      }),
+    [boat.galleryTabs, all],
+  )
 
   const [tabIndex, setTabIndex] = useState(0)
   const [imageIndex, setImageIndex] = useState(0)
@@ -96,9 +110,10 @@ export function BoatGallery({
     }
   }, [lightboxIndex, closeLightbox, stepLightbox])
 
-  // Section hides entirely when there's nothing to show. Tabs with no images still render as tabs —
-  // an editor should see the tab exists and is empty; that's different from the section vanishing.
-  if (!all.length && !tabs.length) return null
+  // `tabs` is already filtered to those holding images, so an empty list means there is genuinely
+  // nothing to show and the whole section hides. This also covers images tagged with a category that
+  // has no tab row — they'd be unreachable, so the section correctly treats them as nothing.
+  if (!tabs.length) return null
 
   const lightboxImage = lightboxIndex === null ? null : all[lightboxIndex]
 
@@ -241,9 +256,7 @@ export function BoatGallery({
                     aria-label="Previous photo"
                     className="pointer-events-auto flex size-[36px] items-center justify-center rounded-full bg-bg-surface text-text-primary shadow-[0_4px_20px_2px_#2C252233] transition-opacity duration-300 hover:opacity-80"
                   >
-                    <span aria-hidden className="rotate-180 text-[18px] leading-none">
-                      ›
-                    </span>
+                    <CarouselChevron direction="left" />
                   </button>
                   <button
                     type="button"
@@ -251,20 +264,12 @@ export function BoatGallery({
                     aria-label="Next photo"
                     className="pointer-events-auto flex size-[36px] items-center justify-center rounded-full bg-bg-surface text-text-primary shadow-[0_4px_20px_2px_#2C252233] transition-opacity duration-300 hover:opacity-80"
                   >
-                    <span aria-hidden className="text-[18px] leading-none">
-                      ›
-                    </span>
+                    <CarouselChevron direction="right" />
                   </button>
                 </div>
               ) : null}
             </div>
-          ) : (
-            // An empty tab says so rather than collapsing to nothing — otherwise an editor can't
-            // tell "no images tagged for this category" from "the tab is broken".
-            <div className="flex aspect-[708/532] w-full items-center justify-center bg-bg-accent">
-              <p className="text-body-medium text-text-secondary">No photos in this category yet</p>
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -311,9 +316,8 @@ export function BoatGallery({
                   aria-label="Previous photo"
                   className="pointer-events-auto flex size-[44px] items-center justify-center rounded-full bg-background-ondark-page/60 text-text-ondark-primary transition-opacity duration-300 hover:opacity-80"
                 >
-                  <span aria-hidden className="rotate-180 text-[20px] leading-none">
-                    ›
-                  </span>
+                  {/* Same chevron size as the 36px buttons — uniform across the site beats scaling per button. */}
+                  <CarouselChevron direction="left" />
                 </button>
                 <button
                   type="button"
@@ -321,9 +325,7 @@ export function BoatGallery({
                   aria-label="Next photo"
                   className="pointer-events-auto flex size-[44px] items-center justify-center rounded-full bg-background-ondark-page/60 text-text-ondark-primary transition-opacity duration-300 hover:opacity-80"
                 >
-                  <span aria-hidden className="text-[20px] leading-none">
-                    ›
-                  </span>
+                  <CarouselChevron direction="right" />
                 </button>
               </div>
             ) : null}

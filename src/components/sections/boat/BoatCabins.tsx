@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 
+import { CarouselChevron } from '@/components/CarouselChevron'
 import { RichText } from '@/components/RichText'
 import { sanityImageProps } from '@/sanity/lib/image'
 import type { BoatData, CabinTypeData } from '@/sanity/queries'
@@ -171,9 +172,7 @@ export function BoatCabins({
                     aria-label="Previous photo"
                     className="flex size-[36px] items-center justify-center rounded-full bg-bg-surface text-text-primary shadow-[0_4px_20px_2px_#2C252233] transition-opacity duration-300 hover:opacity-80"
                   >
-                    <span aria-hidden className="rotate-180 text-[18px] leading-none">
-                      ›
-                    </span>
+                    <CarouselChevron direction="left" />
                   </button>
                   <button
                     type="button"
@@ -181,9 +180,7 @@ export function BoatCabins({
                     aria-label="Next photo"
                     className="flex size-[36px] items-center justify-center rounded-full bg-bg-surface text-text-primary shadow-[0_4px_20px_2px_#2C252233] transition-opacity duration-300 hover:opacity-80"
                   >
-                    <span aria-hidden className="text-[18px] leading-none">
-                      ›
-                    </span>
+                    <CarouselChevron direction="right" />
                   </button>
                 </div>
               ) : null}
