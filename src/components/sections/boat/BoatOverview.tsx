@@ -73,9 +73,15 @@ export function BoatOverview({
     <section id="overview" aria-labelledby="boat-overview-heading" className="w-full bg-bg-page py-64 lg:py-[120px]">
       <div className="mx-auto flex w-full max-w-[1280px] flex-col items-start gap-48 page-gutter-x lg:flex-row lg:gap-80">
         {/* Left: image, then Key Features BELOW it on the page background — not overlaid on the
-            photo. Hides when there's neither an image nor a feature to show. */}
+            photo. Hides when there's neither an image nor a feature to show.
+
+            order-2 on mobile: Key Features drops BELOW the overview copy (Adinda, 2026-07-17). On a
+            narrow screen the columns stack, and leading with a photo + feature list buries the
+            heading that says what the page is about. Desktop keeps Figma's order (features left,
+            copy right) via lg:order-1. Using `order` rather than reordering the JSX keeps the DOM in
+            reading order for screen readers and keyboard tab order — the flip is purely visual. */}
         {keyFeatures.length || boat.keyFeaturesImage ? (
-          <div data-reveal className="flex w-full flex-col gap-[40px] lg:w-[480px] lg:shrink-0">
+          <div data-reveal className="order-2 flex w-full flex-col gap-[40px] lg:order-1 lg:w-[480px] lg:shrink-0">
             <div className="relative aspect-[485/387.2] w-full overflow-hidden">
               <Image
                 {...sanityImageProps(boat.keyFeaturesImage, '/assets/placeholder-photo.svg')}
@@ -112,12 +118,14 @@ export function BoatOverview({
           </div>
         ) : null}
 
-        <div className="flex flex-1 flex-col gap-24 lg:pl-24 lg:pr-48 lg:pt-64" data-reveal="left">
+        <div className="order-1 flex flex-1 flex-col gap-24 lg:order-2 lg:pl-24 lg:pr-48 lg:pt-64" data-reveal="left">
           {eyebrow ? (
             <p className="text-eyebrow uppercase text-action-primary">{eyebrow}</p>
           ) : null}
 
-          <div className="flex w-full flex-col gap-[48px]">
+          {/* gap-24, not Figma's 48 — Adinda's call 2026-07-17: halve the space between the H2 and
+              the body. A deliberate divergence from the mockup, not a miss. */}
+          <div className="flex w-full flex-col gap-24">
             {boat.overviewHeading ? (
               <h2 id="boat-overview-heading" className="text-display-h2 text-text-primary">
                 {boat.overviewHeading}

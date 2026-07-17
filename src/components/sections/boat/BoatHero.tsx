@@ -54,9 +54,17 @@ export function BoatHero({ boat }: { boat: BoatData }) {
       {/* data-reveal="left" — fade + slide in from the left, same as the homepage hero's content
           block. ScrollReveal (rendered by the page) adds [data-revealed]; the animation itself is
           pure CSS in globals.css, and is skipped entirely under prefers-reduced-motion. */}
+      {/* Mobile bottom padding is 144px, not 96 — lifts the hero content ~48px off the bottom edge
+          (Adinda, 2026-07-17: it sat too low). 144 isn't on the spacing scale (…96,128,160), so
+          it's an arbitrary value rather than rounded to 128 or 160 — the ask was a specific 48px
+          lift, and rounding would under- or overshoot it.
+          NOTE: the homepage hero solves this differently — `justify-center` + py-32, centring the
+          block in the viewport. Not copied here because this hero is bottom-anchored by design (the
+          SubNav lands at its bottom edge in Figma). If the lift still reads wrong, switching mobile
+          to the homepage's centred model is the next thing to try, not more padding. */}
       <div
         data-reveal="left"
-        className="flex w-full flex-col gap-32 page-gutter-x pb-96 pt-128 lg:gap-48 lg:pb-128"
+        className="flex w-full flex-col gap-32 page-gutter-x pb-[144px] pt-128 lg:gap-48 lg:pb-128"
       >
         <nav aria-label="Breadcrumb">
           <ol className="flex flex-wrap items-center gap-8 text-caption-label uppercase text-text-ondark-muted">
