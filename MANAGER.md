@@ -49,8 +49,9 @@ here rather than waiting for a chat-side skill-update round, because this file l
      over time. The verified Figma→CSS mapping (plus **3 traps** where a naive rename silently swaps colours)
      is written into `globals.css`'s primitives header. **Rule: match tokens by HEX, never by NAME.**
      Prevention for future builds queued in `_handoff/drk-website.md`.
-2. **`boatDefaults` singleton** — **~20–30min. MUST come BEFORE the boat page slice, not after.** See the
-   dedicated note below.
+2. ~~**`boatDefaults` singleton**~~ ✅ **DONE 2026-07-17** — see the checkpoint below. Estimate was ~0.5h
+   and it held (Adinda's earlier de-padding correction was right again). Nothing referenced the moved
+   fields, so it was a free move — which is exactly what "schema before frontend" was buying.
 2b. **Testimonials PAGE — SCHEDULED 2026-07-17 (Adinda): build it IN PARALLEL WITH THE FAQ PAGE, same
    slot (Jul 23). It does NOT get its own slot.** Her reasoning: the two pages are near-identical in shape
    (a singleton with eyebrow/heading/intro + `seo`, auto-listing docs the frontend already has components
@@ -141,6 +142,57 @@ exist** — which is why Figma's MCP hands back `var(--primitive-cream-10)`.
   target name belongs to a genuinely different colour.
 - Not blocking any build work. It costs nothing until someone reads a token name out of Figma — at which
   point it costs exactly what this whole episode cost.
+
+### ✅ CHECKPOINT 2026-07-17 PM — gallery divergence resolved + `boatDefaults` shipped (boat slice, step 1 of 3)
+
+**Model:** Opus 4.8 (1M context). Repo verified clean: `tsc` ✅ · `eslint` ✅ · `sanity schema validate` ✅
+(0 errors, 0 warnings) · dev server restarted clean, `/` 200 + `/studio` 200.
+
+**1. The `boat-mari` gallery divergence is CLOSED — empty on BOTH sides, as Adinda asked.**
+Published had 4, draft had 0. Cleared published, unset on both, **verified by querying BOTH `boat-mari`
+AND `drafts.boat-mari` independently** (`count(gallery)` = 0 on each) — the specific failure that caused
+this (verifying against the same side you patched) did not recur. Asset refs backed up to
+`_scripts/_gallery-backup-boat-mari.json` before the unset.
+- **The inspect confirmed the "smoke-test residue" read rather than assuming it:** `mari-hero-smoketest.jpg`
+  719KB, `exterior-001` + `-001-edited` the same shot twice, all four with null alt/title. Verifying *what*
+  was rescued, not just *that* it was — the lesson from this morning, applied.
+- **Note on the draft side:** its `_updatedAt` didn't move, because unsetting an already-absent field is a
+  no-op. The end state is still correct; worth knowing so a future reader doesn't read that as a failed write.
+
+**2. `boatDefaults` singleton built + seeded.** 8 fields moved off `boat`, 4 `showXEyebrow` toggles dropped.
+Mirrors `destinationDefaults`. Nested under **Boats** beside Boats / Cabin Types / Cabins, `.id()` set
+explicitly via the `singleton()` helper (the documented duplicate-list-item-ID prevention).
+- **`keyFeaturesHeading` → singleton, ADINDA CONFIRMED 2026-07-17.** The one open question from the handoff
+  is now closed: it's a generic label, not an editorial per-boat choice.
+- **Orphaned data cleaned.** Removing a field from the schema does NOT remove its data — `boat-mari` still
+  held `keyFeaturesHeading`/`cabinsHeading`/`galleryTitle`/`specificationsHeading` invisibly on both sides.
+  Unset on both. **Worth remembering: a field "move" is two jobs, schema and data.**
+- **A value that was already right:** `specificationsHeading` was already "Layout and specifications" on the
+  document, so the singleton's value is sourced from the dataset, not chosen by Claude.
+
+**3. Eyebrow copy — Adinda's correction, now a standing habit.** The first pass invented four generic
+eyebrows ("Discover Mari", "Every detail") — precisely the tourist-board filler `mari-core/brand/voice.md`
+bans. Her call: **inventing copy is fine (a content pass follows), but pull from `mari-core` /
+`mari-itineraries` / related skills FIRST** when Figma has no copy or looks like a wrong copy-paste.
+Redone against the locked positioning; three of four now have a real mari-core anchor, `galleryEyebrow`
+doesn't. All tagged in `_CONTENT-STATUS.md`. **This generalizes beyond eyebrows — queued for the skills.**
+
+**⚠️ NOT VERIFIED — Adinda's reload is the only real test.** Studio resolves structure client-side, so
+`curl /studio` 200 and `schema validate` **cannot** fail on a broken sidebar. The new "Boat Defaults" entry
+under Boats is unverified in a browser. Structurally the duplicate-ID class of bug is ruled out by
+construction (`.id('boatDefaults')` is unique in that list), but that is an argument, not a check.
+
+**⏭️ NEXT — step 2, boat page sections.** Two things to raise with Adinda first (below).
+
+### 🔴 OPEN — raise BEFORE building the boat page sections
+1. **Figma and the schema disagree on what sections exist.** `mari-website`'s `boat.md` lists **Amenities**
+   (`Section/Boat Page/Amenities`, node `718:5516`, 5 tabs) as a real section — **the `boat` schema has no
+   amenities field at all**. Conversely the schema has a **Gallery** section that Figma's section table
+   doesn't list. One of the two is wrong and it changes the slice's scope. **Not yet raised.**
+   - Amenities' 5 tab labels are also an open `[VERIFY]` owed to Serge, so it may be blocked regardless.
+2. **`/boat/mari` vs `/boat`.** The slug is `mari` but it was never a decision — it's whatever was typed
+   pre-rename, recovered from an orphaned draft. `_SCHEMA-SPECS.md` still flags the URL pattern as
+   unconfirmed. **Confirm before the route ships** (a `redirect` doc fixes it later, but cheaply now).
 
 ### 📅 DAY PLAN to the Jul 24 staging push — Adinda's re-shuffle 2026-07-16. Overrides the skill's day-by-day.
 **Jul 20 = DESTINATION ONLY, a deliberately BLOCKED day (Adinda's explicit call).** Private Charters was

@@ -16,6 +16,13 @@ import { sharedComponentNote } from '../../components/SharedComponentNote'
 // Cabin *types* and individual *cabins* are their own document types referencing this one, not
 // inline arrays here — keeps the boat/cabin-type/cabin hierarchy independently queryable.
 //
+// Shared section chrome lives on the `boatDefaults` singleton, NOT here (moved 2026-07-17):
+// overviewEyebrow, keyFeaturesHeading, cabinsEyebrow, cabinsHeading, galleryEyebrow, galleryTitle,
+// specificationsEyebrow, specificationsHeading. They're identical on every boat, so they're edited
+// once. What stays here is per-boat: overviewHeading, cabinsIntro, galleryDescription, and all real
+// content. The four `showXEyebrow` toggles were dropped in the same pass — an empty eyebrow in the
+// singleton simply doesn't render, which is what the toggle was for.
+//
 // Field-description discipline (2026-07-15): every `description:` string below is written to be
 // evergreen and generic — no dates, no names, no instance-specific examples (an editor working on
 // a *different* boat shouldn't read a description that only makes sense for the first one built).
@@ -133,13 +140,6 @@ export const boatType = defineType({
       fieldset: 'overviewFs',
     }),
     defineField({
-      name: 'keyFeaturesHeading',
-      type: 'string',
-      group: 'overview',
-      fieldset: 'overviewFs',
-      initialValue: 'Key features',
-    }),
-    defineField({
       name: 'keyFeatures',
       title: 'Key features',
       type: 'array',
@@ -147,22 +147,6 @@ export const boatType = defineType({
       group: 'overview',
       fieldset: 'overviewFs',
       description: 'Short bullet points. Add as many as needed.',
-    }),
-    defineField({
-      name: 'showOverviewEyebrow',
-      title: 'Show eyebrow?',
-      type: 'boolean',
-      group: 'overview',
-      fieldset: 'overviewFs',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'overviewEyebrow',
-      title: 'Overview eyebrow',
-      type: 'string',
-      group: 'overview',
-      fieldset: 'overviewFs',
-      hidden: ({ parent }) => !parent?.showOverviewEyebrow,
     }),
     defineField({
       name: 'overviewHeading',
@@ -184,29 +168,6 @@ export const boatType = defineType({
     // Cabins — own group (moved out of Overview 2026-07-15; it's its own page section, not part
     // of the overview visually or content-wise).
     defineField({
-      name: 'showCabinsEyebrow',
-      title: 'Show eyebrow?',
-      type: 'boolean',
-      group: 'cabins',
-      fieldset: 'cabinsFs',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'cabinsEyebrow',
-      title: 'Cabins eyebrow',
-      type: 'string',
-      group: 'cabins',
-      fieldset: 'cabinsFs',
-      hidden: ({ parent }) => !parent?.showCabinsEyebrow,
-    }),
-    defineField({
-      name: 'cabinsHeading',
-      type: 'string',
-      group: 'cabins',
-      fieldset: 'cabinsFs',
-      initialValue: 'Cabins',
-    }),
-    defineField({
       name: 'cabinsIntro',
       title: 'Cabins section intro',
       type: 'richTextBasic',
@@ -217,29 +178,6 @@ export const boatType = defineType({
 
     // Gallery — lives ON the page as a FLAT array (not separate documents, not grouped by
     // category — see the comment on the `gallery` field itself below for why). Locked 2026-07-15.
-    defineField({
-      name: 'showGalleryEyebrow',
-      title: 'Show eyebrow?',
-      type: 'boolean',
-      group: 'gallery',
-      fieldset: 'galleryFs',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'galleryEyebrow',
-      title: 'Gallery eyebrow',
-      type: 'string',
-      group: 'gallery',
-      fieldset: 'galleryFs',
-      hidden: ({ parent }) => !parent?.showGalleryEyebrow,
-    }),
-    defineField({
-      name: 'galleryTitle',
-      type: 'string',
-      group: 'gallery',
-      fieldset: 'galleryFs',
-      initialValue: 'Gallery',
-    }),
     defineField({
       name: 'galleryDescription',
       type: 'richTextBasic',
@@ -261,28 +199,6 @@ export const boatType = defineType({
     }),
 
     // Specifications
-    defineField({
-      name: 'showSpecificationsEyebrow',
-      title: 'Show eyebrow?',
-      type: 'boolean',
-      group: 'specifications',
-      fieldset: 'specificationsFs',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'specificationsEyebrow',
-      title: 'Specifications eyebrow',
-      type: 'string',
-      group: 'specifications',
-      fieldset: 'specificationsFs',
-      hidden: ({ parent }) => !parent?.showSpecificationsEyebrow,
-    }),
-    defineField({
-      name: 'specificationsHeading',
-      type: 'string',
-      group: 'specifications',
-      fieldset: 'specificationsFs',
-    }),
     defineField({
       name: 'layoutDiagrams',
       title: 'Layout / deck plan',

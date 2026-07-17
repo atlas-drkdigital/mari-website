@@ -21,6 +21,7 @@ import { announcementBarType } from './documents/announcementBar'
 import { pageType } from './documents/page'
 import { scheduleRatesType } from './documents/scheduleRates'
 import { boatType } from './documents/boat'
+import { boatDefaultsType } from './documents/boatDefaults'
 import { cabinTypeType } from './documents/cabinType'
 import { cabinDocType } from './documents/cabin'
 import { homePageType } from './documents/homePage'
@@ -61,6 +62,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     pageType,
     scheduleRatesType,
     boatType,
+    boatDefaultsType,
     cabinTypeType,
     cabinDocType,
     homePageType,
