@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Photo needed">
+  <rect width="800" height="600" fill="#d8d4cf"/>
+  <g fill="#8f8a83" font-family="system-ui, sans-serif" text-anchor="middle">
+    <text x="400" y="296" font-size="30" letter-spacing="2">PHOTO NEEDED</text>
+    <text x="400" y="332" font-size="19">see _CONTENT-STATUS.md</text>
+  </g>
+</svg>

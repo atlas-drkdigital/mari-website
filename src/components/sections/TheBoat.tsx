@@ -5,8 +5,13 @@ import { sanityImageProps } from '@/sanity/lib/image'
 import type { HomePageData } from '@/sanity/queries'
 
 // Ported from ../v1-static-homepage/sections/the-boat.html. Figma Home/Section/The Boat
-// 218:1327 — homepage teaser linking out to the full boat page (not built yet, href="#").
+// 218:1327 — homepage teaser linking out to the full boat page.
 // Pure hover effect (CSS scale), no interactivity — Server Component.
+//
+// The /boats/mari target was un-hardcoded from "#" when the boat slice shipped (2026-07-17),
+// per the standing per-slice sub-step: each slice fixes the links pointing AT the page it built.
+// The slug is literal on purpose — nav/footer structure stays hardcoded until the global-chrome
+// slice does the Sanity-driven wiring; only the target is corrected here.
 export function TheBoat({ home }: { home: HomePageData | null }) {
   const eyebrow = home?.theBoatEyebrow ?? ''
   const heading = home?.theBoatHeading ?? ''
@@ -15,7 +20,7 @@ export function TheBoat({ home }: { home: HomePageData | null }) {
     <section id="the-boat" aria-labelledby="the-boat-heading" className="flex w-full items-center bg-bg-page py-96 lg:py-80 min-h-[min(100dvh,1080px)]">
       <div className="mx-auto flex w-full max-w-[1280px] flex-col items-center gap-48 page-gutter-x lg:flex-row lg:gap-64">
         <a
-          href="#"
+          href="/boats/mari"
           aria-label="Learn more about the Mari phinisi"
           data-reveal
           className="group/boat relative block aspect-[529/794] w-full overflow-hidden lg:w-[48%] lg:shrink-0"
@@ -37,7 +42,7 @@ export function TheBoat({ home }: { home: HomePageData | null }) {
           <div className="flex flex-col gap-16 text-body-large text-text-primary">
             {home?.theBoatBody?.length ? <RichText value={home.theBoatBody} /> : null}
           </div>
-          <a href="#" className="group inline-flex w-fit items-center gap-4 border-b border-action-primary py-4 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:border-accent-muted hover:text-accent-muted">
+          <a href="/boats/mari" className="group inline-flex w-fit items-center gap-4 border-b border-action-primary py-4 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:border-accent-muted hover:text-accent-muted">
             {linkText}
             <span aria-hidden="true" className="block size-[16px] shrink-0 bg-action-primary transition-[background-color,transform] duration-300 ease-in-out group-hover:translate-x-[2px] group-hover:bg-accent-muted [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
           </a>

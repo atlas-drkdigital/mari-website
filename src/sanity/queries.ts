@@ -57,6 +57,67 @@ export const HOMEPAGE_QUERY = groq`{
   }
 }`
 
+// One fetch for a boat page: the boat itself, the boatDefaults singleton (shared section chrome —
+// eyebrows/headings edited once for every boat, carrying a {boat} token the frontend resolves), the
+// cabin types pointing AT this boat, plus the shared CTA + contact chrome.
+//
+// `defaults` is fetched separately rather than joined: it's a singleton, not a per-boat reference,
+// so there is nothing on the boat document to dereference.
+//
+// Cabin types are queried by their `boat` reference rather than being an inline array — keeps the
+// boat/cabinType hierarchy independently queryable (see cabinType.ts).
+export const BOAT_QUERY = groq`{
+  "boat": *[_type == "boat" && slug.current == $slug][0]{
+    _id, name, pageTitle, tagline,
+    "slug": slug.current,
+    coverImage${IMAGE},
+    stats[]{ _key, label, value },
+    "brochureUrl": brochurePdf.asset->url,
+    keyFeatures,
+    keyFeaturesImage${IMAGE},
+    overviewHeading, overviewBody,
+    cabinsIntro,
+    galleryDescription,
+    galleryTabs[]{ _key, category, heading, body },
+    gallery[]${IMAGE},
+    layoutDiagrams[]{ _key, heading, body, images[]${IMAGE} },
+    specifications[]{ _key, category, body },
+    faqSections[]{ _key, title, questions[]{ question, answer } },
+    seo
+  },
+  "defaults": *[_id == "boatDefaults"][0]{
+    overviewEyebrow, keyFeaturesHeading,
+    cabinsEyebrow, cabinsHeading,
+    galleryEyebrow, galleryTitle,
+    specificationsEyebrow, specificationsHeading
+  },
+  "cabinTypes": *[_type == "cabinType" && boat->slug.current == $slug] | order(order asc, name asc){
+    _id, name, count, maxGuests, description,
+    bedConfiguration, deckLocation, window, bathroom, airConditioning,
+    images[]${IMAGE}
+  },
+  "cta": *[_id == "cta"][0]{
+    cards[]{ _key, heading, description, buttonText, image${IMAGE} }
+  },
+  "settings": *[_id == "siteSettings"][0]{
+    contactEyebrow, contactHeading, contactIntro
+  },
+  "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
+    _id, name, "slug": slug.current
+  }
+}`
+
+// The /boats listing. Separate from BOAT_QUERY so the listing doesn't drag every boat's full
+// gallery + specs over the wire for a card it renders four fields of.
+export const BOATS_INDEX_QUERY = groq`{
+  "boats": *[_type == "boat" && defined(slug.current)] | order(name asc){
+    _id, name, pageTitle, tagline,
+    "slug": slug.current,
+    coverImage${IMAGE},
+    stats[]{ _key, label, value }
+  }
+}`
+
 // ----- Result types (manual — TypeGen not set up on this project yet) -----
 export type WhyUsItemData = {
   _id: string
@@ -138,6 +199,121 @@ export type HomePageData = {
   testimonialsHeading?: string
   testimonialsLinkText?: string
   testimonialItems?: TestimonialData[]
+}
+
+// ----- Boat page -----
+export type BoatStat = { _key: string; label?: string; value?: string }
+
+export type GalleryImageData = SanityImageWithMeta & {
+  _key: string
+  title?: string
+  caption?: string
+  categories?: string[]
+}
+
+export type GalleryTabData = {
+  _key: string
+  category?: string
+  heading?: string
+  body?: PortableTextBlock[]
+}
+
+export type LayoutDiagramData = {
+  _key: string
+  heading?: string
+  body?: PortableTextBlock[]
+  images?: SanityImageWithMeta[]
+}
+
+export type SpecCategoryData = {
+  _key: string
+  category?: string
+  body?: PortableTextBlock[]
+}
+
+export type FaqSectionData = {
+  _key: string
+  title?: string
+  questions?: FaqItemData[]
+}
+
+export type CabinTypeData = {
+  _id: string
+  name?: string
+  count?: number
+  maxGuests?: number
+  description?: PortableTextBlock[]
+  bedConfiguration?: string
+  deckLocation?: string
+  window?: string
+  bathroom?: string
+  airConditioning?: string
+  images?: SanityImageWithMeta[]
+}
+
+export type SeoData = {
+  metaTitle?: string
+  metaDescription?: string
+  noIndex?: boolean
+}
+
+export type BoatData = {
+  _id: string
+  name?: string
+  pageTitle?: string
+  tagline?: string
+  slug?: string
+  coverImage?: SanityImageWithMeta
+  stats?: BoatStat[]
+  brochureUrl?: string
+  keyFeatures?: string[]
+  keyFeaturesImage?: SanityImageWithMeta
+  overviewHeading?: string
+  overviewBody?: PortableTextBlock[]
+  cabinsIntro?: PortableTextBlock[]
+  galleryDescription?: PortableTextBlock[]
+  galleryTabs?: GalleryTabData[]
+  gallery?: GalleryImageData[]
+  layoutDiagrams?: LayoutDiagramData[]
+  specifications?: SpecCategoryData[]
+  faqSections?: FaqSectionData[]
+  seo?: SeoData
+}
+
+// Shared section chrome from the boatDefaults singleton. Every string here may contain a {boat}
+// token — resolve with resolveTokens() before rendering, never pass straight through.
+export type BoatDefaultsData = {
+  overviewEyebrow?: string
+  keyFeaturesHeading?: string
+  cabinsEyebrow?: string
+  cabinsHeading?: string
+  galleryEyebrow?: string
+  galleryTitle?: string
+  specificationsEyebrow?: string
+  specificationsHeading?: string
+}
+
+export type BoatQueryResult = {
+  boat: BoatData | null
+  defaults: BoatDefaultsData | null
+  cabinTypes: CabinTypeData[]
+  cta: { cards?: CtaCardData[] } | null
+  settings: SiteSettingsContact | null
+  destinations: { _id: string; name?: string; slug?: string }[]
+}
+
+export type BoatCardData = {
+  _id: string
+  name?: string
+  pageTitle?: string
+  tagline?: string
+  slug?: string
+  coverImage?: SanityImageWithMeta
+  stats?: BoatStat[]
+}
+
+export type BoatsIndexQueryResult = {
+  boats: BoatCardData[]
 }
 
 export type HomePageQueryResult = {

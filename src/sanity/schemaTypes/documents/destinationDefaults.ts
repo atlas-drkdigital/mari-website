@@ -1,5 +1,9 @@
 import { defineField, defineType } from 'sanity'
 
+// Shown under every section header in this form. Evergreen + generic per CLAUDE.md's
+// field-description discipline: no destination names, no dates, no instance-specific examples.
+const TOKEN_HINT = 'Type {destination} in any field here to insert the destination’s name automatically.'
+
 // Singleton (one document, id "destinationDefaults") — pinned in Structure, nested under the
 // "Destinations" folder in the sidebar. Holds the section eyebrows + headings that are the SAME
 // across every destination page, edited ONCE here instead of retyped on each destination (locked
@@ -19,15 +23,19 @@ export const destinationDefaultsType = defineType({
   type: 'document',
   description:
     'Shared eyebrows and section headings used on every destination page — edit once here. ' +
-    'Use {destination} to drop in a page’s destination name automatically.',
+    'Type {destination} in any field below to drop in the destination’s name automatically.',
+  // The {destination} hint repeats on EVERY fieldset, not just the document description (Adinda,
+  // 2026-07-17). A token nobody knows about is a token nobody uses, and the document-level
+  // description scrolls out of view as soon as an editor is working in a section. Mirrors
+  // `boatDefaults` — the two types are deliberately the same shape.
   fieldsets: [
-    { name: 'overview', title: 'Overview' },
-    { name: 'gallery', title: 'Gallery' },
-    { name: 'itineraries', title: 'Itineraries' },
-    { name: 'upcomingTrips', title: 'Upcoming Trips' },
-    { name: 'faq', title: 'FAQ' },
-    { name: 'boats', title: 'About the Boats' },
-    { name: 'articles', title: 'Latest Articles' },
+    { name: 'overview', title: 'Overview', description: TOKEN_HINT },
+    { name: 'gallery', title: 'Gallery', description: TOKEN_HINT },
+    { name: 'itineraries', title: 'Itineraries', description: TOKEN_HINT },
+    { name: 'upcomingTrips', title: 'Upcoming Trips', description: TOKEN_HINT },
+    { name: 'faq', title: 'FAQ', description: TOKEN_HINT },
+    { name: 'boats', title: 'About the Boats', description: TOKEN_HINT },
+    { name: 'articles', title: 'Latest Articles', description: TOKEN_HINT },
   ],
   fields: [
     defineField({

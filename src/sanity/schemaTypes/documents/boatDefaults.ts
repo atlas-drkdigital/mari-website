@@ -1,5 +1,9 @@
 import { defineField, defineType } from 'sanity'
 
+// Shown under every section header in this form. Evergreen + generic per CLAUDE.md's
+// field-description discipline: no boat names, no dates, no instance-specific examples.
+const TOKEN_HINT = 'Type {boat} in any field here to insert the boat’s name automatically.'
+
 // Singleton (one document, id "boatDefaults") — pinned in Structure, nested under the "Boats"
 // folder in the sidebar. Holds the section eyebrows + headings that are the SAME across every
 // boat page, edited ONCE here instead of retyped on each boat (locked 2026-07-17, Adinda). Use
@@ -38,12 +42,18 @@ export const boatDefaultsType = defineType({
   type: 'document',
   description:
     'Shared eyebrows and section headings used on every boat page — edit once here. ' +
-    'Use {boat} to drop in a page’s boat name automatically.',
+    'Type {boat} in any field below to drop in the boat’s name automatically.',
+  // The {boat} hint repeats on EVERY fieldset, not just the document description (Adinda,
+  // 2026-07-17: "we need to mention it somewhere that I know where it is... because it is
+  // confusing"). A token nobody knows about is a token nobody uses, and the document-level
+  // description scrolls out of view as soon as an editor is working in a section. Fieldset
+  // descriptions render under each section header, so the hint is wherever the editor is looking.
+  // Same treatment on `destinationDefaults` — the two types mirror each other.
   fieldsets: [
-    { name: 'overview', title: 'Overview' },
-    { name: 'cabins', title: 'Cabins' },
-    { name: 'gallery', title: 'Gallery' },
-    { name: 'specifications', title: 'Specifications' },
+    { name: 'overview', title: 'Overview', description: TOKEN_HINT },
+    { name: 'cabins', title: 'Cabins', description: TOKEN_HINT },
+    { name: 'gallery', title: 'Gallery', description: TOKEN_HINT },
+    { name: 'specifications', title: 'Specifications', description: TOKEN_HINT },
   ],
   fields: [
     defineField({
