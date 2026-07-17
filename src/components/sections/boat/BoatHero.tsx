@@ -38,6 +38,11 @@ export function BoatHero({ boat }: { boat: BoatData }) {
           alt={boat.coverImage?.alt ?? ''}
           fill
           priority
+          // 80, not the default 75 — matches the static build's photographic-hero pass.
+          // next.config.ts already allows [75, 80], but a quality Next isn't told to use is never
+          // used: every image on the site currently renders q=75, which made that config inert.
+          // This only helps a source image with pixels to spare; it cannot rescue an upscale.
+          quality={80}
           sizes="100vw"
           className="object-cover"
         />
