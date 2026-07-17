@@ -17,6 +17,39 @@ forward — this file is now the live one.
 Where the two disagree, **this list wins**. Adinda's explicit call 2026-07-16: capture sprint deviations
 here rather than waiting for a chat-side skill-update round, because this file loads first.
 
+### 🔵 GATED ITEM — componentize + write `COMPONENTS.md` (queued 2026-07-17, Adinda)
+**Trigger: the moment the boat page is finished.** Not now, and explicitly NOT mid-slice — but it is
+queued here so it doesn't evaporate, because it's the kind of task that only ever feels deferrable.
+
+**Adinda's ask, in her framing:** *"after we finish the boat page, let's make sure we componentize
+everything and set components as well, so that we can reuse the components that we've created in this
+project and other websites or other projects as well."* So the goal is **cross-project reuse — other
+Atlas boats AND other DRK clients** — not just tidying this repo.
+
+**Why the boat page is the right trigger and not the homepage:** the boat page is where the same shapes
+started repeating and the duplication became visible — the carousel arrow button (Cabins + Gallery +
+lightbox, which is exactly what forced `CarouselChevron` out on 2026-07-17), the tab strip (Cabins 14px /
+Gallery 12px — same component, different scale), the 708×532 image block (byte-identical between Cabins
+and Gallery), the section heading + eyebrow pair, and the round icon button. **One page's worth of
+evidence about what actually repeats beats a guess made up front** — this is the same reasoning already
+in CLAUDE.md for why `COMPONENTS.md` "ports at first use, not up front".
+
+**Scope when it runs:**
+- Extract the repeating primitives above into real shared components; `CarouselChevron` is the precedent
+  and the pattern (one asset + one component = uniform BY CONSTRUCTION, not by a number kept in sync).
+- **Create `COMPONENTS.md`** — the fourth doc in the split that CLAUDE.md has always described as "not yet
+  created, ports from the static build's `COMPONENTS.md` at first use". This is that moment.
+- **Split Mari-specific from DRK-reusable as you go** and queue the reusable half into
+  `_handoff/drk-website.md` — per the daily-recap classification rule (local vs `atlas-website`-wide vs
+  `drk-website`-wide). A component is only reusable across projects if its *spec* travels with it.
+- ⚠️ **Watch the token coupling.** These components read semantic tokens (`action-primary`, `bg-page`)
+  that are Mari's. A genuinely portable component takes the token as input rather than hardcoding it —
+  otherwise "reusable" means "copy-paste and then fix the colours", which is what we have today.
+
+**Estimate/model when scheduled:** ~3–4h, Sonnet-high (mechanical extraction against a settled design);
+escalate to Opus only for the portability boundary (what's Mari's vs what's DRK's), which is the one
+genuinely architectural call in it.
+
 ### Order of work (next sessions)
 1. ~~**auto-hide guards + FAQ min-height.**~~ ✅ **DONE 2026-07-17** — see the 2026-07-17 checkpoint below.
    Guards on Why Us / Latest Articles / FAQ / Testimonials (Destinations ✓ CTA ✓ already had them);
