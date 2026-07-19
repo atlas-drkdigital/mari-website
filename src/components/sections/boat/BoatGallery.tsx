@@ -117,8 +117,10 @@ export function BoatGallery({
 
   const lightboxImage = lightboxIndex === null ? null : all[lightboxIndex]
 
+  // Vertical padding GATED (audit 2026-07-20): desktop = Figma (96/160); mobile 64/96 to match the
+  // homepage rhythm. Was flat `pt-96 pb-160` — desktop-sized padding on phones.
   return (
-    <section id="gallery" aria-labelledby="boat-gallery-heading" className="w-full bg-bg-page pt-96 pb-160">
+    <section id="gallery" aria-labelledby="boat-gallery-heading" className="w-full bg-bg-page pt-64 pb-96 lg:pt-96 lg:pb-160">
       <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start justify-between gap-48 lg:flex-row lg:gap-64 lg:pl-160">
         <div className="flex w-full flex-col gap-48 page-gutter-x lg:w-auto lg:max-w-[560px] lg:flex-1 lg:px-0 lg:pt-64">
           <div className="flex flex-col gap-64">

@@ -18,8 +18,10 @@ export function BoatFaq({ boat }: { boat: BoatData }) {
   const sections = (boat.faqSections ?? []).filter((s) => s.questions?.length)
   if (!sections.length) return null
 
+  // Vertical padding GATED (audit 2026-07-20): desktop = Figma (120); mobile 64 to match the homepage
+  // + BoatOverview rhythm. Was flat `py-[120px]` — desktop-sized padding on phones.
   return (
-    <section id="faq" aria-labelledby="boat-faq-heading" className="w-full bg-bg-page py-[120px]">
+    <section id="faq" aria-labelledby="boat-faq-heading" className="w-full bg-bg-page py-64 lg:py-[120px]">
       <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-48 page-gutter-x">
         <h2 id="boat-faq-heading" className="text-display-h2 text-text-primary">
           Frequently asked questions

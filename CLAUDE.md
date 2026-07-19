@@ -51,10 +51,15 @@ timeline, the QA-pass scopes, and the page inventory. It's specifically the *day
 stale. When a deviation pushes a dated sprint item, **say so explicitly** rather than quietly absorbing it.
 
 ## Skills to load this session
-- `mari-project` — engagement status, active workstreams, what's next
 - `drk-website` — stack conventions (this file adds only what's Mari-specific)
 - `atlas-website` — liveaboard page inventory/content checklists
-- `mari-core` + `mari-website` — brand facts and page copy
+- `mari-core` — brand/product facts (source of truth for boat/destination/brand facts)
+- `mari-website` — **content LOOKUP LIBRARY ONLY** (page copy / SEO / URL reference). Do NOT auto-adhere,
+  and do NOT run it unprompted — consult it only when Adinda explicitly asks to fetch or look something up.
+  It is a reference to pull from, not a spec to follow. (Locked 2026-07-20, Adinda.)
+- **`mari-project` REMOVED 2026-07-20 (Adinda).** It duplicated and clashed with MANAGER.md — two competing
+  trackers. **MANAGER.md is now the SINGLE source of truth for status / queue / day-ordering.** The
+  chat-side skill source still exists; reinstall only if a non-repo context ever needs it.
 Load `atlas-destinations` / `mari-itineraries` only for destination or itinerary work specifically.
 
 **Also read every file in `_handoff/*.md` before relying on a skill's content as current.** Those files are
@@ -885,8 +890,33 @@ Once she agrees on a task, break it into a step-by-step subtask list, each subta
 estimate, small enough to start immediately. (A short note of reasoning is fine on a subtask where it
 genuinely matters; otherwise keep it to the step + estimate.)
 
+### 6. Work-tracking log — MANDATORY, non-skippable, at BOTH bookends (`drk-work-tracker`, locked 2026-07-18)
+Adinda is running a deliberate productivity experiment — how long things actually take, planned-vs-actual,
+where time leaks. The tooling for this already existed (MANAGER.md's "Session Time Log" + the daily-recap
+template) **but was not being filled** — Jul 16's full build day and all of Jul 17 went unlogged, the two
+biggest days of the week. So this is now an **enforced close-out step**, not a habit to remember. The
+`drk-work-tracker` skill owns the mechanics (authored chat-side, payload in `_handoff/_payload/drk-work-tracker.md`);
+this rule is what makes it fire. **Verification-ritual principle applies: a log that can be silently skipped
+is not a log.**
+- **At session CLOSE (every session, before wrap-up is called done):** run the LOG flow. (a) Derive the
+  session's elapsed window from git commit timestamps + the message span — do NOT ask her for elapsed, it's
+  derivable. (b) Ask her the ONE thing only she knows: **active desk time** (she steps away for kanji/cooking
+  while builds/scripts run — elapsed ≠ active, and that gap is real data, per the 2026-07-15 boat-schema row).
+  (c) Reconcile **planned → actual → unplanned** against the ACTIVE QUEUE / day plan: what was scheduled, what
+  shipped, what leaked in (bugs, false-alarm chases like the 2026-07-17 cache hunt, ad-hoc requests). (d) Note
+  **blockers**, carrying open ones forward. (e) Append the row to MANAGER.md's Session Time Log AND update the
+  day-plan actuals. (f) Compute **estimate accuracy** (planned est vs actual) so her estimates self-calibrate.
+- **At session START (with the recap / "good morning"):** run CARRY-FORWARD — surface open blockers +
+  yesterday's unfinished planned items + the running estimate-accuracy trend. This is the same start trigger
+  as the bookend, one step earlier in the flow.
+- **Manual override:** `/drk-work-tracker` (`log` / `recap` / `week`, or bare = infer from context).
+- **Honest-data boundary:** session start is git/clock-derivable; **active desk time stays a one-question
+  self-report** — only she knows when she stepped away. Enforced every session is the win, not measured-to-the-minute.
+
 Generalized (non-Mari) version queued for `drk-website`'s `references/workflow.md` via
-`_handoff/drk-website.md`, alongside the daily-recap-template + commit-cadence workflow conventions.
+`_handoff/drk-website.md`, alongside the daily-recap-template + commit-cadence workflow conventions. The
+`drk-work-tracker` skill itself is a NEW DRK-wide skill — payload staged in `_handoff/_payload/drk-work-tracker.md`,
+authored chat-side per the standard skill workflow.
 
 ## Review requests must always call out mobile explicitly, locked 2026-07-15
 Whenever Claude asks Adinda to review/QA something in a browser, the ask must name checking the **mobile

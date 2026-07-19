@@ -88,7 +88,10 @@ export function BoatCabins({
       aria-labelledby="boat-cabins-heading"
       // bg-accent-secondary (beige-100 #fbf8f2), NOT bg-page — Figma 778:8762 paints this section
       // one step warmer than the page ground so it lifts off it. Adinda, 2026-07-17.
-      className="w-full bg-bg-accent-secondary pt-[120px] pb-160"
+      // Vertical padding GATED (audit 2026-07-20): desktop = Figma (120/160); mobile pt-64 / pb-80
+      // (bottom = top +1 step on the scale — Adinda 2026-07-20, pb-96 read too big). Was flat
+      // `pt-[120px] pb-160` — desktop-sized padding on phones.
+      className="w-full bg-bg-accent-secondary pt-64 pb-80 lg:pt-[120px] lg:pb-160"
     >
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-48">
         {/* section-heading (778:8764) — 720px measure, centred.
@@ -240,12 +243,12 @@ export function BoatCabins({
                 ) : null}
               </div>
 
-              {/* Spec rows (778:8801+) — divider ABOVE every row except the first, plus one closing
-                  rule under the last (778:8844). #ece4d6 = border-subtle, added to @theme 2026-07-17
-                  because no semantic token resolved to it and this file previously reached for the
-                  unexposed `beige-200` primitive, rendering no border at all. */}
+              {/* Spec rows (778:8801+) — divider ABOVE every row except the first. NO closing rule under
+                  the last row: Figma (778:8844) has one, but Adinda removed it on BOTH mobile and desktop
+                  2026-07-20 — it dangled at the section's bottom edge and read as a hard stop. #ece4d6 =
+                  border-subtle (@theme 2026-07-17) is still what the between-row dividers use. */}
               {specRows.length ? (
-                <ul className="flex flex-col border-b border-border-subtle">
+                <ul className="flex flex-col">
                   {specRows.map((row, i) => (
                     <li
                       key={row.field}

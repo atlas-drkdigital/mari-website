@@ -10,7 +10,12 @@ forward — this file is now the live one.
 
 ---
 
-## 🔴 ACTIVE QUEUE — AUTHORITATIVE, OVERRIDES THE `mari-project` SKILL'S SPRINT (set 2026-07-16, Adinda)
+## ▶ RESUME POINT — see `_RESUME.md` (checkpoint 2026-07-20)
+**When Adinda asks "what's next," `_RESUME.md` is the single source.** In brief: boat Instance-1 mobile bug
+FIXED; `mari-project` skill REMOVED (MANAGER now sole tracker); 3 urgent skill-fix chat prompts queued for
+Adinda, then full skill round → 2nd audit → Phase 3 (slim CLAUDE.md). Full findings: `_AUDIT-2026-07-20.md`.
+
+## 🔴 ACTIVE QUEUE — AUTHORITATIVE, THE SOLE TRACKER (the `mari-project` skill was REMOVED 2026-07-20; MANAGER now owns status/queue/ordering)
 
 **Read this before planning any session.** The sprint in `mari-project`'s `working/sprint.md` is a
 *planning artifact that has drifted* — it does not know about work Adinda queued after it was written.
@@ -531,11 +536,12 @@ it exists), schema review (field names get expensive to change once real content
   against something. **Raise this with Adinda; don't silently absorb it.**
 - **The Testimonials page is a NEW page in the inventory**, not a re-order. The page count for the Jul 24
   staging push went up by one. The skill's page table needs it added at the next skill-update round.
-- The skill's sprint still lists **SEO as a separate QA-Pass-1 (Jul 24) + Content pass (Jul 28–29)**. That
-  is superseded: SEO structure + the image pipeline now fold **per-slice**, leaving only a light final
-  review. (Pre-existing flag, restated here so it's in one place.)
-- The skill's `references/pages/faq.md` (via `mari-website`) is **stale 3 ways** after the FAQ restructure —
-  see `_handoff/mari-website.md`. Don't plan FAQ work off it.
+- **[CORRECTED 2026-07-20 — these two were STALE-ABOUT-STALE, per the audit.]** (a) The "SEO as a separate
+  QA-Pass-1" note was already fixed in the skill; (b) `mari-website`'s `references/pages/faq.md` is **NOT**
+  "stale 3 ways" — it was made current 2026-07-17 (inline `faqSection`, `isFeatured` standard). Both false
+  warnings are removed here so they stop misleading. Real facts retained: SEO/image fold per-slice;
+  Testimonials is a new inventory page. NOTE: the `mari-project` skill (whose "sprint" this whole section
+  compared against) is UNINSTALLED as of 2026-07-20 — MANAGER.md is now the only tracker.
 
 ---
 

@@ -26,8 +26,10 @@ export function BoatSpecs({
 
   if (!specs.length && !diagrams.length) return null
 
+  // Vertical padding GATED (audit 2026-07-20): desktop = Figma (120); mobile 64 to match the homepage
+  // + BoatOverview rhythm. Was flat `py-[120px]` — desktop-sized padding on phones.
   return (
-    <section id="layout-and-specs" aria-labelledby="boat-specs-heading" className="w-full bg-bg-page py-[120px]">
+    <section id="layout-and-specs" aria-labelledby="boat-specs-heading" className="w-full bg-bg-page py-64 lg:py-[120px]">
       <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-48 page-gutter-x lg:flex-row lg:gap-64">
         <div className="flex flex-1 flex-col gap-32">
           <div className="flex flex-col gap-24">
