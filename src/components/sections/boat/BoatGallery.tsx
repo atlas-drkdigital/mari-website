@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 
@@ -111,6 +111,7 @@ export function BoatGallery({
   )
 
   const [tabIndex, setTabIndex] = useState(0)
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
   const [imageIndex, setImageIndex] = useState(0)
   // `lightboxIndex === null` means closed. `hasOpened` latches TRUE on the first open and never
   // resets: it is what keeps the dynamic chunk out of the initial load while still letting YARL run
@@ -142,6 +143,29 @@ export function BoatGallery({
     if (visible.length < 2) return
     setImageIndex((i) => (i + delta + visible.length) % visible.length)
   }
+
+  // Scroll the ACTIVE tab into view — same behaviour as the homepage Destinations strip
+  // (Destinations.tsx:43-49). Clicking a partly-hidden tab (e.g. "Relaxation" clipped at the right
+  // edge on a phone) has to bring it fully into view, or the tab you just selected stays hidden.
+  // `inline: 'start'` aligns it to the left of the track; near the end the browser clamps to max
+  // scroll on its own, so the last tabs show as much trailing content as exists rather than
+  // over-scrolling.
+  // 🔴 The mount guard is NOT optional. This effect also fires on mount, and `block: 'nearest'`
+  // scrolls the PAGE vertically when the tab isn't in the viewport — which it never is on load,
+  // since visitors start at the top. Without it, every page load jumps straight to the gallery.
+  // Destinations hit exactly this; the comment there spells it out.
+  const skipFirstScrollIntoView = useRef(true)
+  useEffect(() => {
+    if (skipFirstScrollIntoView.current) {
+      skipFirstScrollIntoView.current = false
+      return
+    }
+    tabRefs.current[tabIndex]?.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'start',
+      block: 'nearest',
+    })
+  }, [tabIndex])
 
   const closeLightbox = useCallback(() => setLightboxIndex(null), [])
   const openLightbox = useCallback((index: number) => {
@@ -194,7 +218,10 @@ export function BoatGallery({
           DOM order is heading → panel → image, i.e. reading order, so screen readers and tab order
           keep the copy together regardless of the visual arrangement. */}
       <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-start gap-48 lg:grid-cols-[minmax(0,560px)_708px] lg:justify-between lg:gap-x-64 lg:gap-y-48 lg:pl-160">
-        <div className="order-1 flex w-full flex-col gap-48 page-gutter-x lg:order-none lg:col-start-1 lg:row-start-1 lg:px-0">
+        {/* lg:pr-48 matches the tab panel below (Adinda, 2026-07-20) — the whole left column now
+            carries the same deliberate right-side asymmetry, not just the panel. DESKTOP ONLY: on
+            mobile the column keeps the plain page gutter on both sides. */}
+        <div className="order-1 flex w-full flex-col gap-48 page-gutter-x lg:order-none lg:col-start-1 lg:row-start-1 lg:px-0 lg:pr-48">
           <div className="flex flex-col gap-64">
             {/* Block/SectionHeading (778:8849) — gap-34 is off-scale, so it's an arbitrary value.
                 NOTE: this node has NO eyebrow child (unlike Cabins' SectionHeading). It's rendered
@@ -242,30 +269,28 @@ export function BoatGallery({
                       the tabs, so it reaches to ~12px before the arrows (Adinda, 2026-07-20). The
                       border lives on the SCROLL CONTAINER, so it spans the flex-1 track rather than
                       ending after the last tab. Each tab's own border-b-2 draws over it at the same
-                      offset, so the active tab still reads as a solid segment on the lighter rail.
-                      Desktop drops it (`lg:border-b-0`) — there the arrows sit up by the heading and
-                      the rail would run to the column edge with nothing to stop at. */}
+                      See the rail span after the tabs — it bridges the gap to the arrows on mobile
+                      without putting a competing border on this container. */}
                   <div
                     role="tablist"
                     aria-label="Gallery categories"
-                    className="flex min-w-0 flex-1 overflow-x-auto border-b-2 border-action-primary/35 [-ms-overflow-style:none] [scrollbar-width:none] lg:overflow-visible lg:border-b-0 [&::-webkit-scrollbar]:hidden"
+                    className="flex min-w-0 flex-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden"
                   >
                     {tabs.map((tab, i) => {
                       const selected = i === tabIndex
                       return (
                         <button
                           key={tab._key}
+                          ref={(el) => {
+                            tabRefs.current[i] = el
+                          }}
                           role="tab"
                           type="button"
                           id={`gallery-tab-${tab._key}`}
                           aria-selected={selected}
                           aria-controls={`gallery-panel-${tab._key}`}
                           onClick={() => selectTab(i)}
-                          // -mb-[2px] pulls each tab down over the container's rail so the ACTIVE
-                          // tab's 2px border REPLACES it rather than stacking above it. Without this
-                          // the two borders sit at different offsets and the active segment looks
-                          // thinner than the rail it's meant to cover (Adinda spotted it 2026-07-20).
-                          className={`-mb-[2px] shrink-0 border-b-2 px-12 py-8 text-button-small whitespace-nowrap uppercase transition-colors duration-300 ease-in-out ${
+                          className={`shrink-0 border-b-2 px-12 py-8 text-button-small whitespace-nowrap uppercase transition-colors duration-300 ease-in-out ${
                             selected
                               ? 'border-action-primary text-action-primary'
                               : 'border-action-primary/35 text-action-primary/55 hover:text-action-primary'
@@ -275,6 +300,20 @@ export function BoatGallery({
                         </button>
                       )
                     })}
+
+                    {/* Rail that fills ONLY the leftover gap between the last tab and the arrows
+                        (Adinda, 2026-07-20). It is a flex sibling of the tabs, NOT a border on the
+                        container — that earlier approach put two 2px borders at the same offset, and
+                        the active tab's border ended up competing with the container's instead of
+                        replacing it, which is why the active state looked like it didn't fully cover.
+                        min-w-0 + flex-1 means it collapses to nothing when the tabs already overflow,
+                        so it never forces a scroll of its own. aria-hidden keeps a non-tab child out
+                        of the tablist's accessibility tree. Mobile only — on desktop the arrows sit
+                        up by the heading, so there is no gap to bridge. */}
+                    <span
+                      aria-hidden="true"
+                      className="min-w-0 flex-1 shrink border-b-2 border-action-primary/35 lg:hidden"
+                    />
                   </div>
                   <CategoryArrows
                     onPrev={() => stepTab(-1)}
