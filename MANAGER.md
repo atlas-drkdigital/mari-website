@@ -160,6 +160,68 @@ the overhead once, and don't price the user's own review time as build time.**
      ⚠️ **Do not build speculatively** — this is the `isFeatured` / section-toggles trap. Research, propose,
      get Adinda's call, then build. A Perplexity prompt was drafted for her on 2026-07-17.
 
+### ✅ CHECKPOINT 2026-07-20 (3) — YARL adopted, boat page polish, Layout & Specs rebuilt
+**Model:** Opus 4.8 (1M context). `tsc` ✅ · `eslint` 0 errors · `/` `/boats/mari` `/yarl-test` all 200.
+Commits: `d72cd31` `bab1505` `f495f1d` `207dfd7` (plus the SEO chain in checkpoint 2).
+
+**🔴 NOTHING IN THIS CHECKPOINT HAS BEEN CLICKED.** Every automated check passes, but no lightbox
+has been opened and the new Specs section has not been seen rendered. `tsc`/lint/200 cannot prove
+either works — that is the whole point of the "a ritual that cannot fail is not a check" rule.
+
+#### YARL adopted (Adinda's verdict after reviewing /yarl-test: "I do want YARL")
+- **`src/components/SiteLightbox.tsx` is NEW** — one shared component holding the approved config,
+  and the dynamic-import boundary. Not duplicated into both sections: the config took many rounds to
+  settle and two copies would drift. Same reasoning as `CarouselChevron`. **This is a head start on
+  the componentization block already queued above.**
+- Dynamic import, `ssr: false`, with a `hasOpened` latch — verified ZERO `yarl__` markup in the
+  initial payload, so the ~40KB only loads on first open.
+- **Cabins now HAS a lightbox** (it never did). All cabin types combined into one, each slide
+  labelled from `cabinType.name`. Opening from Superior lands on the Superior photo, not slide 0.
+  `cabinType.images` is `imageWithAlt` with NO caption field, so `alt` doubles as the caption.
+- ⚠️ **Unreviewed behaviour change:** the old lightbox hid the thumbnail filmstrip on mobile; the
+  approved reference does not, so it now shows there.
+
+#### Schema — `galleryImage.title` REMOVED
+It duplicated `alt` (every seeded image had both set to the identical string). ⚠️ Existing documents
+still CARRY title values — Sanity does not delete data when a field leaves the schema. Left
+deliberately as the only record of the old values.
+
+#### Boat page polish (all Adinda-directed, all unreviewed)
+Gallery is now a **GRID, not flex** — on mobile the tab panel must sit BELOW the image while the
+heading stays above, and those two are not siblings, so `order` cannot reach across the nesting.
+Desktop is visually identical. Tab rail is a spacer sibling filling only the gap to the arrows (the
+earlier border-on-container approach put two 2px borders at the same offset and the active tab
+looked like it didn't cover). Tab scroll-into-view copied from Destinations — **its mount guard is
+load-bearing**, without it every page load jumps to the gallery.
+Cabins: mobile gap 80→24, tabs 12px on mobile, `deckLocation` moved into the eyebrow.
+Overview: read-more threshold −80px desktop only; button up 16px when collapsed.
+Lightbox caption: one bottom line, count first, beige-50, gradient into the scrim, **clamp removed**
+(`descriptionMaxLines` is `-webkit-line-clamp`, so long captions truncated instead of wrapping).
+
+#### Layout & Specs rebuilt (`207dfd7`)
+Tabs copied from Cabins, accordion from the homepage FAQ with ondark→light token substitutions.
+⚠️ **Built WITHOUT a Figma node link** — the standing rule asks for one; it wasn't available and
+Adinda asked to start. Spacing needs a pass against the real node.
+⚠️ **No longer `<details>/<summary>`** — incompatible with the FAQ's animation (the UA hides children
+instantly when `open` drops, so the transition never runs). Keyboard access and crawlability are
+both preserved.
+⚠️ `layoutDiagrams` is EMPTY in Sanity, so the Layout tab hides and only one tab shows.
+
+#### Open / owed
+- 🔴 **Click the two lightboxes** — gallery and cabins, desktop and phone.
+- 🔴 **Review the rebuilt Specs section rendered**, incl. mobile (two-col → one-col, scrolling tabs).
+- 🔵 Delete `/yarl-test` once the real lightboxes are confirmed — it is now redundant.
+- 🔵 Mobile filmstrip: show or hide?
+- 🔵 Single-tab strip on Specs: keep or hide?
+- 🔵 Figma node link for Layout & Specs.
+- 🔵 Gallery captions are PLACEHOLDER copy — replace before launch.
+- 🔵 `_boat.md`'s "Verification Required" list (9 items) — Adinda says the claims are correct, but
+  they are now live on the page and were never formally confirmed.
+- 🔵 Image SEO: only 3 of 23 gallery images reach the HTML. Research says hidden images are NOT
+  reliably indexed; the ranked fix is a real `/gallery` page, then a scroll-snap track, then an
+  image sitemap. Not started.
+- 🔵 Session time log for 2026-07-20 STILL not filled.
+
 ### ✅ CHECKPOINT 2026-07-20 (2) — SEO wiring fixed end-to-end + boat page polish pass
 **Model:** Opus 4.8 (1M context). `tsc` ✅ · `eslint` 0 errors (17 pre-existing warnings) ·
 `/` `/boats/mari` `/yarl-test` all 200 after a clean restart (`.next` removed, server killed by PID —
