@@ -85,6 +85,11 @@
   --amber-600: #b58a2d;
   --navy-900: #1b2a4a;
   --navy-950: #131d34;
+  /* Extends the navy ramp below Figma's darkest step (2026-07-20, Adinda). Added for the lightbox
+     scrim, which needed to go darker than navy-950 — that was already the darkest primitive.
+     Near-black but NOT pure black: it keeps a faint navy cast so the scrim reads as part of this
+     palette rather than a system default, against a site that is otherwise warm cream. */
+  --navy-975: #0a111f;
   --stone-500: #7c7469;
   --red-700: #c10007;
   --green-600: #008236;
@@ -189,6 +194,11 @@
   --color-status-limited: var(--red-700);
   --color-status-available: #016630; /* no primitive match */
   --color-background-ondark-muted: var(--navy-950);
+  /* Lightbox scrim — its own semantic token, not background-ondark-muted, because the two have
+     different jobs: ondark-muted is a SECTION background (content sits on it), this is an overlay
+     that must recede behind a photo. Sharing one token would mean a future tweak to either silently
+     moves the other. */
+  --color-background-lightbox-scrim: var(--navy-975);
   --color-background-ondark-page: var(--navy-900);
   --color-background-ondark-surface: #fdfcfa0a; /* translucent (baked alpha) */
   --color-background-onimage-surface: var(--navy-900);

@@ -130,7 +130,9 @@ export function BoatGallery({
                 empty in Studio to match the mockup. Flagged for review. */}
             <div className="flex flex-col gap-[34px]">
               <div className="flex items-center justify-between gap-24">
-                <div className="flex min-w-0 flex-1 flex-col gap-8">
+                {/* gap-24, NOT Figma's gap-8 — every homepage section heading uses gap-24 between
+                    eyebrow and h2 (TheBoat.tsx). Conventions supersede Figma; see CLAUDE.md. */}
+                <div className="flex min-w-0 flex-1 flex-col gap-24">
                   {eyebrow ? (
                     <p className="text-eyebrow uppercase text-text-eyebrow">{eyebrow}</p>
                   ) : null}
@@ -144,6 +146,43 @@ export function BoatGallery({
                     destination and there is no /gallery route, and no schema field to hold the link
                     — building a button that goes nowhere is worse than omitting it. See §2 of the
                     review doc. */}
+
+                {/* Category arrows, moved here 2026-07-20 from below the tab panel to sit beside the
+                    heading — the Destinations pattern (Destinations.tsx:68-97), which is the homepage
+                    precedent for arrows sharing a row with section header content.
+                    Two things changed with the move, both deliberate:
+                    - Size is now 36/52 responsive (was flat 52), matching Destinations.
+                    - The glyph was the raw character `→`. A typeface decides a glyph's weight and
+                      shape, so it never matches the site's other arrows — the exact problem that
+                      produced CarouselChevron. Now a CSS mask of the SAME asset Destinations uses,
+                      so weight is uniform BY CONSTRUCTION. Colour is action-primary (cream section),
+                      not Destinations' ondark tokens. */}
+                {tabs.length > 1 ? (
+                  <div className="flex shrink-0 gap-12">
+                    <button
+                      type="button"
+                      onClick={() => stepTab(-1)}
+                      aria-label="Previous category"
+                      className="group grid size-[36px] shrink-0 place-items-center rounded-full border border-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary lg:size-[52px]"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="block size-[16px] rotate-180 bg-action-primary transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-action-primary-text [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+                      />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => stepTab(1)}
+                      aria-label="Next category"
+                      className="group grid size-[36px] shrink-0 place-items-center rounded-full border border-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary lg:size-[52px]"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="block size-[16px] bg-action-primary transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-action-primary-text [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+                      />
+                    </button>
+                  </div>
+                ) : null}
               </div>
 
               {/* tab-items (778:8850) — continuous 2px underline track, so tabs butt together
@@ -203,50 +242,34 @@ export function BoatGallery({
             ) : null}
           </div>
 
-          {/* Element/Carousel/Arrows Paired (778:8861) — these move between CATEGORIES. */}
-          {tabs.length > 1 ? (
-            <div className="flex gap-12">
-              <button
-                type="button"
-                onClick={() => stepTab(-1)}
-                aria-label="Previous category"
-                className="flex size-[52px] items-center justify-center rounded-full border border-action-primary text-action-primary transition-colors duration-300 hover:bg-action-primary hover:text-action-primary-text"
-              >
-                <span aria-hidden className="rotate-180 text-[20px] leading-none">
-                  →
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => stepTab(1)}
-                aria-label="Next category"
-                className="flex size-[52px] items-center justify-center rounded-full border border-action-primary text-action-primary transition-colors duration-300 hover:bg-action-primary hover:text-action-primary-text"
-              >
-                <span aria-hidden className="text-[20px] leading-none">
-                  →
-                </span>
-              </button>
-            </div>
-          ) : null}
+          {/* Element/Carousel/Arrows Paired (778:8861) moved UP into the heading row — see the note
+              there. Figma places these below the tab panel; the homepage convention puts section
+              arrows beside the heading, and conventions supersede Figma. */}
         </div>
 
         {/* Image sits flush to the right edge (the frame has pl-160 only, no pr) — mirror image of
             the Cabins block, which is flush left. */}
         <div className="w-full shrink-0 lg:w-[708px]">
+          {/* aspect-[3/2] (2026-07-20, Adinda) — was 708/532 (1.331). Now matches Key Features
+              (BoatOverview.tsx:142) and Cabins, so every non-hero image block on the page shares
+              one ratio. */}
           {visible.length ? (
-            <div className="relative aspect-[708/532] w-full overflow-hidden">
+            <div className="group/gallery relative aspect-[3/2] w-full overflow-hidden" data-reveal>
               <button
                 type="button"
                 onClick={() => setLightboxIndex(all.indexOf(currentImage))}
                 aria-label={`Open ${currentImage?.title ?? 'photo'} in full screen`}
                 className="absolute inset-0 block size-full cursor-zoom-in"
               >
+                {/* Hover zoom — the site-wide treatment for every non-hero image (TheBoat, WhyUs,
+                    Destinations, Cta, LatestArticles). It is opt-in per component, not automatic,
+                    which is why this section never had it. duration-[1100ms] matches TheBoat. */}
                 <Image
                   {...sanityImageProps(currentImage, '/assets/placeholder-photo.svg')}
                   alt={currentImage?.alt ?? ''}
                   fill
                   sizes="(min-width: 1024px) 708px, 100vw"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-[1100ms] ease-in-out group-hover/gallery:scale-105"
                 />
               </button>
 
@@ -281,7 +304,7 @@ export function BoatGallery({
           role="dialog"
           aria-modal="true"
           aria-label="Gallery"
-          className="fixed inset-0 z-50 flex flex-col bg-background-ondark-muted/95 p-16 pb-[env(safe-area-inset-bottom)] lg:p-24"
+          className="fixed inset-0 z-50 flex flex-col bg-background-lightbox-scrim/95 backdrop-blur-md p-16 pb-[env(safe-area-inset-bottom)] lg:p-24"
         >
           <div className="flex shrink-0 items-center justify-between gap-16 pb-16">
             <p className="text-body-medium text-text-ondark-secondary">

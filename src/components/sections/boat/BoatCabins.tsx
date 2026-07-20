@@ -118,11 +118,18 @@ export function BoatCabins({
         <div className="flex flex-col gap-80">
           {/* tab-items (778:8770) — the underline is a continuous 2px track across the whole row, so
               the tabs butt together (px-12 each, NO gap) rather than sitting apart. On mobile the row
-              scrolls horizontally instead of wrapping, which keeps that track unbroken. */}
+              scrolls horizontally instead of wrapping, which keeps that track unbroken.
+              justify-center on mobile too (2026-07-20, Adinda) — was justify-start. Desktop was
+              already centred, so this only changes mobile.
+              ⚠️ Caveat if cabin types grow: with overflow-x-auto, a centred flex row whose content is
+              WIDER than the viewport becomes unscrollable at the start edge in some browsers — the
+              first tab gets clipped and can't be reached. Two types fit comfortably today. If a third
+              is ever added, re-check on a narrow phone and fall back to justify-start when
+              overflowing. */}
           <div
             role="tablist"
             aria-label="Cabin types"
-            className="flex justify-start overflow-x-auto page-gutter-x lg:justify-center lg:overflow-visible lg:px-0"
+            className="flex justify-center overflow-x-auto page-gutter-x lg:justify-center lg:overflow-visible lg:px-0"
           >
             {cabinTypes.map((cabin, i) => {
               const selected = i === typeIndex
@@ -156,14 +163,19 @@ export function BoatCabins({
             {/* Image block is a fixed 708x532 on desktop (778:8775), full-bleed on mobile. That 708
                 is why `sizes` says 708px — 2x target 1416px. Do NOT swap this for a vw fraction
                 without re-reading the node: every image-resolution verdict depends on this number. */}
-            <div className="relative aspect-[708/532] w-full shrink-0 overflow-hidden lg:w-[708px]">
+            {/* aspect-[3/2] (2026-07-20, Adinda) — was 708/532 (1.331), now matches Key Features and
+                the Gallery. NOTE the sizes= caveat above still holds: the slot is still 708px wide on
+                desktop, only its HEIGHT changed, so the resolution targets are unaffected. */}
+            <div className="group/cabin relative aspect-[3/2] w-full shrink-0 overflow-hidden lg:w-[708px]" data-reveal>
+              {/* Hover zoom + data-reveal — site-wide non-hero image treatment; opt-in per
+                  component, which is why this section never had it. */}
               {currentImage ? (
                 <Image
                   {...sanityImageProps(currentImage, '/assets/placeholder-photo.svg')}
                   alt={currentImage.alt ?? ''}
                   fill
                   sizes="(min-width: 1024px) 708px, 100vw"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-[1100ms] ease-in-out group-hover/cabin:scale-105"
                 />
               ) : null}
 
