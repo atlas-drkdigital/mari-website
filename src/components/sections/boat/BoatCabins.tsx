@@ -166,7 +166,13 @@ export function BoatCabins({
             {/* aspect-[3/2] (2026-07-20, Adinda) — was 708/532 (1.331), now matches Key Features and
                 the Gallery. NOTE the sizes= caveat above still holds: the slot is still 708px wide on
                 desktop, only its HEIGHT changed, so the resolution targets are unaffected. */}
-            <div className="group/cabin relative aspect-[3/2] w-full shrink-0 overflow-hidden lg:w-[708px]" data-reveal>
+            {/* cursor-zoom-in matches the Gallery (Adinda, 2026-07-20 — the hover CTA overlay was
+                tried and rejected as "annoying"; the zoom cursor is the affordance instead).
+                ⚠️ Cabins has NO lightbox yet, so the cursor currently promises a zoom that does not
+                happen. Accepted knowingly while the cabin lightbox is pending the YARL decision —
+                it is a far smaller lie than a button that does nothing, and it becomes true the
+                moment that lands. When it does, this <div> becomes a <button> wrapping the image. */}
+            <div className="group/cabin relative aspect-[3/2] w-full shrink-0 cursor-zoom-in overflow-hidden lg:w-[708px]" data-reveal>
               {/* Hover zoom + data-reveal — site-wide non-hero image treatment; opt-in per
                   component, which is why this section never had it. */}
               {currentImage ? (
@@ -179,23 +185,28 @@ export function BoatCabins({
                 />
               ) : null}
 
+              {/* Bare chevrons, no circle — see the matching note in BoatGallery. These step through
+                  PHOTOS; the round arrows by the heading step through CABIN TYPES, and the two read
+                  as one control when both are white circles. z-10 keeps them above the hover overlay. */}
               {images.length > 1 ? (
-                <div className="absolute inset-x-16 top-1/2 flex -translate-y-1/2 items-center justify-between">
+                <div className="absolute inset-x-16 top-1/2 z-10 flex -translate-y-1/2 items-center justify-between">
                   <button
                     type="button"
                     onClick={() => stepImage(-1)}
                     aria-label="Previous photo"
-                    className="flex size-[36px] items-center justify-center rounded-full bg-bg-surface text-text-primary shadow-[0_4px_20px_2px_#2C252233] transition-opacity duration-300 hover:opacity-80"
+                    style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
+                    className="flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
                   >
-                    <CarouselChevron direction="left" />
+                    <CarouselChevron direction="left" sizeClassName="h-[12.13px] w-[16px]" />
                   </button>
                   <button
                     type="button"
                     onClick={() => stepImage(1)}
                     aria-label="Next photo"
-                    className="flex size-[36px] items-center justify-center rounded-full bg-bg-surface text-text-primary shadow-[0_4px_20px_2px_#2C252233] transition-opacity duration-300 hover:opacity-80"
+                    style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
+                    className="flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
                   >
-                    <CarouselChevron direction="right" />
+                    <CarouselChevron direction="right" sizeClassName="h-[12.13px] w-[16px]" />
                   </button>
                 </div>
               ) : null}

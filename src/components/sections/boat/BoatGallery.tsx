@@ -298,25 +298,39 @@ export function BoatGallery({
                   sizes="(min-width: 1024px) 708px, 100vw"
                   className="object-cover transition-transform duration-[1100ms] ease-in-out group-hover/gallery:scale-105"
                 />
+
               </button>
 
+              {/* Bare chevrons — NO circle (Adinda, 2026-07-20). The white circular buttons read as
+                  the same control as the round CATEGORY arrows beside the heading, so two different
+                  jobs looked identical and competed. These step through PHOTOS; those step through
+                  CATEGORIES. Stripping the circle separates them visually.
+                  Legibility over a photo now comes from a drop-shadow instead of the circle. It is an
+                  inline style, not an arbitrary class: `filter:drop-shadow(...)` contains commas and
+                  parens that Tailwind's class parser mangles — the same family of trap as the escaped
+                  url() that 500'd the site earlier today. drop-shadow follows the mask's alpha, so it
+                  traces the chevron outline rather than boxing it.
+                  Chevron scaled 10 -> 16px wide since there's no longer a circle giving it presence;
+                  height follows the 7.91668:6 viewBox ratio (see CarouselChevron). */}
               {visible.length > 1 ? (
                 <div className="pointer-events-none absolute inset-x-16 top-1/2 flex -translate-y-1/2 items-center justify-between">
                   <button
                     type="button"
                     onClick={() => stepImage(-1)}
                     aria-label="Previous photo"
-                    className="pointer-events-auto flex size-[36px] items-center justify-center rounded-full bg-bg-surface text-text-primary shadow-[0_4px_20px_2px_#2C252233] transition-opacity duration-300 hover:opacity-80"
+                    style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
+                    className="pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
                   >
-                    <CarouselChevron direction="left" />
+                    <CarouselChevron direction="left" sizeClassName="h-[12.13px] w-[16px]" />
                   </button>
                   <button
                     type="button"
                     onClick={() => stepImage(1)}
                     aria-label="Next photo"
-                    className="pointer-events-auto flex size-[36px] items-center justify-center rounded-full bg-bg-surface text-text-primary shadow-[0_4px_20px_2px_#2C252233] transition-opacity duration-300 hover:opacity-80"
+                    style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
+                    className="pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
                   >
-                    <CarouselChevron direction="right" />
+                    <CarouselChevron direction="right" sizeClassName="h-[12.13px] w-[16px]" />
                   </button>
                 </div>
               ) : null}
@@ -331,7 +345,7 @@ export function BoatGallery({
           role="dialog"
           aria-modal="true"
           aria-label="Gallery"
-          className="fixed inset-0 z-50 flex flex-col bg-background-lightbox-scrim/95 backdrop-blur-md p-16 pb-[env(safe-area-inset-bottom)] lg:p-24"
+          className="fixed inset-0 z-50 flex flex-col bg-background-lightbox-scrim/92 backdrop-blur-md p-16 pb-[env(safe-area-inset-bottom)] lg:p-24"
         >
           <div className="flex shrink-0 items-center justify-between gap-16 pb-16">
             <p className="text-body-medium text-text-ondark-secondary">
