@@ -30,6 +30,50 @@ import type { BoatData, GalleryImageData, GalleryTabData } from '@/sanity/querie
 // The image block is 708.144 x 532.072 — IDENTICAL to the cabins block (778:8775), which is why
 // `sizes` says 708px and every image verdict uses a 1416px @2x target. The old code claimed 55vw
 // (=792px); that was never in the design. Do not reintroduce a vw fraction here.
+// Paired round CATEGORY arrows. Rendered TWICE — beside the heading on desktop, at the end of the
+// tab row on mobile — because the two breakpoints want them in structurally different places and
+// only one is ever visible (`hidden lg:flex` / `flex lg:hidden`). One component, so a change to the
+// hover state or the icon cannot land on one and miss the other.
+//
+// The glyph is a CSS mask of icon-arrow-forward.svg, the SAME asset Destinations uses, rotated for
+// "previous". It replaced the raw character `→`: a typeface decides a glyph's weight and shape, so
+// it never matches the site's other arrows — the exact problem that produced CarouselChevron.
+// Size 36/52 responsive, matching Destinations. Colour is action-primary (cream section), not
+// Destinations' ondark tokens.
+function CategoryArrows({
+  onPrev,
+  onNext,
+  show,
+  className = '',
+}: {
+  onPrev: () => void
+  onNext: () => void
+  show: boolean
+  className?: string
+}) {
+  if (!show) return null
+
+  const button =
+    'group grid size-[36px] shrink-0 place-items-center rounded-full border border-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary lg:size-[52px]'
+  // DOUBLE-quoted deliberately: the class contains single quotes inside url(...). Writing this as a
+  // single-quoted JS string needs \' escapes, and Tailwind then bakes the BACKSLASHES into the class
+  // name — it emits url(\'...\'), which the bundler cannot resolve. tsc and eslint both pass; the
+  // only symptom is a 500 and a "Module not found" line in .next/dev/logs.
+  const glyph =
+    "block size-[16px] bg-action-primary transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-action-primary-text [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+
+  return (
+    <div className={`shrink-0 gap-12 ${className}`}>
+      <button type="button" onClick={onPrev} aria-label="Previous category" className={button}>
+        <span aria-hidden="true" className={`${glyph} rotate-180`} />
+      </button>
+      <button type="button" onClick={onNext} aria-label="Next category" className={button}>
+        <span aria-hidden="true" className={glyph} />
+      </button>
+    </div>
+  )
+}
+
 export function BoatGallery({
   boat,
   eyebrow,
@@ -129,93 +173,76 @@ export function BoatGallery({
                 conditionally so `boatDefaults.galleryEyebrow` isn't an orphaned field, but leave it
                 empty in Studio to match the mockup. Flagged for review. */}
             <div className="flex flex-col gap-[34px]">
-              <div className="flex items-center justify-between gap-24">
-                {/* gap-24, NOT Figma's gap-8 — every homepage section heading uses gap-24 between
-                    eyebrow and h2 (TheBoat.tsx). Conventions supersede Figma; see CLAUDE.md. */}
-                <div className="flex min-w-0 flex-1 flex-col gap-24">
-                  {eyebrow ? (
-                    <p className="text-eyebrow uppercase text-text-eyebrow">{eyebrow}</p>
-                  ) : null}
+              {/* Eyebrow on its OWN line, then heading + arrows sharing a row — the
+                  LatestArticles.tsx:44-52 pattern (eyebrow above, h2 and its button aligned to each
+                  other). This is what makes the arrows align to "Gallery" rather than floating at the
+                  centre of the eyebrow+heading block, which is what they did before.
+                  gap-24 between eyebrow and h2, NOT Figma's gap-8 — conventions supersede Figma. */}
+              <div className="flex flex-col gap-24">
+                {eyebrow ? (
+                  <p className="text-eyebrow uppercase text-text-eyebrow">{eyebrow}</p>
+                ) : null}
+                <div className="flex items-center justify-between gap-24">
                   {heading ? (
                     <h2 id="boat-gallery-heading" className="text-display-h2 text-text-primary">
                       {heading}
                     </h2>
                   ) : null}
+                  {/* "VIEW FULL GALLERY" (778:8849;700:3347) is DELIBERATELY NOT BUILT — it needs a
+                      destination and there is no /gallery route. See §2 of the review doc. */}
+                  <CategoryArrows
+                    onPrev={() => stepTab(-1)}
+                    onNext={() => stepTab(1)}
+                    show={tabs.length > 1}
+                    className="hidden lg:flex"
+                  />
                 </div>
-                {/* "VIEW FULL GALLERY" (778:8849;700:3347) is DELIBERATELY NOT BUILT. It needs a
-                    destination and there is no /gallery route, and no schema field to hold the link
-                    — building a button that goes nowhere is worse than omitting it. See §2 of the
-                    review doc. */}
-
-                {/* Category arrows, moved here 2026-07-20 from below the tab panel to sit beside the
-                    heading — the Destinations pattern (Destinations.tsx:68-97), which is the homepage
-                    precedent for arrows sharing a row with section header content.
-                    Two things changed with the move, both deliberate:
-                    - Size is now 36/52 responsive (was flat 52), matching Destinations.
-                    - The glyph was the raw character `→`. A typeface decides a glyph's weight and
-                      shape, so it never matches the site's other arrows — the exact problem that
-                      produced CarouselChevron. Now a CSS mask of the SAME asset Destinations uses,
-                      so weight is uniform BY CONSTRUCTION. Colour is action-primary (cream section),
-                      not Destinations' ondark tokens. */}
-                {tabs.length > 1 ? (
-                  <div className="flex shrink-0 gap-12">
-                    <button
-                      type="button"
-                      onClick={() => stepTab(-1)}
-                      aria-label="Previous category"
-                      className="group grid size-[36px] shrink-0 place-items-center rounded-full border border-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary lg:size-[52px]"
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="block size-[16px] rotate-180 bg-action-primary transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-action-primary-text [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => stepTab(1)}
-                      aria-label="Next category"
-                      className="group grid size-[36px] shrink-0 place-items-center rounded-full border border-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary lg:size-[52px]"
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="block size-[16px] bg-action-primary transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-action-primary-text [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-                      />
-                    </button>
-                  </div>
-                ) : null}
               </div>
 
               {/* tab-items (778:8850) — continuous 2px underline track, so tabs butt together
                   (px-12, no gap). 12px here (text-button-small), genuinely SMALLER than the Cabins
-                  tabs at 14px — that's the design, not a slip. Mobile: horizontal drag-scroll, same
-                  treatment as Destinations. */}
+                  tabs at 14px — that's the design, not a slip. Mobile: horizontal drag-scroll.
+                  MOBILE-ONLY arrows live at the end of THIS row (Adinda, 2026-07-20) so the tab
+                  underline track stops short of them — the Destinations treatment. Desktop keeps its
+                  arrows up beside the heading, so the two placements are mutually exclusive and only
+                  ever one is visible. Both render the SAME component, so they cannot drift apart.
+                  Note the tablist lost its `-mx-24 px-24` edge-bleed: it now has to be a flex-1
+                  sibling of the arrows for the track to end before them. */}
               {tabs.length ? (
-                <div
-                  role="tablist"
-                  aria-label="Gallery categories"
-                  className="-mx-24 flex overflow-x-auto px-24 lg:mx-0 lg:overflow-visible lg:px-0"
-                >
-                  {tabs.map((tab, i) => {
-                    const selected = i === tabIndex
-                    return (
-                      <button
-                        key={tab._key}
-                        role="tab"
-                        type="button"
-                        id={`gallery-tab-${tab._key}`}
-                        aria-selected={selected}
-                        aria-controls={`gallery-panel-${tab._key}`}
-                        onClick={() => selectTab(i)}
-                        className={`shrink-0 border-b-2 px-12 py-8 text-button-small whitespace-nowrap uppercase transition-colors duration-300 ease-in-out ${
-                          selected
-                            ? 'border-action-primary text-action-primary'
-                            : 'border-action-primary/35 text-action-primary/55 hover:text-action-primary'
-                        }`}
-                      >
-                        {tab.category}
-                      </button>
-                    )
-                  })}
+                <div className="flex items-center gap-16">
+                  <div
+                    role="tablist"
+                    aria-label="Gallery categories"
+                    className="flex min-w-0 flex-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden"
+                  >
+                    {tabs.map((tab, i) => {
+                      const selected = i === tabIndex
+                      return (
+                        <button
+                          key={tab._key}
+                          role="tab"
+                          type="button"
+                          id={`gallery-tab-${tab._key}`}
+                          aria-selected={selected}
+                          aria-controls={`gallery-panel-${tab._key}`}
+                          onClick={() => selectTab(i)}
+                          className={`shrink-0 border-b-2 px-12 py-8 text-button-small whitespace-nowrap uppercase transition-colors duration-300 ease-in-out ${
+                            selected
+                              ? 'border-action-primary text-action-primary'
+                              : 'border-action-primary/35 text-action-primary/55 hover:text-action-primary'
+                          }`}
+                        >
+                          {tab.category}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <CategoryArrows
+                    onPrev={() => stepTab(-1)}
+                    onNext={() => stepTab(1)}
+                    show={tabs.length > 1}
+                    className="flex lg:hidden"
+                  />
                 </div>
               ) : null}
             </div>

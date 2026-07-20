@@ -204,47 +204,62 @@ export function BoatCabins({
             {/* right-col-content (778:8781) — 475.86px in Figma, rounded to 476. */}
             <div className="flex flex-col gap-16 page-gutter-x lg:w-[476px] lg:shrink-0 lg:px-0 lg:pt-24">
               <div className="flex flex-col gap-24">
-                <div className="flex items-center justify-center gap-16">
-                  <div className="flex min-w-0 flex-1 flex-col gap-16">
-                    <h3 className="text-display-h3 text-text-primary">{active.name}</h3>
-                    {/* "3 Cabins · Max. 2 Guests" (778:8788) — assembled from the two numeric fields
-                        rather than a typed string, so it can't drift from the real counts. It's
-                        styled as an eyebrow (11px / 1.375 tracking / action-primary), not body copy. */}
-                    {active.count || active.maxGuests ? (
-                      <p className="text-eyebrow uppercase text-text-eyebrow">
-                        {[
-                          active.count ? `${active.count} Cabins` : null,
-                          active.maxGuests ? `Max. ${active.maxGuests} Guests` : null,
-                        ]
-                          .filter(Boolean)
-                          .join(' · ')}
-                      </p>
+                {/* The cabin NAME shares a row with the arrows so the two align to each other; the
+                    "3 Cabins · Max. 2 Guests" label drops to its own row beneath (Adinda, 2026-07-20).
+                    Previously all three sat in one row with the arrows centred against the whole
+                    name+label block, which left the arrows floating between the two lines.
+                    Same fix, same reasoning as the Gallery heading — see LatestArticles.tsx:44-52. */}
+                <div className="flex flex-col gap-16">
+                  <div className="flex items-center justify-between gap-16">
+                    <h3 className="min-w-0 text-display-h3 text-text-primary">{active.name}</h3>
+
+                    {/* Glyph changed from the raw character `→` to a CSS mask of
+                        icon-arrow-forward.svg — the SAME asset the Gallery and Destinations use.
+                        Not in Adinda's brief, but the Gallery arrows moved to that asset earlier
+                        today and these sit on the SAME PAGE: leaving them as a font glyph would have
+                        shipped two visibly different arrow weights a few sections apart. Size is
+                        36/52 responsive to match. */}
+                    {cabinTypes.length > 1 ? (
+                      <div className="flex shrink-0 gap-12">
+                        <button
+                          type="button"
+                          onClick={() => stepType(-1)}
+                          aria-label="Previous cabin type"
+                          className="group grid size-[36px] shrink-0 place-items-center rounded-full border border-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary lg:size-[52px]"
+                        >
+                          <span
+                            aria-hidden="true"
+                            className="block size-[16px] rotate-180 bg-action-primary transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-action-primary-text [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+                          />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => stepType(1)}
+                          aria-label="Next cabin type"
+                          className="group grid size-[36px] shrink-0 place-items-center rounded-full border border-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary lg:size-[52px]"
+                        >
+                          <span
+                            aria-hidden="true"
+                            className="block size-[16px] bg-action-primary transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:bg-action-primary-text [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+                          />
+                        </button>
+                      </div>
                     ) : null}
                   </div>
 
-                  {cabinTypes.length > 1 ? (
-                    <div className="flex shrink-0 gap-12">
-                      <button
-                        type="button"
-                        onClick={() => stepType(-1)}
-                        aria-label="Previous cabin type"
-                        className="flex size-[52px] items-center justify-center rounded-full border border-action-primary text-action-primary transition-colors duration-300 hover:bg-action-primary hover:text-action-primary-text"
-                      >
-                        <span aria-hidden className="rotate-180 text-[20px] leading-none">
-                          →
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => stepType(1)}
-                        aria-label="Next cabin type"
-                        className="flex size-[52px] items-center justify-center rounded-full border border-action-primary text-action-primary transition-colors duration-300 hover:bg-action-primary hover:text-action-primary-text"
-                      >
-                        <span aria-hidden className="text-[20px] leading-none">
-                          →
-                        </span>
-                      </button>
-                    </div>
+                  {/* "3 Cabins · Max. 2 Guests" (778:8788) — assembled from the two numeric fields
+                      rather than a typed string, so it can't drift from the real counts. Styled as an
+                      eyebrow (11px / 1.375 tracking), not body copy. Now on its OWN row below the
+                      name+arrows row. */}
+                  {active.count || active.maxGuests ? (
+                    <p className="text-eyebrow uppercase text-text-eyebrow">
+                      {[
+                        active.count ? `${active.count} Cabins` : null,
+                        active.maxGuests ? `Max. ${active.maxGuests} Guests` : null,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </p>
                   ) : null}
                 </div>
 

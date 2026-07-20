@@ -160,6 +160,78 @@ the overhead once, and don't price the user's own review time as build time.**
      ⚠️ **Do not build speculatively** — this is the `isFeatured` / section-toggles trap. Research, propose,
      get Adinda's call, then build. A Perplexity prompt was drafted for her on 2026-07-17.
 
+### ✅ CHECKPOINT 2026-07-20 (2) — SEO wiring fixed end-to-end + boat page polish pass
+**Model:** Opus 4.8 (1M context). `tsc` ✅ · `eslint` 0 errors (17 pre-existing warnings) ·
+`/` `/boats/mari` `/yarl-test` all 200 after a clean restart (`.next` removed, server killed by PID —
+`TaskStop` alone leaves the `next` child holding the port, which cost a wrong diagnosis this session).
+
+**⚠️ NOT REVIEWED BY ADINDA.** Every visual change below is unreviewed — she stepped away before seeing
+the boat page. Do not treat any of it as approved.
+
+#### 1. SEO — the logged gap was one layer deeper than logged, and the reference was broken
+Commits `cf9d42e` (fix) · `8c8e587` (doc corrections) · `f400188` (stega).
+- Homepage had **no `generateMetadata`**. Now has one.
+- `HOMEPAGE_QUERY` never selected `seo` at all — CLAUDE.md claimed it did "at line 86"; that line was
+  inside `BOAT_QUERY`.
+- **`SeoData` declared `metaTitle`/`metaDescription`; the schema defines `title`/`description`.** So the
+  boat page's `generateMetadata` — the designated reference to copy — had **never** read the seo field.
+  `tsc` cannot catch this: query results are **cast**, so a wrong field name type-checks against nothing.
+- CLAUDE.md's "the boat title is the fallback working correctly, don't fix it" note was **wrong** and has
+  been corrected. It was one session away from causing this fix to be reverted.
+- `stega: false` added to both metadata fetches (no-op today; prevents silent corruption when Visual
+  Editing is enabled).
+- **Verified end-to-end against served HTML**, not source: both titles now come from Sanity. Seeded via
+  `_scripts/seed-seo.ts`. Copy is **drafted, not approved** — `mari-website` had both as TBD. Adinda:
+  *"I'm ok with anything for now as long as the SEO works"*, to be redone at real-content time.
+
+#### 2. Boat page polish (commit `437ece1` + follow-ups)
+Gallery: eyebrow→heading `gap-8`→`gap-24`; arrows moved beside the heading (eyebrow on its own line,
+heading+arrows share a row — the `LatestArticles.tsx:44-52` pattern); **mobile-only second arrow set at
+the end of the tab row** so the underline track stops before it (Destinations treatment, Adinda's
+explicit call, she pre-approved duplicate buttons). Cabins: tab items centred on mobile; cabin **name**
+now shares a row with the arrows, the "3 Cabins · Max 2 Guests" label dropped to its own row.
+Both: `aspect-[708/532]`→`aspect-[3/2]`, plus `data-reveal` + hover zoom (neither section had either).
+**All arrow glyphs de-fonted** — 0 raw `→` characters left on the page; both sections now CSS-mask the
+same `icon-arrow-forward.svg` Destinations uses, so weight is uniform by construction.
+
+#### 3. Lightbox scrim + YARL evaluation
+New primitive `--navy-975 #0a111f` (navy-950 was already the darkest step; Adinda wanted darker,
+approved pure black but near-black-with-navy-cast was used to stay in-palette) + semantic
+`--color-background-lightbox-scrim`, deliberately NOT reusing `background-ondark-muted`. Scrim +
+`backdrop-blur-md` applied. **Verified in the COMPILED css**, not source.
+🔵 **`/yarl-test` (commit `9f3ee79`) is a THROWAWAY route awaiting Adinda's UI verdict** — delete it once
+the call is made. It demos (a) YARL reproducing the current gallery and (b) **cabins combined into one
+lightbox with each slide labelled by cabin name, derived from `cabinType.name` with NO schema change** —
+which matters because `cabinType.images` uses `imageWithAlt`, which has no title/caption field at all.
+**YARL is ~2-3h, not a small fix** — flagged to Adinda; the existing lightbox is ~100 lines inlined in
+`BoatGallery.tsx`, is NOT a shared component, and YARL is installed but has never been imported.
+
+#### 4. Two bugs I introduced and caught — both invisible to tsc/eslint
+- JSX comment placed inside a ternary / between attributes → parse error. Twice. `tsc` caught it.
+- **A `mask-image` arbitrary-value class written inside a SINGLE-quoted JS string** → Tailwind baked the
+  backslashes into the class name and emitted an unresolvable escaped URL. **`tsc` AND `eslint` both
+  passed; the page 500'd and the only evidence was `Module not found` in
+  `.next/dev/logs/next-development.log`.** Use double-quoted JS strings for such classes.
+  This is the "read the dev log before theorising" rule paying off again.
+- 🔴 **AND THEN THIS FILE CAUSED THE SAME BUG.** Writing that broken class **as prose in this checkpoint**
+  re-broke the build: **Tailwind v4 scans every non-ignored file in the project, including `.md`**, so it
+  extracted the pattern out of the documentation and tried to generate a real rule for it. The site 500'd
+  with an identical error, from a Markdown file, with no code change. **Never paste a literal
+  arbitrary-value class into a tracked doc** — describe it, or break the token up. Same trap applies to
+  `CLAUDE.md`, `_SCHEMA-SPECS.md`, and any doc Tailwind can see. (`_handoff/*` is safe only because
+  `/_*` is gitignored.)
+
+#### Open / owed
+- 🔴 **Adinda's visual review of the whole boat page** — nothing here is approved.
+- 🔵 **YARL verdict** at `/yarl-test`, then delete the route.
+- 🔵 Gallery `gap-24` vs Cabins `gap-32` still differ; site-wide there are **three** eyebrow→heading gaps
+  (24 / 24-lg-32 / 32). Adinda offered a normalisation pass — not taken up yet.
+- 🔵 `data-reveal` remains **opt-in with no failure mode**; the structural fix (wrapper component) is
+  deferred to the componentization block.
+- 🔵 Session time log NOT filled for 2026-07-20 (Adinda stepped away mid-session) — owed at next bookend.
+- Handoff staged this session: SEO silent-omission trap → `_handoff/drk-website.md`; scroll-reveal opt-in
+  rule → `_handoff/atlas-website.md`. **Both staged only, not merged into the skills.**
+
 ### ✅ CHECKPOINT 2026-07-17 (3) — Overview refinements + the "mobile read-more" bug was CACHE, not code
 **Model:** Opus 4.8 (1M context). `tsc` ✅. Dev server restarted clean; `/` 200 + `/boats/mari` 200.
 ~~⚠️ `eslint` has **4 PRE-EXISTING errors** in `Nav.tsx` + `TheBoat.tsx` — `<a href="/boats/mari/">`
