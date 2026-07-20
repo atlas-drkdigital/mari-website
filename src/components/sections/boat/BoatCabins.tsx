@@ -1,12 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 
 import { CarouselChevron } from '@/components/CarouselChevron'
 import { RichText } from '@/components/RichText'
-import { sanityImageProps } from '@/sanity/lib/image'
+import type { LightboxSlide } from '@/components/SiteLightbox'
+import { sanityImageProps, urlForImage } from '@/sanity/lib/image'
 import type { BoatData, CabinTypeData } from '@/sanity/queries'
+
+// DYNAMIC, ssr:false — see the matching note in BoatGallery. YARL and its stylesheets (~40KB) load
+// only once a visitor opens the lightbox; a static import would silently put them back in the
+// page's first load.
+const SiteLightbox = dynamic(
+  () => import('@/components/SiteLightbox').then((m) => m.SiteLightbox),
+  { ssr: false },
+)
 
 // Figma Section/Cabins = 778:8762. REBUILT 2026-07-17 against the node — the first pass was written
 // from the schema spec alone and drifted in ~6 places (tabs at 12px not 14px, description at 16px not
@@ -60,6 +70,59 @@ export function BoatCabins({
 }) {
   const [typeIndex, setTypeIndex] = useState(0)
   const [imageIndex, setImageIndex] = useState(0)
+  // `lightboxIndex === null` means closed; `hasOpened` latches TRUE on the first open and never
+  // resets, so the dynamic chunk stays out of the initial load while YARL still gets to run its own
+  // close animation (unmounting on close would cut that off). Same pattern as BoatGallery.
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [hasOpened, setHasOpened] = useState(false)
+
+  // ONE lightbox holding EVERY cabin type's photos, flattened in the order `cabinTypes` arrives
+  // (Deluxe then Superior — the query already orders by `order asc, name asc`). Each slide is
+  // stamped with the cabin it came from, DERIVED from `cabin.name`, never hand-typed, so the label
+  // cannot drift if a cabin is renamed.
+  //
+  // ⚠️ `cabinType.images` is `imageWithAlt`, which has NO caption field — unlike the gallery's
+  // `galleryImage`. So `alt` doubles as the caption text here, falling back to the cabin name when
+  // an editor has left alt empty (recommended-not-required, per the site-wide alt rule).
+  //
+  // fit('max') is mandatory — the only guard against the CDN upscaling past the master.
+  // auto('format') is the ONLY path to AVIF; q75 is the measured choice for the cold WebP path.
+  const cabinSlides: LightboxSlide[] = useMemo(
+    () =>
+      cabinTypes.flatMap((cabin) =>
+        (cabin.images ?? [])
+          .filter((img) => img.asset?._ref)
+          .map((img) => ({
+            src: urlForImage(img).width(1920).fit('max').quality(75).auto('format').url(),
+            alt: img.alt,
+            label: cabin.name,
+            caption: img.alt || cabin.name,
+          })),
+      ),
+    [cabinTypes],
+  )
+
+  // Where each cabin type's photos START inside that flattened list. Opening from the Superior tab
+  // must land on the Superior slide the visitor was actually looking at, not on slide 0 — which is
+  // exactly what a naive `imageIndex` would do. Counted over the SAME filter as the slides above,
+  // or one missing asset shifts the offsets out from under the index.
+  // Written as a running SUM of the preceding types rather than a mutated accumulator: the React
+  // compiler's immutability rule rejects reassigning a local across a render-phase callback.
+  const slideOffsets = useMemo(
+    () =>
+      cabinTypes.map((_cabin, index) =>
+        cabinTypes
+          .slice(0, index)
+          .reduce(
+            (total, prev) =>
+              total + (prev.images ?? []).filter((img) => img.asset?._ref).length,
+            0,
+          ),
+      ),
+    [cabinTypes],
+  )
+
+  const closeLightbox = useCallback(() => setLightboxIndex(null), [])
 
   if (!cabinTypes.length) return null
 
@@ -78,6 +141,16 @@ export function BoatCabins({
   const stepImage = (delta: number) => {
     if (images.length < 2) return
     setImageIndex((i) => (i + delta + images.length) % images.length)
+  }
+
+  // Open the COMBINED lightbox on the photo currently showing. The index is resolved against the
+  // filtered list (`openableImages`), not `images`, so it matches `cabinSlides` exactly.
+  const openableImages = images.filter((img) => img.asset?._ref)
+  const openLightbox = () => {
+    if (!cabinSlides.length) return
+    const within = currentImage ? openableImages.indexOf(currentImage) : -1
+    setHasOpened(true)
+    setLightboxIndex(slideOffsets[typeIndex] + Math.max(within, 0))
   }
 
   const specRows = SPEC_FIELDS.flatMap((field) => {
@@ -178,22 +251,30 @@ export function BoatCabins({
                 the Gallery. NOTE the sizes= caveat above still holds: the slot is still 708px wide on
                 desktop, only its HEIGHT changed, so the resolution targets are unaffected. */}
             {/* cursor-zoom-in matches the Gallery (Adinda, 2026-07-20 — the hover CTA overlay was
-                tried and rejected as "annoying"; the zoom cursor is the affordance instead).
-                ⚠️ Cabins has NO lightbox yet, so the cursor currently promises a zoom that does not
-                happen. Accepted knowingly while the cabin lightbox is pending the YARL decision —
-                it is a far smaller lie than a button that does nothing, and it becomes true the
-                moment that lands. When it does, this <div> becomes a <button> wrapping the image. */}
+                tried and rejected as "annoying"; the zoom cursor is the affordance instead). The
+                cursor now tells the truth: as of 2026-07-20 the click opens the combined cabin
+                lightbox. The image is wrapped in a <button>, and that button is an ABSOLUTE OVERLAY
+                rather than the outer element — the prev/next chevrons are siblings inside this same
+                box, and a <button> nested in a <button> is invalid HTML. Same structure as the
+                Gallery, for the same reason. */}
             <div className="group/cabin relative aspect-[3/2] w-full shrink-0 cursor-zoom-in overflow-hidden lg:w-[708px]" data-reveal>
               {/* Hover zoom + data-reveal — site-wide non-hero image treatment; opt-in per
                   component, which is why this section never had it. */}
               {currentImage ? (
-                <Image
-                  {...sanityImageProps(currentImage, '/assets/placeholder-photo.svg')}
-                  alt={currentImage.alt ?? ''}
-                  fill
-                  sizes="(min-width: 1024px) 708px, 100vw"
-                  className="object-cover transition-transform duration-[1100ms] ease-in-out group-hover/cabin:scale-105"
-                />
+                <button
+                  type="button"
+                  onClick={openLightbox}
+                  aria-label={`Open ${currentImage.alt || active.name || 'cabin photo'} in full screen`}
+                  className="absolute inset-0 block size-full cursor-zoom-in"
+                >
+                  <Image
+                    {...sanityImageProps(currentImage, '/assets/placeholder-photo.svg')}
+                    alt={currentImage.alt ?? ''}
+                    fill
+                    sizes="(min-width: 1024px) 708px, 100vw"
+                    className="object-cover transition-transform duration-[1100ms] ease-in-out group-hover/cabin:scale-105"
+                  />
+                </button>
               ) : null}
 
               {/* Bare chevrons, no circle — see the matching note in BoatGallery. These step through
@@ -327,6 +408,19 @@ export function BoatCabins({
           </div>
         </div>
       </div>
+
+      {/* ONE lightbox for ALL cabin types combined (see cabinSlides above), not one per tab — a
+          visitor browsing photos shouldn't have to come back out and switch tabs to keep going.
+          Gated on `hasOpened` so the dynamic chunk is never fetched until a visitor clicks. */}
+      {hasOpened ? (
+        <SiteLightbox
+          open={lightboxIndex !== null}
+          index={lightboxIndex ?? 0}
+          slides={cabinSlides}
+          onClose={closeLightbox}
+          ariaLabel="cabin photos"
+        />
+      ) : null}
     </section>
   )
 }

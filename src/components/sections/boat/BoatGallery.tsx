@@ -1,12 +1,23 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 
 import { CarouselChevron } from '@/components/CarouselChevron'
 import { RichText } from '@/components/RichText'
-import { sanityImageProps } from '@/sanity/lib/image'
+import type { LightboxSlide } from '@/components/SiteLightbox'
+import { sanityImageProps, urlForImage } from '@/sanity/lib/image'
 import type { BoatData, GalleryImageData, GalleryTabData } from '@/sanity/queries'
+
+// DYNAMIC, ssr:false — an explicit condition of adopting YARL. The library plus its three
+// stylesheets (~40KB) are pulled only when a visitor actually opens the lightbox, and the module is
+// never rendered below until `hasOpened` flips, so nothing is fetched on page load. Importing
+// SiteLightbox statically would undo all of that with no visible symptom.
+const SiteLightbox = dynamic(
+  () => import('@/components/SiteLightbox').then((m) => m.SiteLightbox),
+  { ssr: false },
+)
 
 // Figma Section/Gallery = 778:8845. REBUILT 2026-07-17 against the node.
 //
@@ -101,7 +112,11 @@ export function BoatGallery({
 
   const [tabIndex, setTabIndex] = useState(0)
   const [imageIndex, setImageIndex] = useState(0)
+  // `lightboxIndex === null` means closed. `hasOpened` latches TRUE on the first open and never
+  // resets: it is what keeps the dynamic chunk out of the initial load while still letting YARL run
+  // its own close animation (unmounting the component on close would cut that animation off).
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [hasOpened, setHasOpened] = useState(false)
 
   const activeTab = tabs[Math.min(tabIndex, Math.max(tabs.length - 1, 0))]
 
@@ -129,37 +144,41 @@ export function BoatGallery({
   }
 
   const closeLightbox = useCallback(() => setLightboxIndex(null), [])
-  const stepLightbox = useCallback(
-    (delta: number) =>
-      setLightboxIndex((i) => (i === null ? null : (i + delta + all.length) % all.length)),
-    [all.length],
-  )
+  const openLightbox = useCallback((index: number) => {
+    if (index < 0) return
+    setHasOpened(true)
+    setLightboxIndex(index)
+  }, [])
 
-  // Keyboard + scroll lock. NOTE: this is deliberately NOT a full modal implementation — there is no
-  // focus trap and no touch-swipe. Both are pending the decision on `yet-another-react-lightbox`
-  // (see _handoff/_REVIEW-2026-07-17-boat-sections.md §6). Do not call this lightbox done.
-  useEffect(() => {
-    if (lightboxIndex === null) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeLightbox()
-      if (e.key === 'ArrowRight') stepLightbox(1)
-      if (e.key === 'ArrowLeft') stepLightbox(-1)
-    }
-    document.addEventListener('keydown', onKey)
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prev
-    }
-  }, [lightboxIndex, closeLightbox, stepLightbox])
+  // THE LIGHTBOX'S read: every image, combined, ignoring the active tab (Adinda, explicit). Built
+  // from `all`, never from `visible` — feeding it the filtered list is the bug that looks correct on
+  // tab one.
+  //
+  // fit('max') is mandatory: it is the only guard against the CDN happily upscaling past the master,
+  // and our masters top out around 1535px. auto('format') is the ONLY path to AVIF. q75 is the
+  // measured choice — q80 busts the byte budget on the cold WebP path, which is what most
+  // first-time visitors actually get. See CLAUDE.md's image-pipeline section.
+  //
+  // `title` no longer exists on galleryImage (removed from the schema — it duplicated `alt`), so
+  // `caption` is the only caption source and `alt` is used for aria/alt text only.
+  // An image with no asset can't produce a CDN URL, so it is dropped. `openable` is kept as its own
+  // array — the lightbox index must be an index into THIS list, not into `all`, or a single missing
+  // asset silently shifts every slide after it by one.
+  const openable = useMemo(() => all.filter((img) => img.asset?._ref), [all])
+  const lightboxSlides: LightboxSlide[] = useMemo(
+    () =>
+      openable.map((img) => ({
+        src: urlForImage(img).width(1920).fit('max').quality(75).auto('format').url(),
+        alt: img.alt,
+        caption: img.caption,
+      })),
+    [openable],
+  )
 
   // `tabs` is already filtered to those holding images, so an empty list means there is genuinely
   // nothing to show and the whole section hides. This also covers images tagged with a category that
   // has no tab row — they'd be unreachable, so the section correctly treats them as nothing.
   if (!tabs.length) return null
-
-  const lightboxImage = lightboxIndex === null ? null : all[lightboxIndex]
 
   // Vertical padding GATED (audit 2026-07-20): desktop = Figma (96/160); mobile 64/96 to match the
   // homepage rhythm. Was flat `pt-96 pb-160` — desktop-sized padding on phones.
@@ -308,7 +327,7 @@ export function BoatGallery({
             <div className="group/gallery relative aspect-[3/2] w-full overflow-hidden" data-reveal>
               <button
                 type="button"
-                onClick={() => setLightboxIndex(all.indexOf(currentImage))}
+                onClick={() => openLightbox(openable.indexOf(currentImage))}
                 aria-label={`Open ${currentImage?.alt ?? 'photo'} in full screen`}
                 className="absolute inset-0 block size-full cursor-zoom-in"
               >
@@ -363,108 +382,18 @@ export function BoatGallery({
         </div>
       </div>
 
-      {/* THE LIGHTBOX'S read: every image, combined, ignoring the active tab (Adinda, explicit). */}
-      {lightboxImage ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Gallery"
-          className="fixed inset-0 z-50 flex flex-col bg-background-lightbox-scrim/92 backdrop-blur-md p-16 pb-[env(safe-area-inset-bottom)] lg:p-24"
-        >
-          <div className="flex shrink-0 items-center justify-between gap-16 pb-16">
-            <p className="text-body-medium text-text-ondark-secondary">
-              {lightboxIndex! + 1} / {all.length}
-            </p>
-            <button
-              type="button"
-              onClick={closeLightbox}
-              aria-label="Close gallery"
-              className="flex size-[44px] items-center justify-center rounded-full border border-border-ondark-muted text-text-ondark-primary transition-colors duration-300 hover:bg-background-ondark-surface"
-            >
-              <span aria-hidden className="text-[20px] leading-none">
-                ✕
-              </span>
-            </button>
-          </div>
-
-          {/* object-contain, so a PORTRAIT is height-bound here and passes easily — the same
-              portrait can still fail the cover-cropped carousel above, where it's width-bound.
-              "Is this image big enough" has no single answer, only a per-slot one. */}
-          <div className="relative min-h-0 flex-1">
-            <Image
-              {...sanityImageProps(lightboxImage, '/assets/placeholder-photo.svg')}
-              alt={lightboxImage.alt ?? ''}
-              fill
-              sizes="100vw"
-              className="object-contain"
-            />
-            {all.length > 1 ? (
-              <div className="pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => stepLightbox(-1)}
-                  aria-label="Previous photo"
-                  className="pointer-events-auto flex size-[44px] items-center justify-center rounded-full bg-background-ondark-page/60 text-text-ondark-primary transition-opacity duration-300 hover:opacity-80"
-                >
-                  {/* Same chevron size as the 36px buttons — uniform across the site beats scaling per button. */}
-                  <CarouselChevron direction="left" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => stepLightbox(1)}
-                  aria-label="Next photo"
-                  className="pointer-events-auto flex size-[44px] items-center justify-center rounded-full bg-background-ondark-page/60 text-text-ondark-primary transition-opacity duration-300 hover:opacity-80"
-                >
-                  <CarouselChevron direction="right" />
-                </button>
-              </div>
-            ) : null}
-          </div>
-
-          {/* Image count + caption on ONE line (Adinda, 2026-07-20). `title` was removed from the
-              galleryImage schema — it duplicated `alt` — so the old two-line title/caption block is
-              gone with it.
-              Count is ondark-primary (beige-50, near-white) at reduced opacity rather than a dimmer
-              token, so it reads as the same colour family as the caption, just quieter. */}
-          {lightboxImage.caption ? (
-            <div className="mx-auto flex w-full max-w-[720px] shrink-0 items-baseline justify-center gap-8 pt-16 text-center">
-              <span className="shrink-0 font-light text-body-medium text-text-ondark-primary opacity-60">
-                {all.indexOf(lightboxImage) + 1} / {all.length}
-              </span>
-              <p className="text-body-medium text-text-ondark-primary">{lightboxImage.caption}</p>
-            </div>
-          ) : null}
-
-          {/* Thumbnail filmstrip — hidden on mobile to preserve vertical space for a portrait under
-              object-contain. That's the common pattern across leading lightboxes, and it also dodges
-              YARL's open issue #398 (its filmstrip isn't independently swipeable on touch). */}
-          {all.length > 1 ? (
-            <div className="hidden shrink-0 gap-8 overflow-x-auto pt-16 lg:flex">
-              {all.map((img, i) => (
-                <button
-                  key={img._key}
-                  type="button"
-                  onClick={() => setLightboxIndex(i)}
-                  aria-label={`Go to photo ${i + 1}`}
-                  aria-current={i === lightboxIndex}
-                  className={`relative aspect-[3/2] h-[64px] shrink-0 overflow-hidden transition-opacity duration-300 ${
-                    i === lightboxIndex
-                      ? 'opacity-100 ring-2 ring-accent-ondark-primary'
-                      : 'opacity-50 hover:opacity-80'
-                  }`}
-                >
-                  <Image
-                    {...sanityImageProps(img, '/assets/placeholder-photo.svg')}
-                    alt=""
-                    fill
-                    sizes="96px"
-                    className="object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          ) : null}
-        </div>
+      {/* The hand-rolled overlay that used to live here (fixed inset-0 div, manual keyboard
+          handling, manual filmstrip) was replaced by YARL on 2026-07-20 — it had no focus trap and
+          no touch-swipe, which is what the library was adopted for. Config lives in SiteLightbox.
+          Gated on `hasOpened` so the dynamic chunk is never fetched until a visitor clicks. */}
+      {hasOpened ? (
+        <SiteLightbox
+          open={lightboxIndex !== null}
+          index={lightboxIndex ?? 0}
+          slides={lightboxSlides}
+          onClose={closeLightbox}
+          ariaLabel="gallery"
+        />
       ) : null}
     </section>
   )
