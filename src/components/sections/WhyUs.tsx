@@ -55,7 +55,7 @@ export function WhyUs({ home }: { home: HomePageData | null }) {
         ref={trackRef}
         onMouseLeave={() => setActive(null)}
         data-reveal
-        className="mx-auto flex w-full max-w-[1920px] cursor-grab snap-x snap-mandatory gap-16 overflow-x-auto px-24 pb-4 select-none [-ms-overflow-style:none] [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden lg:cursor-auto lg:select-auto lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0"
+        className="mx-auto flex w-full max-w-[1920px] cursor-grab snap-x snap-mandatory gap-16 overflow-x-auto px-24 pb-4 select-none scrollbar-hidden active:cursor-grabbing lg:cursor-auto lg:select-auto lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0"
       >
         {cards.map((card) => {
           const isActive = active === card.id

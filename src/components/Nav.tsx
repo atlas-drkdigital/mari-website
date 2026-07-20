@@ -236,7 +236,7 @@ export function Nav() {
                 aria-label="Destinations"
                 data-reveal="left"
                 {...(destListRevealed ? { 'data-revealed': '' } : {})}
-                className="flex h-full flex-col overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                className="flex h-full flex-col overflow-y-auto scrollbar-hidden"
               >
                 {DESTINATIONS.map((dest, i) => {
                   const active = dest.id === activeDestination

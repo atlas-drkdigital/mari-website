@@ -165,7 +165,7 @@ export function Testimonials({ home }: { home: HomePageData | null }) {
         </div>
 
         <div className="relative">
-          <div ref={trackRef} data-reveal className="flex w-full cursor-grab snap-x snap-mandatory items-start gap-16 overflow-x-auto pb-16 select-none [-ms-overflow-style:none] [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden lg:gap-24">
+          <div ref={trackRef} data-reveal className="flex w-full cursor-grab snap-x snap-mandatory items-start gap-16 overflow-x-auto pb-16 select-none scrollbar-hidden active:cursor-grabbing lg:gap-24">
             {reviews.map((review, i) => (
               <article key={review.key} className="group/card w-[84%] shrink-0 snap-center bg-bg-surface p-24 shadow-[0px_4px_10px_rgba(44,37,34,0.2)] md:w-[calc(50%-8px)] md:snap-start lg:w-[calc(25%-18px)]">
                 <div className="flex items-center gap-8">

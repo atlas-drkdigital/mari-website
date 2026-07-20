@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { CarouselChevron } from '@/components/CarouselChevron'
 import { RichText } from '@/components/RichText'
 import type { LightboxSlide } from '@/components/SiteLightbox'
+import { useDragScroll } from '@/lib/useDragScroll'
 import { sanityImageProps, urlForImage } from '@/sanity/lib/image'
 import type { BoatData, CabinTypeData } from '@/sanity/queries'
 
@@ -69,6 +70,9 @@ export function BoatCabins({
   heading?: string
 }) {
   const [typeIndex, setTypeIndex] = useState(0)
+  // Drag-to-scroll the cabin-type tablist — the site-wide rule is that any horizontally
+  // scrollable track is draggable on mouse AND touch, not just the image carousels.
+  const tabTrackRef = useDragScroll<HTMLDivElement>()
   const [imageIndex, setImageIndex] = useState(0)
   // `lightboxIndex === null` means closed; `hasOpened` latches TRUE on the first open and never
   // resets, so the dynamic chunk stays out of the initial load while YARL still gets to run its own
@@ -208,9 +212,10 @@ export function BoatCabins({
               is ever added, re-check on a narrow phone and fall back to justify-start when
               overflowing. */}
           <div
+            ref={tabTrackRef}
             role="tablist"
             aria-label="Cabin types"
-            className="flex justify-center overflow-x-auto page-gutter-x lg:justify-center lg:overflow-visible lg:px-0"
+            className="flex cursor-grab justify-center overflow-x-auto select-none page-gutter-x scrollbar-hidden active:cursor-grabbing lg:cursor-auto lg:justify-center lg:overflow-visible lg:px-0 lg:select-auto"
           >
             {cabinTypes.map((cabin, i) => {
               const selected = i === typeIndex

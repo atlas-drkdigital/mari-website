@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { CarouselChevron } from '@/components/CarouselChevron'
 import { RichText } from '@/components/RichText'
 import type { LightboxSlide } from '@/components/SiteLightbox'
+import { useDragScroll } from '@/lib/useDragScroll'
 import { sanityImageProps, urlForImage } from '@/sanity/lib/image'
 import type { BoatData, GalleryImageData, GalleryTabData } from '@/sanity/queries'
 
@@ -112,6 +113,9 @@ export function BoatGallery({
 
   const [tabIndex, setTabIndex] = useState(0)
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  // Drag-to-scroll the category tablist — the site-wide rule is that any horizontally
+  // scrollable track is draggable on mouse AND touch, not just the image carousels.
+  const tabTrackRef = useDragScroll<HTMLDivElement>()
   const [imageIndex, setImageIndex] = useState(0)
   // `lightboxIndex === null` means closed. `hasOpened` latches TRUE on the first open and never
   // resets: it is what keeps the dynamic chunk out of the initial load while still letting YARL run
@@ -272,9 +276,10 @@ export function BoatGallery({
                       See the rail span after the tabs — it bridges the gap to the arrows on mobile
                       without putting a competing border on this container. */}
                   <div
+                    ref={tabTrackRef}
                     role="tablist"
                     aria-label="Gallery categories"
-                    className="flex min-w-0 flex-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden"
+                    className="flex min-w-0 flex-1 cursor-grab overflow-x-auto select-none scrollbar-hidden active:cursor-grabbing lg:cursor-auto lg:overflow-visible lg:select-auto"
                   >
                     {tabs.map((tab, i) => {
                       const selected = i === tabIndex

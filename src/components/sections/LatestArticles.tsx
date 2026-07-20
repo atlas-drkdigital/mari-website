@@ -55,7 +55,7 @@ export function LatestArticles({ home, posts }: { home: HomePageData | null; pos
         <div
           ref={trackRef}
           data-reveal
-          className="flex w-full cursor-grab snap-x snap-mandatory gap-16 overflow-x-auto pb-4 select-none [-ms-overflow-style:none] [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden lg:cursor-auto lg:select-auto lg:gap-32 lg:overflow-visible lg:pb-0"
+          className="flex w-full cursor-grab snap-x snap-mandatory gap-16 overflow-x-auto pb-4 select-none scrollbar-hidden active:cursor-grabbing lg:cursor-auto lg:select-auto lg:gap-32 lg:overflow-visible lg:pb-0"
         >
           {articles.map((article) => (
             <article key={article.key} className="group/card w-[84%] shrink-0 snap-center lg:w-auto lg:flex-1">

@@ -68,7 +68,7 @@ export function Destinations({ destinations }: { destinations: DestinationCardDa
       <div className="relative z-10 flex items-center justify-between gap-24 page-gutter-x pt-64 lg:pt-[100px]">
         <div
           ref={tabTrackRef}
-          className="flex flex-1 cursor-grab items-center overflow-x-auto scroll-smooth select-none py-2 active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] lg:max-w-[632px] [&::-webkit-scrollbar]:hidden"
+          className="flex flex-1 cursor-grab items-center overflow-x-auto scroll-smooth select-none py-2 active:cursor-grabbing scrollbar-hidden lg:max-w-[632px]"
         >
           {destinations.map((dest, i) => (
             <button
