@@ -64,11 +64,15 @@ function AccordionColumn({
     <div className="flex flex-1 flex-col">
       {rows.map((row) => {
         const active = openKey === row.key
+        // beige-400 at 0.75px for EVERY row, open or closed (Adinda, 2026-07-20) —
+        // border-accent-subtle IS beige-400 (globals.css:224). The closed rows were on
+        // border-subtle (beige-200), which read as a different, lighter rule. Only the opacity
+        // still differs between states.
         return (
           <div
             key={row.key}
-            className={`mb-8 flex flex-col border-b-[0.75px] py-12 [transition:opacity_500ms_cubic-bezier(0.65,0,0.35,1),border-color_500ms_cubic-bezier(0.65,0,0.35,1)] ${
-              active ? 'border-accent-subtle' : 'border-border-subtle opacity-80'
+            className={`mb-8 flex flex-col border-b-[0.75px] border-accent-subtle py-12 [transition:opacity_500ms_cubic-bezier(0.65,0,0.35,1),border-color_500ms_cubic-bezier(0.65,0,0.35,1)] ${
+              active ? '' : 'opacity-80'
             }`}
           >
             <h3>
@@ -78,9 +82,14 @@ function AccordionColumn({
                 onClick={() => onToggle(row.key)}
                 className="flex w-full items-center justify-between gap-8 text-left"
               >
+                {/* ACTIVE = bold + accent (Adinda, 2026-07-20). action-primary is chocolate-600,
+                    which is the "Accent/Primary" in the mockup. Inactive stays regular weight in
+                    text-primary — it is NOT a size change like the homepage FAQ's
+                    editorial-h5/body-large swap; here only weight and colour move, so the rows keep
+                    a stable height and the column split doesn't reflow as you open and close. */}
                 <span
-                  className={`flex-1 text-text-primary [transition:color_500ms_cubic-bezier(0.65,0,0.35,1)] ${
-                    active ? 'text-editorial-h5' : 'text-body-large'
+                  className={`flex-1 text-body-large [transition:color_500ms_cubic-bezier(0.65,0,0.35,1)] ${
+                    active ? 'font-semibold text-action-primary' : 'text-text-primary'
                   }`}
                 >
                   {row.title}
@@ -103,7 +112,12 @@ function AccordionColumn({
               }`}
             >
               <div className="overflow-hidden">
-                <div className="mt-12 flex flex-col gap-16 text-body-medium text-text-primary lg:text-body-large">
+                {/* Type ramp matches the homepage FAQ answer exactly (Faq.tsx:44):
+                    mt-12 + text-body-medium -> lg:text-body-large. The `flex flex-col gap-16`
+                    wrapper was REMOVED — it stacked a 16px flex gap on top of RichText's own
+                    paragraph spacing, which is what made the line spacing read as too loose. The FAQ
+                    has no such wrapper. Images keep their own spacing block below. */}
+                <div className="mt-12 text-body-medium text-text-primary lg:text-body-large">
                   {row.body?.length ? <RichText value={row.body} /> : null}
                   {row.images?.map((img, i) => (
                     <div key={i} className="relative aspect-[16/9] w-full overflow-hidden">
@@ -158,14 +172,24 @@ export function BoatSpecs({
   // First row of the active tab open on load, same as the FAQ (locked 2026-07-17, Adinda): one
   // expanded item shows the rest are clickable. Derived from the row key rather than a fixed index
   // so it can't point at a row that doesn't exist — the FAQ shipped that exact bug.
-  const [openKey, setOpenKey] = useState<string | null>(null)
+  const [openKey, setOpenKey] = useState<string | null | undefined>(undefined)
 
   // Hooks must run before any early return, or hook order changes between renders.
   if (!tabs.length) return null
 
   const active = tabs[Math.min(tabIndex, tabs.length - 1)]
   const rows = active.rows
-  const resolvedOpenKey = openKey && rows.some((r) => r.key === openKey) ? openKey : rows[0].key
+  // 🔴 `null` means CLOSED and must survive. The previous version fell back to `rows[0].key`
+  // whenever openKey was null, so closing the first row instantly re-opened it — you could only
+  // "close" a row by opening a different one (Adinda hit this immediately).
+  // `undefined` is the distinct "never touched" state that opens the first row on load; a stale key
+  // pointing at a row from another tab resolves back to that default rather than to nothing.
+  const resolvedOpenKey =
+    openKey === undefined
+      ? rows[0].key
+      : openKey && rows.some((r) => r.key === openKey)
+        ? openKey
+        : null
   const toggle = (key: string) => setOpenKey((prev) => (prev === key ? null : key))
 
   const splitAt = Math.ceil(rows.length / 2)
