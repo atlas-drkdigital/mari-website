@@ -202,8 +202,16 @@ export function BoatSpecs({
     <section
       id="layout-and-specs"
       aria-labelledby="boat-specs-heading"
-      className="w-full bg-bg-page py-64 lg:py-[120px]"
+      className="relative isolate w-full bg-bg-page py-64 lg:py-[120px]"
     >
+      {/* texture-light overlay (Adinda, 2026-07-20) — the tileable topographic pattern visible
+          behind this section in the mockup. Identical treatment to WhyUs / Testimonials / Contact:
+          same 720px tile, same opacity-20, same -z-10 under an `isolate` parent so it can never
+          stack above content. Copied rather than re-derived so all four stay in step. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] [background-size:720px_auto] bg-repeat opacity-20"
+      />
       <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-48">
         {/* Centred heading block. Spacing follows the homepage/BoatCabins convention, not Figma:
             eyebrow->h2 is gap-32, and the 800px measure is the locked ladder step for a centred
