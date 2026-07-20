@@ -39,8 +39,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { boat } = await getBoat(slug)
   if (!boat) return {}
 
-  const title = boat.seo?.metaTitle || boat.pageTitle || boat.name
-  const description = boat.seo?.metaDescription || boat.tagline
+  const title = boat.seo?.title || boat.pageTitle || boat.name
+  const description = boat.seo?.description || boat.tagline
 
   return {
     title,

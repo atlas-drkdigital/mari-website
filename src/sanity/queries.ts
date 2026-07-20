@@ -28,7 +28,8 @@ export const HOMEPAGE_QUERY = groq`{
     latestArticlesEyebrow, latestArticlesHeading, latestArticlesLinkText,
     faqEyebrow, faqHeading, faqLinkText,
     testimonialsEyebrow, testimonialsHeading, testimonialsLinkText,
-    testimonialItems[]->{ _id, name, date, title, text, rating }
+    testimonialItems[]->{ _id, name, date, title, text, rating },
+    seo
   },
   "cta": *[_id == "cta"][0]{
     cards[]{ _key, heading, description, buttonText, image${IMAGE} }
@@ -199,6 +200,7 @@ export type HomePageData = {
   testimonialsHeading?: string
   testimonialsLinkText?: string
   testimonialItems?: TestimonialData[]
+  seo?: SeoData
 }
 
 // ----- Boat page -----
@@ -251,9 +253,14 @@ export type CabinTypeData = {
   images?: SanityImageWithMeta[]
 }
 
+// Field names MUST match objects/seo.ts exactly. They are `title`/`description` there — an earlier
+// version of this type declared `metaTitle`/`metaDescription`, which no schema field ever emitted, so
+// every read silently resolved to undefined and fell through to the fallback. `tsc` could not catch
+// it: query results are cast (`as BoatQueryResult`), so a wrong name here type-checks against nothing.
+// Corrected 2026-07-20. If you rename a field in seo.ts, rename it here in the same commit.
 export type SeoData = {
-  metaTitle?: string
-  metaDescription?: string
+  title?: string
+  description?: string
   noIndex?: boolean
 }
 

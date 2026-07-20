@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import { Nav } from '@/components/Nav'
 import { ScrollReveal } from '@/components/ScrollReveal'
 import { Contact } from '@/components/sections/Contact'
@@ -20,6 +22,26 @@ import { HOMEPAGE_QUERY, type HomePageQueryResult } from '@/sanity/queries'
 // seeded, so nothing renders blank; sections degrade gracefully to empty, never throw). Locked
 // section order: Nav → Hero → The Boat → Why Us → Destinations → Latest Articles → FAQ →
 // Testimonials → CTA → Contact → Footer. Footer/Nav are global chrome, wired in a separate slice.
+// Mirrors the boat page's generateMetadata. Until 2026-07-20 this did not exist at all: the homePage
+// singleton had an `seo` field an editor could fill in, and the served page took its title/description
+// from layout.tsx's hardcoded root metadata instead — so typing a meta title into Studio did nothing.
+// Falls back to the root metadata (by returning an empty field) rather than to hardcoded copy.
+export async function generateMetadata(): Promise<Metadata> {
+  const { data } = await sanityFetch({ query: HOMEPAGE_QUERY })
+  const { home } = (data ?? {}) as HomePageQueryResult
+
+  const title = home?.seo?.title
+  const description = home?.seo?.description
+
+  return {
+    ...(title ? { title } : {}),
+    ...(description ? { description } : {}),
+    alternates: { canonical: '/' },
+    robots: home?.seo?.noIndex ? { index: false, follow: false } : undefined,
+    openGraph: { title, description, type: 'website' },
+  }
+}
+
 export default async function Home() {
   const { data } = await sanityFetch({ query: HOMEPAGE_QUERY })
   const { home, cta, latestPosts, destinations, settings, faq } = (data ?? {}) as HomePageQueryResult
