@@ -27,7 +27,11 @@ import { HOMEPAGE_QUERY, type HomePageQueryResult } from '@/sanity/queries'
 // from layout.tsx's hardcoded root metadata instead — so typing a meta title into Studio did nothing.
 // Falls back to the root metadata (by returning an empty field) rather than to hardcoded copy.
 export async function generateMetadata(): Promise<Metadata> {
-  const { data } = await sanityFetch({ query: HOMEPAGE_QUERY })
+  // stega: false is REQUIRED on any fetch feeding metadata. Stega encodes edit-links as invisible
+  // Unicode inside every string; harmless in rendered copy, but in a <title> or og: tag it ships
+  // junk to Google. Visual Editing is off today so this is currently a no-op — it is here so that
+  // turning it on later cannot silently corrupt metadata. Per drk-seo/references/technical-seo.md.
+  const { data } = await sanityFetch({ query: HOMEPAGE_QUERY, stega: false })
   const { home } = (data ?? {}) as HomePageQueryResult
 
   const title = home?.seo?.title

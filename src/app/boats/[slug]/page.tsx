@@ -36,7 +36,9 @@ async function getBoat(slug: string) {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params
-  const { boat } = await getBoat(slug)
+  // stega: false — see the note in src/app/page.tsx. Metadata must never carry stega encoding.
+  const { data } = await sanityFetch({ query: BOAT_QUERY, params: { slug }, stega: false })
+  const { boat } = (data ?? {}) as BoatQueryResult
   if (!boat) return {}
 
   const title = boat.seo?.title || boat.pageTitle || boat.name
