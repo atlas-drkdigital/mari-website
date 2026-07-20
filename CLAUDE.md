@@ -651,17 +651,42 @@ homepage nothing consumed it.
 **Retroactive scope, agreed 2026-07-17:** run it on the **boat page once approved**, and on the **homepage**
 (already built, never passed). Every subsequent slice gets it inline.
 
-### 🔴 KNOWN GAP — the homepage's `seo` field is fetched and thrown away. VERIFIED 2026-07-17, not inferred.
-Checked against the served HTML, not by reading the source and assuming:
-- `homePage.ts` **has** a `seo` field (line 313) · `HOMEPAGE_QUERY` **selects** `seo` (line 86) ·
-  `src/app/page.tsx` has **no `generateMetadata`**. The data is queried, typed, and discarded.
-- **Served homepage:** `<title>` = `Mari Liveaboard`, description = the tagline — **both from
-  `layout.tsx`'s hardcoded root metadata**, not from Sanity. **0 JSON-LD blocks. 0 `og:` tags.**
-- **An editor can type a meta title into Studio today and nothing happens.** No error, no warning.
-- **The boat page is the correct reference** — `src/app/boats/[slug]/page.tsx`'s `generateMetadata` resolves
-  `seo.metaTitle || pageTitle || name`, sets canonical + robots + openGraph, and serves 2 JSON-LD blocks.
-  **Copy that shape onto the homepage; don't re-derive it.** (Its `<title>` also reads "Mari Liveaboard" —
-  that is the `pageTitle` fallback working correctly, NOT the same bug. Don't "fix" it.)
+### ✅ RESOLVED 2026-07-20 — the homepage `seo` gap, and the bug hiding UNDERNEATH it
+**The 2026-07-17 entry that stood here was right that the homepage had no `generateMetadata`, but two of
+its supporting details were wrong — and one of them was actively dangerous.** Corrected in `cf9d42e`;
+kept in full because *how* it was wrong is the reusable part.
+
+**What was actually true (verified 2026-07-20 by grep + a live GROQ query, not by re-reading the note):**
+1. ❌ *"`HOMEPAGE_QUERY` **selects** `seo` (line 86)"* — **it did not.** Line 86 was inside `BOAT_QUERY`.
+   The homepage query never fetched `seo` at all, so the gap was one layer deeper than logged: there was
+   nothing to "throw away." **A line number is a claim about a file that drifts; it pointed at the wrong
+   query and nobody re-checked for three days.**
+2. ❌ *"the boat page is the correct reference — copy that shape"* — **the reference was itself broken.**
+   `objects/seo.ts` defines the fields as **`title`/`description`**; `SeoData` declared
+   **`metaTitle`/`metaDescription`**. So `boat.seo?.metaTitle` was ALWAYS `undefined`. **Copying the
+   reference as instructed would have propagated a dead lookup onto the homepage.**
+3. ❌ *"the boat `<title>` reading 'Mari Liveaboard' is the `pageTitle` fallback working correctly, NOT
+   the same bug. Don't 'fix' it."* — **it WAS the bug.** The fallback fired precisely because the real
+   field could never resolve. This line came within one session of causing the fix to be reverted.
+
+**Why `tsc` never caught any of it — the generalisable trap:** query results are **cast**
+(`as BoatQueryResult`), so the TS type is an *assertion*, not a check. A field name that exists in no
+schema type-checks against nothing, forever. **When a type is reached through a cast, `tsc` green means
+"the cast compiles", NOT "the field exists."** Same shape as the "verification ritual that cannot fail"
+rule — the check passed because it was structurally incapable of failing.
+
+**Current state:** `HOMEPAGE_QUERY` selects `seo`; `HomePageData` carries it; `src/app/page.tsx` has
+`generateMetadata`; both pages read the real field names.
+⚠️ **The fix is LATENT and NOT verified against served HTML.** `homePage.seo` and `boat.seo` are both
+**`null` in the production dataset**, so the served output is byte-identical to before and no page will
+change until an editor fills the field. **The only test that can actually fail: type an SEO title into
+Studio and confirm the browser tab changes.** Do that before trusting this.
+
+**Still open, same class, wider scope:** `ogTitle` / `ogDescription` / `twitterTitle` / `twitterImage` /
+`canonicalUrl` / `focusKeyword` / `breadcrumbTitle` / `noFollow` / `overrideJsonLd` / `jsonLd` in
+`seo.ts` have **no consumer anywhere in the codebase** — every one is a control an editor can fill that
+does nothing. The homepage still serves **0 JSON-LD blocks and no `og:image`**. This is the
+"schema field nothing renders is a promise, not a feature" rule at its widest; needs a real slot.
 
 Skill-wide (Adinda's ask) — queued for `drk-website` via `_handoff/drk-website.md`.
 

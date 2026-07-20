@@ -162,9 +162,15 @@ the overhead once, and don't price the user's own review time as build time.**
 
 ### ✅ CHECKPOINT 2026-07-17 (3) — Overview refinements + the "mobile read-more" bug was CACHE, not code
 **Model:** Opus 4.8 (1M context). `tsc` ✅. Dev server restarted clean; `/` 200 + `/boats/mari` 200.
-⚠️ `eslint` has **4 PRE-EXISTING errors** in `Nav.tsx` + `TheBoat.tsx` — `<a href="/boats/mari/">` instead
-of `<Link>` (drops client-side nav). **Not this session's work and not touched.** Real, small, worth a
-slot — it's the incremental nav-link un-hardcoding done with a plain `<a>`.
+~~⚠️ `eslint` has **4 PRE-EXISTING errors** in `Nav.tsx` + `TheBoat.tsx` — `<a href="/boats/mari/">`
+instead of `<Link>`.~~ ✅ **STALE — CLOSED 2026-07-20 without any code change.** Re-checked: both files
+already import and use `<Link>` (`TheBoat.tsx:2,23-24,46` · `Nav.tsx:4,207,431`), and `tsc` + `eslint`
+are **both clean, zero errors**. The remaining raw `<a>` in `Nav.tsx` are correct as-is — two `mailto:`
+and several `href="#"` placeholders for routes that don't exist yet. Most likely fixed within the
+2026-07-17 boat slice itself, after this checkpoint line was written.
+**Lesson (same one as the stale Figma-screenshots reminder above):** this sat in the queue as a real
+scheduled item for three days and would have consumed a slot. **A logged to-do is a claim about the
+present — re-verify it before scheduling it, not just before reporting it done.**
 
 **Shipped + approved by Adinda:**
 - **Hero mobile +40px** — `translate-y-[40px] lg:translate-y-0`. A transform, NOT padding: under
