@@ -12,6 +12,7 @@ import { BoatSpecs } from '@/components/sections/boat/BoatSpecs'
 import { Contact } from '@/components/sections/Contact'
 import { Cta } from '@/components/sections/Cta'
 import { Footer } from '@/components/sections/Footer'
+import { buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
 import { resolveTokens } from '@/lib/tokens'
 import { sanityFetch } from '@/sanity/lib/live'
 import { BOAT_QUERY, type BoatQueryResult } from '@/sanity/queries'
@@ -41,16 +42,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { boat } = (data ?? {}) as BoatQueryResult
   if (!boat) return {}
 
-  const title = boat.seo?.title || boat.pageTitle || boat.name
-  const description = boat.seo?.description || boat.tagline
-
-  return {
-    title,
-    description,
-    alternates: { canonical: `/boats/${slug}` },
-    robots: boat.seo?.noIndex ? { index: false, follow: false } : undefined,
-    openGraph: { title: title ?? undefined, description: description ?? undefined, type: 'website' },
-  }
+  // The page's own title/tagline are the fallbacks when the editor leaves the SEO fields blank;
+  // everything below that (social overrides, OG/Twitter images, canonical override, noFollow)
+  // resolves in buildSeoMetadata, shared with the homepage so the two cannot drift.
+  return buildSeoMetadata({
+    seo: boat.seo,
+    fallbackTitle: boat.pageTitle || boat.name,
+    fallbackDescription: boat.tagline,
+    path: `/boats/${slug}`,
+  })
 }
 
 export default async function BoatPage({ params }: { params: Promise<Params> }) {
@@ -82,6 +82,11 @@ export default async function BoatPage({ params }: { params: Promise<Params> }) 
           })),
       }
     : null
+
+  // The editor's `jsonLd` override REPLACES the generated block when `overrideJsonLd` is on — that
+  // toggle existed in Studio since the schema pass with nothing reading it. Note this means an
+  // override also replaces the FAQPage block, which is what "override" should mean.
+  const jsonLd = resolveJsonLd(boat.seo, faqJsonLd)
 
   return (
     <>
@@ -115,10 +120,10 @@ export default async function BoatPage({ params }: { params: Promise<Params> }) 
       </main>
       <Footer />
       <ScrollReveal />
-      {faqJsonLd ? (
+      {jsonLd ? (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       ) : null}
     </>

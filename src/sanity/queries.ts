@@ -258,10 +258,24 @@ export type CabinTypeData = {
 // every read silently resolved to undefined and fell through to the fallback. `tsc` could not catch
 // it: query results are cast (`as BoatQueryResult`), so a wrong name here type-checks against nothing.
 // Corrected 2026-07-20. If you rename a field in seo.ts, rename it here in the same commit.
+// Both HOMEPAGE_QUERY and BOAT_QUERY select `seo` WHOLESALE (a bare `seo`, no projection), so every
+// field below arrives without a query change. Extended 2026-07-20 from the title/description/noIndex
+// subset — the rest were schema fields nothing rendered. Consumed by buildSeoMetadata in lib/seo.ts.
+// `focusKeyword` and `breadcrumbTitle` are deliberately absent: see that file's notes.
 export type SeoData = {
   title?: string
   description?: string
+  canonicalUrl?: string
   noIndex?: boolean
+  noFollow?: boolean
+  ogTitle?: string
+  ogDescription?: string
+  ogImage?: SanityImageWithMeta
+  twitterTitle?: string
+  twitterDescription?: string
+  twitterImage?: SanityImageWithMeta
+  overrideJsonLd?: boolean
+  jsonLd?: string
 }
 
 export type BoatData = {

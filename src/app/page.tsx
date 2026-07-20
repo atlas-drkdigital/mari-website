@@ -12,6 +12,7 @@ import { LatestArticles } from '@/components/sections/LatestArticles'
 import { Testimonials } from '@/components/sections/Testimonials'
 import { TheBoat } from '@/components/sections/TheBoat'
 import { WhyUs } from '@/components/sections/WhyUs'
+import { buildSeoMetadata } from '@/lib/seo'
 import { sanityFetch } from '@/sanity/lib/live'
 import { HOMEPAGE_QUERY, type HomePageQueryResult } from '@/sanity/queries'
 
@@ -34,16 +35,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const { data } = await sanityFetch({ query: HOMEPAGE_QUERY, stega: false })
   const { home } = (data ?? {}) as HomePageQueryResult
 
-  const title = home?.seo?.title
-  const description = home?.seo?.description
-
-  return {
-    ...(title ? { title } : {}),
-    ...(description ? { description } : {}),
-    alternates: { canonical: '/' },
-    robots: home?.seo?.noIndex ? { index: false, follow: false } : undefined,
-    openGraph: { title, description, type: 'website' },
-  }
+  // Every seo field with a rendering target resolves in buildSeoMetadata — social overrides, OG /
+  // Twitter images, the canonical override, and noIndex/noFollow as independent directives. With no
+  // title/description set it returns neither key, so layout.tsx's root metadata still applies.
+  return buildSeoMetadata({ seo: home?.seo, path: '/' })
 }
 
 export default async function Home() {

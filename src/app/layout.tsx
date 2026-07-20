@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/seo";
 import { SanityLive } from "@/sanity/lib/live";
 
 // Brand font (theme.css: --font-sans) — also available to /studio since it's the same document.
@@ -12,6 +13,10 @@ const bricolageGrotesque = Bricolage_Grotesque({
 // Static placeholder — becomes dynamic (generateMetadata reading Sanity's siteSettings/SEO
 // fields) once page data-fetching is wired up. Not the "Create Next App" default at least.
 export const metadata: Metadata = {
+  // Without metadataBase, Next emits the site-relative canonical/og:url/og:image values the pages
+  // set (e.g. `/boats/mari`) verbatim. Crawlers and social scrapers can't resolve a relative URL in
+  // a <link rel=canonical> or an og:image, so both were silently useless. Added 2026-07-20.
+  metadataBase: new URL(SITE_URL),
   title: "Mari Liveaboard",
   description: "A traditional Phinisi liveaboard for serious divers.",
   icons: {
