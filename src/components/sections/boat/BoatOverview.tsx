@@ -120,7 +120,16 @@ export function BoatOverview({
       aria-labelledby="boat-overview-heading"
       className="w-full scroll-mt-[70px] bg-bg-page py-64 lg:scroll-mt-[110px] lg:py-[120px]"
     >
-      <div className="mx-auto flex w-full max-w-[1280px] flex-col items-start gap-48 page-gutter-x lg:flex-row lg:gap-80">
+      {/* max-w 1280 -> 1440 (Adinda, 2026-07-20). She asked for the "side padding" to match the hero;
+          the padding was ALREADY identical (both use page-gutter-x = 24/48/80). The gap was the
+          CONTAINER: the hero is w-full with no cap, so at 1920 it spans 1760px, while this was capped
+          at 1280 and centred — 320px of dead space per side against the hero's 80.
+          Went to 1440, NOT uncapped, deliberately: the hero can be uncapped because its text carries
+          its own max-w-[480px]/[560px], so lines stay readable. This section's right column is
+          flex-1 prose — uncapped, it would run ~1700px per line on a wide monitor. 1440 also matches
+          the widest sections already on this page (Gallery, Cabins), so Overview doesn't end up
+          visibly wider than its neighbours. Say the word if you want it fully uncapped. */}
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start gap-48 page-gutter-x lg:flex-row lg:gap-[104px]">
         {/* Left: image, then Key Features BELOW it on the page background — not overlaid on the
             photo. Hides when there's neither an image nor a feature to show.
 
@@ -129,8 +138,10 @@ export function BoatOverview({
             heading that says what the page is about. Desktop keeps Figma's order (features left,
             copy right) via lg:order-1. Using `order` rather than reordering the JSX keeps the DOM in
             reading order for screen readers and keyboard tab order — the flip is purely visual. */}
+        {/* Left column 480 -> 432 (−10%, Adinda 2026-07-20). The right column is flex-1, so every
+            pixel taken off here goes straight to the body copy — which was the point. */}
         {keyFeatures.length || boat.keyFeaturesImage ? (
-          <div data-reveal className="order-2 flex w-full flex-col gap-[40px] lg:order-1 lg:w-[480px] lg:shrink-0">
+          <div data-reveal className="order-2 flex w-full flex-col gap-[40px] lg:order-1 lg:w-[432px] lg:shrink-0">
             {/* 3:2, NOT Figma's 485/387.2 (≈1.25, nearly 5:4). Adinda's call 2026-07-17 — the
                 mockup's near-square crop reads heavy above the Key Features list. A deliberate
                 divergence from the design file, not a miss.
@@ -175,7 +186,16 @@ export function BoatOverview({
           </div>
         ) : null}
 
-        <div className="order-1 flex flex-1 flex-col gap-24 lg:order-2 lg:pl-24 lg:pr-48 lg:pt-64" data-reveal="left">
+        {/* Column gap 80 -> 104 and lg:pr-48 restored (Adinda, 2026-07-20).
+            History worth keeping, because the class looks like it was just put back:
+            this column originally had `lg:pl-24 lg:pr-48`, which is what made the section read as
+            more inset than the hero (right edge at 80+48=128 vs the hero's 80). Both were removed.
+            Adinda then asked for the 48 back on the RIGHT ONLY, as a deliberate asymmetry now that
+            the column widths and cap have changed — not a revert. `lg:pl-24` stays gone; the gap
+            does that job.
+            104 is off-scale (the scale has 96 and 128, no 104), so it is an arbitrary value rather
+            than rounded to 96 — rounding is what makes a layout drift from the intent. */}
+        <div className="order-1 flex flex-1 flex-col gap-24 lg:order-2 lg:pr-48 lg:pt-64" data-reveal="left">
           {eyebrow ? (
             <p className="text-eyebrow uppercase text-action-primary">{eyebrow}</p>
           ) : null}
@@ -236,7 +256,7 @@ export function BoatOverview({
                   className={`flex flex-col gap-16 overflow-hidden text-body-large text-text-primary transition-[max-height] duration-700 ease-out ${
                     expanded
                       ? ''
-                      : 'max-h-[max(240px,60dvh)] [mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_100%)]'
+                      : 'max-h-[max(240px,60dvh)] lg:max-h-[max(240px,calc(60dvh_-_80px))] [mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_100%)]'
                   }`}
                 >
                   <RichText value={boat.overviewBody!} />
@@ -250,7 +270,12 @@ export function BoatOverview({
                     onClick={toggle}
                     aria-expanded={expanded}
                     aria-controls="boat-overview-body"
-                    className="group inline-flex w-fit items-center gap-4 py-4 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:text-accent-muted"
+                    // -mt-16 while COLLAPSED only (Adinda, 2026-07-20): the mask fades the last line
+                    // out well before the box ends, so the button sat in dead space. Expanded, the
+                    // text ends where the box ends and no pull-up is wanted.
+                    className={`group inline-flex w-fit items-center gap-4 py-4 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:text-accent-muted ${
+                      expanded ? '' : '-mt-16'
+                    }`}
                   >
                     {expanded ? 'Read less' : 'Read more'}
                     {/* Same chevron as the nav dropdowns (icon-nav-chevron, 7x6, rotate-180 on

@@ -36,9 +36,12 @@ const SPEC_ICONS: Record<string, string> = {
 
 // Fixed row order. A field an editor leaves blank drops its whole row rather than rendering an
 // empty one — blank `window` should mean one less row, not a stray icon.
+// `deckLocation` deliberately NOT in this list (Adinda, 2026-07-20) — it moved up into the
+// count/guests eyebrow line as its third item ("3 Cabins · Max. 2 Guests · Main Deck"). It is still
+// a cabinType field and still editor-set; only where it RENDERS changed. Do not add it back here or
+// it will appear twice.
 const SPEC_FIELDS = [
   'bedConfiguration',
-  'deckLocation',
   'window',
   'bathroom',
   'airConditioning',
@@ -99,7 +102,10 @@ export function BoatCabins({
             supersede Figma for type + spacing). eyebrow→h2 is gap-32, matching WhyUs.tsx's centred
             heading (Figma agrees here). heading→body is gap-24, matching TheBoat.tsx — Figma says
             gap-8, and that's the side that loses. */}
-        <div className="mx-auto flex max-w-[720px] flex-col gap-24 page-gutter-x text-center">
+        {/* 720 -> 800 (Adinda, 2026-07-20). Follows the existing max-w ladder, which steps in 80s at
+            the small end (480/560/640/720). 840 was considered and rejected as too wide for centred
+            prose. This is the reference for any future centred section heading + description. */}
+        <div className="mx-auto flex max-w-[800px] flex-col gap-24 page-gutter-x text-center">
           <div className="flex flex-col gap-32">
             {eyebrow ? <p className="text-eyebrow uppercase text-text-eyebrow">{eyebrow}</p> : null}
             {heading ? (
@@ -115,7 +121,9 @@ export function BoatCabins({
           ) : null}
         </div>
 
-        <div className="flex flex-col gap-80">
+        {/* gap-24 on mobile (Adinda, 2026-07-20) — 80px between the tab strip and the image read as
+            a disconnect on a narrow screen. Desktop keeps 80. */}
+        <div className="flex flex-col gap-24 lg:gap-80">
           {/* tab-items (778:8770) — the underline is a continuous 2px track across the whole row, so
               the tabs butt together (px-12 each, NO gap) rather than sitting apart. On mobile the row
               scrolls horizontally instead of wrapping, which keeps that track unbroken.
@@ -142,7 +150,10 @@ export function BoatCabins({
                   aria-selected={selected}
                   aria-controls={`cabin-panel-${cabin._id}`}
                   onClick={() => selectType(i)}
-                  className={`shrink-0 border-b-2 px-12 py-8 text-button whitespace-nowrap uppercase transition-colors duration-300 ease-in-out ${
+                  // text-button-small on MOBILE only (Adinda, 2026-07-20) so the cabin tabs match the
+                  // gallery's 12px tabs on a phone. Desktop keeps 14px (text-button) — the size
+                  // difference between the two sections is deliberate there, per the Figma note above.
+                  className={`shrink-0 border-b-2 px-12 py-8 text-button-small whitespace-nowrap uppercase transition-colors duration-300 ease-in-out lg:text-button ${
                     selected
                       ? 'border-action-primary text-action-primary'
                       : 'border-action-primary/35 text-action-primary/55 hover:text-action-primary'
@@ -213,7 +224,10 @@ export function BoatCabins({
             </div>
 
             {/* right-col-content (778:8781) — 475.86px in Figma, rounded to 476. */}
-            <div className="flex flex-col gap-16 page-gutter-x lg:w-[476px] lg:shrink-0 lg:px-0 lg:pt-24">
+            {/* lg:pt-24 removed (Adinda, 2026-07-20) — the text column sat 24px below the image.
+                Parent is already lg:items-start, so dropping the offset top-aligns the two. Same
+                change as the Gallery's lg:pt-64. */}
+            <div className="flex flex-col gap-16 page-gutter-x lg:w-[476px] lg:shrink-0 lg:px-0">
               <div className="flex flex-col gap-24">
                 {/* The cabin NAME shares a row with the arrows so the two align to each other; the
                     "3 Cabins · Max. 2 Guests" label drops to its own row beneath (Adinda, 2026-07-20).
@@ -262,11 +276,13 @@ export function BoatCabins({
                       rather than a typed string, so it can't drift from the real counts. Styled as an
                       eyebrow (11px / 1.375 tracking), not body copy. Now on its OWN row below the
                       name+arrows row. */}
-                  {active.count || active.maxGuests ? (
+                  {active.count || active.maxGuests || active.deckLocation ? (
                     <p className="text-eyebrow uppercase text-text-eyebrow">
                       {[
                         active.count ? `${active.count} Cabins` : null,
                         active.maxGuests ? `Max. ${active.maxGuests} Guests` : null,
+                        // Third item (Adinda, 2026-07-20), moved up out of the spec list below.
+                        active.deckLocation,
                       ]
                         .filter(Boolean)
                         .join(' · ')}

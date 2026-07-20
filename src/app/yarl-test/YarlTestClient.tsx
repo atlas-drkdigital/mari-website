@@ -1,17 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Lightbox from 'yet-another-react-lightbox'
+import Captions from 'yet-another-react-lightbox/plugins/captions'
 import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 
 import 'yet-another-react-lightbox/styles.css'
+import 'yet-another-react-lightbox/plugins/captions.css'
 import 'yet-another-react-lightbox/plugins/thumbnails.css'
 
-// The Captions and Counter PLUGINS were both dropped (2026-07-20) — see the slideFooter note below.
-// Short version: the plugin splits title (top) from description (bottom) and positions the counter
-// independently, which is what made the count collide with the title. One custom footer puts all
-// three where the old hand-rolled lightbox had them.
+// CAPTIONS: back to the PLUGIN's default layout (2026-07-20, Adinda: "i like the initial title (big
+// upper left, and the image count next to it not overlapping) ... you've created too much"). The
+// custom bottom-centred `slideFooter` that briefly replaced it is gone.
+//
+// The count is NOT the Counter plugin. Counter mounts its own absolutely-positioned node, which is
+// exactly what made it land ON TOP of the title. Instead the count is folded INTO the title itself:
+// YARL types `title` as React.ReactNode (see plugins/captions/index.d.ts), so a node — not a string
+// — is a supported value, and the two can never collide because they are one element.
 
 // Our icons, masked so they inherit currentColor — same technique as the section arrows, so the
 // lightbox chrome matches the rest of the site instead of using YARL's heavier Material defaults.
@@ -86,6 +92,37 @@ export function YarlTestClient({
 
   const active = open?.set === 'cabins' ? cabins : gallery
 
+  // ONE caption line at the BOTTOM — no top title bar (Adinda, 2026-07-20).
+  //   Gallery:  "21 / 23  <caption>"
+  //   Cabins :  "3 / 7  Deluxe Cabin: <caption>"   (cabin name bold, then a colon)
+  // `title` was removed from the galleryImage schema entirely, so there is nothing to show at the
+  // top; the count moved down to join the caption.
+  //
+  // Built as `description` (which the Captions plugin renders at the BOTTOM) rather than `title`
+  // (which it renders at the top). The count is baked into the slide it belongs to, so there is no
+  // "current index" to read wrong while adjacent slides render mid-swipe.
+  //
+  // The cabins set is distinguished by `s.title` still carrying the CABIN NAME — on the test page
+  // that value is derived from cabinType.name in page.tsx, not from the removed schema field.
+  const isCabins = open?.set === 'cabins'
+  const slides = useMemo(
+    () =>
+      active.map((s, i) => ({
+        ...s,
+        title: undefined,
+        description: (
+          <span className="flex flex-wrap items-baseline justify-center gap-x-8 gap-y-4">
+            <span className="shrink-0 font-light opacity-60">{`${i + 1} / ${active.length}`}</span>
+            {isCabins && s.title ? (
+              <span className="font-semibold">{`${s.title}:`}</span>
+            ) : null}
+            {s.description ? <span>{s.description}</span> : null}
+          </span>
+        ),
+      })),
+    [active, isCabins],
+  )
+
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-64 px-24 py-96">
       <header className="flex flex-col gap-16">
@@ -118,8 +155,13 @@ export function YarlTestClient({
         open={open !== null}
         close={() => setOpen(null)}
         index={open?.index ?? 0}
-        slides={active}
-        plugins={[Thumbnails, Zoom]}
+        slides={slides}
+        plugins={[Captions, Thumbnails, Zoom]}
+        // descriptionMaxLines was 3 — the plugin implements it as `-webkit-line-clamp`, so a longer
+        // caption TRUNCATED with an ellipsis instead of wrapping. Worst on mobile, where 3 lines is
+        // reached almost immediately. Raised high and the clamp is fully removed in the style below;
+        // the maxWidth is what controls line length now, not a line count.
+        captions={{ descriptionTextAlign: 'center', descriptionMaxLines: 99 }}
         thumbnails={{ width: 96, height: 64, border: 0, gap: 8 }}
         zoom={{ maxZoomPixelRatio: 3 }}
         // ── TRANSITION ────────────────────────────────────────────────────────────────────────
@@ -149,47 +191,46 @@ export function YarlTestClient({
           iconClose: () => <MaskIcon src="/assets/icon-close.svg" />,
           iconZoomIn: () => <MaskIcon src="/assets/icon-zoom-in.svg" />,
           iconZoomOut: () => <MaskIcon src="/assets/icon-zoom-out.svg" />,
-          // ── CAPTION + COUNT, one block, at the BOTTOM ───────────────────────────────────────
-          // Replaces the Captions and Counter plugins. Why they had to go:
-          //   - Captions renders `title` at the TOP and `description` at the BOTTOM (its own CSS:
-          //     title_container{top:0} / description_container{bottom:0}). The old hand-rolled
-          //     lightbox put BOTH at the bottom (BoatGallery.tsx:404-413), so the title appeared to
-          //     "move" and — because every gallery `caption` is null in Sanity — the bottom looked
-          //     empty. Nothing was lost; it was relocated.
-          //   - Counter positions itself independently, which is why it landed ON TOP of the title.
-          // Index is derived from the slide itself, NOT tracked in state: slideFooter renders for
-          // adjacent slides during a swipe, so a single "current index" would print the wrong
-          // number on the incoming slide mid-transition.
-          slideFooter: ({ slide }) => {
-            const s = slide as unknown as TestSlide
-            const i = active.findIndex((x) => x.src === s.src)
-            if (!s.title && !s.description) return null
-            return (
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center px-24 pb-24">
-                <div className="flex w-full max-w-[720px] flex-col gap-4 text-center">
-                  <p className="text-button-small uppercase text-text-ondark-eyebrow">
-                    {/* Count BEFORE the title, same size/style, thinner + slightly transparent.
-                        Bricolage Grotesque is loaded as a variable font with no weight subset, so
-                        300 is genuinely available (the ramp already uses 200 for display-accent). */}
-                    {i >= 0 ? (
-                      <span className="font-light opacity-60">{`${i + 1}/${active.length}  `}</span>
-                    ) : null}
-                    {s.title}
-                  </p>
-                  {s.description ? (
-                    <p className="text-body-medium text-text-ondark-secondary">{s.description}</p>
-                  ) : null}
-                </div>
-              </div>
-            )
-          },
         }}
         // Scrim at 92% (was 95%, Adinda) + the same blur as the hand-rolled overlay. YARL themes via
-        // CSS custom properties, so this is the supported hook, not an override hack.
+        // CSS custom properties and per-slot style objects, so this is the supported hook, not an
+        // override hack. The four `captions*` slots are the plugin's own documented slots.
         styles={{
           container: {
             backgroundColor: 'color-mix(in srgb, var(--color-background-lightbox-scrim) 92%, transparent)',
             backdropFilter: 'blur(12px)',
+          },
+          // Gradient overlay that sits ON the image and resolves INTO the scrim (Adinda, 2026-07-20).
+          // Bottom stop is the scrim colour at full opacity, so the band has no visible bottom edge —
+          // it blends into the background rather than ending on a line. The top stop is the same
+          // colour at 0 alpha, NOT `transparent`: in most engines `transparent` is rgba(0,0,0,0), so
+          // interpolating to it drags the midpoint toward grey and produces a dirty fade.
+          // Tall (140px) so the fade is gradual enough to read as part of the photo rather than a
+          // caption bar; two- and three-line captions still sit inside it.
+          captionsDescriptionContainer: {
+            background:
+              'linear-gradient(to top, rgba(10,17,31,1) 0%, rgba(10,17,31,0.85) 45%, rgba(10,17,31,0) 100%)',
+            padding: '64px 24px 20px',
+          },
+          // beige-50 (#fdfcfa) via text-ondark-PRIMARY — "almost white", Adinda's words. It was on
+          // ondark-secondary (beige-300), which reads noticeably duller over a photo.
+          // maxWidth on the TEXT, not the container — the gradient band stays full-bleed while the
+          // caption wraps. 720 matches the hand-rolled lightbox's existing caption width
+          // (BoatGallery), so the two stay consistent when they converge. ~90 characters at
+          // body-medium; drop to 640 (~80ch) if it still reads long on a wide monitor.
+          captionsDescription: {
+            fontSize: 'var(--text-body-medium)',
+            lineHeight: 'var(--text-body-medium--line-height)',
+            color: 'var(--color-text-ondark-primary)',
+            textAlign: 'center',
+            maxWidth: '720px',
+            marginInline: 'auto',
+            // Kills the clamp outright: the plugin's css sets `display:-webkit-box` +
+            // `-webkit-line-clamp`, which is what truncates. `display:block` removes the mechanism
+            // entirely, so the caption always wraps regardless of length.
+            display: 'block',
+            WebkitLineClamp: 'unset',
+            overflow: 'visible',
           },
         }}
         controller={{ closeOnBackdropClick: true }}

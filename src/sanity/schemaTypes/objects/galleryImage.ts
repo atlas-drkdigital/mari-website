@@ -7,16 +7,23 @@ import { GALLERY_CATEGORIES } from '../galleryCategories'
 // what enables native multi-file batch upload: "arrays of images accept batches of files to be
 // dropped on them" (Sanity v6.4 image-type docs). An object *wrapping* an image would not reliably
 // get that behavior — this must stay a bare image type with extra fields, not a wrapper object.
-// title / alt / caption are all editable, NONE required — bulk upload is about getting the files in
+// alt / caption are both editable, NEITHER required — bulk upload is about getting the files in
 // fast; the text is filled per image afterward (or left blank). Editable alt on every image is the
 // DRK hard rule; requiring it to be filled is not.
+//
+// `title` REMOVED 2026-07-20 (Adinda). It duplicated `alt` in practice — every seeded image had the
+// two set to the identical string — and gave editors two boxes with no clear difference between
+// them. The lightbox now shows image count + caption only, so nothing renders a title.
+// ⚠️ Existing documents still CARRY a `title` value in their gallery array members. Sanity does not
+// delete data when a field leaves the schema; it just stops showing it. That orphaned data is
+// harmless and is deliberately left in place — it is the only record of the old values if this is
+// ever reversed. Strip it in a migration only if it actually gets in the way.
 export const galleryImageType = defineType({
   name: 'galleryImage',
   title: 'Gallery Image',
   type: 'image',
   options: { hotspot: true },
   fields: [
-    defineField({ name: 'title', title: 'Title', type: 'string' }),
     defineField({
       name: 'alt',
       title: 'Alt text',

@@ -165,8 +165,17 @@ export function BoatGallery({
   // homepage rhythm. Was flat `pt-96 pb-160` — desktop-sized padding on phones.
   return (
     <section id="gallery" aria-labelledby="boat-gallery-heading" className="w-full bg-bg-page pt-64 pb-96 lg:pt-96 lg:pb-160">
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start justify-between gap-48 lg:flex-row lg:gap-64 lg:pl-160">
-        <div className="flex w-full flex-col gap-48 page-gutter-x lg:w-auto lg:max-w-[560px] lg:flex-1 lg:px-0 lg:pt-64">
+      {/* GRID, not flex (Adinda, 2026-07-20). On mobile the tab panel (category heading + body) must
+          sit BELOW the image, while the section heading + tabs stay above it. Those two text blocks
+          are not siblings of the image, so flex `order` cannot reach across the nesting — grid can,
+          by placing three children into explicit areas per breakpoint. No DOM duplication.
+            mobile   1 column: heading+tabs (1) · image (2) · tab panel (3)
+            desktop  2 columns: heading+tabs and tab panel stacked in col 1, image spans both rows
+                     in col 2 — visually identical to the previous flex layout.
+          DOM order is heading → panel → image, i.e. reading order, so screen readers and tab order
+          keep the copy together regardless of the visual arrangement. */}
+      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-start gap-48 lg:grid-cols-[minmax(0,560px)_708px] lg:justify-between lg:gap-x-64 lg:gap-y-48 lg:pl-160">
+        <div className="order-1 flex w-full flex-col gap-48 page-gutter-x lg:order-none lg:col-start-1 lg:row-start-1 lg:px-0">
           <div className="flex flex-col gap-64">
             {/* Block/SectionHeading (778:8849) — gap-34 is off-scale, so it's an arbitrary value.
                 NOTE: this node has NO eyebrow child (unlike Cabins' SectionHeading). It's rendered
@@ -209,11 +218,18 @@ export function BoatGallery({
                   Note the tablist lost its `-mx-24 px-24` edge-bleed: it now has to be a flex-1
                   sibling of the arrows for the track to end before them. */}
               {tabs.length ? (
-                <div className="flex items-center gap-16">
+                <div className="flex items-center gap-12 lg:gap-16">
+                  {/* MOBILE: the inactive underline runs the FULL width of the tablist, not just under
+                      the tabs, so it reaches to ~12px before the arrows (Adinda, 2026-07-20). The
+                      border lives on the SCROLL CONTAINER, so it spans the flex-1 track rather than
+                      ending after the last tab. Each tab's own border-b-2 draws over it at the same
+                      offset, so the active tab still reads as a solid segment on the lighter rail.
+                      Desktop drops it (`lg:border-b-0`) — there the arrows sit up by the heading and
+                      the rail would run to the column edge with nothing to stop at. */}
                   <div
                     role="tablist"
                     aria-label="Gallery categories"
-                    className="flex min-w-0 flex-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden"
+                    className="flex min-w-0 flex-1 overflow-x-auto border-b-2 border-action-primary/35 [-ms-overflow-style:none] [scrollbar-width:none] lg:overflow-visible lg:border-b-0 [&::-webkit-scrollbar]:hidden"
                   >
                     {tabs.map((tab, i) => {
                       const selected = i === tabIndex
@@ -226,7 +242,11 @@ export function BoatGallery({
                           aria-selected={selected}
                           aria-controls={`gallery-panel-${tab._key}`}
                           onClick={() => selectTab(i)}
-                          className={`shrink-0 border-b-2 px-12 py-8 text-button-small whitespace-nowrap uppercase transition-colors duration-300 ease-in-out ${
+                          // -mb-[2px] pulls each tab down over the container's rail so the ACTIVE
+                          // tab's 2px border REPLACES it rather than stacking above it. Without this
+                          // the two borders sit at different offsets and the active segment looks
+                          // thinner than the rail it's meant to cover (Adinda spotted it 2026-07-20).
+                          className={`-mb-[2px] shrink-0 border-b-2 px-12 py-8 text-button-small whitespace-nowrap uppercase transition-colors duration-300 ease-in-out ${
                             selected
                               ? 'border-action-primary text-action-primary'
                               : 'border-action-primary/35 text-action-primary/55 hover:text-action-primary'
@@ -246,14 +266,22 @@ export function BoatGallery({
                 </div>
               ) : null}
             </div>
+          </div>
+        </div>
 
-            {activeTab ? (
-              <div
-                role="tabpanel"
-                id={`gallery-panel-${activeTab._key}`}
-                aria-labelledby={`gallery-tab-${activeTab._key}`}
-                className="flex flex-col gap-16"
-              >
+        {/* TAB PANEL — a GRID CHILD, deliberately not nested in the heading column. That is what lets
+            it sit below the image on mobile (order-3) while staying under the heading on desktop
+            (col 1 / row 2). Moving it back inside the column would silently undo the mobile order. */}
+        {activeTab ? (
+          <div
+            role="tabpanel"
+            id={`gallery-panel-${activeTab._key}`}
+            aria-labelledby={`gallery-tab-${activeTab._key}`}
+            /* lg:pr-48 for deliberate asymmetry (Adinda, 2026-07-20). Scoped to THIS panel only
+               — the tab heading + body. The section heading, eyebrow and tab strip above are
+               untouched, and it is desktop-only so mobile keeps the full gutter width. */
+            className="order-3 flex flex-col gap-16 page-gutter-x lg:order-none lg:col-start-1 lg:row-start-2 lg:px-0 lg:pr-48"
+          >
                 {/* EDITORIAL h3 (23px), not display — this is a heading inside body copy, not a
                     section anchor. The old code used display-h3 (34px). See the ramp rule in
                     CLAUDE.md; picking by number alone is how that drifts. */}
@@ -265,18 +293,14 @@ export function BoatGallery({
                     <RichText value={activeTab.body} />
                   </div>
                 ) : null}
-              </div>
-            ) : null}
           </div>
-
-          {/* Element/Carousel/Arrows Paired (778:8861) moved UP into the heading row — see the note
-              there. Figma places these below the tab panel; the homepage convention puts section
-              arrows beside the heading, and conventions supersede Figma. */}
-        </div>
+        ) : null}
 
         {/* Image sits flush to the right edge (the frame has pl-160 only, no pr) — mirror image of
-            the Cabins block, which is flush left. */}
-        <div className="w-full shrink-0 lg:w-[708px]">
+            the Cabins block, which is flush left.
+            order-2 on mobile puts it BETWEEN the tabs and the tab panel; on desktop it spans both
+            grid rows in column 2, which reproduces the old flex layout exactly. */}
+        <div className="order-2 w-full shrink-0 lg:order-none lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:w-[708px]">
           {/* aspect-[3/2] (2026-07-20, Adinda) — was 708/532 (1.331). Now matches Key Features
               (BoatOverview.tsx:142) and Cabins, so every non-hero image block on the page shares
               one ratio. */}
@@ -285,7 +309,7 @@ export function BoatGallery({
               <button
                 type="button"
                 onClick={() => setLightboxIndex(all.indexOf(currentImage))}
-                aria-label={`Open ${currentImage?.title ?? 'photo'} in full screen`}
+                aria-label={`Open ${currentImage?.alt ?? 'photo'} in full screen`}
                 className="absolute inset-0 block size-full cursor-zoom-in"
               >
                 {/* Hover zoom — the site-wide treatment for every non-hero image (TheBoat, WhyUs,
@@ -397,20 +421,17 @@ export function BoatGallery({
             ) : null}
           </div>
 
-          {/* Caption: title + caption together as ONE block below the image (Adinda's ask). Worth
-              knowing: YARL's Captions plugin does NOT do this — it overlays them and splits title to
-              the top of the viewport and description to the bottom. Matching this layout under YARL
-              needs `render.slideFooter`. */}
-          {lightboxImage.title || lightboxImage.caption ? (
-            <div className="mx-auto flex w-full max-w-[720px] shrink-0 flex-col gap-4 pt-16 text-center">
-              {lightboxImage.title ? (
-                <p className="text-button-small uppercase text-text-ondark-eyebrow">
-                  {lightboxImage.title}
-                </p>
-              ) : null}
-              {lightboxImage.caption ? (
-                <p className="text-body-medium text-text-ondark-secondary">{lightboxImage.caption}</p>
-              ) : null}
+          {/* Image count + caption on ONE line (Adinda, 2026-07-20). `title` was removed from the
+              galleryImage schema — it duplicated `alt` — so the old two-line title/caption block is
+              gone with it.
+              Count is ondark-primary (beige-50, near-white) at reduced opacity rather than a dimmer
+              token, so it reads as the same colour family as the caption, just quieter. */}
+          {lightboxImage.caption ? (
+            <div className="mx-auto flex w-full max-w-[720px] shrink-0 items-baseline justify-center gap-8 pt-16 text-center">
+              <span className="shrink-0 font-light text-body-medium text-text-ondark-primary opacity-60">
+                {all.indexOf(lightboxImage) + 1} / {all.length}
+              </span>
+              <p className="text-body-medium text-text-ondark-primary">{lightboxImage.caption}</p>
             </div>
           ) : null}
 
