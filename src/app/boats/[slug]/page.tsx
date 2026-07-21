@@ -119,13 +119,17 @@ export default async function BoatPage({ params }: { params: Promise<Params> }) 
         {/* The SubNav is pinned to the hero's bottom edge — non-floating state (the floating/
             compact scrolled state is a later pass). Composed HERE, not inside BoatHero: the
             component is shared with the destination page, and the hero stays a Server Component
-            while the SubNav is a client island. Desktop-only for now; mobile ships with the
-            floating pass. z-20 sits it above the hero (z-10). */}
+            while the SubNav is a client island. On mobile it is a drag-scrollable TabRail (the
+            component owns that behavior) and runs FLUSH to the screen's left edge — no gutter
+            below lg (Adinda, 2026-07-21: the gutter read awkward on a scroll rail; edge-to-edge
+            is the norm for one). lg+ restores the page gutter, INSIDE the scroll container so the
+            start-aligned rail scroll lands items at the gutter (the component reads the computed
+            padding, so both states align correctly). z-20 sits it above the hero (z-10). */}
         <div className="relative">
           <BoatHero boat={boat} />
           <SubNav
             items={subNavItems}
-            className="absolute inset-x-0 bottom-0 z-20 hidden w-full items-center page-gutter-x lg:flex"
+            className="absolute inset-x-0 bottom-0 z-20 w-full"
           />
         </div>
         <BoatOverview

@@ -58,6 +58,11 @@ export function BoatHero({ boat }: { boat: BoatData }) {
         {/* Same scrim recipe as the homepage hero: a left-to-right gradient, not a flat overlay.
             The copy sits left, so the photo stays readable on the right where it's uncovered. */}
         <div className="absolute inset-0 bg-linear-to-r from-background-ondark-page/78 via-background-ondark-page/40 to-transparent lg:from-background-ondark-page/70 lg:via-background-ondark-page/25" />
+        {/* Bottom scrim band (Adinda, 2026-07-21): the left-to-right scrim fades out toward the
+            right, leaving the SubNav's right-side items on bare photo. Same recipe as the nav
+            mega-menu's bottom fade (Nav.tsx) — a fixed-height bottom-up gradient in the hero's
+            own navy, under the SubNav across its full width. */}
+        <div className="absolute inset-x-0 bottom-0 h-[160px] bg-gradient-to-t from-background-ondark-page/70 to-transparent" />
       </div>
 
       {/* data-reveal="left" — fade + slide in from the left, same as the homepage hero's content
@@ -120,6 +125,10 @@ export function BoatHero({ boat }: { boat: BoatData }) {
             CSS-only on purpose: this keeps BoatHero a Server Component (it holds the LCP image). Mouse
             drag-scroll would need the client hook — native touch swipe covers the phone case, which is
             the one that broke. shrink-0 on each item so they keep their width in the scroll row. */}
+        {/* Stats + brochure share ONE box at gap-24 (Figma 778:8723, Adinda 2026-07-21 — both
+            breakpoints): they're a unit, closer to each other than the container's 32/48 rhythm
+            spaces the other hero children. */}
+        <div className="flex flex-col gap-24">
         {stats.length ? (
           <dl className="flex max-w-full flex-nowrap gap-24 overflow-x-auto scrollbar-hidden lg:flex-wrap lg:gap-x-48 lg:gap-y-24 lg:overflow-visible">
             {stats.map((stat) => (
@@ -131,23 +140,42 @@ export function BoatHero({ boat }: { boat: BoatData }) {
           </dl>
         ) : null}
 
-        {/* Figma 778:8741. Hidden entirely when no PDF is uploaded — a download button with
-            nothing behind it is worse than no button. */}
+        {/* Figma 778:8741 `download-cta` — REBUILT to the node 2026-07-21 (Adinda caught the first
+            pass diverging): a 38px circle holding the picture_as_pdf icon (14px) — NOT an arrow —
+            then gap-8 (was 16) to the label, 14px BOLD at 1.8 leading in accent-onimage-muted,
+            with a 16px arrow_forward AFTER the text. Hover lifts the whole group to full white
+            (no hover in the node; this matches the on-image link convention).
+            target=_blank (Adinda): the CDN is cross-origin so `download` is ignored by browsers —
+            the PDF opens as a page, and it must not swap out the site. rel per the external-link
+            convention. Hidden entirely when no PDF is uploaded — a download button with nothing
+            behind it is worse than no button. */}
         {boat.brochureUrl ? (
           <a
             href={boat.brochureUrl}
-            download
-            className="group inline-flex w-fit items-center gap-16 text-text-ondark-primary transition-colors duration-300 ease-in-out hover:text-accent-ondark-primary"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="group inline-flex w-fit items-center gap-8 text-accent-onimage-muted transition-colors duration-300 ease-in-out hover:text-text-ondark-primary"
           >
-            <span className="grid size-[38px] shrink-0 place-items-center rounded-full border border-text-ondark-primary transition-colors duration-300 ease-in-out group-hover:border-accent-ondark-primary">
+            <span className="grid size-[38px] shrink-0 place-items-center rounded-full border border-current">
               <span
                 aria-hidden="true"
-                className="block size-[16px] bg-current [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+                className="block size-[14px] bg-current [mask-image:url('/assets/icon-pdf.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
               />
             </span>
-            <span className="text-button-small">Download Brochure</span>
+            <span className="flex items-center gap-4 py-4 text-body-medium font-bold">
+              Download Brochure
+              {/* Download glyph (arrow onto a tray line), NOT the node's arrow_forward — Adinda's
+                  explicit override 2026-07-21: a sideways arrow says nothing about downloading;
+                  this is the industry-standard icon for it. Nudges DOWN on hover, matching the
+                  direction it points. */}
+              <span
+                aria-hidden="true"
+                className="block size-[16px] shrink-0 bg-current transition-transform duration-300 ease-in-out group-hover:translate-y-[2px] [mask-image:url('/assets/icon-download.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+              />
+            </span>
           </a>
         ) : null}
+        </div>
       </div>
     </section>
   )

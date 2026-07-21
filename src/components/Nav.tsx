@@ -429,11 +429,16 @@ export function Nav() {
                 className={`block h-[8px] w-[10px] shrink-0 transition-[background-color,transform] duration-300 ease-in-out [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${mobileAccordion.destinations ? 'rotate-180 bg-accent-ondark-muted' : 'bg-text-ondark-primary'}`}
               />
             </button>
-            {/* Same grid-rows 0fr/1fr animated-height pattern as FAQ.tsx — overflow-hidden lives on
-                the inner content (not this grid wrapper), so its own bottom padding collapses away
-                too when the row animates to 0fr, matching the established, proven approach. */}
+            {/* Same grid-rows 0fr/1fr animated-height pattern as FAQ.tsx — with one structural rule
+                learned the hard way (Android Chrome + large system font, 2026-07-21): the DIRECT
+                grid item must carry `min-h-0 overflow-hidden` and NO padding — padding on the item
+                joins its minimum size, so the 0fr row can't fully collapse and the closed accordion
+                rows render taller than the plain links (scaled fonts make the leak visible).
+                Padding lives one level deeper, where the collapse clips it. The FAQ never hit this
+                because its collapsed child uses a margin, which doesn't join the minimum. */}
             <div className={`grid [transition:grid-template-rows_500ms_cubic-bezier(0.65,0,0.35,1)] ${mobileAccordion.destinations ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-              <ul id="mobile-mega-destinations" aria-label="Destinations" className="flex flex-col divide-y divide-accent-ondark-onprimary/10 overflow-hidden pb-16">
+              <div className="min-h-0 overflow-hidden">
+                <ul id="mobile-mega-destinations" aria-label="Destinations" className="flex flex-col divide-y divide-accent-ondark-onprimary/10 pb-16">
                 {DESTINATIONS.map((dest) => (
                   <li key={dest.id}>
                     <button type="button" className="flex w-full flex-col gap-2 py-12 text-left">
@@ -442,7 +447,8 @@ export function Nav() {
                     </button>
                   </li>
                 ))}
-              </ul>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -464,16 +470,20 @@ export function Nav() {
                 className={`block h-[8px] w-[10px] shrink-0 transition-[background-color,transform] duration-300 ease-in-out [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${mobileAccordion.resources ? 'rotate-180 bg-accent-ondark-muted' : 'bg-text-ondark-primary'}`}
               />
             </button>
+            {/* min-h-0 + padding-one-level-deeper — same Android large-font collapse fix as the
+                Destinations accordion above. */}
             <div className={`grid [transition:grid-template-rows_500ms_cubic-bezier(0.65,0,0.35,1)] ${mobileAccordion.resources ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-              <ul id="mobile-mega-resources" aria-label="Resources" className="flex flex-col divide-y divide-accent-ondark-onprimary/10 overflow-hidden pb-16">
-                {RESOURCE_LINKS.map((label) => (
-                  <li key={label}>
-                    <button type="button" className="flex w-full py-12 text-left">
-                      <span className="text-nav-large text-text-ondark-primary">{label}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <div className="min-h-0 overflow-hidden">
+                <ul id="mobile-mega-resources" aria-label="Resources" className="flex flex-col divide-y divide-accent-ondark-onprimary/10 pb-16">
+                  {RESOURCE_LINKS.map((label) => (
+                    <li key={label}>
+                      <button type="button" className="flex w-full py-12 text-left">
+                        <span className="text-nav-large text-text-ondark-primary">{label}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
 
