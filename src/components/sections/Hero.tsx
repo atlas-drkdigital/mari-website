@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
+import { HeroVideo } from '@/components/HeroVideo'
 import { sanityImageProps } from '@/sanity/lib/image'
 import type { DestinationCardData, HomePageData } from '@/sanity/queries'
 
@@ -74,6 +75,14 @@ export function Hero({ home, destinations }: { home: HomePageData | null; destin
             priority
             sizes="100vw"
             className="object-cover object-[65%_42%] lg:object-cover"
+          />
+          {/* Optional hero video over the cover image (the image stays as poster + LCP + fallback).
+              Behaviour/guards (mobile, reduced-motion, fade-in) all live in HeroVideo. className
+              matches the poster's crop so a swap between them doesn't jump. */}
+          <HeroVideo
+            url={home?.heroVideo?.url}
+            playOnMobile={home?.heroVideo?.playOnMobile}
+            className="object-[65%_42%] lg:object-center"
           />
           <div className="absolute inset-0 bg-linear-to-r from-background-ondark-page/78 via-background-ondark-page/40 to-transparent lg:from-background-ondark-page/55 lg:via-transparent" />
         </div>
