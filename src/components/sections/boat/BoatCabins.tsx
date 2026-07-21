@@ -306,18 +306,18 @@ export function BoatCabins({
                     onClick={() => stepImage(-1)}
                     aria-label="Previous photo"
                     style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
-                    className="pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
+                    className="group pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary"
                   >
-                    <CarouselChevron direction="left" sizeClassName="h-[12.13px] w-[16px]" />
+                    <CarouselChevron direction="left" sizeClassName="h-[18.19px] w-[24px] transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
                   </button>
                   <button
                     type="button"
                     onClick={() => stepImage(1)}
                     aria-label="Next photo"
                     style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
-                    className="pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
+                    className="group pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary"
                   >
-                    <CarouselChevron direction="right" sizeClassName="h-[12.13px] w-[16px]" />
+                    <CarouselChevron direction="right" sizeClassName="h-[18.19px] w-[24px] transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
                   </button>
                 </div>
               ) : null}

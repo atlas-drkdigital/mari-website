@@ -551,6 +551,16 @@ per-image busywork.
 editors actually use it. Reusable beyond Mari (every Atlas liveaboard/destination gallery) — queued for
 the skill in `_handoff/drk-website.md`.
 
+## SubNav scroll chrome — LOCKED PATTERN, site-wide + future DRK sites (2026-07-21, Adinda)
+The in-page section navigation and its scroll ladder are a locked pattern; the behavior contract
+lives in `src/components/SubNav.tsx`'s header (anchors + IntersectionObserver positional scroll-spy
++ TabRail mobile + the two-row compact floating chrome with the main nav). **Desktop ladder: dark
+nav over hero → ONE switch to compact light nav row + navy-glass section row; no intermediate
+states, no scroll-direction logic. Mobile: nav always visible, chip bar beneath.** Registered
+component names for the componentization pass: `SubNav`, `TabRail`, `SingleImageCarousel`,
+`LightboxGallery` (variant `default`), `CarouselChevron`. Queued for `drk-website` via
+`_handoff/drk-website.md`.
+
 ## FAQ section layout variants — `default` / `categorized` (locked 2026-07-17, Adinda)
 The FAQ section repeats site-wide in two shapes, and they are ONE component with a `layout` field, not two
 components. **The field values are `default` and `categorized`** — named for what the variant *does*, not

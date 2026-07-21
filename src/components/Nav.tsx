@@ -47,14 +47,23 @@ export function Nav() {
   // subNavFloating turns itself off near the top of the page and on pages without a SubNav, which
   // is what brings the full nav back. No scroll-direction logic — deliberately (a scroll-up
   // reveal variant produced a 3-row stack and was rejected).
-  const { subNavFloating } = useSyncExternalStore(navChrome.subscribe, navChrome.get, navChrome.getServer)
-  const navCompact = isDesktop && subNavFloating && !megaOpen && !mobileMenuOpen
+  // COMPACT triggers at the ordinary FLIP THRESHOLD, not at the rail hand-off (Adinda,
+  // 2026-07-21 final revision): on a sub-nav page the nav goes STRAIGHT from its transparent
+  // dark form to the compact light row as soon as you scroll — a transparent full nav overlaying
+  // scrolled hero content was a mess, and flipping to the full light nav first was the dizzying
+  // extra costume. The floating SubNav row joins later, once the hero's static rail passes out
+  // of view (SubNav's own boundary) — so the section anchors always live in exactly ONE place.
+  const { subNavPresent } = useSyncExternalStore(navChrome.subscribe, navChrome.get, navChrome.getServer)
+  const navCompact = isDesktop && subNavPresent && scrolled && !megaOpen && !mobileMenuOpen
 
-  // Compact mode keeps the NATURAL light theme (flipped back, Adinda 2026-07-21, second pass): a
-  // navy first row made the MAIN nav the loudest thing on screen, backwards for a bar that should
-  // "just be there when needed" — the navy moved to the SECTION row (SubNav), which is the one
-  // that deserves centre stage while reading the page.
-  const navTheme: NavTheme = megaOpen ? 'mega' : scrolled ? 'light' : 'top'
+  // Theme: compact = the natural LIGHT bar (a navy first row made the main nav the loudest thing
+  // on screen — backwards; the navy lives on the SubNav row). Pages without a SubNav, and mobile,
+  // keep the ordinary scrolled flip.
+  const navTheme: NavTheme =
+    megaOpen ? 'mega'
+    : navCompact ? 'light'
+    : scrolled && !(isDesktop && subNavPresent) ? 'light'
+    : 'top'
 
   // Scroll-based theme flip — fixed distance, not tied to hero height (see nav.js's own comment
   // on why: waiting for the full hero to clear read as unresponsive on a near-full-viewport hero).

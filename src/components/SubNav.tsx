@@ -83,7 +83,19 @@ export function SubNav({ items, className = '' }: { items: SubNavItem[]; classNa
   const [floating, setFloating] = useState(false)
   const [navHeight, setNavHeight] = useState(0)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  // ⚠️ The desktop float BOUNDARY uses the FULL nav's height, frozen while floating — never the
+  // live height. Floating itself shrinks the header (full two rows → compact row), so a live
+  // boundary oscillates in the band between the two heights: float → header shrinks → "not past
+  // the boundary" → unfloat → header grows → float again, every scroll event. Shipped and caught
+  // by Adinda 2026-07-21 ("subnav does not float anymore"). Positioning (navHeight state) still
+  // tracks the live height — only the boundary is frozen.
+  const floatBoundaryRef = useRef(0)
+  const floatingRef = useRef(false)
   useEffect(() => {
+    // Announce this page HAS a SubNav (desktop: suppresses the nav's intermediate light flip so
+    // the chrome changes costume once, not twice). Store write, not React state — allowed in the
+    // effect body.
+    navChrome.set({ subNavPresent: true })
     const header = document.querySelector('header')
     const recompute = () => {
       const navH = header?.getBoundingClientRect().height ?? 0
@@ -92,9 +104,14 @@ export function SubNav({ items, className = '' }: { items: SubNavItem[]; classNa
       if (window.innerWidth < DESKTOP_MIN_WIDTH) {
         isFloating = window.scrollY > NAV_FLIP_SCROLL_Y.mobile
       } else {
+        const boundary = floatingRef.current ? floatBoundaryRef.current : navH
         const wrapper = wrapperRef.current
-        isFloating = wrapper ? wrapper.getBoundingClientRect().bottom <= navH : false
+        isFloating = wrapper ? wrapper.getBoundingClientRect().bottom <= boundary : false
+        // While NOT floating the header is in its full form — that's the height the boundary
+        // must hold on to for the whole floating stretch.
+        if (!isFloating) floatBoundaryRef.current = navH
       }
+      floatingRef.current = isFloating
       setFloating(isFloating)
       // Published so the main nav knows it may auto-hide on this page (navChrome store).
       navChrome.set({ subNavFloating: isFloating })
@@ -107,8 +124,8 @@ export function SubNav({ items, className = '' }: { items: SubNavItem[]; classNa
       window.removeEventListener('scroll', recompute)
       window.removeEventListener('resize', recompute)
       // Leaving the page (unmount) must release the nav — otherwise the NEXT page inherits a
-      // stale "may auto-hide" flag from this one.
-      navChrome.set({ subNavFloating: false })
+      // stale subnav flag from this one.
+      navChrome.set({ subNavPresent: false, subNavFloating: false })
     }
   }, [])
 

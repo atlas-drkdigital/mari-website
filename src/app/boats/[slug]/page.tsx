@@ -147,6 +147,7 @@ export default async function BoatPage({ params }: { params: Promise<Params> }) 
           boat={boat}
           eyebrow={t(defaults?.galleryEyebrow)}
           heading={t(defaults?.galleryTitle)}
+          ctaText={t(defaults?.galleryCtaText)}
         />
         <BoatSpecs
           boat={boat}

@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import Lightbox from 'yet-another-react-lightbox'
 import Captions from 'yet-another-react-lightbox/plugins/captions'
+import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen'
 import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 
@@ -97,7 +98,11 @@ export function SiteLightbox({
       index={index}
       slides={yarlSlides}
       labels={ariaLabel ? { Close: `Close ${ariaLabel}` } : undefined}
-      plugins={[Captions, Thumbnails, Zoom]}
+      // Fullscreen added 2026-07-21 (Adinda) — the official plugin, so every lightbox on the site
+      // gets the toolbar button from this one config. ⚠️ iPhones don't expose the element
+      // fullscreen API at all, so the plugin correctly shows NO button there — that's the
+      // platform, not a bug; iPad/Android/desktop all get it.
+      plugins={[Captions, Fullscreen, Thumbnails, Zoom]}
       // descriptionMaxLines was 3 — the plugin implements it as `-webkit-line-clamp`, so a longer
       // caption TRUNCATED with an ellipsis instead of wrapping. Worst on mobile, where 3 lines is
       // reached almost immediately. Raised high and the clamp is fully removed in the style below;
@@ -132,6 +137,8 @@ export function SiteLightbox({
         iconClose: () => <MaskIcon src="/assets/icon-close.svg" />,
         iconZoomIn: () => <MaskIcon src="/assets/icon-zoom-in.svg" />,
         iconZoomOut: () => <MaskIcon src="/assets/icon-zoom-out.svg" />,
+        iconEnterFullscreen: () => <MaskIcon src="/assets/icon-fullscreen.svg" />,
+        iconExitFullscreen: () => <MaskIcon src="/assets/icon-fullscreen-exit.svg" />,
       }}
       // Scrim at 92% (was 95%, Adinda) + the same blur as the hand-rolled overlay. YARL themes via
       // CSS custom properties and per-slot style objects, so this is the supported hook, not an

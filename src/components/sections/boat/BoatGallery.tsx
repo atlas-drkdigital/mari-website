@@ -42,10 +42,9 @@ const SiteLightbox = dynamic(
 // The image block is 708.144 x 532.072 — IDENTICAL to the cabins block (778:8775), which is why
 // `sizes` says 708px and every image verdict uses a 1416px @2x target. The old code claimed 55vw
 // (=792px); that was never in the design. Do not reintroduce a vw fraction here.
-// Paired round CATEGORY arrows. Rendered TWICE — beside the heading on desktop, at the end of the
-// tab row on mobile — because the two breakpoints want them in structurally different places and
-// only one is ever visible (`hidden lg:flex` / `flex lg:hidden`). One component, so a change to the
-// hover state or the icon cannot land on one and miss the other.
+// Paired round CATEGORY arrows — MOBILE ONLY since 2026-07-21 (Adinda): the desktop instance
+// beside the heading was replaced by the "Open Gallery" CTA, and desktop categories switch via
+// the tabs alone. The mobile pair lives at the end of the tab row (`flex lg:hidden`).
 //
 // The glyph is a CSS mask of icon-arrow-forward.svg, the SAME asset Destinations uses, rotated for
 // "previous". It replaced the raw character `→`: a typeface decides a glyph's weight and shape, so
@@ -90,10 +89,12 @@ export function BoatGallery({
   boat,
   eyebrow,
   heading,
+  ctaText,
 }: {
   boat: BoatData
   eyebrow?: string
   heading?: string
+  ctaText?: string
 }) {
   const all: GalleryImageData[] = useMemo(() => boat.gallery ?? [], [boat.gallery])
 
@@ -241,20 +242,30 @@ export function BoatGallery({
                 {eyebrow ? (
                   <p className="text-eyebrow uppercase text-text-eyebrow">{eyebrow}</p>
                 ) : null}
-                <div className="flex items-center justify-between gap-24">
+                {/* Heading + "Open Gallery" CTA — the homepage section-header recipe verbatim
+                    (LatestArticles/Testimonials/FAQ: bordered uppercase button, arrow icon; desktop
+                    right-aligned on the heading row, mobile stacked below, left-aligned). Replaces
+                    the DESKTOP category arrows (Adinda, 2026-07-21) — desktop categories now switch
+                    via the tabs only; the MOBILE arrows at the end of the tab row stay, coexisting
+                    with this button. A <button>, not an <a>: it opens the LightboxGallery with ALL
+                    images (at the image currently showing — identical to tapping the photo), it
+                    doesn't navigate. Label is editable (boatDefaults.galleryCtaText). */}
+                <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:gap-48">
                   {heading ? (
                     <h2 id="boat-gallery-heading" className="text-display-h2 text-text-primary">
                       {heading}
                     </h2>
                   ) : null}
-                  {/* "VIEW FULL GALLERY" (778:8849;700:3347) is DELIBERATELY NOT BUILT — it needs a
-                      destination and there is no /gallery route. See §2 of the review doc. */}
-                  <CategoryArrows
-                    onPrev={() => stepTab(-1)}
-                    onNext={() => stepTab(1)}
-                    show={tabs.length > 1}
-                    className="hidden lg:flex"
-                  />
+                  {ctaText && openable.length ? (
+                    <button
+                      type="button"
+                      onClick={() => openLightbox(Math.max(openable.indexOf(currentImage), 0))}
+                      className="group inline-flex h-48 w-fit shrink-0 items-center gap-4 border border-action-primary px-20 py-8 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary/10 lg:ml-auto"
+                    >
+                      {ctaText}
+                      <span aria-hidden="true" className="block size-[12px] shrink-0 bg-action-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
+                    </button>
+                  ) : null}
                 </div>
               </div>
 
@@ -410,18 +421,18 @@ export function BoatGallery({
                     onClick={() => stepImage(-1)}
                     aria-label="Previous photo"
                     style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
-                    className="pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
+                    className="group pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary"
                   >
-                    <CarouselChevron direction="left" sizeClassName="h-[12.13px] w-[16px]" />
+                    <CarouselChevron direction="left" sizeClassName="h-[18.19px] w-[24px] transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
                   </button>
                   <button
                     type="button"
                     onClick={() => stepImage(1)}
                     aria-label="Next photo"
                     style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
-                    className="pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
+                    className="group pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary"
                   >
-                    <CarouselChevron direction="right" sizeClassName="h-[12.13px] w-[16px]" />
+                    <CarouselChevron direction="right" sizeClassName="h-[18.19px] w-[24px] transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
                   </button>
                 </div>
               ) : null}

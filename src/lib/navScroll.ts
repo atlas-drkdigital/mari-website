@@ -15,22 +15,30 @@ export const DESKTOP_MIN_WIDTH = 1024
 // useSyncExternalStore on the consumer side — no context provider, no re-render cascade.
 
 type NavChromeState = {
-  /** A SubNav is mounted on this page and currently in its floating state. While true (desktop),
-   *  the main nav renders its COMPACT single row (Mari · menu items · Find a Trip) and the
-   *  floating SubNav row sits beneath it — the two-row floating chrome (Adinda, 2026-07-21). */
+  /** A SubNav exists on the current page (set on mount). On desktop this suppresses the nav's
+   *  intermediate light flip — the nav keeps its natural dark look over the hero and switches
+   *  ONCE, straight into compact (Adinda, 2026-07-21: three costume changes was dizzying). */
+  subNavPresent: boolean
+  /** That SubNav is currently in its floating state. While true (desktop), the main nav renders
+   *  its COMPACT single row (Mari · menu items · Find a Trip) and the floating SubNav row sits
+   *  beneath it — the two-row floating chrome (Adinda, 2026-07-21). */
   subNavFloating: boolean
 }
 
-let navChromeState: NavChromeState = { subNavFloating: false }
+let navChromeState: NavChromeState = { subNavPresent: false, subNavFloating: false }
 const navChromeListeners = new Set<() => void>()
-const SERVER_SNAPSHOT: NavChromeState = { subNavFloating: false }
+const SERVER_SNAPSHOT: NavChromeState = { subNavPresent: false, subNavFloating: false }
 
 export const navChrome = {
   get: (): NavChromeState => navChromeState,
   getServer: (): NavChromeState => SERVER_SNAPSHOT,
   set(partial: Partial<NavChromeState>) {
     const next = { ...navChromeState, ...partial }
-    if (next.subNavFloating === navChromeState.subNavFloating) return
+    if (
+      next.subNavPresent === navChromeState.subNavPresent &&
+      next.subNavFloating === navChromeState.subNavFloating
+    )
+      return
     navChromeState = next
     navChromeListeners.forEach((l) => l())
   },

@@ -89,7 +89,7 @@ export const BOAT_QUERY = groq`{
   "defaults": *[_id == "boatDefaults"][0]{
     overviewEyebrow, keyFeaturesHeading,
     cabinsEyebrow, cabinsHeading,
-    galleryEyebrow, galleryTitle,
+    galleryEyebrow, galleryTitle, galleryCtaText,
     specificationsEyebrow, specificationsHeading,
     faqEyebrow, faqHeading, faqLinkText,
     subnavOverviewLabel, subnavCabinsLabel, subnavGalleryLabel,
@@ -321,6 +321,7 @@ export type BoatDefaultsData = {
   cabinsHeading?: string
   galleryEyebrow?: string
   galleryTitle?: string
+  galleryCtaText?: string
   specificationsEyebrow?: string
   specificationsHeading?: string
   faqEyebrow?: string

@@ -106,6 +106,16 @@ export const boatDefaultsType = defineType({
       fieldset: 'gallery',
       initialValue: 'Gallery',
     }),
+    // The header button that opens the full image lightbox (Adinda, 2026-07-21 — replaces the
+    // desktop category arrows). destinationDefaults gets its twin when the destination page builds.
+    defineField({
+      name: 'galleryCtaText',
+      title: 'Gallery CTA label',
+      type: 'string',
+      fieldset: 'gallery',
+      description: 'Label on the button that opens the full image gallery.',
+      initialValue: 'Open Gallery',
+    }),
     defineField({
       name: 'specificationsEyebrow',
       title: 'Specifications eyebrow',

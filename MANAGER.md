@@ -172,6 +172,43 @@ copy pass doesn't refuse to publish settled facts. Cross-refs cleaned the same d
 mari-website paste block), `_AUDIT-2026-07-20.md` (mari-core lane), and CLAUDE.md's two filename-lesson
 blocks (the lessons stand; the "evidence against the inventory" claims are annotated closed).
 
+### ✅ CHECKPOINT 2026-07-21 (4) — SESSION CLOSE: SubNav APPROVED, gallery CTA, lightbox fullscreen
+**Model:** Fable 5. `tsc` ✅ · eslint ✅ · `/` `/boats/mari` 200 · **every item below reviewed +
+approved by Adinda in the browser before this checkpoint. Session closed here; `_RESUME.md`
+rewritten as the next session's automatic kickoff.**
+
+**SubNav — FINAL, APPROVED, LOCKED AS A PATTERN (site-wide + future DRK sites; queued for
+`drk-website`).** Final desktop ladder (post-checkpoint-3 refinements):
+1. Top: full dark transparent nav + hero + static rail.
+2. First scroll (flip threshold): nav goes STRAIGHT to the compact light row (Mari · menu items ·
+   Find a Trip) — NO intermediate full-light flip on subnav pages ("too many transitions is
+   dizzying"); the hero rail still visible below = anchors always in exactly one place.
+3. Past the rail: navy-glass section row (90%+blur, amber active) fades in beneath (subnav-reveal
+   keyframe — a top-transition slide-from-bottom artifact was removed).
+🔴 **Oscillation bug fixed on Adinda's catch ("subnav does not float anymore"):** the float
+boundary measured the LIVE header height, but floating shrinks the header → feedback loop at the
+hand-off band. Boundary now = full-nav height FROZEN while floating (`SubNav.tsx`, documented).
+Mobile: nav always visible, light chip bar, approved unchanged.
+
+**Gallery section (Adinda + a Serge complaint):**
+- `SingleImageCarousel` chevrons (Cabins + Gallery): fully-opaque beige-50, 24px (was 80% × 16px),
+  shadow kept, directional-nudge hover. Component/pattern NAMES REGISTERED for componentization:
+  **`SingleImageCarousel`** (single-image thumbnail carousel — masonry etc. may join later),
+  **`LightboxGallery` variant `default`** (the YARL config), joining `SubNav`, `TabRail`,
+  `CarouselChevron`.
+- **"Open Gallery" header CTA**: desktop replaces the round category arrows (categories = tabs
+  only); mobile keeps the tab-row arrows AND gains the button (homepage section-header recipe
+  verbatim — LatestArticles/Testimonials/FAQ share one structure). Opens the LightboxGallery with
+  ALL images at the currently-shown photo. Label editable: `boatDefaults.galleryCtaText`
+  (seeded "Open Gallery"; `_scripts/seed-gallery-cta.ts`); **destinationDefaults gets its twin at
+  destination-build time — Adinda's "both defaults" was speech-to-text for BOAT defaults.**
+- **Lightbox fullscreen** — YARL's official plugin in the shared `SiteLightbox` config → all
+  lightboxes at once; enter/exit icons in our mask style. ⚠️ iPhones have no fullscreen API — the
+  button correctly doesn't render there; not a bug.
+
+**Session total:** see the Time Log row (≈5h elapsed ≈ active — interactive design iteration).
+Open items and next actions: `_RESUME.md` (rewritten this checkpoint).
+
 ### ✅ CHECKPOINT 2026-07-21 (3) — SubNav FINAL FORM (two-row compact chrome) + scroll-top + fixes
 **Model:** Fable 5. `tsc` ✅ · eslint ✅ · `/` `/boats/mari` 200 · **iterated live with Adinda through
 4 design pivots — the final form is what she approved; the intermediate states below are recorded so
@@ -2390,6 +2427,7 @@ ones.
 | 2026-07-14 | Sanity schema pass + Studio branding + theme.css port | ~2h15–2h30 | First full backend session on this build — established schema/Studio/branding conventions from scratch. Expect meaningfully faster on similar future sessions now that the patterns exist. |
 | 2026-07-15 | Full homepage QA pass (every section, desktop + mobile) + fixes | **~2h** (Adinda's own tracked estimate, rounded up from ~1h48m measured mid-session) | **~1h of this was a false-alarm chase** (see below), not real QA/bug-fixing time. Once resolved, the actual QA pass covered all 11 sections (Nav, Hero, The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials, CTA, Contact, Footer) and turned up ~10 real bugs total, all fixed same session. **Calibration takeaway, revises the 2026-07-14 row's own assumption:** that earlier entry expected future sessions to be "meaningfully faster... now that the patterns exist" — true for *coding* patterns, but a full QA pass has its own largely-fixed cost regardless of how established the code conventions are, because QA time is dominated by *discovering* each section's specific bugs, not by applying known patterns. Budget a full single-homepage QA pass at **~2h** even on a well-patterned codebase, not scaled down just because earlier sessions established good conventions. Sub-note: a "barely any content on mobile" report that looked like a WebKit/iOS bug turned out to be `allowedDevOrigins` (dev server blocking LAN-IP requests), unrelated to any browser engine — see `references/troubleshooting.md`'s localhost-vs-LAN-IP check, which exists specifically to prevent this cost recurring. |
 | 2026-07-15 (later, same day) | Boat page full schema build + gallery redesign (3 iterations) + content-model changes (Full Rich Text Block extraction, alt-rule correction) + new tracking docs (`_SCHEMA-SPECS.md`/`_CONTENT-STATUS.md`/`_QA-CHECKLIST.md`) | **~4h30m elapsed, but Adinda estimates only ~70% (~3h10m) was active desk time** — ~30% was her doing other things (learning Japanese, cooking) while background tasks (dev server restarts, Sanity scripts) ran, not actively reviewing/responding. | **New calibration point, distinct from the 2026-07-14 row's caution:** elapsed time and active time diverge meaningfully when a session has real background-task latency (dev server restarts, `sanity exec` scripts, Perplexity/web research) — Adinda could step away during those. **Track both going forward**, not just one figure — elapsed matters for calendar/deadline planning, active time matters for comparing actual effort across sessions. This session's scope was large (full boat schema + 3 gallery redesign iterations + several corrected mistakes), so the ~3h10m active figure is the more honest "how much work was this" number. |
+| 2026-07-21 | Categorized FAQ built+approved · SubNav complete arc (static rail → floating → compact two-row chrome, 4 design pivots) · scroll-top button · gallery CTA + chevrons + lightbox fullscreen · ~10 side-fixes (nav hover/active, accordion hovers, Android accordion leak, paragraph rule, deck-plan border, brochure rebuild) | **~5h elapsed (from commits 09:14–13:22 + pre-commit recap); Adinda's active figure: 4h15m given at ~12:30, plus ~45m of review after — call it ~4h45–5h active.** | Unusually interactive session — nearly all elapsed was active (live design iteration with screenshots, not background waits). Calibration: interactive design-iteration sessions have elapsed ≈ active, unlike build sessions with script latency. The SubNav went through FOUR rejected/revised designs before landing — budget real iteration time for novel interactive chrome, it is not a build-to-spec task. |
 | 2026-07-16 | Session-bookend protocol locked into CLAUDE.md + first full chat-side skills-update round: all 4 skills (drk-website, atlas-website, mari-website, mari-project) ported, installed, verified, archived, handoffs reconciled | **~1h elapsed (Adinda's estimate); active time notably lower** — she finished her kanji reviews in between, so this is an elapsed figure, not active. | **Calibration for skills-update rounds specifically:** a full 4-skill update round is heavily parallelizable with the user's other tasks. The heavy lifting was Claude-side (assembling self-contained payloads, verification greps, install/archive/reconcile), so Adinda's active involvement was mostly the chat-side paste + re-export + Downloads steps — she could step away during payload prep and Claude-side install/verify. Good template for future rounds: elapsed ≈ 1h for 4 skills, active user time a fraction of that. Distinct from the build-session rows above (those need active review/response). |
 
 ---
