@@ -449,8 +449,9 @@ surface, re-upload is cheap.
 **Mine the photographer's ORIGINAL filenames — they carry location facts our renames destroyed.** The
 shared folder names distinguish `Sky Deck` from `Sundeck Main Deck` / `Sundeck 1` / `Long chairs Sundeck
 Main Deck`, and include `Divedeck` and `Lounge Area 1/2`. Whoever shot them treated sky deck and the
-main-deck sundeck as **different spaces** — which is real evidence against `mari-core`'s three-outdoor-space
-inventory (it lists only al fresco dining / sky deck / shaded lounge deck). Our rename to
+main-deck sundeck as **different spaces**. (That read as evidence against `mari-core`'s three-outdoor-space
+inventory — **resolved 2026-07-21: Adinda confirmed mari-core is correct; the inventory stands, question
+closed.** The read-the-filename lesson itself still applies.) Our rename to
 `common-006-sundeck-1-sunbeds` dropped "Main Deck" and lost that. **Read the original filename before
 naming a photo.**
 
@@ -483,8 +484,8 @@ Proven twice in one session, on files that had *already been hand-renamed*:
 **But the photographer's ORIGINAL filenames carry real location facts our renames destroyed** — the
 shared folder distinguishes `Sky Deck` from `Sundeck Main Deck` / `Sundeck 1` / `Long chairs Sundeck
 Main Deck`, plus `Divedeck` and `Lounge Area 1/2`. Whoever shot them treated sky deck and the
-main-deck sundeck as **different spaces**, which is real evidence against `mari-core`'s
-three-outdoor-space inventory. Our rename to `common-006-sundeck-1-sunbeds` dropped "Main Deck".
+main-deck sundeck as **different spaces** (a question since closed — Adinda confirmed mari-core's
+three-space inventory correct, 2026-07-21). Our rename to `common-006-sundeck-1-sunbeds` dropped "Main Deck".
 **So: read the original filename AND look at the image. Neither alone is enough.**
 
 **Adinda's resolution to the resulting deck-naming mess (2026-07-17), and it's the reusable trick:**

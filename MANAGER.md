@@ -160,6 +160,18 @@ the overhead once, and don't price the user's own review time as build time.**
      ⚠️ **Do not build speculatively** — this is the `isFeatured` / section-toggles trap. Research, propose,
      get Adinda's call, then build. A Perplexity prompt was drafted for her on 2026-07-17.
 
+### 🔵 NOTE 2026-07-21 — `_handoff/mari-core.md` RETIRED (Adinda: mari-core is correct, all four items dropped)
+Adinda confirmed the mari-core facts questioned on 2026-07-17 are correct as locked: the 3-outdoor-space
+inventory, the sky-deck naming, and the equipment ✅s (oxygen / first aid / camera rinse tank); the hull
+colour question was dropped as a non-issue. **`_handoff/mari-core.md` DELETED — no mari-core skill round
+needed, now or later.** Follow-through moved into `_handoff/mari-website.md`: (a) the two stale "sun deck"
+lines in `private-charters.md` L71/L96 are now a **safe straight replace** (the old Serge gate is closed),
+(b) flip mari-website's 🔴 "unverified" flags on oxygen/first-aid/rinse-tank to match mari-core's ✅ — so a
+copy pass doesn't refuse to publish settled facts. Cross-refs cleaned the same day in `_ADINDA-TODOS.md`
+(items 3/5/8), `_RESUME.md`, `_SKILL-ROUND-PLAN.md` (§5 + cleanup checklist), `_STEP2-READY.md` (§5 + the
+mari-website paste block), `_AUDIT-2026-07-20.md` (mari-core lane), and CLAUDE.md's two filename-lesson
+blocks (the lessons stand; the "evidence against the inventory" claims are annotated closed).
+
 ### ✅ CHECKPOINT 2026-07-21 (2) — SubNav desktop + nav hover/active + chevron standard + cabins rhythm
 **Model:** Fable 5. `tsc` ✅ · eslint ✅ · `/` `/boats/mari` `/studio` 200 · **each piece REVIEWED by
 Adinda in the browser before this checkpoint** (sub-nav clicks incl. Layout/Specs tab pre-select ✓,
