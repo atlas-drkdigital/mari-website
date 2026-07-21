@@ -152,11 +152,14 @@ function AccordionColumn({
         // border-accent-subtle IS beige-400 (globals.css:224). The closed rows were on
         // border-subtle (beige-200), which read as a different, lighter rule. Only the opacity
         // still differs between states.
+        // Hover = the active row's COLOR treatment only — opacity + title/chevron colour, NOT the
+        // weight bump, rotation, or expansion (Adinda, 2026-07-21; site-wide accordion rule, see
+        // CLAUDE.md). group/row carries the hover to the title span and chevron below.
         return (
           <div
             key={row.key}
-            className={`mb-8 flex flex-col border-b-[0.75px] border-accent-subtle py-12 [transition:opacity_500ms_cubic-bezier(0.65,0,0.35,1),border-color_500ms_cubic-bezier(0.65,0,0.35,1)] ${
-              active ? '' : 'opacity-80'
+            className={`group/row mb-8 flex flex-col border-b-[0.75px] border-accent-subtle py-12 [transition:opacity_500ms_cubic-bezier(0.65,0,0.35,1),border-color_500ms_cubic-bezier(0.65,0,0.35,1)] ${
+              active ? '' : 'opacity-80 hover:opacity-100'
             }`}
           >
             <h3>
@@ -175,9 +178,13 @@ function AccordionColumn({
                     500ms color transition lagged behind it, so on click the label flashed
                     bold-in-the-inactive-colour before fading to accent. Dropping the transition makes
                     weight and colour flip together in one frame — the chevron still animates. */}
+                {/* Hover lights the COLOUR only — no font-semibold on hover, both per the
+                    colors-not-typography hover rule (Adinda, 2026-07-21) and because a weight
+                    change on hover would reflow the row (the exact thing the weight+colour
+                    active treatment was tuned to avoid mid-animation). */}
                 <span
                   className={`flex-1 text-body-large ${
-                    active ? 'font-semibold text-action-primary' : 'text-text-primary'
+                    active ? 'font-semibold text-action-primary' : 'text-text-primary group-hover/row:text-action-primary'
                   }`}
                 >
                   {row.title}
@@ -199,7 +206,7 @@ function AccordionColumn({
                       letting `contain` derive it from the width. */}
                   <span
                     className={`block h-[6.5px] w-[10px] [transition:transform_500ms_cubic-bezier(0.65,0,0.35,1),background-color_500ms_cubic-bezier(0.65,0,0.35,1)] [mask-image:url("/assets/icon-nav-chevron.svg")] [mask-position:center] [mask-repeat:no-repeat] [mask-size:100%_100%] ${
-                      active ? 'rotate-180 bg-action-primary' : 'bg-accent-subtle'
+                      active ? 'rotate-180 bg-action-primary' : 'bg-accent-subtle group-hover/row:bg-action-primary'
                     }`}
                   />
                 </span>
@@ -429,6 +436,15 @@ export function BoatSpecs({
                   onClick={() => {
                     setTabIndex(i)
                     setOpenKey(null)
+                    // Sync the OTHER direction too (Adinda, 2026-07-21): the SubNav's LAYOUT/SPECS
+                    // items disambiguate by hash, so an in-section tab click must update it or the
+                    // SubNav keeps highlighting the stale one. replaceState = no scroll jump, no
+                    // history entry; replaceState doesn't fire hashchange, so we dispatch it —
+                    // the SubNav's hash store (and this section's own listener, a harmless no-op
+                    // here) both re-read from it.
+                    const hash = tab.id === 'specifications' ? '#specs' : '#layout'
+                    window.history.replaceState(null, '', hash)
+                    window.dispatchEvent(new HashChangeEvent('hashchange'))
                   }}
                   className={`shrink-0 border-b-2 px-12 py-8 text-button-small whitespace-nowrap uppercase transition-colors duration-300 ease-in-out lg:text-button ${
                     selected

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
+import { ScrollTopButton } from "@/components/ScrollTopButton";
 import { SITE_URL } from "@/lib/seo";
 import { SanityLive } from "@/sanity/lib/live";
 
@@ -44,6 +45,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {children}
         <SanityLive />
+        {/* Site-wide back-to-top (Adinda, 2026-07-21) — appears at the nav-flip scroll threshold. */}
+        <ScrollTopButton />
       </body>
     </html>
   );

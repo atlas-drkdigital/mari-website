@@ -408,6 +408,13 @@ body {
   &::-webkit-scrollbar { display: none; }
 }
 
+/* SubNav floating bar entrance — a plain eased fade (Adinda, 2026-07-21: the earlier top-
+   transition made it slide up from the bottom of the screen, an artifact, not a design).
+   Referenced via animate-[subnav-reveal_300ms_ease-out]. */
+@keyframes subnav-reveal {
+  from { opacity: 0; }
+}
+
 @layer base {
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),

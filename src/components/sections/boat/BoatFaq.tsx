@@ -163,8 +163,11 @@ export function BoatFaq({
                     <div
                       key={id}
                       id={anchor}
+                      /* Hover = the active row's COLOR treatment only — border + opacity, no
+                         size/rotation/expansion (Adinda, 2026-07-21; site-wide accordion rule,
+                         see CLAUDE.md). Same classes as the homepage Faq row. */
                       className={`mb-8 flex flex-col border-b-[0.75px] py-12 [transition:opacity_500ms_cubic-bezier(0.65,0,0.35,1),border-color_500ms_cubic-bezier(0.65,0,0.35,1)] ${
-                        active ? 'border-border-onimage-primary' : 'border-accent-ondark-subtle opacity-80'
+                        active ? 'border-border-onimage-primary' : 'border-accent-ondark-subtle opacity-80 hover:border-border-onimage-primary hover:opacity-100'
                       }`}
                     >
                       <h3>

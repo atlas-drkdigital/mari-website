@@ -3,9 +3,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 import { DESTINATIONS } from '@/lib/destinations'
+import { DESKTOP_MIN_WIDTH, NAV_FLIP_SCROLL_Y, navChrome } from '@/lib/navScroll'
 
 // Ported from ../v1-static-homepage/sections/nav.html + assets/nav.js + assets/mega-menu.js.
 // Figma Block/Navbar 218:1231. DESKTOP (>=lg/1024px) = exact Figma overlay. MOBILE (<lg) =
@@ -30,18 +31,38 @@ export function Nav() {
   const [scrollHint, setScrollHint] = useState<'more' | 'top' | 'none'>('none')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileAccordion, setMobileAccordion] = useState({ destinations: false, resources: false })
+  // Auto-hide (Adinda, 2026-07-21, revised same day): NO scroll-direction logic. On desktop, the
+  // nav is simply hidden the whole time a SubNav is floating (that bar carries brand + sections +
+  // Find a Trip, so nothing essential is lost) and returns when the visitor is back near the top.
+  // The earlier scroll-up-reveal variant produced a 3-row stack Adinda rejected — don't rebuild it.
+  const [isDesktop, setIsDesktop] = useState(false)
 
   const navRef = useRef<HTMLElement>(null)
   const destListRef = useRef<HTMLUListElement>(null)
 
+  // COMPACT mode (Adinda, 2026-07-21 — the two-row floating chrome): while a SubNav is floating
+  // on this page (desktop), the nav's two rows collapse into ONE — Mari wordmark · the same menu
+  // items · Find a Trip (no email/WhatsApp icons) — and the floating SubNav row sits beneath it.
+  // An open mega temporarily restores the full nav (the mega panels are laid out against it);
+  // subNavFloating turns itself off near the top of the page and on pages without a SubNav, which
+  // is what brings the full nav back. No scroll-direction logic — deliberately (a scroll-up
+  // reveal variant produced a 3-row stack and was rejected).
+  const { subNavFloating } = useSyncExternalStore(navChrome.subscribe, navChrome.get, navChrome.getServer)
+  const navCompact = isDesktop && subNavFloating && !megaOpen && !mobileMenuOpen
+
+  // Compact mode keeps the NATURAL light theme (flipped back, Adinda 2026-07-21, second pass): a
+  // navy first row made the MAIN nav the loudest thing on screen, backwards for a bar that should
+  // "just be there when needed" — the navy moved to the SECTION row (SubNav), which is the one
+  // that deserves centre stage while reading the page.
   const navTheme: NavTheme = megaOpen ? 'mega' : scrolled ? 'light' : 'top'
 
   // Scroll-based theme flip — fixed distance, not tied to hero height (see nav.js's own comment
   // on why: waiting for the full hero to clear read as unresponsive on a near-full-viewport hero).
   useEffect(() => {
     const recompute = () => {
-      const isMobile = window.innerWidth < 1024
-      setScrolled(window.scrollY > (isMobile ? 40 : 80))
+      const isMobile = window.innerWidth < DESKTOP_MIN_WIDTH
+      setScrolled(window.scrollY > (isMobile ? NAV_FLIP_SCROLL_Y.mobile : NAV_FLIP_SCROLL_Y.desktop))
+      setIsDesktop(!isMobile)
     }
     recompute()
     window.addEventListener('scroll', recompute, { passive: true })
@@ -131,6 +152,66 @@ export function Nav() {
   // behaves like "home" regardless of current route; harmless once other pages exist too.
   const goHome = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
+  // The six primary menu items + the Find a Trip CTA — defined ONCE, rendered by BOTH the full
+  // two-row nav and the compact single row (Adinda, 2026-07-21), so the two states can never
+  // drift. Every colour variant keys off the header's data-nav group, so the same markup adapts
+  // in either container.
+  const findATripCta = (
+    <a href="#" className="group inline-flex shrink-0 items-center gap-4 border border-accent-ondark-onprimary px-20 py-8 text-button-small uppercase hover:bg-accent-ondark-onprimary/10 group-data-[nav=light]/nav:border-text-primary group-data-[nav=light]/nav:hover:bg-text-primary/5">
+      Find a trip
+      <span aria-hidden="true" className="block size-[13px] shrink-0 bg-accent-ondark-onprimary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] group-data-[nav=light]/nav:bg-text-primary [mask-image:url('/assets/icon-arrow.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
+    </a>
+  )
+  const menuItems = (
+    <>
+      <button
+        type="button"
+        aria-expanded={megaOpen === 'destinations'}
+        aria-controls="mega-menu-destinations"
+        onClick={() => toggleMega('destinations')}
+        className="group/mt inline-flex items-center gap-4 pb-4 opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100"
+      >
+        {/* Hover accent needs the stacked light-mode variant twice over: the span carries an
+            EXPLICIT light-mode colour, and the light-mode hover token differs (chocolate
+            action-primary, not amber — see the menu-link comment). */}
+        <span className="text-nav uppercase text-accent-ondark-onprimary transition-colors duration-300 ease-in-out group-hover/mt:text-accent-ondark-primary group-data-[nav=light]/nav:text-text-primary group-data-[nav=light]/nav:group-hover/mt:text-action-primary group-aria-expanded/mt:text-accent-ondark-muted">Destinations</span>
+        <span
+          aria-hidden="true"
+          className="block h-[6px] w-[7px] shrink-0 bg-accent-ondark-onprimary transition-[transform,background-color] duration-300 ease-in-out group-hover/mt:bg-accent-ondark-primary group-data-[nav=light]/nav:bg-text-primary group-data-[nav=light]/nav:group-hover/mt:bg-action-primary group-aria-expanded/mt:bg-accent-ondark-muted group-aria-expanded/mt:rotate-180 [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+        />
+      </button>
+      {/* Menu-link hover + active-page accent (Adinda, 2026-07-21 — the old opacity 85→100
+          shift was too subtle to read as a hover at all). TWO tokens by nav state, per the
+          palette's own split: dark nav → accent-ondark-primary (amber gold); light/floated
+          nav → action-primary (chocolate — the established light-background interactive
+          accent, same as the Specs tabs). Amber was wrong on the light bar — Adinda's catch.
+          The light-mode compound variants out-specify the base hover classes, so they win. */}
+      <Link
+        href="/boats/mari"
+        aria-current={pathname?.startsWith('/boats') ? 'page' : undefined}
+        className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 aria-[current=page]:text-accent-ondark-primary aria-[current=page]:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary group-data-[nav=light]/nav:aria-[current=page]:text-action-primary"
+      >
+        The Boat
+      </Link>
+      <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">Private Charters</a>
+      <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">About</a>
+      <button
+        type="button"
+        aria-expanded={megaOpen === 'resources'}
+        aria-controls="mega-menu-resources"
+        onClick={() => toggleMega('resources')}
+        className="group/mt inline-flex items-center gap-4 pb-4 opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100"
+      >
+        <span className="text-nav uppercase text-accent-ondark-onprimary transition-colors duration-300 ease-in-out group-hover/mt:text-accent-ondark-primary group-data-[nav=light]/nav:text-text-primary group-data-[nav=light]/nav:group-hover/mt:text-action-primary group-aria-expanded/mt:text-accent-ondark-muted">Resources</span>
+        <span
+          aria-hidden="true"
+          className="block h-[6px] w-[7px] shrink-0 bg-accent-ondark-onprimary transition-[transform,background-color] duration-300 ease-in-out group-hover/mt:bg-accent-ondark-primary group-data-[nav=light]/nav:bg-text-primary group-data-[nav=light]/nav:group-hover/mt:bg-action-primary group-aria-expanded/mt:bg-accent-ondark-muted group-aria-expanded/mt:rotate-180 [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+        />
+      </button>
+      <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">Schedule &amp; Rates</a>
+    </>
+  )
+
   return (
     <header
       ref={navRef}
@@ -157,8 +238,26 @@ export function Nav() {
         </button>
       </div>
 
-      {/* DESKTOP (>=lg): exact Figma two-row nav */}
+      {/* DESKTOP (>=lg): the full two-row nav, OR — while a SubNav floats on this page — the
+          COMPACT single row (Mari · menu items · Find a Trip; no email/WhatsApp icons), with the
+          floating SubNav row directly beneath it (Adinda, 2026-07-21: two rows max, both
+          designed). The mega panels below are shared by both forms; opening one restores the full
+          nav while it's open (navCompact excludes megaOpen). */}
       <div className="hidden lg:block">
+        {navCompact ? (
+          /* h-48 (not padding-derived) so this row and the SubNav row below match exactly —
+             Adinda's equal-heights call. No own bg: the header's light theme paints it. */
+          <div className="flex h-48 items-center justify-between gap-32 page-gutter-x">
+            <Link href="/" onClick={goHome} aria-label="MariLiveaboard — home" className="shrink-0 font-bold text-caption-label uppercase tracking-[0.238em]">
+              Mari
+            </Link>
+            <nav aria-label="Primary" className="flex min-w-0 items-center gap-32">
+              {menuItems}
+            </nav>
+            {findATripCta}
+          </div>
+        ) : (
+          <>
         <div className="flex items-center border-b-[0.25px] border-accent-ondark-onprimary page-gutter-x py-16 group-data-[nav=light]/nav:border-border-default">
           <div className="flex w-[480px] items-center">
             <Link
@@ -186,60 +285,15 @@ export function Nav() {
             <a href="#" aria-label="Chat on WhatsApp" className="inline-flex opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">
               <span aria-hidden="true" className="block size-[15px] shrink-0 bg-accent-ondark-onprimary group-data-[nav=light]/nav:bg-text-primary [mask-image:url('/assets/icon-whatsapp.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
             </a>
-            <a href="#" className="group inline-flex items-center gap-4 border border-accent-ondark-onprimary px-20 py-8 text-button-small uppercase hover:bg-accent-ondark-onprimary/10 group-data-[nav=light]/nav:border-text-primary group-data-[nav=light]/nav:hover:bg-text-primary/5">
-              Find a trip
-              <span aria-hidden="true" className="block size-[13px] shrink-0 bg-accent-ondark-onprimary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] group-data-[nav=light]/nav:bg-text-primary [mask-image:url('/assets/icon-arrow.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
-            </a>
+            {findATripCta}
           </div>
         </div>
 
         <nav aria-label="Primary" className="flex items-center justify-center gap-32 border-b-[0.25px] border-transparent page-gutter-x py-12 group-data-[nav=mega]/nav:border-accent-ondark-onprimary">
-          <button
-            type="button"
-            aria-expanded={megaOpen === 'destinations'}
-            aria-controls="mega-menu-destinations"
-            onClick={() => toggleMega('destinations')}
-            className="group/mt inline-flex items-center gap-4 pb-4 opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100"
-          >
-            {/* Hover accent needs the stacked light-mode variant twice over: the span carries an
-                EXPLICIT light-mode colour, and the light-mode hover token differs (chocolate
-                action-primary, not amber — see the menu-link comment). */}
-            <span className="text-nav uppercase text-accent-ondark-onprimary transition-colors duration-300 ease-in-out group-hover/mt:text-accent-ondark-primary group-data-[nav=light]/nav:text-text-primary group-data-[nav=light]/nav:group-hover/mt:text-action-primary group-aria-expanded/mt:text-accent-ondark-muted">Destinations</span>
-            <span
-              aria-hidden="true"
-              className="block h-[6px] w-[7px] shrink-0 bg-accent-ondark-onprimary transition-[transform,background-color] duration-300 ease-in-out group-hover/mt:bg-accent-ondark-primary group-data-[nav=light]/nav:bg-text-primary group-data-[nav=light]/nav:group-hover/mt:bg-action-primary group-aria-expanded/mt:bg-accent-ondark-muted group-aria-expanded/mt:rotate-180 [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-            />
-          </button>
-          {/* Menu-link hover + active-page accent (Adinda, 2026-07-21 — the old opacity 85→100
-              shift was too subtle to read as a hover at all). TWO tokens by nav state, per the
-              palette's own split: dark nav → accent-ondark-primary (amber gold); light/floated
-              nav → action-primary (chocolate — the established light-background interactive
-              accent, same as the Specs tabs). Amber was wrong on the light bar — Adinda's catch.
-              The light-mode compound variants out-specify the base hover classes, so they win. */}
-          <Link
-            href="/boats/mari"
-            aria-current={pathname?.startsWith('/boats') ? 'page' : undefined}
-            className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 aria-[current=page]:text-accent-ondark-primary aria-[current=page]:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary group-data-[nav=light]/nav:aria-[current=page]:text-action-primary"
-          >
-            The Boat
-          </Link>
-          <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">Private Charters</a>
-          <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">About</a>
-          <button
-            type="button"
-            aria-expanded={megaOpen === 'resources'}
-            aria-controls="mega-menu-resources"
-            onClick={() => toggleMega('resources')}
-            className="group/mt inline-flex items-center gap-4 pb-4 opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100"
-          >
-            <span className="text-nav uppercase text-accent-ondark-onprimary transition-colors duration-300 ease-in-out group-hover/mt:text-accent-ondark-primary group-data-[nav=light]/nav:text-text-primary group-data-[nav=light]/nav:group-hover/mt:text-action-primary group-aria-expanded/mt:text-accent-ondark-muted">Resources</span>
-            <span
-              aria-hidden="true"
-              className="block h-[6px] w-[7px] shrink-0 bg-accent-ondark-onprimary transition-[transform,background-color] duration-300 ease-in-out group-hover/mt:bg-accent-ondark-primary group-data-[nav=light]/nav:bg-text-primary group-data-[nav=light]/nav:group-hover/mt:bg-action-primary group-aria-expanded/mt:bg-accent-ondark-muted group-aria-expanded/mt:rotate-180 [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-            />
-          </button>
-          <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">Schedule &amp; Rates</a>
+          {menuItems}
         </nav>
+          </>
+        )}
 
         {/* Destinations mega menu — Figma Section/Nav/MegaMenu 326:3777 */}
         <div

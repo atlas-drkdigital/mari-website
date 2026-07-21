@@ -172,6 +172,47 @@ copy pass doesn't refuse to publish settled facts. Cross-refs cleaned the same d
 mari-website paste block), `_AUDIT-2026-07-20.md` (mari-core lane), and CLAUDE.md's two filename-lesson
 blocks (the lessons stand; the "evidence against the inventory" claims are annotated closed).
 
+### ✅ CHECKPOINT 2026-07-21 (3) — SubNav FINAL FORM (two-row compact chrome) + scroll-top + fixes
+**Model:** Fable 5. `tsc` ✅ · eslint ✅ · `/` `/boats/mari` 200 · **iterated live with Adinda through
+4 design pivots — the final form is what she approved; the intermediate states below are recorded so
+nobody resurrects them.**
+
+**SubNav final desktop behavior (the pivots that got here):**
+1. auto-hide nav w/ scroll-up reveal → REJECTED (3-row stack on scroll-up).
+2. unified single bar (Mari · sections · CTA in ONE row) → REJECTED (misunderstanding).
+3. two-row: navy compact nav over light section row → REJECTED (main nav stole attention).
+4. **FINAL: floating = compact LIGHT nav row (Mari · full menu items · Find a Trip, no
+   email/WhatsApp) + NAVY GLASS section row beneath (90% navy + blur, amber active/hover)** — the
+   section row takes centre stage; both rows h-48 exactly; NO scroll-direction logic anywhere (full
+   nav returns only near page top); mega menus restore the full nav while open; menu items are ONE
+   JSX definition shared by both nav forms (cannot drift). Mobile: nav never hides (hamburger =
+   wayfinding, Adinda), light chip bar under it, unchanged.
+   Entrance = subnav-reveal FADE keyframe (globals.css), motion-safe; the top-transition slide-from-
+   bottom artifact was removed on Adinda's catch.
+**Coordination lives in `navScroll.ts`:** shared flip thresholds + the navChrome store
+(subNavFloating). Backup of the pre-rework state: commit `806c9c3`.
+
+**Scroll-top button (site-wide, `ScrollTopButton.tsx`, root layout):** bottom-right, glass navy
+(90% + blur + faint border + whisper shadow — tuned twice from Adinda's feedback), hero-indicator
+chevron asset pointed up, appears at the nav-flip threshold, reduced-motion honoured.
+
+**Scroll-spy hardened:** active section recomputed from POSITIONS on every observer tick (last top
+past the 35% line) — the entry-order race (fast backward jumps sticking the wrong item) is dead.
+Rail scrolling is reveal-only (fully visible items never move). Layout/Specs sync is bidirectional
+(in-section tab clicks replaceState the hash + dispatch hashchange).
+
+**Also this arc:** brochure CTA rebuilt to node 778:8741 (PDF-icon circle, gap-8, bold label) with
+the DOWNLOAD glyph (Adinda's override of the node's arrow_forward; icon-download.svg — the iOS
+grey-square saga ended by matching the proven Figma asset format: positive viewBox + %-dims);
+opens new tab. Stats+brochure grouped at gap-24 (node 778:8723). Placeholder brochure PDF seeded
+(`_scripts/seed-brochure-placeholder.ts`) — replace with the real one in Studio. Accordion hover =
+active's colour treatment, site-wide (subagent; locked in CLAUDE.md). Android large-font accordion
+leak fixed (grid-item padding rule — documented in Nav.tsx). Hero bottom scrim. Mobile rail flush
+left. `lg:page-gutter-x` variant-on-@utility compiled wrong — plain utilities now (documented).
+
+**Open:** boat page = gallery uploads (Adinda) + final all-sections review + post-slice drk-seo pass.
+Then the between-pages track (work-tracker → Phase 3 → componentize → skill round → audit).
+
 ### ✅ CHECKPOINT 2026-07-21 (2) — SubNav desktop + nav hover/active + chevron standard + cabins rhythm
 **Model:** Fable 5. `tsc` ✅ · eslint ✅ · `/` `/boats/mari` `/studio` 200 · **each piece REVIEWED by
 Adinda in the browser before this checkpoint** (sub-nav clicks incl. Layout/Specs tab pre-select ✓,

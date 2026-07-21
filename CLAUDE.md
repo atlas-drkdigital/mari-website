@@ -137,6 +137,13 @@ renders the nav-chevron mask ~7.6px tall and reads elongated (tuning history in 
 homepage FAQ, boat FAQ all conform); goes into the shared accordion component's contract at the
 componentization pass.
 
+**Accordion row hover — a closed row takes the ACTIVE row's COLOR treatment on hover (locked
+2026-07-21, Adinda).** Colors/opacity/border-color/chevron color only — never the active state's
+size or typography changes (no body-large→editorial-h5 swap, no weight bump), never the chevron
+rotation, never expansion. Hover = "looks lit like the open one," not "looks open." Applied in
+`Faq.tsx`, `BoatFaq.tsx`, `BoatSpecs.tsx`; part of the shared accordion component's contract at
+the componentization pass, same as the glyph standard above.
+
 ## Building a section: ASK FOR THE FIGMA LINK + SCREENSHOT FIRST — locked 2026-07-17 (Adinda)
 **Standing rule, every section, no exceptions.** Before building any page section, **ask Adinda for the
 Figma node link and a screenshot**, then pull `get_design_context` on that node for exact values. Do not
