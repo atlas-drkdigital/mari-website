@@ -158,13 +158,14 @@ export function BoatGallery({
   // 🔴 The mount guard is NOT optional. This effect also fires on mount, and `block: 'nearest'`
   // scrolls the PAGE vertically when the tab isn't in the viewport — which it never is on load,
   // since visitors start at the top. Without it, every page load jumps straight to the gallery.
-  // Destinations hit exactly this; the comment there spells it out.
-  const skipFirstScrollIntoView = useRef(true)
+  // ⚠️ Guard by PREVIOUS index, not a `useRef(true)` skip-first flag: React Strict Mode double-
+  // invokes effects on mount (setup → cleanup → setup), which clears the flag and scrolls anyway
+  // (dev-only, but it's the "lands you mid-page on navigation" bug). An unchanged-index re-run is a
+  // no-op here no matter how many times it fires. Destinations spells out the full reasoning.
+  const prevTabRef = useRef(tabIndex)
   useEffect(() => {
-    if (skipFirstScrollIntoView.current) {
-      skipFirstScrollIntoView.current = false
-      return
-    }
+    if (prevTabRef.current === tabIndex) return
+    prevTabRef.current = tabIndex
     tabRefs.current[tabIndex]?.scrollIntoView({
       behavior: 'smooth',
       inline: 'start',

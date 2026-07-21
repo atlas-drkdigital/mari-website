@@ -34,17 +34,18 @@ export function Destinations({ destinations }: { destinations: DestinationCardDa
   // Keep the active tab in view — aligns it to the start of the visible track; for tabs near
   // the end (not enough remaining items to fill the width), the browser naturally clamps this
   // to the max scroll position instead, showing as much trailing content as exists.
-  // Must skip the very first run: this effect fires on mount too (not just on real index
-  // changes), and `block: 'nearest'` scrolls the whole PAGE vertically if the tab isn't yet
-  // in the viewport — which it never is on load, since the user starts at the top of the
-  // page. Without this guard, every page load force-scrolls straight to the Destinations
-  // section regardless of where the user actually is.
-  const skipFirstScrollIntoView = useRef(true)
+  // Must fire ONLY on a real index change, never on mount: `block: 'nearest'` scrolls the whole
+  // PAGE vertically if the tab isn't yet in the viewport — which it never is on load, since the
+  // user starts at the top — so a mount-fire force-scrolls straight to this section.
+  // ⚠️ A `useRef(true)` "skip the first run" guard is NOT enough: React Strict Mode double-invokes
+  // effects on mount (setup → cleanup → setup), so the flag is already cleared by the second run
+  // and it scrolls anyway (dev-only, but it's the bug that lands you mid-page on navigation).
+  // Comparing against the PREVIOUS index is immune to that — a re-run with an unchanged index is a
+  // no-op no matter how many times it fires.
+  const prevIndexRef = useRef(index)
   useEffect(() => {
-    if (skipFirstScrollIntoView.current) {
-      skipFirstScrollIntoView.current = false
-      return
-    }
+    if (prevIndexRef.current === index) return
+    prevIndexRef.current = index
     tabRefs.current[index]?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
   }, [index])
 

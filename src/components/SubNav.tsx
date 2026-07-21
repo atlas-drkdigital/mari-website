@@ -174,15 +174,17 @@ export function SubNav({ items, className = '' }: { items: SubNavItem[]; classNa
   // a fully visible item must NOT move; the first pass start-aligned every tap, which read as the
   // rail reordering itself). Only a partially-hidden/off-track active item scrolls, start-aligned
   // (minus the track's own left padding, so it lands at the content edge; the browser clamps near
-  // the end, so a last item simply becomes fully visible). Skip the mount run.
+  // the end, so a last item simply becomes fully visible). Fire ONLY on a real activeIndex change,
+  // never on mount. NOTE: this is a HORIZONTAL scrollTo on the rail track (not scrollIntoView — see
+  // the header), so a mount-fire only nudges the rail sideways, never the page; still, guard by the
+  // PREVIOUS index rather than a `useRef(true)` skip-first flag, which React Strict Mode's double
+  // effect-invoke on mount defeats (same hardening as Destinations/Gallery/FAQ).
   const trackRef = useDragScroll<HTMLDivElement>()
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([])
-  const skipFirstRailScroll = useRef(true)
+  const prevActiveRef = useRef(activeIndex)
   useEffect(() => {
-    if (skipFirstRailScroll.current) {
-      skipFirstRailScroll.current = false
-      return
-    }
+    if (prevActiveRef.current === activeIndex) return
+    prevActiveRef.current = activeIndex
     const track = trackRef.current
     const el = activeIndex >= 0 ? itemRefs.current[activeIndex] : null
     if (!track || !el || track.scrollWidth <= track.clientWidth) return

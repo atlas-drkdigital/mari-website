@@ -60,15 +60,14 @@ export function BoatFaq({
 
   // Global rail behavior (Adinda, 2026-07-21 — same fix the gallery tabs got): a tapped chip
   // scrolls into view, aligned to the start of the track; for the last chip the browser clamps to
-  // max scroll, so it simply becomes fully visible with its neighbours. Skip the mount run —
-  // `block: 'nearest'` would vertically scroll the PAGE to this section on load otherwise (the
-  // exact bug the Destinations/gallery implementations already guard against).
-  const skipFirstScrollIntoView = useRef(true)
+  // max scroll, so it simply becomes fully visible with its neighbours. Must fire ONLY on a real
+  // category change, never on mount — `block: 'nearest'` would vertically scroll the PAGE to this
+  // section on load otherwise. A `useRef(true)` skip-first guard is defeated by React Strict Mode's
+  // double effect-invoke on mount; comparing against the previous index is immune (see Destinations).
+  const prevCatRef = useRef(activeCat)
   useEffect(() => {
-    if (skipFirstScrollIntoView.current) {
-      skipFirstScrollIntoView.current = false
-      return
-    }
+    if (prevCatRef.current === activeCat) return
+    prevCatRef.current = activeCat
     chipRefs.current[activeCat]?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
   }, [activeCat])
 
