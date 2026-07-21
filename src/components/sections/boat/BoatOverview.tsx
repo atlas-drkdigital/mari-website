@@ -166,7 +166,10 @@ export function BoatOverview({
             {keyFeatures.length ? (
               <div className="flex flex-col gap-16 px-[8px]">
                 {keyFeaturesHeading ? (
-                  <h3 className="text-editorial-h3 text-text-primary">{keyFeaturesHeading}</h3>
+                  // <h2>, not <h3> (Adinda, 2026-07-21): in DOM order this heading precedes the
+                  // Overview <h2>, so an <h3> made the outline jump H1 (hero) -> H3, skipping a
+                  // level. Kept at the editorial-h3 SIZE — the level is semantic, the ramp is visual.
+                  <h2 className="text-editorial-h3 text-text-primary">{keyFeaturesHeading}</h2>
                 ) : null}
                 <ul className="flex flex-col gap-16">
                   {keyFeatures.map((feature) => (

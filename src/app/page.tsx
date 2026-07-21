@@ -12,7 +12,8 @@ import { LatestArticles } from '@/components/sections/LatestArticles'
 import { Testimonials } from '@/components/sections/Testimonials'
 import { TheBoat } from '@/components/sections/TheBoat'
 import { WhyUs } from '@/components/sections/WhyUs'
-import { buildSeoMetadata } from '@/lib/seo'
+import { toPlainText } from '@/lib/portableText'
+import { buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
 import { sanityFetch } from '@/sanity/lib/live'
 import { HOMEPAGE_QUERY, type HomePageQueryResult } from '@/sanity/queries'
 
@@ -46,6 +47,23 @@ export default async function Home() {
   const { home, cta, latestPosts, destinations, settings, faq } = (data ?? {}) as HomePageQueryResult
   const dests = destinations ?? []
 
+  // FAQPage JSON-LD for the homepage's FAQ block (the boat page already emits its own). Same reason
+  // as the boat page: answer engines, not Google rich results. The Organization block is emitted
+  // site-wide in layout.tsx. `resolveJsonLd` lets an editor's `overrideJsonLd` replace this.
+  const homeFaqQuestions = (faq?.questions ?? []).filter((q) => q?.question)
+  const homeFaqJsonLd = homeFaqQuestions.length
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: homeFaqQuestions.map((q) => ({
+          '@type': 'Question',
+          name: q.question,
+          acceptedAnswer: { '@type': 'Answer', text: toPlainText(q.answer) },
+        })),
+      }
+    : null
+  const homeJsonLd = resolveJsonLd(home?.seo, homeFaqJsonLd)
+
   return (
     <>
       <Nav />
@@ -62,6 +80,12 @@ export default async function Home() {
       </main>
       <Footer />
       <ScrollReveal />
+      {homeJsonLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(homeJsonLd) }}
+        />
+      ) : null}
     </>
   )
 }

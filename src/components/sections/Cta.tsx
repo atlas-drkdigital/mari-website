@@ -1,5 +1,6 @@
 import Image from 'next/image'
 
+import { resolveLink } from '@/lib/links'
 import { sanityImageProps } from '@/sanity/lib/image'
 import type { CtaCardData } from '@/sanity/queries'
 
@@ -15,6 +16,10 @@ export function Cta({ cta }: { cta: { cards?: CtaCardData[] } | null }) {
     heading: c.heading ?? '',
     description: c.description ?? '',
     buttonText: c.buttonText ?? '',
+    // The editor's `buttonLink` (objects/link.ts), resolved to a real href. Until it's set the card
+    // links nowhere — a `#` placeholder is honest here (the control now works; it just needs a value)
+    // and is far better than the old HARDCODED `href="#"` that ignored the field entirely.
+    link: resolveLink(c.buttonLink),
     imageProps: sanityImageProps(c.image, '/assets/cta-private-charter.webp'),
   }))
 
@@ -27,7 +32,8 @@ export function Cta({ cta }: { cta: { cards?: CtaCardData[] } | null }) {
         {cards.map((card) => (
           <a
             key={card.key}
-            href="#"
+            href={card.link?.href ?? '#'}
+            {...(card.link?.newTab ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
             data-reveal
             className="group/cta relative isolate flex h-[calc(50dvh-28px)] w-full flex-col justify-between overflow-hidden px-24 pb-[56px] pt-64 lg:h-[669px] lg:w-1/2 lg:px-64 lg:pb-[88px] lg:pt-96"
           >

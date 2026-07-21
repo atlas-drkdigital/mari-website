@@ -114,7 +114,7 @@ export function Contact({ settings, destinations }: { settings: SiteSettingsCont
 
         {submitted && (
           <div role="status" className="max-w-[560px] text-center text-body-large text-action-primary">
-            <p>Thank you for your message. We&rsquo;ll be in touch shortly. If you don&rsquo;t hear from us within 48 hours, please reach us at <a href="mailto:info@mariliveaboard.com" className="underline">info@mariliveaboard.com</a>.</p>
+            <p>Thank you for your message. We&rsquo;ll be in touch shortly. If you don&rsquo;t hear from us within 48 hours, please reach us at <a href="mailto:info@mari-liveaboard.com" className="underline">info@mari-liveaboard.com</a>.</p>
           </div>
         )}
       </div>

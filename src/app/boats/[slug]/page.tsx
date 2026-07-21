@@ -13,6 +13,7 @@ import { Contact } from '@/components/sections/Contact'
 import { Cta } from '@/components/sections/Cta'
 import { Footer } from '@/components/sections/Footer'
 import { SubNav, type SubNavItem } from '@/components/SubNav'
+import { toPlainText } from '@/lib/portableText'
 import { buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
 import { resolveTokens } from '@/lib/tokens'
 import { sanityFetch } from '@/sanity/lib/live'
@@ -174,17 +175,4 @@ export default async function BoatPage({ params }: { params: Promise<Params> }) 
       ) : null}
     </>
   )
-}
-
-// Portable Text → plain string, for JSON-LD only (schema.org answers are plain text, not markup).
-function toPlainText(blocks: unknown): string {
-  if (!Array.isArray(blocks)) return ''
-  return blocks
-    .map((b) =>
-      b && typeof b === 'object' && 'children' in b && Array.isArray((b as { children: unknown[] }).children)
-        ? (b as { children: { text?: string }[] }).children.map((c) => c.text ?? '').join('')
-        : '',
-    )
-    .join('\n\n')
-    .trim()
 }

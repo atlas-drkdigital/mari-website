@@ -288,7 +288,7 @@ export function Nav() {
           </Link>
 
           <div className="flex w-[480px] items-center justify-end gap-20">
-            <a href="mailto:hello@mariliveaboard.com" aria-label="Email us" className="inline-flex opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">
+            <a href="mailto:hello@mari-liveaboard.com" aria-label="Email us" className="inline-flex opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">
               <span aria-hidden="true" className="block size-[16px] shrink-0 bg-accent-ondark-onprimary group-data-[nav=light]/nav:bg-text-primary [mask-image:url('/assets/icon-email.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
             </a>
             <a href="#" aria-label="Chat on WhatsApp" className="inline-flex opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">
@@ -431,7 +431,10 @@ export function Nav() {
             <div className="relative flex h-full flex-1 items-center overflow-hidden px-64">
               <div className="flex max-w-[520px] flex-col gap-16">
                 <p className="text-eyebrow uppercase text-accent-ondark-muted">Before You Set Sail</p>
-                <h3 className="text-editorial-h1 text-text-ondark-primary">Plan your voyage with confidence.</h3>
+                {/* A promo tagline, not an outline node — a <p>, not a heading. As an <h3> it landed
+                    before the page <h1> in DOM order, making the document's first heading an
+                    out-of-order H3 on every page. Styling unchanged. */}
+                <p className="text-editorial-h1 text-text-ondark-primary">Plan your voyage with confidence.</p>
                 <p className="text-body-large text-text-ondark-primary/55">Pricing, policies, and everything else you need to know before you set sail — all in one place.</p>
               </div>
 
@@ -558,7 +561,7 @@ export function Nav() {
             <button type="button" aria-label="Select language" className="inline-flex items-center opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">
               <span aria-hidden="true" className="block h-[15px] w-[17px] shrink-0 bg-accent-ondark-primary [mask-image:url('/assets/icon-lang.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
             </button>
-            <a href="mailto:hello@mariliveaboard.com" aria-label="Email us" className="inline-flex opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">
+            <a href="mailto:hello@mari-liveaboard.com" aria-label="Email us" className="inline-flex opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">
               <span aria-hidden="true" className="block size-[16px] shrink-0 bg-accent-ondark-primary [mask-image:url('/assets/icon-email.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
             </a>
             <a href="#" aria-label="Chat on WhatsApp" className="inline-flex opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">

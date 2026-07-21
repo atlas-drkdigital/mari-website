@@ -73,9 +73,9 @@ export function Footer() {
               <span aria-hidden="true" className="block size-[15px] shrink-0 bg-accent-ondark-primary [mask-image:url('/assets/icon-whatsapp.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
               <span className="text-body-medium text-accent-ondark-primary transition-colors duration-300 ease-in-out group-hover:text-accent-ondark-onprimarymuted">+62 822 4751 1537</span>
             </a>
-            <a href="mailto:info@mariliveaboard.com" className="group flex items-center gap-12">
+            <a href="mailto:info@mari-liveaboard.com" className="group flex items-center gap-12">
               <span aria-hidden="true" className="block size-[15px] shrink-0 bg-accent-ondark-primary [mask-image:url('/assets/icon-email.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
-              <span className="text-body-medium text-accent-ondark-primary transition-colors duration-300 ease-in-out group-hover:text-accent-ondark-onprimarymuted">info@mariliveaboard.com</span>
+              <span className="text-body-medium text-accent-ondark-primary transition-colors duration-300 ease-in-out group-hover:text-accent-ondark-onprimarymuted">info@mari-liveaboard.com</span>
             </a>
           </div>
 

@@ -32,6 +32,19 @@ export const metadata: Metadata = {
   manifest: "/assets/favico/site.webmanifest",
 };
 
+// Organization structured data — emitted site-wide (every page) so search + answer engines have a
+// stable identity for the business. Page-specific structured data (FAQPage on the homepage + boat
+// pages) is emitted by those pages on top of this. Kept minimal + valid; contact/social details move
+// here from siteSettings when the global-chrome slice wires them.
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Mari Liveaboard",
+  url: SITE_URL,
+  logo: `${SITE_URL}/assets/favico/android-chrome-512x512.png`,
+  description: "A traditional Phinisi liveaboard for serious divers in Indonesia.",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -47,6 +60,10 @@ export default function RootLayout({
         <SanityLive />
         {/* Site-wide back-to-top (Adinda, 2026-07-21) — appears at the nav-flip scroll threshold. */}
         <ScrollTopButton />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
       </body>
     </html>
   );

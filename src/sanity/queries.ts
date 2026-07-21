@@ -33,7 +33,11 @@ export const HOMEPAGE_QUERY = groq`{
     seo
   },
   "cta": *[_id == "cta"][0]{
-    cards[]{ _key, heading, description, buttonText, image${IMAGE} }
+    cards[]{
+      _key, heading, description, buttonText,
+      buttonLink{ linkType, "internalType": internalLink->_type, "internalSlug": internalLink->slug.current, externalUrl, openInNewTab },
+      image${IMAGE}
+    }
   },
   // Homepage FAQ = the questions an editor marked "Feature on homepage", pulled from the General FAQ
   // and from every boat (destinations deliberately don't feed the homepage — see faqSection.ts).
@@ -111,7 +115,11 @@ export const BOAT_QUERY = groq`{
     images[]${IMAGE}
   },
   "cta": *[_id == "cta"][0]{
-    cards[]{ _key, heading, description, buttonText, image${IMAGE} }
+    cards[]{
+      _key, heading, description, buttonText,
+      buttonLink{ linkType, "internalType": internalLink->_type, "internalSlug": internalLink->slug.current, externalUrl, openInNewTab },
+      image${IMAGE}
+    }
   },
   "settings": *[_id == "siteSettings"][0]{
     contactEyebrow, contactHeading, contactIntro
@@ -155,6 +163,7 @@ export type TestimonialData = {
 }
 
 export type CtaCardData = {
+  buttonLink?: import('@/lib/links').LinkQuery
   _key: string
   heading?: string
   description?: string
@@ -282,10 +291,13 @@ export type CabinTypeData = {
 // Both HOMEPAGE_QUERY and BOAT_QUERY select `seo` WHOLESALE (a bare `seo`, no projection), so every
 // field below arrives without a query change. Extended 2026-07-20 from the title/description/noIndex
 // subset — the rest were schema fields nothing rendered. Consumed by buildSeoMetadata in lib/seo.ts.
-// `focusKeyword` and `breadcrumbTitle` are deliberately absent: see that file's notes.
+// `focusKeyword` stays absent (editorial-only, no render target). `breadcrumbTitle` IS consumed now
+// (BoatHero's breadcrumb uses it, falling back to the boat name) — wired 2026-07-21, so it's queried
+// (via the wholesale `seo` select) and typed here.
 export type SeoData = {
   title?: string
   description?: string
+  breadcrumbTitle?: string
   canonicalUrl?: string
   noIndex?: boolean
   noFollow?: boolean

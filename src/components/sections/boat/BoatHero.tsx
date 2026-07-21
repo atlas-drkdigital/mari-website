@@ -102,9 +102,11 @@ export function BoatHero({ boat }: { boat: BoatData }) {
               </Link>
             </li>
             <li aria-hidden="true">/</li>
-            {/* Current page — a link to itself is noise, so it's plain text. */}
+            {/* Current page — a link to itself is noise, so it's plain text. Uses the editor's
+                seo.breadcrumbTitle when set (a shorter label for a long page title), else the boat
+                name. The field existed with nothing reading it until wired 2026-07-21. */}
             <li className="text-accent-ondark-primary" aria-current="page">
-              {boat.name}
+              {boat.seo?.breadcrumbTitle || boat.name}
             </li>
           </ol>
         </nav>

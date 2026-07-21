@@ -82,7 +82,14 @@ export function Hero({ home, destinations }: { home: HomePageData | null; destin
           <div data-reveal="left" className="mx-auto flex w-full max-w-[400px] flex-col items-center gap-24 text-center lg:mx-0 lg:items-start lg:gap-48 lg:text-left">
             <div className="flex flex-col gap-16">
               <p className="text-eyebrow uppercase text-accent-ondark-primary">{eyebrow}</p>
-              <h1 id="hero-heading" className="flex flex-col text-text-ondark-primary">
+              {/* aria-label gives the accessible name a SPACE between the two lines — without it the
+                  spans concatenate to "Mari LiveaboardIndonesia" for screen readers and page-title
+                  extraction, even though flex-col shows them on separate lines. */}
+              <h1
+                id="hero-heading"
+                aria-label={[headingAccent, headingMain].filter(Boolean).join(' ')}
+                className="flex flex-col text-text-ondark-primary"
+              >
                 <span className="text-display-accent">{headingAccent}</span>
                 <span className="text-display-h1">{headingMain}</span>
               </h1>
