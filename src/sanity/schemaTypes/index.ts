@@ -12,6 +12,7 @@ import { richTextBasicType } from './objects/richTextBasic'
 import { richTextFullType } from './objects/richTextFull'
 import { imageWithAltType } from './objects/imageWithAlt'
 import { galleryImageType } from './objects/galleryImage'
+import { heroVideoType } from './objects/heroVideo'
 import { faqSectionType } from './objects/faqSection'
 import { redirectType } from './documents/redirect'
 import { languageType } from './documents/language'
@@ -52,6 +53,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     richTextFullType,
     imageWithAltType,
     galleryImageType,
+    heroVideoType,
     faqSectionType,
     // documents
     redirectType,

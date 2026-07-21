@@ -50,6 +50,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     seo: boat.seo,
     fallbackTitle: boat.pageTitle || boat.name,
     fallbackDescription: boat.tagline,
+    fallbackImage: boat.coverImage,
     path: `/boats/${slug}`,
   })
 }

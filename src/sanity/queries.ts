@@ -21,6 +21,7 @@ export const HOMEPAGE_QUERY = groq`{
   "home": *[_id == "homePage"][0]{
     heroEyebrow, heroHeadingAccent, heroHeadingMain, heroSubheading, heroSearchPlaceholder,
     heroImage${IMAGE},
+    heroVideo{ url, playOnMobile },
     theBoatEyebrow, theBoatHeading, theBoatBody, theBoatLinkText,
     theBoatImage${IMAGE},
     whyUsEyebrow, whyUsHeading,
@@ -72,6 +73,7 @@ export const BOAT_QUERY = groq`{
     _id, name, pageTitle, tagline,
     "slug": slug.current,
     coverImage${IMAGE},
+    coverVideo{ url, playOnMobile },
     stats[]{ _key, label, value },
     "brochureUrl": brochurePdf.asset->url,
     keyFeatures,
@@ -186,6 +188,13 @@ export type SiteSettingsContact = {
   contactIntro?: string
 }
 
+// Hero background video (objects/heroVideo.ts) — a CDN URL, not a Sanity asset. Rendered by
+// HeroVideo.tsx over the hero's poster image. boat.coverVideo / homePage.heroVideo / destination.coverVideo.
+export type HeroVideoData = {
+  url?: string
+  playOnMobile?: boolean
+}
+
 export type HomePageData = {
   heroEyebrow?: string
   heroHeadingAccent?: string
@@ -193,6 +202,7 @@ export type HomePageData = {
   heroSubheading?: string
   heroSearchPlaceholder?: string
   heroImage?: SanityImageWithMeta
+  heroVideo?: HeroVideoData
   theBoatEyebrow?: string
   theBoatHeading?: string
   theBoatBody?: PortableTextBlock[]
@@ -296,6 +306,7 @@ export type BoatData = {
   tagline?: string
   slug?: string
   coverImage?: SanityImageWithMeta
+  coverVideo?: HeroVideoData
   stats?: BoatStat[]
   brochureUrl?: string
   keyFeatures?: string[]

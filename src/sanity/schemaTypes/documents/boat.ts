@@ -101,6 +101,16 @@ export const boatType = defineType({
       fieldset: 'basicInfoFs',
       description: 'Used as the hero background and wherever this item appears as a card/thumbnail elsewhere.',
     }),
+    // Optional hero background video (CDN URL, not an upload) — plays over the cover image, which
+    // stays as poster + fallback. Shared object type; see objects/heroVideo.ts for the full rationale.
+    defineField({
+      name: 'coverVideo',
+      title: 'Cover video',
+      type: 'heroVideo',
+      group: 'basicInfo',
+      fieldset: 'basicInfoFs',
+      description: 'Optional hero background video. Leave empty to just use the cover image.',
+    }),
     defineField({
       name: 'tagline',
       title: 'Tagline / short description',

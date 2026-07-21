@@ -150,13 +150,16 @@ export function BoatOverview({
                 width. Note the source image is centre-cropped (see the hotspot item in
                 _POLISH-BACKLOG.md) — a wider ratio crops MORE off the top and bottom, so this may
                 read differently once the hotspot is honoured and real photos land. */}
-            <div className="relative aspect-[3/2] w-full overflow-hidden">
+            {/* group/features + overflow-hidden + slow scale on hover — the SAME image-zoom pattern
+                as Cabins/Gallery/Specs (group-hover/x:scale-105, duration-[1100ms]). This image is
+                the one that was missing it; the lone overflow-hidden was the leftover intent. */}
+            <div className="group/features relative aspect-[3/2] w-full overflow-hidden">
               <Image
                 {...sanityImageProps(boat.keyFeaturesImage, '/assets/placeholder-photo.svg')}
                 alt={boat.keyFeaturesImage?.alt ?? ''}
                 fill
-                sizes="(min-width: 1024px) 480px, 100vw"
-                className="object-cover"
+                sizes="(min-width: 1024px) 432px, 100vw"
+                className="object-cover transition-transform duration-[1100ms] ease-in-out group-hover/features:scale-105"
               />
             </div>
 

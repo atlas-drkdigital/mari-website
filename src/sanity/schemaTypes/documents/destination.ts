@@ -77,37 +77,16 @@ export const destinationType = defineType({
       fieldset: 'basicInfoFs',
       description: 'Used as the hero background and wherever this destination appears as a card/thumbnail elsewhere.',
     }),
-    // Optional hero video — a hosted-video URL, NOT a Sanity upload. Research 2026-07-16 (see
-    // MANAGER.md): Sanity's free tier caps bandwidth at 10GB/mo with NO overage (serving just
-    // blocks), and a hero background video can't be lazy-loaded, so self-hosting it in the dataset
-    // would burn the cap fast. Sanity's Media Library video CDN is Enterprise-only, so that's out
-    // too. Instead the editor points at a video CDN (Cloudflare Stream / Bunny / Cloudinary). When
-    // set, the frontend plays it muted + looped + playsinline as the hero background over the cover
-    // image (which stays as poster/fallback); autoplay/mute/loop are fixed behavior, not toggles.
+    // Optional hero background video (CDN URL, not an upload) — plays over the cover image, which
+    // stays as poster + fallback. Shared object type; see objects/heroVideo.ts for the full rationale
+    // (was an inline object here; consolidated 2026-07-21 so boat/homePage/destination share one shape).
     defineField({
       name: 'coverVideo',
       title: 'Cover video',
-      type: 'object',
+      type: 'heroVideo',
       group: 'basicInfo',
       fieldset: 'basicInfoFs',
       description: 'Optional hero background video. Leave empty to just use the cover image.',
-      options: { collapsible: true, collapsed: true },
-      fields: [
-        defineField({
-          name: 'url',
-          title: 'Video URL',
-          type: 'url',
-          description: 'Link to a video hosted on a video CDN (e.g. Cloudflare Stream, Bunny, Cloudinary) — do not upload large video into Sanity. Recommended: a seamless silent loop, MP4 (H.264), 720p, under ~5MB, 5–15 seconds.',
-        }),
-        defineField({
-          name: 'playOnMobile',
-          title: 'Play on mobile?',
-          type: 'boolean',
-          initialValue: false,
-          description: 'Off by default — mobile shows the cover image instead, to save data and keep the page fast.',
-          hidden: ({ parent }) => !parent?.url,
-        }),
-      ],
     }),
     defineField({
       name: 'tagline',

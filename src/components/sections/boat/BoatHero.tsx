@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { HeroVideo } from '@/components/HeroVideo'
 import { sanityImageProps } from '@/sanity/lib/image'
 import type { BoatData } from '@/sanity/queries'
 
@@ -55,6 +56,9 @@ export function BoatHero({ boat }: { boat: BoatData }) {
           sizes="100vw"
           className="object-cover"
         />
+        {/* Optional hero video over the cover image (the image stays as poster + LCP + fallback).
+            Behaviour/guards (mobile, reduced-motion, fade-in) all live in HeroVideo. */}
+        <HeroVideo url={boat.coverVideo?.url} playOnMobile={boat.coverVideo?.playOnMobile} />
         {/* Same scrim recipe as the homepage hero: a left-to-right gradient, not a flat overlay.
             The copy sits left, so the photo stays readable on the right where it's uncovered. */}
         <div className="absolute inset-0 bg-linear-to-r from-background-ondark-page/78 via-background-ondark-page/40 to-transparent lg:from-background-ondark-page/70 lg:via-background-ondark-page/25" />

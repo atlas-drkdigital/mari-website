@@ -86,6 +86,16 @@ export const homePageType = defineType({
       fieldset: 'heroFs',
       validation: (Rule) => Rule.required(),
     }),
+    // Optional hero background video (CDN URL, not an upload) — plays over the background image,
+    // which stays as poster + fallback. Shared object type; see objects/heroVideo.ts.
+    defineField({
+      name: 'heroVideo',
+      title: 'Background video',
+      type: 'heroVideo',
+      group: 'hero',
+      fieldset: 'heroFs',
+      description: 'Optional hero background video. Leave empty to just use the background image.',
+    }),
 
     // ----- The Boat -----
     defineField({

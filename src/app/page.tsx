@@ -38,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // Every seo field with a rendering target resolves in buildSeoMetadata — social overrides, OG /
   // Twitter images, the canonical override, and noIndex/noFollow as independent directives. With no
   // title/description set it returns neither key, so layout.tsx's root metadata still applies.
-  return buildSeoMetadata({ seo: home?.seo, path: '/' })
+  return buildSeoMetadata({ seo: home?.seo, fallbackImage: home?.heroImage, path: '/' })
 }
 
 export default async function Home() {

@@ -34,11 +34,19 @@ export function buildSeoMetadata({
   seo,
   fallbackTitle,
   fallbackDescription,
+  fallbackImage,
   path,
 }: {
   seo: SeoData | undefined
   fallbackTitle?: string
   fallbackDescription?: string
+  /**
+   * The page's own hero / cover IMAGE — used as the default social image when the editor hasn't set
+   * `seo.ogImage`. Standing rule (Adinda, 2026-07-21): social metadata is never left empty; a page
+   * with a hero image gets it as the default OG/Twitter image. Pass the poster/cover image, NOT a
+   * hero video — a video can never be an og:image.
+   */
+  fallbackImage?: SanityImageWithMeta
   /** Site-relative path for the default canonical, e.g. `/boats/mari`. */
   path: string
 }): Metadata {
@@ -47,12 +55,22 @@ export function buildSeoMetadata({
 
   const ogTitle = seo?.ogTitle || title
   const ogDescription = seo?.ogDescription || description
-  const ogImage = ogImageUrl(seo?.ogImage)
+  // Social image is NEVER left empty (Adinda, 2026-07-21 — now a standing rule): the editor's
+  // ogImage wins, else the page's own hero/cover image is the default. A hero VIDEO can never be an
+  // og:image, so callers pass the poster/cover image and this keys off that, not the video.
+  const ogImageSource = seo?.ogImage?.asset?._ref ? seo.ogImage : fallbackImage
+  const ogImage = ogImageUrl(ogImageSource)
+  // og:image:alt — social scrapers read this, not the image's own alt attribute. Derived down a
+  // chain so it is never blank when there is an image (this is also why seo.ogImage carries no alt
+  // FIELD — the alt is generated here, per the documented social-image carve-out).
+  const ogImageAlt = ogImageSource?.alt || ogTitle || title
 
   const twitterTitle = seo?.twitterTitle || ogTitle
   const twitterDescription = seo?.twitterDescription || ogDescription
   // Falls back to the OG image, per the field's own "Leave blank to reuse the social share image".
-  const twitterImage = ogImageUrl(seo?.twitterImage) ?? ogImage
+  const twitterImageSource = seo?.twitterImage?.asset?._ref ? seo.twitterImage : ogImageSource
+  const twitterImage = ogImageUrl(twitterImageSource)
+  const twitterImageAlt = twitterImageSource?.alt || twitterTitle || title
 
   // canonicalUrl is an absolute `url` field in the schema; it wins over the page's own path when an
   // editor has set it (that is the entire point of the field — pointing a duplicate at its master).
@@ -74,7 +92,9 @@ export function buildSeoMetadata({
       ...(ogDescription ? { description: ogDescription } : {}),
       type: 'website',
       url: canonical,
-      ...(ogImage ? { images: [{ url: ogImage, width: OG_W, height: OG_H }] } : {}),
+      ...(ogImage
+        ? { images: [{ url: ogImage, width: OG_W, height: OG_H, ...(ogImageAlt ? { alt: ogImageAlt } : {}) }] }
+        : {}),
     },
     twitter: {
       // summary_large_image only when there IS an image — the large card renders as a broken
@@ -82,7 +102,7 @@ export function buildSeoMetadata({
       card: twitterImage ? 'summary_large_image' : 'summary',
       ...(twitterTitle ? { title: twitterTitle } : {}),
       ...(twitterDescription ? { description: twitterDescription } : {}),
-      ...(twitterImage ? { images: [twitterImage] } : {}),
+      ...(twitterImage ? { images: [{ url: twitterImage, ...(twitterImageAlt ? { alt: twitterImageAlt } : {}) }] } : {}),
     },
   }
 }
