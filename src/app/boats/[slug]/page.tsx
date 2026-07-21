@@ -12,6 +12,7 @@ import { BoatSpecs } from '@/components/sections/boat/BoatSpecs'
 import { Contact } from '@/components/sections/Contact'
 import { Cta } from '@/components/sections/Cta'
 import { Footer } from '@/components/sections/Footer'
+import { SubNav, type SubNavItem } from '@/components/SubNav'
 import { buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
 import { resolveTokens } from '@/lib/tokens'
 import { sanityFetch } from '@/sanity/lib/live'
@@ -96,11 +97,37 @@ export default async function BoatPage({ params }: { params: Promise<Params> }) 
   // override also replaces the FAQPage block, which is what "override" should mean.
   const jsonLd = resolveJsonLd(boat.seo, faqJsonLd)
 
+  // SubNav items — an item exists only when its section will actually render ("hide what's empty":
+  // a link to a section that isn't there is worse than no link — the Gallery item appears by itself
+  // the moment images are uploaded). Each guard mirrors the section's own empty test. LAYOUT and
+  // SPECS deliberately share a target (one combined section, two tabs) with distinct hashes; the
+  // section's hashchange listener pre-selects the matching tab (Adinda, 2026-07-21).
+  const subNavItems: SubNavItem[] = [
+    { href: '#overview', targetId: 'overview', label: t(defaults?.subnavOverviewLabel) ?? '' },
+    (cabinTypes ?? []).length && { href: '#cabins', targetId: 'cabins', label: t(defaults?.subnavCabinsLabel) ?? '' },
+    (boat.gallery ?? []).length && { href: '#gallery', targetId: 'gallery', label: t(defaults?.subnavGalleryLabel) ?? '' },
+    (boat.layoutDiagrams ?? []).length && { href: '#layout', targetId: 'layout-and-specs', label: t(defaults?.subnavLayoutLabel) ?? '' },
+    (boat.specifications ?? []).length && { href: '#specs', targetId: 'layout-and-specs', label: t(defaults?.subnavSpecsLabel) ?? '' },
+    faqSections.length && { href: '#faq', targetId: 'faq', label: t(defaults?.subnavFaqLabel) ?? '' },
+  ]
+    .filter((item): item is SubNavItem => Boolean(item && item.label))
+
   return (
     <>
       <Nav />
       <main className="flex flex-1 flex-col">
-        <BoatHero boat={boat} />
+        {/* The SubNav is pinned to the hero's bottom edge — non-floating state (the floating/
+            compact scrolled state is a later pass). Composed HERE, not inside BoatHero: the
+            component is shared with the destination page, and the hero stays a Server Component
+            while the SubNav is a client island. Desktop-only for now; mobile ships with the
+            floating pass. z-20 sits it above the hero (z-10). */}
+        <div className="relative">
+          <BoatHero boat={boat} />
+          <SubNav
+            items={subNavItems}
+            className="absolute inset-x-0 bottom-0 z-20 hidden w-full items-center page-gutter-x lg:flex"
+          />
+        </div>
         <BoatOverview
           boat={boat}
           eyebrow={t(defaults?.overviewEyebrow)}

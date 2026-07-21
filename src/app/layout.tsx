@@ -36,8 +36,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // motion-safe:scroll-smooth — smooth in-page anchor navigation (SubNav, 2026-07-21) done in CSS
+  // so native anchor semantics stay intact (hash updates, hashchange fires, deep links work) and
+  // reduced-motion users get instant jumps for free.
   return (
-    <html lang="en" className={`${bricolageGrotesque.variable} h-full antialiased`}>
+    <html lang="en" className={`${bricolageGrotesque.variable} h-full antialiased motion-safe:scroll-smooth`}>
       <body className="min-h-full flex flex-col">
         {children}
         <SanityLive />

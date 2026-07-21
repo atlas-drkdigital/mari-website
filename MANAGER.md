@@ -160,6 +160,44 @@ the overhead once, and don't price the user's own review time as build time.**
      ⚠️ **Do not build speculatively** — this is the `isFeatured` / section-toggles trap. Research, propose,
      get Adinda's call, then build. A Perplexity prompt was drafted for her on 2026-07-17.
 
+### ✅ CHECKPOINT 2026-07-21 (2) — SubNav desktop + nav hover/active + chevron standard + cabins rhythm
+**Model:** Fable 5. `tsc` ✅ · eslint ✅ · `/` `/boats/mari` `/studio` 200 · **each piece REVIEWED by
+Adinda in the browser before this checkpoint** (sub-nav clicks incl. Layout/Specs tab pre-select ✓,
+nav colours both states ✓, cabins rhythm ✓, chevrons ✓).
+
+**SubNav (desktop, non-floating)** — new shared `src/components/SubNav.tsx` (destination page reuses):
+- Real `<a href="#…">` anchors + IntersectionObserver scroll-spy (top-third band, `-70px 0px -65%`),
+  smooth scroll via `motion-safe:scroll-smooth` on `<html>` (layout.tsx) — native anchor semantics
+  kept, reduced-motion honoured. Sections got `scroll-mt-[70px] lg:scroll-mt-[110px]` (BoatOverview's
+  existing convention).
+- LAYOUT + SPECS deliberately share one target: `#layout` / `#specs` are real zero-size anchors in
+  BoatSpecs; its hashchange listener pre-selects the matching tab. Deep links work (`#specs` opens
+  scrolled + tab active).
+- Items hide when their section would (guards mirror each section's empty test). NOTE: dataset has
+  23 gallery images — `_RESUME.md`'s "gallery renders nothing" was STALE.
+- Labels editable in `boatDefaults` → "Section navigation" fieldset (seeded; rides field-level i18n
+  later). Item styling = TabRail chip sized up (p-16), inactive at the TabRail 40% (Figma's 55/60
+  overridden, Adinda). **Pending: floating/compact state + the mobile pass (started next).**
+
+**Nav menu links — hover + active state (Adinda's long-deferred ask):**
+- Hover/active accent is TWO tokens by nav state: dark bar → `accent-ondark-primary` (amber);
+  light/floated bar → `action-primary` (chocolate, matches Specs/Cabins tabs). First pass used amber
+  in both — Adinda caught the light-state error. Active page = `aria-current` holding the accent
+  (only The Boat resolves today). Dropdown chevrons follow their labels.
+
+**Accordion chevron STANDARD locked (CLAUDE.md Styling):** `h-[6.5px] w-[10px]` +
+`mask-size:100%_100%` in the `size-[20px]` box — never `size-[10px]`+`contain` (~7.6px, elongated).
+Homepage FAQ + boat FAQ brought in line with Specs. Goes into the shared accordion contract at
+componentization. Nav's own 7×6 glyph untouched (Adinda asked — colours/transitions only changed there).
+
+**Cabins spacing (Adinda's "looming" polish):** description→tabs→image now 32 / **36** / (mobile) and
+48/48 (desktop) — the 36 is +one-unit air before the image, arbitrary value, off-scale, don't round.
+**Tab-strip gap-4 between tabs was tried and REJECTED same-day** (seam in the continuous underline
+track "looks very strange") — comment in BoatCabins warns against reintroducing it.
+
+Seeds: `_scripts/seed-subnav-labels.ts`. Open: SubNav mobile (in progress) → floating state → final
+boat review → post-slice drk-seo pass.
+
 ### ✅ CHECKPOINT 2026-07-21 — categorized FAQ built + reviewed, rename-proof composition, paragraph rule
 **Model:** Fable 5. `tsc` ✅ · `eslint` 0 errors · `/` `/boats/mari` `/studio` all 200 · **REVIEWED BY
 ADINDA on the rendered page** (FAQ look ✓, spacing ✓, rename test ✓) — not just automated checks.

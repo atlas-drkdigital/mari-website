@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 
@@ -284,6 +284,27 @@ export function BoatSpecs({
   // so it can't point at a row that doesn't exist — the FAQ shipped that exact bug.
   const [openKey, setOpenKey] = useState<string | null | undefined>(undefined)
 
+  // SubNav tab pre-select (Adinda, 2026-07-21): the hero's LAYOUT and SPECS items both scroll to
+  // this one section, each carrying its own hash — #layout / #specs are real anchor spans at the
+  // section's top, so deep links (`/boats/mari#specs`) scroll natively too, and this listener
+  // switches the tab to match. Runs on mount for the deep-link case, then on every hashchange
+  // (which native anchor clicks fire; the SubNav deliberately doesn't preventDefault).
+  useEffect(() => {
+    const apply = () => {
+      const hash = window.location.hash
+      const wantId = hash === '#specs' ? 'specifications' : hash === '#layout' ? 'layout' : null
+      if (!wantId) return
+      const idx = tabs.findIndex((tab) => tab.id === wantId)
+      if (idx >= 0) setTabIndex(idx)
+    }
+    apply()
+    window.addEventListener('hashchange', apply)
+    return () => window.removeEventListener('hashchange', apply)
+    // tabs is rebuilt each render from boat data that never changes on the client — the ids and
+    // order it yields are stable, so mount + hashchange are the only triggers that matter.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Layout-tab lightbox — every layout diagram's images flattened into ONE list, so a deck plan (or
   // several) opens as a lightbox gallery (Adinda, 2026-07-20). Same dynamic/hasOpened pattern as
   // BoatGallery/BoatCabins. `null` = closed.
@@ -351,8 +372,14 @@ export function BoatSpecs({
     <section
       id="layout-and-specs"
       aria-labelledby="boat-specs-heading"
-      className="relative isolate w-full bg-bg-page py-64 lg:py-[120px]"
+      className="relative isolate w-full scroll-mt-[70px] bg-bg-page py-64 lg:scroll-mt-[110px] lg:py-[120px]"
     >
+      {/* Real anchor targets for the SubNav's LAYOUT / SPECS items — zero-size, at the section's
+          top edge, so native #layout / #specs navigation (clicks AND deep links) scrolls here;
+          the hashchange listener above picks the matching tab. scroll-mt values follow the
+          BoatOverview convention (70px sticky nav, 110 with desktop breathing room). */}
+      <span id="layout" aria-hidden="true" className="absolute top-0 scroll-mt-[70px] lg:scroll-mt-[110px]" />
+      <span id="specs" aria-hidden="true" className="absolute top-0 scroll-mt-[70px] lg:scroll-mt-[110px]" />
       {/* texture-light overlay (Adinda, 2026-07-20) — the tileable topographic pattern visible
           behind this section in the mockup. Identical treatment to WhyUs / Testimonials / Contact:
           same 720px tile, same opacity-20, same -z-10 under an `isolate` parent so it can never

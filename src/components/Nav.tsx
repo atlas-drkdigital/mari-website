@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { DESTINATIONS } from '@/lib/destinations'
@@ -20,6 +21,8 @@ type MegaKey = 'destinations' | 'resources' | null
 const RESOURCE_LINKS = ['Blog', 'Terms & Conditions', 'Onboard Prices', 'FAQ']
 
 export function Nav() {
+  // Current route, for the aria-current active state on menu links (Adinda, 2026-07-21).
+  const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
   const [megaOpen, setMegaOpen] = useState<MegaKey>(null)
   const [activeDestination, setActiveDestination] = useState(DESTINATIONS[0].id)
@@ -198,15 +201,30 @@ export function Nav() {
             onClick={() => toggleMega('destinations')}
             className="group/mt inline-flex items-center gap-4 pb-4 opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100"
           >
-            <span className="text-nav uppercase text-accent-ondark-onprimary group-data-[nav=light]/nav:text-text-primary group-aria-expanded/mt:text-accent-ondark-muted">Destinations</span>
+            {/* Hover accent needs the stacked light-mode variant twice over: the span carries an
+                EXPLICIT light-mode colour, and the light-mode hover token differs (chocolate
+                action-primary, not amber — see the menu-link comment). */}
+            <span className="text-nav uppercase text-accent-ondark-onprimary transition-colors duration-300 ease-in-out group-hover/mt:text-accent-ondark-primary group-data-[nav=light]/nav:text-text-primary group-data-[nav=light]/nav:group-hover/mt:text-action-primary group-aria-expanded/mt:text-accent-ondark-muted">Destinations</span>
             <span
               aria-hidden="true"
-              className="block h-[6px] w-[7px] shrink-0 bg-accent-ondark-onprimary transition-transform duration-300 ease-in-out group-data-[nav=light]/nav:bg-text-primary group-aria-expanded/mt:bg-accent-ondark-muted group-aria-expanded/mt:rotate-180 [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+              className="block h-[6px] w-[7px] shrink-0 bg-accent-ondark-onprimary transition-[transform,background-color] duration-300 ease-in-out group-hover/mt:bg-accent-ondark-primary group-data-[nav=light]/nav:bg-text-primary group-data-[nav=light]/nav:group-hover/mt:bg-action-primary group-aria-expanded/mt:bg-accent-ondark-muted group-aria-expanded/mt:rotate-180 [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
             />
           </button>
-          <Link href="/boats/mari" className="pb-4 text-nav uppercase opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">The Boat</Link>
-          <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">Private Charters</a>
-          <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">About</a>
+          {/* Menu-link hover + active-page accent (Adinda, 2026-07-21 — the old opacity 85→100
+              shift was too subtle to read as a hover at all). TWO tokens by nav state, per the
+              palette's own split: dark nav → accent-ondark-primary (amber gold); light/floated
+              nav → action-primary (chocolate — the established light-background interactive
+              accent, same as the Specs tabs). Amber was wrong on the light bar — Adinda's catch.
+              The light-mode compound variants out-specify the base hover classes, so they win. */}
+          <Link
+            href="/boats/mari"
+            aria-current={pathname?.startsWith('/boats') ? 'page' : undefined}
+            className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 aria-[current=page]:text-accent-ondark-primary aria-[current=page]:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary group-data-[nav=light]/nav:aria-[current=page]:text-action-primary"
+          >
+            The Boat
+          </Link>
+          <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">Private Charters</a>
+          <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">About</a>
           <button
             type="button"
             aria-expanded={megaOpen === 'resources'}
@@ -214,13 +232,13 @@ export function Nav() {
             onClick={() => toggleMega('resources')}
             className="group/mt inline-flex items-center gap-4 pb-4 opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100"
           >
-            <span className="text-nav uppercase text-accent-ondark-onprimary group-data-[nav=light]/nav:text-text-primary group-aria-expanded/mt:text-accent-ondark-muted">Resources</span>
+            <span className="text-nav uppercase text-accent-ondark-onprimary transition-colors duration-300 ease-in-out group-hover/mt:text-accent-ondark-primary group-data-[nav=light]/nav:text-text-primary group-data-[nav=light]/nav:group-hover/mt:text-action-primary group-aria-expanded/mt:text-accent-ondark-muted">Resources</span>
             <span
               aria-hidden="true"
-              className="block h-[6px] w-[7px] shrink-0 bg-accent-ondark-onprimary transition-transform duration-300 ease-in-out group-data-[nav=light]/nav:bg-text-primary group-aria-expanded/mt:bg-accent-ondark-muted group-aria-expanded/mt:rotate-180 [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+              className="block h-[6px] w-[7px] shrink-0 bg-accent-ondark-onprimary transition-[transform,background-color] duration-300 ease-in-out group-hover/mt:bg-accent-ondark-primary group-data-[nav=light]/nav:bg-text-primary group-data-[nav=light]/nav:group-hover/mt:bg-action-primary group-aria-expanded/mt:bg-accent-ondark-muted group-aria-expanded/mt:rotate-180 [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
             />
           </button>
-          <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">Schedule &amp; Rates</a>
+          <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">Schedule &amp; Rates</a>
         </nav>
 
         {/* Destinations mega menu — Figma Section/Nav/MegaMenu 326:3777 */}

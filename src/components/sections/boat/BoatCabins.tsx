@@ -171,9 +171,13 @@ export function BoatCabins({
       // Vertical padding GATED (audit 2026-07-20): desktop = Figma (120/160); mobile pt-64 / pb-80
       // (bottom = top +1 step on the scale — Adinda 2026-07-20, pb-96 read too big). Was flat
       // `pt-[120px] pb-160` — desktop-sized padding on phones.
-      className="w-full bg-bg-accent-secondary pt-64 pb-80 lg:pt-[120px] lg:pb-160"
+      className="w-full scroll-mt-[70px] bg-bg-accent-secondary pt-64 pb-80 lg:scroll-mt-[110px] lg:pt-[120px] lg:pb-160"
     >
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-48">
+      {/* EVEN GAPS around the tab strip (Adinda, 2026-07-21): description → tabs → first image are
+          equal spaces — 32 mobile / 48 desktop, this outer gap and the inner one below in step.
+          Replaces 48 here + 24/80 below, which left the tabs hugging the image on mobile and
+          floating far from it on desktop. */}
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-32 lg:gap-48">
         {/* section-heading (778:8764) — 720px measure, centred.
             SPACING FOLLOWS THE HOMEPAGE, NOT FIGMA (Adinda, 2026-07-17: established conventions
             supersede Figma for type + spacing). eyebrow→h2 is gap-32, matching WhyUs.tsx's centred
@@ -200,12 +204,16 @@ export function BoatCabins({
           ) : null}
         </div>
 
-        {/* gap-24 on mobile (Adinda, 2026-07-20) — 80px between the tab strip and the image read as
-            a disconnect on a narrow screen. Desktop keeps 80. */}
-        <div className="flex flex-col gap-24 lg:gap-80">
+        {/* One step off the outer gap-32 by design: +4px (one spacing unit) of extra air between
+            the tab strip and the image, Adinda 2026-07-21 — mobile only, desktop stays at the even
+            48. 36 is off the spacing scale, hence the arbitrary value (never round to 32/48).
+            History: 24/80 (2026-07-20) → even 32/48 → this. */}
+        <div className="flex flex-col gap-[36px] lg:gap-48">
           {/* tab-items (778:8770) — the underline is a continuous 2px track across the whole row, so
-              the tabs butt together (px-12 each, NO gap) rather than sitting apart. On mobile the row
-              scrolls horizontally instead of wrapping, which keeps that track unbroken.
+              the tabs butt together (px-12 each, NO gap) rather than sitting apart. A gap-4 between
+              tabs was tried 2026-07-21 and rejected same-day (the seam in the track "looks very
+              strange" — Adinda); don't reintroduce it. On mobile the row scrolls horizontally
+              instead of wrapping, which keeps that track unbroken.
               justify-center on mobile too (2026-07-20, Adinda) — was justify-start. Desktop was
               already centred, so this only changes mobile.
               ⚠️ Caveat if cabin types grow: with overflow-x-auto, a centred flex row whose content is

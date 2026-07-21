@@ -82,7 +82,7 @@ export function BoatFaq({
   const toggle = (id: string) => setOpenId((prev) => (prev === id ? null : id))
 
   return (
-    <section id="faq" aria-labelledby="boat-faq-heading" className="relative isolate w-full pt-80 pb-80 lg:min-h-[calc(100dvh-70px)] lg:pt-[144px] lg:pb-160">
+    <section id="faq" aria-labelledby="boat-faq-heading" className="relative isolate w-full scroll-mt-[70px] pt-80 pb-80 lg:min-h-[calc(100dvh-70px)] lg:scroll-mt-[110px] lg:pt-[144px] lg:pb-160">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-dark)] bg-cover bg-center" />
       <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-[36px] page-gutter-x lg:gap-64">
         {/* Header — identical markup to the homepage Faq. The link is a plain <a> like the
@@ -171,7 +171,9 @@ export function BoatFaq({
                         <button type="button" aria-expanded={active} onClick={() => toggle(id)} className="flex w-full items-center justify-between gap-8 text-left">
                           <span className={`flex-1 text-text-ondark-primary [transition:color_500ms_cubic-bezier(0.65,0,0.35,1)] ${active ? 'text-editorial-h5' : 'text-body-large'}`}>{q.question}</span>
                           <span aria-hidden="true" className="flex size-[20px] shrink-0 items-center justify-center">
-                            <span className={`block size-[10px] bg-text-ondark-primary [transition:transform_500ms_cubic-bezier(0.65,0,0.35,1)] [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${active ? 'rotate-180' : ''}`} />
+                            {/* Specs accordion's flattened glyph (Adinda, 2026-07-21) — see
+                                Faq.tsx / BoatSpecs.tsx for the sizing history. */}
+                            <span className={`block h-[6.5px] w-[10px] bg-text-ondark-primary [transition:transform_500ms_cubic-bezier(0.65,0,0.35,1)] [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:100%_100%] ${active ? 'rotate-180' : ''}`} />
                           </span>
                         </button>
                       </h3>

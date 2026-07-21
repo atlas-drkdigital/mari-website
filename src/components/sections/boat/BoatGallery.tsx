@@ -211,7 +211,7 @@ export function BoatGallery({
   // Vertical padding GATED (audit 2026-07-20): desktop = Figma (96/160); mobile 64/96 to match the
   // homepage rhythm. Was flat `pt-96 pb-160` — desktop-sized padding on phones.
   return (
-    <section id="gallery" aria-labelledby="boat-gallery-heading" className="w-full bg-bg-page pt-64 pb-96 lg:pt-96 lg:pb-160">
+    <section id="gallery" aria-labelledby="boat-gallery-heading" className="w-full scroll-mt-[70px] bg-bg-page pt-64 pb-96 lg:scroll-mt-[110px] lg:pt-96 lg:pb-160">
       {/* GRID, not flex (Adinda, 2026-07-20). On mobile the tab panel (category heading + body) must
           sit BELOW the image, while the section heading + tabs stay above it. Those two text blocks
           are not siblings of the image, so flex `order` cannot reach across the nesting — grid can,

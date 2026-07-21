@@ -91,7 +91,9 @@ export const BOAT_QUERY = groq`{
     cabinsEyebrow, cabinsHeading,
     galleryEyebrow, galleryTitle,
     specificationsEyebrow, specificationsHeading,
-    faqEyebrow, faqHeading, faqLinkText
+    faqEyebrow, faqHeading, faqLinkText,
+    subnavOverviewLabel, subnavCabinsLabel, subnavGalleryLabel,
+    subnavLayoutLabel, subnavSpecsLabel, subnavFaqLabel
   },
   // Shared FAQ categories composed onto the boat page (composition model locked 2026-07-16, see
   // mari-website's faq.md: boat pages show the boat's own sections plus shared General FAQ ones).
@@ -324,6 +326,12 @@ export type BoatDefaultsData = {
   faqEyebrow?: string
   faqHeading?: string
   faqLinkText?: string
+  subnavOverviewLabel?: string
+  subnavCabinsLabel?: string
+  subnavGalleryLabel?: string
+  subnavLayoutLabel?: string
+  subnavSpecsLabel?: string
+  subnavFaqLabel?: string
 }
 
 export type BoatQueryResult = {

@@ -55,6 +55,11 @@ export const boatDefaultsType = defineType({
     { name: 'gallery', title: 'Gallery', description: TOKEN_HINT },
     { name: 'specifications', title: 'Specifications', description: TOKEN_HINT },
     { name: 'faq', title: 'FAQ', description: TOKEN_HINT },
+    {
+      name: 'subnav',
+      title: 'Section navigation',
+      description: 'Labels in the strip of section links on the boat page hero.',
+    },
   ],
   fields: [
     defineField({
@@ -139,6 +144,52 @@ export const boatDefaultsType = defineType({
       fieldset: 'faq',
       description: 'Label on the button linking to the full FAQ page.',
       initialValue: 'Read All FAQ',
+    }),
+    // Sub-nav labels live HERE rather than hardcoded (Adinda, 2026-07-21) so they ride the
+    // singleton's field-level localization when i18n lands — same translate-once story as every
+    // other label in this document. The ITEMS (which sections exist, their order, their anchors)
+    // are structural and stay in code; only the visible words are editable.
+    defineField({
+      name: 'subnavOverviewLabel',
+      title: 'Overview label',
+      type: 'string',
+      fieldset: 'subnav',
+      initialValue: 'Overview',
+    }),
+    defineField({
+      name: 'subnavCabinsLabel',
+      title: 'Cabins label',
+      type: 'string',
+      fieldset: 'subnav',
+      initialValue: 'Cabins',
+    }),
+    defineField({
+      name: 'subnavGalleryLabel',
+      title: 'Gallery label',
+      type: 'string',
+      fieldset: 'subnav',
+      initialValue: 'Gallery',
+    }),
+    defineField({
+      name: 'subnavLayoutLabel',
+      title: 'Layout label',
+      type: 'string',
+      fieldset: 'subnav',
+      initialValue: 'Layout',
+    }),
+    defineField({
+      name: 'subnavSpecsLabel',
+      title: 'Specs label',
+      type: 'string',
+      fieldset: 'subnav',
+      initialValue: 'Specs',
+    }),
+    defineField({
+      name: 'subnavFaqLabel',
+      title: 'FAQ label',
+      type: 'string',
+      fieldset: 'subnav',
+      initialValue: 'FAQ',
     }),
   ],
   preview: {

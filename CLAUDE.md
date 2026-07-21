@@ -130,6 +130,13 @@ multi-paragraph copy renders unseparated (shipped that way in the boat FAQ befor
 Values step with the type size: **body-large → `gap-16`, body-medium → `gap-12`** (responsive text
 steps the gap with it). Full reasoning in `RichText.tsx`'s header.
 
+**Accordion chevron glyph — THE STANDARD is `h-[6.5px] w-[10px]` + `[mask-size:100%_100%]`, inside
+a `size-[20px]` centering box (locked 2026-07-21, Adinda).** Never `size-[10px]` + `contain` — that
+renders the nav-chevron mask ~7.6px tall and reads elongated (tuning history in `BoatSpecs.tsx`;
+5.5px was tried and read as a pancake). Applies to every accordion/expander site-wide (Specs,
+homepage FAQ, boat FAQ all conform); goes into the shared accordion component's contract at the
+componentization pass.
+
 ## Building a section: ASK FOR THE FIGMA LINK + SCREENSHOT FIRST — locked 2026-07-17 (Adinda)
 **Standing rule, every section, no exceptions.** Before building any page section, **ask Adinda for the
 Figma node link and a screenshot**, then pull `get_design_context` on that node for exact values. Do not

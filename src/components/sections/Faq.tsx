@@ -36,7 +36,11 @@ function FaqColumn({ items, openId, onToggle, columnOffset }: { items: FaqItem[]
               <button type="button" aria-expanded={active} onClick={() => onToggle(id)} className="flex w-full items-center justify-between gap-8 text-left">
                 <span className={`flex-1 text-text-ondark-primary [transition:color_500ms_cubic-bezier(0.65,0,0.35,1)] ${active ? 'text-editorial-h5' : 'text-body-large'}`}>{item.q}</span>
                 <span aria-hidden="true" className="flex size-[20px] shrink-0 items-center justify-center">
-                  <span className={`block size-[10px] bg-text-ondark-primary [transition:transform_500ms_cubic-bezier(0.65,0,0.35,1)] [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${active ? 'rotate-180' : ''}`} />
+                  {/* h-[6.5px] w-[10px] + mask-size:100%_100% — the Specs accordion's flattened
+                      glyph (Adinda, 2026-07-21: apply it to every FAQ). The old size-[10px] +
+                      contain rendered ~7.6px tall and read elongated; see BoatSpecs for the
+                      tuning history. */}
+                  <span className={`block h-[6.5px] w-[10px] bg-text-ondark-primary [transition:transform_500ms_cubic-bezier(0.65,0,0.35,1)] [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:100%_100%] ${active ? 'rotate-180' : ''}`} />
                 </span>
               </button>
             </h3>
