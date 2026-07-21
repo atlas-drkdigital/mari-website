@@ -62,12 +62,25 @@ stale. When a deviation pushes a dated sprint item, **say so explicitly** rather
   chat-side skill source still exists; reinstall only if a non-repo context ever needs it.
 Load `atlas-destinations` / `mari-itineraries` only for destination or itinerary work specifically.
 
-**Also read every file in `_handoff/*.md` before relying on a skill's content as current.** Those files are
-a staging area for decisions made in this repo that haven't been merged into the skill sources yet (no live
-bridge from this local session to the chat-side skill containers — see `_handoff/drk-website.md`'s own
-explanation). A skill can be stale relative to a handoff file, and a handoff file can itself describe a
-decision this session's own work has since superseded — when they conflict, flag it back to Adinda rather
-than silently picking one. Don't skip this because the skill "should" already have it; verify.
+## 🔑 Precedence — TWO layers, and `_handoff/` is NOT one of them (locked 2026-07-20, Adinda)
+> **`CLAUDE.md` + `rules/*.md` (project) — SUPERSEDES → skills (portable)**
+
+**Placement test, one question: "would this be true on another DRK project?"** Yes → the skill. No → here.
+Yes-but-we-differ → here, as a one-line override that **names what it overrides**. Detail/war-stories →
+`rules/*.md`. **A fact lives in exactly ONE place.**
+
+**Exception — locked decisions keep a one-line tripwire here even when a skill carries the detail.** Not
+hypothetical: `drk-website`'s Figma rule once said the *opposite* of the locked "conventions always win" and
+silently produced an over-literal boat page. With no local assertion there was nothing to catch it against.
+
+**`_handoff/*.md` is an OUTBOX, not a knowledge layer** — write-only staging for decisions not yet merged
+into the chat-side skills (there is no live bridge). **Do not read it to decide what is true**; merge it
+promptly instead. Full routing rule: `_PHASE3-PLAN.md` §1b.
+⚠️ **Until Phase 3 lands, the old behaviour still applies as a stopgap:** skills may be stale relative to
+`_handoff/*.md`, so when a skill's content is load-bearing and looks outdated, check the handoff and flag
+the conflict to Adinda rather than silently picking one. **Verify a chat-side item's status against
+`~/.claude/skills/` directly — repo docs go stale silently** (on 2026-07-20 both `_RESUME.md` and
+`MANAGER.md` still called the 3 urgent skill fixes "queued" days after they had shipped).
 
 ## Stack — verified live 2026-07-14, corrects `drk-website/references/stack.md` (stale, dated 2026-06-10)
 | Layer | Version | Note |
@@ -110,6 +123,12 @@ Off by default in Next.js; leave it off — do not set `cacheComponents: true` i
 
 ## Styling
 Tailwind v4 CSS-first `@theme` layer. **Not yet ported** — the static build's `theme.css` (colors, type, spacing, radius, all generated from Figma variables) needs to move into this repo before any section gets built; don't hand-copy values ad hoc per component. Same "no custom CSS classes / no `@apply` / native utilities only" rule as the static build.
+
+**Paragraph spacing in rich text — the WRAPPER owns it (locked 2026-07-21, Adinda).** `RichText`
+blocks carry no margins, so every wrapper around `<RichText>` must be a flex column with a gap or
+multi-paragraph copy renders unseparated (shipped that way in the boat FAQ before this was caught).
+Values step with the type size: **body-large → `gap-16`, body-medium → `gap-12`** (responsive text
+steps the gap with it). Full reasoning in `RichText.tsx`'s header.
 
 ## Building a section: ASK FOR THE FIGMA LINK + SCREENSHOT FIRST — locked 2026-07-17 (Adinda)
 **Standing rule, every section, no exceptions.** Before building any page section, **ask Adinda for the

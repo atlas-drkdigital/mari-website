@@ -160,6 +160,53 @@ the overhead once, and don't price the user's own review time as build time.**
      ⚠️ **Do not build speculatively** — this is the `isFeatured` / section-toggles trap. Research, propose,
      get Adinda's call, then build. A Perplexity prompt was drafted for her on 2026-07-17.
 
+### ✅ CHECKPOINT 2026-07-21 — categorized FAQ built + reviewed, rename-proof composition, paragraph rule
+**Model:** Fable 5. `tsc` ✅ · `eslint` 0 errors · `/` `/boats/mari` `/studio` all 200 · **REVIEWED BY
+ADINDA on the rendered page** (FAQ look ✓, spacing ✓, rename test ✓) — not just automated checks.
+
+**Built — the `categorized` FAQ layout (Figma `Section/FAQWithCategories` 703:3047 via 778:8696):**
+- `BoatFaq.tsx` REBUILT as the categorized variant: homepage `Faq`'s expression verbatim (dark texture,
+  header + Read-All button, Block/FAQItem rows, 500ms accordion, first-question-open, same min-height,
+  empty → hides) + category rail left (320px cap, 4px active bar) / single accordion column right.
+  Mobile: rail becomes the draggable chip track (Destinations pattern) with scroll-into-view.
+  `default`/`categorized` are the locked variant names (2026-07-17) — merge into ONE Faq component with
+  a `layout` prop at the componentization pass.
+- **Accordion mechanics = homepage button pattern, NOT `<details>` (Adinda's call after SEO analysis):**
+  the two are SEO-equivalent (all answers in DOM either way; JSON-LD + headings + anchors are the real
+  levers), so behavioral parity with the shipped homepage won. Do not "fix" this back for SEO.
+- **Shared-category composition IMPLEMENTED** (was a schema-comment promise since 2026-07-16): boat page
+  = boat's own sections + General FAQ categories flagged **`showOnBoatPages`** — an editor-visible toggle
+  on faqSection, NOT a title match. First pass matched titles; Adinda caught that renaming would silently
+  drop a category. Toggle is rename-proof (verified by an actual rename in Studio) and shows editors what
+  is shared. Same pattern available for destination pages later (`showOnDestinationPages`, not built).
+- `boatDefaults` + FAQ fieldset (`faqEyebrow`/`faqHeading` `{boat} FAQ`/`faqLinkText`), seeded via patch;
+  page JSON-LD + rendered DOM now built from ONE composed list so they cannot disagree (11 questions).
+- Seeds: `_scripts/seed-faq-defaults.ts`, `_scripts/seed-faq-share-toggles.ts`.
+
+**Rules locked this session (Adinda):**
+- **Paragraph spacing: the RichText WRAPPER owns it — `gap-16` body-large / `gap-12` body-medium**,
+  responsive text steps the gap. Found live in FAQ answers; four other body-medium wrappers (Specs ×2,
+  Gallery tab body, cabin descriptions) had silently omitted it — all fixed. Documented in
+  `RichText.tsx` header + CLAUDE.md Styling.
+- **Links: internal = same tab, external = new tab (+noopener) — REAFFIRMED, stays.** Adinda floated
+  all-new-tab for section links; pushback accepted ("keep same page for now, easy to change later").
+  Lives in `RichText`'s link mark + per-component links; centralize in a link primitive at componentization.
+- **Global rail behavior + name: `TabRail`** (Adinda asked for a name — proposed, not yet confirmed).
+  The draggable scrollbar-hidden chip/tab track: drag-scroll, active-chip `scrollIntoView`
+  (`inline:'start'`, browser clamps for last items), skip-on-mount guard. Now in 4 places
+  (Destinations, Gallery, Cabins, FAQ mobile) — extract as ONE component at the componentization pass.
+- `/faq` route linked from both FAQ sections ahead of its build (Adinda's call); flip `<a>` → `Link`
+  when the page ships.
+- Deck-plan hover "black border" fixed: Chromium bleeds a box-shadow inward when shadow + overflow clip
+  share an element and a child transforms — shadow and clip now on separate elements (`BoatSpecs.tsx`).
+
+**Also in this commit (prior-session leftovers, verified working):** BoatHero mobile stats strip
+scroll-not-wrap fix (2026-07-20, enlarged-font wrap bug) + the OG-image backlog note above.
+
+**Open:** `/faq` page design+build (queued — Figma not designed yet) · destination-page FAQ pull toggle ·
+homepage FAQ still flattens answers to plain text (loses paragraphs/marks — fine while answers are
+1-paragraph; revisit at componentization) · sub-nav next (needs Figma link).
+
 ### ✅ CHECKPOINT 2026-07-20 (3) — YARL adopted, boat page polish, Layout & Specs rebuilt
 **Model:** Opus 4.8 (1M context). `tsc` ✅ · `eslint` 0 errors · `/` `/boats/mari` `/yarl-test` all 200.
 Commits: `d72cd31` `bab1505` `f495f1d` `207dfd7` (plus the SEO chain in checkpoint 2).
@@ -220,6 +267,16 @@ both preserved.
 - 🔵 Image SEO: only 3 of 23 gallery images reach the HTML. Research says hidden images are NOT
   reliably indexed; the ranked fix is a real `/gallery` page, then a scroll-snap track, then an
   image sitemap. Not started.
+- 🔵 **BACKEND PASS — auto-derive Open Graph from existing data (Adinda, 2026-07-21).** Social
+  sharing (OG title / description / image) should PRELOAD automatically from data the page already
+  has — hero/cover image, page title, tagline — so a share card looks right even when the editor
+  never touches the dedicated `seo.ogImage`/`ogTitle` fields. Today's SEO wiring (commit `a2dcaa4`,
+  `src/lib/seo.ts`) falls OG *title/description* back to page title/tagline but has NO image
+  fallback, so with no `ogImage` uploaded there is simply no card image. Build the chain
+  `seo.ogImage` → **hero/cover image** → `siteSettings` default OG image, inside `buildSeoMetadata`,
+  for the homepage and every page type. NOT now — this is a backend-pass item.
+  **DRK-reusable** (sensible default for every DRK site, not Mari-specific) → queue into
+  `_handoff/drk-website.md` when the backend pass runs.
 - 🔵 Session time log for 2026-07-20 STILL not filled.
 
 ### ✅ CHECKPOINT 2026-07-20 (2) — SEO wiring fixed end-to-end + boat page polish pass

@@ -351,8 +351,12 @@ export function BoatGallery({
                 {activeTab.heading ? (
                   <h3 className="text-editorial-h3 text-text-primary">{activeTab.heading}</h3>
                 ) : null}
+                {/* body-medium, matching the Cabins description (BoatCabins.tsx:380) — Adinda,
+                    2026-07-20. Was body-large, which read a step bigger than the sibling section. */}
                 {activeTab.body?.length ? (
-                  <div className="text-body-large text-text-primary">
+                  /* gap-12 = the paragraph-spacing rule (2026-07-21): wrapper owns it, 12 for
+                     body-medium / 16 for body-large. */
+                  <div className="flex flex-col gap-12 text-body-medium text-text-primary">
                     <RichText value={activeTab.body} />
                   </div>
                 ) : null}

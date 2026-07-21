@@ -54,6 +54,7 @@ export const boatDefaultsType = defineType({
     { name: 'cabins', title: 'Cabins', description: TOKEN_HINT },
     { name: 'gallery', title: 'Gallery', description: TOKEN_HINT },
     { name: 'specifications', title: 'Specifications', description: TOKEN_HINT },
+    { name: 'faq', title: 'FAQ', description: TOKEN_HINT },
   ],
   fields: [
     defineField({
@@ -113,6 +114,31 @@ export const boatDefaultsType = defineType({
       type: 'string',
       fieldset: 'specifications',
       initialValue: 'Layout and specifications',
+    }),
+    // FAQ section chrome (added 2026-07-21 with the categorized FAQ build). The questions
+    // themselves stay on each boat (`faqSections`) plus the shared General FAQ pull — only the
+    // header strings live here, same split as every other section.
+    defineField({
+      name: 'faqEyebrow',
+      title: 'FAQ eyebrow',
+      type: 'string',
+      fieldset: 'faq',
+      initialValue: 'Good to Know',
+    }),
+    defineField({
+      name: 'faqHeading',
+      title: 'FAQ heading',
+      type: 'string',
+      fieldset: 'faq',
+      initialValue: '{boat} FAQ',
+    }),
+    defineField({
+      name: 'faqLinkText',
+      title: 'FAQ link label',
+      type: 'string',
+      fieldset: 'faq',
+      description: 'Label on the button linking to the full FAQ page.',
+      initialValue: 'Read All FAQ',
     }),
   ],
   preview: {

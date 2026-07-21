@@ -1,13 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 
 import { RichText } from '@/components/RichText'
-import { sanityImageProps } from '@/sanity/lib/image'
+import type { LightboxSlide } from '@/components/SiteLightbox'
+import { sanityImageProps, urlForImage } from '@/sanity/lib/image'
 import type { SanityImageWithMeta } from '@/sanity/lib/image'
 import type { BoatData } from '@/sanity/queries'
 import type { PortableTextBlock } from 'sanity'
+
+// DYNAMIC, ssr:false — same as BoatGallery/BoatCabins: YARL + its stylesheets load only when a
+// visitor opens a layout diagram, never on page load.
+const SiteLightbox = dynamic(
+  () => import('@/components/SiteLightbox').then((m) => m.SiteLightbox),
+  { ssr: false },
+)
 
 // Figma Section/LayoutAndSpecs = 778:8878.
 //
@@ -51,6 +60,81 @@ type AccordionRow = {
   images?: SanityImageWithMeta[]
 }
 
+// LAYOUT tab — NOT an accordion (Adinda, 2026-07-20). Each diagram is just an editorial-h3 label,
+// a description, then the image below it. The Figma node (778:8878) only spec'd the Specifications
+// tab (accordion); the Layout tab shape comes from Adinda's direct instruction.
+//   - container capped at 720px (the accordion is full-width; a single stacked column at that width
+//     ran too long a line)
+//   - gap-48 between the description block and the image (on the spacing scale; the description +
+//     image are the two children of each diagram's flex, so one gap value sets both)
+//   - image gets the Testimonials card treatment: rounded-[2px] + the exact card shadow token
+//   - aspect-square because the deck plan asset is 1:1 (2000x2000); object-contain so a
+//     non-square replacement later still shows in full rather than cropping.
+// `imageStartIndex` is where THIS diagram's images begin in the flattened lightbox list, so a click
+// opens the right slide even across multiple diagrams.
+function LayoutPanel({
+  rows,
+  imageStartIndex,
+  onOpen,
+}: {
+  rows: AccordionRow[]
+  imageStartIndex: number[]
+  onOpen: (index: number) => void
+}) {
+  return (
+    <div className="mx-auto flex w-full max-w-[720px] flex-col gap-64 page-gutter-x lg:px-0">
+      {rows.map((row, r) => (
+        <div key={row.key} className="flex flex-col gap-48">
+          <div className="flex flex-col gap-16">
+            {row.title ? (
+              <h3 className="text-editorial-h3 text-text-primary">{row.title}</h3>
+            ) : null}
+            {row.body?.length ? (
+              /* gap-12 = the paragraph-spacing rule (2026-07-21): the RichText wrapper owns it —
+                 gap-12 for body-medium copy, gap-16 for body-large. */
+              <div className="flex flex-col gap-12 text-body-medium text-text-primary">
+                <RichText value={row.body} />
+              </div>
+            ) : null}
+          </div>
+          {row.images?.map((img, i) => {
+            // Respect the image's OWN ratio (Adinda, 2026-07-20) — not a forced aspect-square. The
+            // box's aspect-ratio comes from the asset's real dimensions (already in the query), so a
+            // wide deck plan lays out wide and a tall one tall. object-contain keeps the whole plan
+            // visible either way. Falls back to 3/2 only if dimensions are somehow missing.
+            const dims = img.dimensions
+            const ratio = dims?.width && dims?.height ? `${dims.width} / ${dims.height}` : '3 / 2'
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => onOpen(imageStartIndex[r] + i)}
+                aria-label={`Open ${img.alt ?? row.title ?? 'deck plan'} full screen`}
+                style={{ aspectRatio: ratio }}
+                className="group/layout relative w-full cursor-zoom-in rounded-[2px] shadow-[0px_4px_10px_rgba(44,37,34,0.2)]"
+              >
+                {/* Shadow and overflow clip live on SEPARATE elements deliberately (Adinda, 2026-07-21):
+                    with both on the button, Chromium bleeds the shadow inward along the clip edge the
+                    moment the child image starts its hover transform — it reads as a thin black border
+                    around the plan. Splitting them is the canonical fix; visually identical otherwise. */}
+                <div className="absolute inset-0 overflow-hidden rounded-[2px]">
+                  <Image
+                    {...sanityImageProps(img, '/assets/placeholder-photo.svg')}
+                    alt={img.alt ?? ''}
+                    fill
+                    sizes="(min-width: 1024px) 720px, 100vw"
+                    className="object-contain transition-transform duration-[1100ms] ease-in-out group-hover/layout:scale-105"
+                  />
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function AccordionColumn({
   rows,
   openKey,
@@ -87,20 +171,35 @@ function AccordionColumn({
                     text-primary — it is NOT a size change like the homepage FAQ's
                     editorial-h5/body-large swap; here only weight and colour move, so the rows keep
                     a stable height and the column split doesn't reflow as you open and close. */}
+                {/* NO color transition (Adinda, 2026-07-20). font-weight applies INSTANTLY while a
+                    500ms color transition lagged behind it, so on click the label flashed
+                    bold-in-the-inactive-colour before fading to accent. Dropping the transition makes
+                    weight and colour flip together in one frame — the chevron still animates. */}
                 <span
-                  className={`flex-1 text-body-large [transition:color_500ms_cubic-bezier(0.65,0,0.35,1)] ${
+                  className={`flex-1 text-body-large ${
                     active ? 'font-semibold text-action-primary' : 'text-text-primary'
                   }`}
                 >
                   {row.title}
                 </span>
+                {/* Chevron: box size-[20px] + glyph size-[10px] + mask-size:contain — BYTE-IDENTICAL
+                    to the homepage FAQ (Faq.tsx:38-39). Colour is the only intended difference:
+                    Figma's Accent/Primary = action-primary (chocolate-600) when open, the subtle
+                    accent = accent-subtle (beige-400) when closed. Was bg-text-primary (navy) in both
+                    states, which is the wrong colour and reads heavier than the FAQ's. Colour now
+                    transitions on the same curve as the rotation. */}
                 <span
                   aria-hidden="true"
                   className="flex size-[20px] shrink-0 items-center justify-center"
                 >
+                  {/* Flattened ~1px shorter than the FAQ's square glyph (Adinda, 2026-07-20). The
+                      contained 10x10 rendered ~7.6px tall and read elongated; -2px (5.5) went too far
+                      and read as a pancake, so it's back to h-[6.5px] — half the original reduction.
+                      Explicit height + mask-size:100%_100% sets the height directly instead of
+                      letting `contain` derive it from the width. */}
                   <span
-                    className={`block size-[10px] bg-text-primary [transition:transform_500ms_cubic-bezier(0.65,0,0.35,1)] [mask-image:url("/assets/icon-nav-chevron.svg")] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${
-                      active ? 'rotate-180' : ''
+                    className={`block h-[6.5px] w-[10px] [transition:transform_500ms_cubic-bezier(0.65,0,0.35,1),background-color_500ms_cubic-bezier(0.65,0,0.35,1)] [mask-image:url("/assets/icon-nav-chevron.svg")] [mask-position:center] [mask-repeat:no-repeat] [mask-size:100%_100%] ${
+                      active ? 'rotate-180 bg-action-primary' : 'bg-accent-subtle'
                     }`}
                   />
                 </span>
@@ -112,12 +211,17 @@ function AccordionColumn({
               }`}
             >
               <div className="overflow-hidden">
-                {/* Type ramp matches the homepage FAQ answer exactly (Faq.tsx:44):
-                    mt-12 + text-body-medium -> lg:text-body-large. The `flex flex-col gap-16`
-                    wrapper was REMOVED — it stacked a 16px flex gap on top of RichText's own
-                    paragraph spacing, which is what made the line spacing read as too loose. The FAQ
-                    has no such wrapper. Images keep their own spacing block below. */}
-                <div className="mt-12 text-body-medium text-text-primary lg:text-body-large">
+                {/* Answer is body-medium on BOTH breakpoints — exactly one step below the body-large
+                    question (Adinda, 2026-07-20). This DIVERGES from the homepage FAQ, whose answer
+                    bumps to lg:text-body-large; there the question is editorial-h5 (bigger), so its
+                    answer sitting at body-large is still a step down. Here the question is body-large,
+                    so the answer has to be body-medium to keep that one-step relationship. The
+                    `flex flex-col gap-16` wrapper stays removed — it stacked a 16px gap on top of
+                    RichText's own paragraph spacing. Images keep their own spacing block below. */}
+                {/* pb-4 only when open (Adinda, 2026-07-20) — a little breathing room below the
+                    answer before the row's bottom border. Harmless while closed: the row is
+                    height-clipped to 0 in that state. */}
+                <div className={`mt-12 flex flex-col gap-12 text-body-medium text-text-primary ${active ? 'pb-4' : ''}`}>
                   {row.body?.length ? <RichText value={row.body} /> : null}
                   {row.images?.map((img, i) => (
                     <div key={i} className="relative aspect-[16/9] w-full overflow-hidden">
@@ -150,14 +254,20 @@ export function BoatSpecs({
   heading?: string
 }) {
   // A layout row survives on images alone; a spec row needs a body (it has nothing else to show).
-  const layoutRows: AccordionRow[] = (boat.layoutDiagrams ?? [])
-    .filter((d) => d.body?.length || d.images?.length)
-    .map((d) => ({
-      key: `layout-${d._key}`,
-      title: d.heading ?? '',
-      body: d.body,
-      images: d.images,
-    }))
+  // Memoised because it feeds the lightbox useMemos below — recreating it every render would defeat
+  // their memoization (the React compiler flags exactly that).
+  const layoutRows: AccordionRow[] = useMemo(
+    () =>
+      (boat.layoutDiagrams ?? [])
+        .filter((d) => d.body?.length || d.images?.length)
+        .map((d) => ({
+          key: `layout-${d._key}`,
+          title: d.heading ?? '',
+          body: d.body,
+          images: d.images,
+        })),
+    [boat.layoutDiagrams],
+  )
 
   const specRows: AccordionRow[] = (boat.specifications ?? [])
     .filter((s) => s.body?.length)
@@ -173,6 +283,45 @@ export function BoatSpecs({
   // expanded item shows the rest are clickable. Derived from the row key rather than a fixed index
   // so it can't point at a row that doesn't exist — the FAQ shipped that exact bug.
   const [openKey, setOpenKey] = useState<string | null | undefined>(undefined)
+
+  // Layout-tab lightbox — every layout diagram's images flattened into ONE list, so a deck plan (or
+  // several) opens as a lightbox gallery (Adinda, 2026-07-20). Same dynamic/hasOpened pattern as
+  // BoatGallery/BoatCabins. `null` = closed.
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [hasOpened, setHasOpened] = useState(false)
+
+  const layoutSlides: LightboxSlide[] = useMemo(
+    () =>
+      layoutRows.flatMap((row) =>
+        (row.images ?? [])
+          .filter((img) => img.asset?._ref)
+          .map((img) => ({
+            src: urlForImage(img).width(1920).fit('max').quality(75).auto('format').url(),
+            alt: img.alt,
+            label: row.title || undefined,
+            caption: img.alt || row.title || undefined,
+          })),
+      ),
+    [layoutRows],
+  )
+
+  // Where each diagram's images start in the flattened list. Counted over the SAME asset._ref filter
+  // as the slides, or a missing asset shifts every later click's target. Pure reduce (no mutated
+  // accumulator) — the React compiler's immutability rule rejects the latter.
+  const layoutOffsets = useMemo(
+    () =>
+      layoutRows.map((_row, index) =>
+        layoutRows
+          .slice(0, index)
+          .reduce((total, prev) => total + (prev.images ?? []).filter((img) => img.asset?._ref).length, 0),
+      ),
+    [layoutRows],
+  )
+
+  const openLightbox = (index: number) => {
+    setHasOpened(true)
+    setLightboxIndex(index)
+  }
 
   // Hooks must run before any early return, or hook order changes between renders.
   if (!tabs.length) return null
@@ -266,22 +415,39 @@ export function BoatSpecs({
             })}
           </div>
 
-          {/* Two STABLE columns at lg, one column below — see the header note on why this isn't
-              CSS `columns-2`. col2 is empty when a tab has a single row; flex-1 on an empty column
-              would still claim half the width, so it's only rendered when it has content. */}
+          {/* The Layout tab is a stacked heading/description/image panel; Specifications is the
+              two-column accordion. Same tabpanel wrapper, different body. */}
           <div
             role="tabpanel"
             id={`specs-panel-${active.id}`}
             aria-labelledby={`specs-tab-${active.id}`}
-            className="flex flex-col gap-8 page-gutter-x lg:flex-row lg:items-start lg:gap-80"
           >
-            <AccordionColumn rows={col1} openKey={resolvedOpenKey} onToggle={toggle} />
-            {col2.length ? (
-              <AccordionColumn rows={col2} openKey={resolvedOpenKey} onToggle={toggle} />
-            ) : null}
+            {active.id === 'layout' ? (
+              <LayoutPanel rows={rows} imageStartIndex={layoutOffsets} onOpen={openLightbox} />
+            ) : (
+              // Two STABLE columns at lg, one below — see the header note on why this isn't CSS
+              // `columns-2`. col2 is empty when a tab has a single row; flex-1 on an empty column
+              // would still claim half the width, so it's only rendered when it has content.
+              <div className="flex flex-col gap-8 page-gutter-x lg:flex-row lg:items-start lg:gap-80">
+                <AccordionColumn rows={col1} openKey={resolvedOpenKey} onToggle={toggle} />
+                {col2.length ? (
+                  <AccordionColumn rows={col2} openKey={resolvedOpenKey} onToggle={toggle} />
+                ) : null}
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Gated on hasOpened so the dynamic chunk is never fetched until a visitor clicks a diagram. */}
+      {hasOpened ? (
+        <SiteLightbox
+          open={lightboxIndex !== null}
+          index={lightboxIndex ?? 0}
+          slides={layoutSlides}
+          onClose={() => setLightboxIndex(null)}
+        />
+      ) : null}
     </section>
   )
 }

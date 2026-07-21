@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function BoatPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params
-  const { boat, defaults, cabinTypes, cta, settings, destinations } = await getBoat(slug)
+  const { boat, defaults, sharedFaqSections, cabinTypes, cta, settings, destinations } = await getBoat(slug)
 
   if (!boat) notFound()
 
@@ -64,11 +64,19 @@ export default async function BoatPage({ params }: { params: Promise<Params> }) 
   const tokens = { boat: boat.name }
   const t = (text?: string) => resolveTokens(text, tokens)
 
+  // FAQ composition (locked model, mari-website faq.md): the boat's own categories first, then the
+  // shared General FAQ pulls ("Payment & Booking" / "What's Included" — filtered in BOAT_QUERY).
+  // Composed HERE, once, so the rendered section and the JSON-LD below can never disagree about
+  // which questions this page carries.
+  const faqSections = [...(boat.faqSections ?? []), ...(sharedFaqSections ?? [])].filter(
+    (s) => s.questions?.length,
+  )
+
   // FAQPage JSON-LD — emitted for answer engines (AI Overviews / ChatGPT / Perplexity), NOT for
   // Google rich results, which have been gov/health-only since late 2023. See drk-seo's
   // aeo-considerations.md; the reasoning is counterintuitive enough that removing this "because
   // FAQ rich results are dead" would be a mistake. Scoped to THIS page's questions only.
-  const faqQuestions = (boat.faqSections ?? []).flatMap((s) => s.questions ?? [])
+  const faqQuestions = faqSections.flatMap((s) => s.questions ?? [])
   const faqJsonLd = faqQuestions.length
     ? {
         '@context': 'https://schema.org',
@@ -114,7 +122,12 @@ export default async function BoatPage({ params }: { params: Promise<Params> }) 
           eyebrow={t(defaults?.specificationsEyebrow)}
           heading={t(defaults?.specificationsHeading)}
         />
-        <BoatFaq boat={boat} />
+        <BoatFaq
+          sections={faqSections}
+          eyebrow={t(defaults?.faqEyebrow)}
+          heading={t(defaults?.faqHeading)}
+          linkText={t(defaults?.faqLinkText)}
+        />
         <Cta cta={cta} />
         <Contact settings={settings} destinations={destinations ?? []} />
       </main>

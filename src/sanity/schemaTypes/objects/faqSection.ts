@@ -20,6 +20,19 @@ export const faqSectionType = defineType({
       description: 'Shown as the heading for this group of questions.',
       validation: (Rule) => Rule.required(),
     }),
+    // Which General FAQ categories are composed onto every boat page. A visible toggle, NOT a
+    // title match (replaced 2026-07-21, Adinda): matching on the title meant renaming a category
+    // silently dropped it from boat pages — the toggle survives renames and the editor can SEE
+    // what's shared where. Only meaningful on the General FAQ (boats/destinations don't compose
+    // into each other), so it's hidden elsewhere — same reasoning as `isFeatured` below.
+    defineField({
+      name: 'showOnBoatPages',
+      title: 'Show on every boat page',
+      type: 'boolean',
+      description: 'Include this category in the FAQ section of every boat page.',
+      initialValue: false,
+      hidden: ({ document }) => document?._type !== 'faqGeneral',
+    }),
     defineField({
       name: 'questions',
       title: 'Questions',

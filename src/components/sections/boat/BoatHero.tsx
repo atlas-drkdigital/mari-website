@@ -111,10 +111,19 @@ export function BoatHero({ boat }: { boat: BoatData }) {
           ) : null}
         </div>
 
+        {/* Stats strip: on MOBILE, scroll sideways instead of wrapping (Adinda, 2026-07-20). Her
+            husband's phone with an enlarged system font made the four items wrap into a ragged block.
+            flex-nowrap + overflow-x-auto keeps them on one line and lets the row scroll — the same
+            mobile behaviour as the Gallery / Destinations tab strips. Gap is reduced to 24 on mobile
+            (was 48) so more fits before it needs to scroll. Desktop keeps the wrapping layout with
+            the full 48/24 gaps (there is always room there, so it never wraps oddly).
+            CSS-only on purpose: this keeps BoatHero a Server Component (it holds the LCP image). Mouse
+            drag-scroll would need the client hook — native touch swipe covers the phone case, which is
+            the one that broke. shrink-0 on each item so they keep their width in the scroll row. */}
         {stats.length ? (
-          <dl className="flex flex-wrap gap-x-48 gap-y-24">
+          <dl className="flex max-w-full flex-nowrap gap-24 overflow-x-auto scrollbar-hidden lg:flex-wrap lg:gap-x-48 lg:gap-y-24 lg:overflow-visible">
             {stats.map((stat) => (
-              <div key={stat._key} className="flex flex-col gap-8">
+              <div key={stat._key} className="flex shrink-0 flex-col gap-8">
                 <dt className="text-caption-label uppercase text-accent-ondark-primary">{stat.label}</dt>
                 <dd className="text-body-medium text-text-ondark-primary">{stat.value}</dd>
               </div>

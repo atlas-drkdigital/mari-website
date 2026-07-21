@@ -192,7 +192,9 @@ export function BoatCabins({
             ) : null}
           </div>
           {boat.cabinsIntro?.length ? (
-            <div className="text-body-large text-text-primary">
+            /* gap-16 = the paragraph-spacing rule (2026-07-21): wrapper owns it, 12 for
+               body-medium / 16 for body-large. */
+            <div className="flex flex-col gap-16 text-body-large text-text-primary">
               <RichText value={boat.cabinsIntro} />
             </div>
           ) : null}
@@ -283,16 +285,20 @@ export function BoatCabins({
               ) : null}
 
               {/* Bare chevrons, no circle — see the matching note in BoatGallery. These step through
-                  PHOTOS; the round arrows by the heading step through CABIN TYPES, and the two read
-                  as one control when both are white circles. z-10 keeps them above the hover overlay. */}
+                  PHOTOS; the round arrows by the heading step through CABIN TYPES.
+                  🔴 pointer-events-none on the CONTAINER (Adinda, 2026-07-20 — was missing). This row
+                  spans the full width across the image's vertical centre; without it, its empty
+                  middle band (a z-10 div with no handler) SWALLOWED taps and the lightbox never
+                  opened — worst on mobile, where you naturally tap centre. The buttons re-enable
+                  pointer-events for themselves. Gallery already had this; Cabins did not. */}
               {images.length > 1 ? (
-                <div className="absolute inset-x-16 top-1/2 z-10 flex -translate-y-1/2 items-center justify-between">
+                <div className="pointer-events-none absolute inset-x-16 top-1/2 z-10 flex -translate-y-1/2 items-center justify-between">
                   <button
                     type="button"
                     onClick={() => stepImage(-1)}
                     aria-label="Previous photo"
                     style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
-                    className="flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
+                    className="pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
                   >
                     <CarouselChevron direction="left" sizeClassName="h-[12.13px] w-[16px]" />
                   </button>
@@ -301,7 +307,7 @@ export function BoatCabins({
                     onClick={() => stepImage(1)}
                     aria-label="Next photo"
                     style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
-                    className="flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
+                    className="pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary opacity-80 transition-opacity duration-300 ease-in-out hover:opacity-100"
                   >
                     <CarouselChevron direction="right" sizeClassName="h-[12.13px] w-[16px]" />
                   </button>
@@ -377,7 +383,7 @@ export function BoatCabins({
                 </div>
 
                 {active.description?.length ? (
-                  <div className="text-body-medium text-text-primary">
+                  <div className="flex flex-col gap-12 text-body-medium text-text-primary">
                     <RichText value={active.description} />
                   </div>
                 ) : null}

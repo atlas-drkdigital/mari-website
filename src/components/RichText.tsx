@@ -13,6 +13,13 @@ import { sanityImageProps, type SanityImageWithMeta } from '@/sanity/lib/image'
 // Layout/spacing is governed by the PARENT (e.g. a flex column with gap) — blocks carry no imposed
 // margins, with ONE deliberate exception: editorial headings get `mt-8` (see HEADING_SPACING).
 //
+// PARAGRAPH-SPACING RULE (Adinda, 2026-07-21): because blocks carry no margins, every wrapper
+// around <RichText> MUST be a flex column with a gap, or multi-paragraph copy renders as one
+// unseparated wall (found live in the boat FAQ). The values, stepped with the type size:
+//   body-large  → `flex flex-col gap-16`
+//   body-medium → `flex flex-col gap-12`
+// A wrapper whose text size is responsive steps the gap with it (`gap-12 lg:gap-16`).
+//
 // Why the exception (Adinda, 2026-07-17). A parent `gap` is SYMMETRIC — it puts the same space above
 // a heading as below it. Typographically that's wrong: a heading belongs to the text that FOLLOWS
 // it, so it needs more space above than below, or it floats between two paragraphs looking equally

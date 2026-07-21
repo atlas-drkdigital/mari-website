@@ -90,7 +90,16 @@ export const BOAT_QUERY = groq`{
     overviewEyebrow, keyFeaturesHeading,
     cabinsEyebrow, cabinsHeading,
     galleryEyebrow, galleryTitle,
-    specificationsEyebrow, specificationsHeading
+    specificationsEyebrow, specificationsHeading,
+    faqEyebrow, faqHeading, faqLinkText
+  },
+  // Shared FAQ categories composed onto the boat page (composition model locked 2026-07-16, see
+  // mari-website's faq.md: boat pages show the boat's own sections plus shared General FAQ ones).
+  // Selected by the editor-visible "Show on every boat page" toggle — NOT by title (replaced
+  // 2026-07-21, Adinda): a title match silently dropped a category from boat pages the moment an
+  // editor renamed it. The toggle is rename-proof and shows the editor exactly what is shared.
+  "sharedFaqSections": *[_id == "faqGeneral"][0].categories[showOnBoatPages == true]{
+    _key, title, questions[]{ question, answer }
   },
   "cabinTypes": *[_type == "cabinType" && boat->slug.current == $slug] | order(order asc, name asc){
     _id, name, count, maxGuests, description,
@@ -312,11 +321,15 @@ export type BoatDefaultsData = {
   galleryTitle?: string
   specificationsEyebrow?: string
   specificationsHeading?: string
+  faqEyebrow?: string
+  faqHeading?: string
+  faqLinkText?: string
 }
 
 export type BoatQueryResult = {
   boat: BoatData | null
   defaults: BoatDefaultsData | null
+  sharedFaqSections: FaqSectionData[] | null
   cabinTypes: CabinTypeData[]
   cta: { cards?: CtaCardData[] } | null
   settings: SiteSettingsContact | null

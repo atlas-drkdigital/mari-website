@@ -90,7 +90,9 @@ export function Faq({ home, faq }: { home: HomePageData | null; faq: { questions
           <p className="text-eyebrow uppercase text-accent-ondark-primary">{eyebrow}</p>
           <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:gap-48">
             <h2 id="faq-heading" className="mr-[40px] max-w-[640px] text-display-h2 text-text-ondark-primary lg:mr-0">{heading}</h2>
-            <a href="#" className="group inline-flex h-48 w-fit shrink-0 items-center gap-4 border border-border-onimage-primary px-20 py-8 text-button-small uppercase text-text-ondark-primary transition-colors duration-300 ease-in-out hover:bg-text-ondark-primary/10 lg:ml-auto">
+            {/* /faq doesn't exist yet — linked ahead of the build (Adinda, 2026-07-21), same as the
+                boat FAQ's button. Both flip to next/link Link when the page ships. */}
+            <a href="/faq" className="group inline-flex h-48 w-fit shrink-0 items-center gap-4 border border-border-onimage-primary px-20 py-8 text-button-small uppercase text-text-ondark-primary transition-colors duration-300 ease-in-out hover:bg-text-ondark-primary/10 lg:ml-auto">
               {linkText}
               <span aria-hidden="true" className="block size-[12px] shrink-0 bg-text-ondark-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
             </a>
