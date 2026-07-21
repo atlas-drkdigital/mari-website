@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { FaqAccordionItem } from '@/components/Accordion'
 import { toPlainText } from '@/components/RichText'
 import type { FaqItemData, HomePageData } from '@/sanity/queries'
 
@@ -24,32 +25,12 @@ function FaqColumn({ items, openId, onToggle, columnOffset }: { items: FaqItem[]
     <div className="flex flex-1 flex-col">
       {items.map((item, i) => {
         const id = `faq-${columnOffset + i}`
-        const active = openId === id
         return (
-          <div
-            key={id}
-            /* Hover = the active row's COLOR treatment only — border + opacity, no size/rotation/
-               expansion (Adinda, 2026-07-21; site-wide accordion rule, see CLAUDE.md). */
-            className={`mb-8 flex flex-col border-b-[0.75px] py-12 [transition:opacity_500ms_cubic-bezier(0.65,0,0.35,1),border-color_500ms_cubic-bezier(0.65,0,0.35,1)] ${
-              active ? 'border-border-onimage-primary' : 'border-accent-ondark-subtle opacity-80 hover:border-border-onimage-primary hover:opacity-100'
-            }`}
-          >
-            <h3>
-              <button type="button" aria-expanded={active} onClick={() => onToggle(id)} className="flex w-full items-center justify-between gap-8 text-left">
-                <span className={`flex-1 text-text-ondark-primary [transition:color_500ms_cubic-bezier(0.65,0,0.35,1)] ${active ? 'text-editorial-h5' : 'text-body-large'}`}>{item.q}</span>
-                <span aria-hidden="true" className="flex size-[20px] shrink-0 items-center justify-center">
-                  {/* h-[6.5px] w-[10px] + mask-size:100%_100% — the Specs accordion's flattened
-                      glyph (Adinda, 2026-07-21: apply it to every FAQ). The old size-[10px] +
-                      contain rendered ~7.6px tall and read elongated; see BoatSpecs for the
-                      tuning history. */}
-                  <span className={`block h-[6.5px] w-[10px] bg-text-ondark-primary [transition:transform_500ms_cubic-bezier(0.65,0,0.35,1)] [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:100%_100%] ${active ? 'rotate-180' : ''}`} />
-                </span>
-              </button>
-            </h3>
-            <div className={`grid [transition:grid-template-rows_500ms_cubic-bezier(0.65,0,0.35,1)] ${active ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-              <p className="mt-12 overflow-hidden text-body-medium lg:text-body-large text-text-ondark-primary">{item.a}</p>
-            </div>
-          </div>
+          <FaqAccordionItem key={id} question={item.q} open={openId === id} onToggle={() => onToggle(id)}>
+            {/* Homepage answer is pre-flattened plain text (toPlainText). The overflow-hidden collapse
+                is owned by FaqAccordionItem; the <p> keeps its own top gap + type. */}
+            <p className="mt-12 text-body-medium lg:text-body-large text-text-ondark-primary">{item.a}</p>
+          </FaqAccordionItem>
         )
       })}
     </div>

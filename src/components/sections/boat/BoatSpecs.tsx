@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 
+import { AccordionChevron } from '@/components/Accordion'
 import { RichText } from '@/components/RichText'
 import type { LightboxSlide } from '@/components/SiteLightbox'
 import { sanityImageProps, urlForImage } from '@/sanity/lib/image'
@@ -189,27 +190,18 @@ function AccordionColumn({
                 >
                   {row.title}
                 </span>
-                {/* Chevron: box size-[20px] + glyph size-[10px] + mask-size:contain — BYTE-IDENTICAL
-                    to the homepage FAQ (Faq.tsx:38-39). Colour is the only intended difference:
-                    Figma's Accent/Primary = action-primary (chocolate-600) when open, the subtle
-                    accent = accent-subtle (beige-400) when closed. Was bg-text-primary (navy) in both
-                    states, which is the wrong colour and reads heavier than the FAQ's. Colour now
-                    transitions on the same curve as the rotation. */}
-                <span
-                  aria-hidden="true"
-                  className="flex size-[20px] shrink-0 items-center justify-center"
-                >
-                  {/* Flattened ~1px shorter than the FAQ's square glyph (Adinda, 2026-07-20). The
-                      contained 10x10 rendered ~7.6px tall and read elongated; -2px (5.5) went too far
-                      and read as a pancake, so it's back to h-[6.5px] — half the original reduction.
-                      Explicit height + mask-size:100%_100% sets the height directly instead of
-                      letting `contain` derive it from the width. */}
-                  <span
-                    className={`block h-[6.5px] w-[10px] [transition:transform_500ms_cubic-bezier(0.65,0,0.35,1),background-color_500ms_cubic-bezier(0.65,0,0.35,1)] [mask-image:url("/assets/icon-nav-chevron.svg")] [mask-position:center] [mask-repeat:no-repeat] [mask-size:100%_100%] ${
-                      active ? 'rotate-180 bg-action-primary' : 'bg-accent-subtle group-hover/row:bg-action-primary'
-                    }`}
-                  />
-                </span>
+                {/* Chevron: the shared AccordionChevron — the locked geometry (size-[20px] box,
+                    h-[6.5px] w-[10px] glyph, mask-size:100%_100%, rotate) lives there. Colour is the
+                    only per-context difference here: Figma's Accent/Primary = action-primary
+                    (chocolate-600) when open, the subtle accent = accent-subtle (beige-400) when
+                    closed, transitioning on the same curve as the rotation; group/row carries the
+                    hover colour. */}
+                <AccordionChevron
+                  open={active}
+                  className={`[transition:transform_500ms_cubic-bezier(0.65,0,0.35,1),background-color_500ms_cubic-bezier(0.65,0,0.35,1)] ${
+                    active ? 'bg-action-primary' : 'bg-accent-subtle group-hover/row:bg-action-primary'
+                  }`}
+                />
               </button>
             </h3>
             <div

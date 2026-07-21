@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { FaqAccordionItem } from '@/components/Accordion'
 import { RichText } from '@/components/RichText'
 import { useDragScroll } from '@/lib/useDragScroll'
 import type { FaqSectionData } from '@/sanity/queries'
@@ -160,40 +161,16 @@ export function BoatFaq({
                   const active = openId === id
                   const anchor = slugifyQuestion(q.question) || `q-${id}`
                   return (
-                    <div
-                      key={id}
-                      id={anchor}
-                      /* Hover = the active row's COLOR treatment only — border + opacity, no
-                         size/rotation/expansion (Adinda, 2026-07-21; site-wide accordion rule,
-                         see CLAUDE.md). Same classes as the homepage Faq row. */
-                      className={`mb-8 flex flex-col border-b-[0.75px] py-12 [transition:opacity_500ms_cubic-bezier(0.65,0,0.35,1),border-color_500ms_cubic-bezier(0.65,0,0.35,1)] ${
-                        active ? 'border-border-onimage-primary' : 'border-accent-ondark-subtle opacity-80 hover:border-border-onimage-primary hover:opacity-100'
-                      }`}
-                    >
-                      <h3>
-                        <button type="button" aria-expanded={active} onClick={() => toggle(id)} className="flex w-full items-center justify-between gap-8 text-left">
-                          <span className={`flex-1 text-text-ondark-primary [transition:color_500ms_cubic-bezier(0.65,0,0.35,1)] ${active ? 'text-editorial-h5' : 'text-body-large'}`}>{q.question}</span>
-                          <span aria-hidden="true" className="flex size-[20px] shrink-0 items-center justify-center">
-                            {/* Specs accordion's flattened glyph (Adinda, 2026-07-21) — see
-                                Faq.tsx / BoatSpecs.tsx for the sizing history. */}
-                            <span className={`block h-[6.5px] w-[10px] bg-text-ondark-primary [transition:transform_500ms_cubic-bezier(0.65,0,0.35,1)] [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:100%_100%] ${active ? 'rotate-180' : ''}`} />
-                          </span>
-                        </button>
-                      </h3>
-                      <div className={`grid [transition:grid-template-rows_500ms_cubic-bezier(0.65,0,0.35,1)] ${active ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                        {/* Answers are tier-2 rich text (paragraph/bold/italic/link/bullets — no
-                            headings), so RichText's light-background heading colors never fire
-                            here; paragraphs inherit the ondark color set on this wrapper.
-                            Paragraph spacing rule (Adinda, 2026-07-21): the RichText WRAPPER owns
-                            it — gap-12 for body-medium copy, gap-16 for body-large. This answer is
-                            medium on mobile / large on lg, so the gap steps with the type. */}
-                        <div className="overflow-hidden">
-                          <div className="mt-12 flex flex-col gap-12 text-body-medium text-text-ondark-primary lg:gap-16 lg:text-body-large">
-                            <RichText value={q.answer} />
-                          </div>
-                        </div>
+                    <FaqAccordionItem key={id} id={anchor} question={q.question ?? ''} open={active} onToggle={() => toggle(id)}>
+                      {/* Answers are tier-2 rich text (paragraph/bold/italic/link/bullets — no
+                          headings), so RichText's light-background heading colors never fire here;
+                          paragraphs inherit the ondark color set on this wrapper. Paragraph spacing
+                          rule (Adinda, 2026-07-21): the RichText WRAPPER owns it — gap-12 for
+                          body-medium copy, gap-16 for body-large; this answer steps medium→large. */}
+                      <div className="mt-12 flex flex-col gap-12 text-body-medium text-text-ondark-primary lg:gap-16 lg:text-body-large">
+                        <RichText value={q.answer} />
                       </div>
-                    </div>
+                    </FaqAccordionItem>
                   )
                 })}
               </div>

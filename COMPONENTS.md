@@ -76,19 +76,34 @@ Destination docs when the destination page ships, per CLAUDE.md).
 
 ---
 
-## Inline — extraction pending (🧩)
+## Extracted components (✅) — added by the componentization pass
 
-### Accordion — in `Faq.tsx`, `BoatFaq.tsx`, `BoatSpecs.tsx`
-The `<h3><button aria-expanded>` row + locked chevron glyph + measure-then-animate expand are **duplicated
-verbatim** across all three. Locked contract (CLAUDE.md Styling) the shared component must encode:
-- **Chevron glyph:** `h-[6.5px] w-[10px]` + `[mask-size:100%_100%]` inside a `size-[20px]` centering box,
-  masking `icon-nav-chevron.svg`. NEVER `size-[10px]` + `contain`. Rotates 180° when open.
-- **First item open on load** (one expanded item signals the rest are clickable).
-- **Hover = active COLOR treatment** (color/opacity/border/chevron-color only) — never the active state's
-  size/typography/rotation/expansion. "Looks lit like the open one," not "looks open."
-- Button pattern, NOT `<details>/<summary>` (decided with Adinda — do not "upgrade" back; no SEO gain).
-- **Consumers (post-extraction):** `Faq` (default), `BoatFaq` (categorized), `BoatSpecs`. **Destination FAQ.**
-- **Status:** ⏳ next up (extraction #1).
+### Accordion — `src/components/Accordion.tsx` — exports `AccordionChevron`, `FaqAccordionItem`
+Extracted 2026-07-21. The accordion is **not one component** — the FAQ rows and the Specs row genuinely
+diverge, so it's a shared primitive + a variant, not one boolean-parameterised blob (composition rule:
+explicit variants over boolean props).
+- **`AccordionChevron`** — THE locked chevron glyph, used by **all three** consumers. Owns the geometry:
+  `h-[6.5px] w-[10px]` + `[mask-size:100%_100%]` inside a `size-[20px]` box, masking `icon-nav-chevron.svg`,
+  rotating 180° on `open`. NEVER `size-[10px]` + `contain`. Colour + which transitions run are the only
+  per-context difference → passed via `className` (FAQ: `bg-text-ondark-primary`, transform only; Specs:
+  recolours `accent-subtle`→`action-primary`, so also transitions background-color).
+- **`FaqAccordionItem`** — one row of the **ondark FAQ accordion**, shared by the homepage `Faq` (`default`
+  layout) and boat `BoatFaq` (`categorized` layout). **The row is IDENTICAL between the two FAQ layouts —
+  the categorization is the ONLY difference** (Adinda, 2026-07-21): `default` = two columns, no categories;
+  `categorized` = category rail + single column. So this row is the shared seam; the layout lives in the
+  section. Owns wrapper (border/opacity hover — colour treatment only, per the locked rule), `h3>button`,
+  title (active swaps to `editorial-h5`), chevron, and the `grid-rows-[0fr↔1fr]` collapse. Answer passed as
+  `children` (plain `<p>` on the homepage, `<RichText>` gap-column on the boat page). Optional `id` anchor.
+  Button pattern, NOT `<details>/<summary>` (no SEO gain — do not "upgrade").
+- **Consumers:** `Faq` (default), `BoatFaq` (categorized) — both refactored to it. `BoatSpecs` adopts
+  `AccordionChevron` only (its row is the divergent light/weight+colour variant). **Destination FAQ** reuses
+  `FaqAccordionItem`.
+- **Verified:** rendered FAQ DOM byte-identical pre/post (only intra-class-attribute order changed, which
+  Tailwind treats as equivalent); tsc + eslint clean.
+- **Open:** unifying `Faq` + `BoatFaq` into ONE section component with a `layout: default | categorized`
+  field (the locked variant values) is the eventual step — they now share the row, which is the hard part.
+
+## Inline — extraction pending (🧩)
 
 ### `TabRail` — in `SubNav.tsx`, `BoatFaq.tsx`, `Destinations.tsx`
 Horizontally-draggable category chip bar (mobile section nav + categorized-FAQ categories + destinations
