@@ -33,6 +33,7 @@ export const destinationType = defineType({
     { name: 'cards', title: 'Cards' },
     { name: 'overview', title: 'Overview' },
     { name: 'gallery', title: 'Gallery' },
+    { name: 'itineraries', title: 'Itineraries' },
     { name: 'trips', title: 'Upcoming Trips' },
     { name: 'faq', title: 'FAQ' },
     { name: 'seo', title: 'SEO' },
@@ -46,6 +47,7 @@ export const destinationType = defineType({
     },
     { name: 'overviewFs', title: 'Overview' },
     { name: 'galleryFs', title: 'Gallery' },
+    { name: 'itinerariesFs', title: 'Itineraries' },
     { name: 'tripsFs', title: 'Upcoming Trips' },
     { name: 'faqFs', title: 'FAQ' },
   ],
@@ -220,6 +222,20 @@ export const destinationType = defineType({
       fieldset: 'galleryFs',
       of: [defineArrayMember({ type: 'galleryImage' })],
       description: 'Drop or select many images at once — they upload straight onto this list.',
+    }),
+
+    // Itineraries tab is a SIGNPOST only (Adinda, 2026-07-22, editor-intuitiveness rule): the
+    // section auto-pulls `itinerary` documents that reference this destination, so there is
+    // nothing to edit here — but an editor looking for "the itineraries on the Komodo page"
+    // will look in the Komodo document first, and an absent tab reads as "this page has no
+    // itineraries section". Same pattern as the FAQ note above.
+    sharedComponentNote({
+      name: 'itinerariesNote',
+      title: 'About this section',
+      message:
+        'Itineraries are managed as their own documents (see Itineraries in the sidebar). Every itinerary whose Destination field points at this destination appears here automatically, sorted by its Sort order number.',
+      group: 'itineraries',
+      fieldset: 'itinerariesFs',
     }),
 
     // Upcoming Trips — the INSEANQ booking widget, one embed code per destination (filtered by

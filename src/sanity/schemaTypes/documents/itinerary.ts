@@ -1,5 +1,7 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
+import { CharCountInput } from '../../components/CharCountInput'
+
 // Stub only, per locked scope (mari-project skill / CLAUDE.md): itineraries are listed on the
 // Schedule & Rates page and referenced from their destination page, but individual itinerary
 // pages are NOT clickable/published at launch — full itinerary detail pages are a future paid
@@ -63,7 +65,24 @@ export const itineraryType = defineType({
       group: 'content',
       fieldset: 'contentFs',
     }),
-    defineField({ name: 'summary', type: 'text', rows: 3, group: 'content', fieldset: 'contentFs' }),
+    // Soft 240-char budget with a live counter (Adinda, 2026-07-22 — same treatment as the meta
+    // description): the destination card clamps the summary to 6 lines on phones, and ~240 chars
+    // is what fits. Warning, not required — the frontend clamp is the safety net.
+    defineField({
+      name: 'summary',
+      type: 'text',
+      rows: 3,
+      group: 'content',
+      fieldset: 'contentFs',
+      components: { input: CharCountInput },
+      // maxLength is a custom option read by CharCountInput — not part of Sanity's built-in typing
+      // (same cast as seo.ts).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      options: { maxLength: 240 } as any,
+      validation: (Rule) =>
+        Rule.max(240).warning('Keep the summary under 240 characters — longer text is cut off on the card.'),
+      description: 'Short description shown on the itinerary card when it opens.',
+    }),
     defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
   ],
   preview: {

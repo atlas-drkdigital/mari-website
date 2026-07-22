@@ -141,13 +141,11 @@ export function DestinationItineraries({
     <section
       id="itineraries"
       aria-labelledby="destination-itineraries-heading"
-      className="relative isolate w-full scroll-mt-[70px] overflow-hidden bg-bg-page pt-64 pb-96 lg:scroll-mt-[110px] lg:pt-80 lg:pb-128"
+      /* NO texture — it originally carried the Trips-section treatment per the mock, removed on
+         Adinda's call 2026-07-22 ("it's fighting with the next section"): Upcoming Trips sits
+         directly below and keeps the texture, so this section stays plain bg-page. */
+      className="w-full scroll-mt-[70px] bg-bg-page pt-64 pb-96 lg:scroll-mt-[110px] lg:pt-80 lg:pb-128"
     >
-      {/* The light contour texture at 20% — the Why Us / Upcoming Trips recipe verbatim. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] [background-size:720px_auto] bg-repeat opacity-20"
-      />
 
       <div className="mx-auto flex w-full flex-col gap-48 lg:gap-64">
         {/* Header keeps the Trips section's gutter treatment (page-gutter mobile, 160 desktop). */}
@@ -162,10 +160,11 @@ export function DestinationItineraries({
                 {heading}
               </h2>
             ) : null}
-            {/* Arrows exist only when the row actually scrolls, and only on desktop — mobile is
-                the Why Us peek-carousel (drag affords the swipe). */}
+            {/* Arrows exist only when the row actually scrolls — on EVERY breakpoint (Adinda,
+                2026-07-22: "I want the arrows still" on mobile; an earlier lg-only pass followed
+                Why Us, which has none). CarouselArrowButton is 36px mobile / 52px lg on its own. */}
             {isCarousel ? (
-              <div className="hidden shrink-0 gap-12 lg:flex">
+              <div className="flex shrink-0 gap-12">
                 <CarouselArrowButton direction="prev" onClick={() => step(-1)} ariaLabel="Previous itinerary" />
                 <CarouselArrowButton direction="next" onClick={() => step(1)} ariaLabel="Next itinerary" />
               </div>
@@ -201,7 +200,11 @@ export function DestinationItineraries({
                       ? () => setActiveId((cur) => (cur === card._id ? null : card._id))
                       : undefined
                   }
-                  className="group/card relative aspect-[4/5] w-[84%] shrink-0 snap-center overflow-hidden md:w-[46%] lg:h-[580px] lg:w-[464px] lg:snap-start"
+                  /* Mobile height is dvh-based, not an aspect ratio (Adinda, 2026-07-22): "a
+                     little less than one full viewport height" so the description fits without
+                     drowning the card. 70dvh, capped so tall phones don't balloon it; desktop
+                     keeps the mock's fixed 464x580. */
+                  className="group/card relative h-[70dvh] max-h-[640px] w-[84%] shrink-0 snap-center overflow-hidden md:w-[46%] lg:h-[580px] lg:max-h-none lg:w-[464px] lg:snap-start"
                 >
                   <Image
                     {...sanityImageProps(card.image, '/assets/placeholder-photo.svg')}
@@ -245,11 +248,14 @@ export function DestinationItineraries({
                       <h3 className="max-w-[400px] text-display-h3 text-text-ondark-primary">
                         {card.title}
                       </h3>
+                      {/* body-medium to match the season/duration line, NOT the mock's 16px
+                          (Adinda, 2026-07-22: route should read as a label, same size as the key
+                          info); pin scaled down with it. */}
                       {card.route ? (
-                        <p className="flex items-center gap-4 text-body-large text-text-ondark-primary">
+                        <p className="flex items-center gap-4 text-body-medium text-text-ondark-primary">
                           <span
                             aria-hidden="true"
-                            className="block size-[16px] shrink-0 bg-text-ondark-primary [mask-image:url('/assets/icon-location.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+                            className="block size-[14px] shrink-0 bg-text-ondark-primary [mask-image:url('/assets/icon-location.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
                           />
                           {card.route}
                         </p>
@@ -261,8 +267,12 @@ export function DestinationItineraries({
                         isOpen ? 'opacity-100' : 'opacity-0'
                       }`}
                     >
+                      {/* line-clamp-6 on mobile only (Adinda, 2026-07-22) — the dvh card can't
+                          grow with the text, so an over-long summary truncates with an ellipsis
+                          instead of colliding with the CTA. Studio pairs this with a 240-char
+                          counter on the field; the clamp is the safety net, not the editor UX. */}
                       {card.summary ? (
-                        <p className="max-w-[400px] text-body-large text-text-ondark-primary">
+                        <p className="line-clamp-6 max-w-[400px] text-body-large text-text-ondark-primary lg:line-clamp-none">
                           {card.summary}
                         </p>
                       ) : null}
