@@ -3,9 +3,12 @@ import { notFound } from 'next/navigation'
 
 import { Nav } from '@/components/Nav'
 import { ScrollReveal } from '@/components/ScrollReveal'
+import { Contact } from '@/components/sections/Contact'
+import { Cta } from '@/components/sections/Cta'
 import { DestinationHero } from '@/components/sections/destination/DestinationHero'
 import { FaqCategorized } from '@/components/sections/FaqCategorized'
 import { Footer } from '@/components/sections/Footer'
+import { LatestArticles } from '@/components/sections/LatestArticles'
 import { SubNav, type SubNavItem } from '@/components/SubNav'
 import { toPlainText } from '@/lib/portableText'
 import { buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
@@ -36,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { slug } = await params
   // stega: false — see the note in src/app/page.tsx. Metadata must never carry stega encoding.
   const { data } = await sanityFetch({ query: DESTINATION_QUERY, params: { slug }, stega: false })
-  const { destination } = (data ?? {}) as DestinationQueryResult
+  const { destination, settings } = (data ?? {}) as DestinationQueryResult
   if (!destination) return {}
 
   return buildSeoMetadata({
@@ -45,12 +48,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     fallbackDescription: destination.tagline,
     fallbackImage: destination.coverImage,
     path: `/destinations/${slug}`,
+    siteName: settings?.siteTitle,
   })
 }
 
 export default async function DestinationPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params
-  const { destination, defaults, itineraries, sharedFaqSections } = await getDestination(slug)
+  const { destination, defaults, itineraries, sharedFaqSections, latestPosts, cta, settings, destinations } =
+    await getDestination(slug)
 
   if (!destination) notFound()
 
@@ -111,6 +116,17 @@ export default async function DestinationPage({ params }: { params: Promise<Para
           heading={t(defaults?.faqHeading)}
           linkText={t(defaults?.faqLinkText)}
         />
+        {/* Section order per the mock (778:8608): FAQ → [About the Boats, pending] → CTA →
+            Articles → Contact. Articles = the homepage component, Komodo-linked posts only, no
+            button (the mock has none — its arrows are deferred; the drag-track convention covers
+            the overflow case). */}
+        <Cta cta={cta} />
+        <LatestArticles
+          eyebrow={t(defaults?.articlesEyebrow)}
+          heading={t(defaults?.articlesHeading)}
+          posts={latestPosts ?? []}
+        />
+        <Contact settings={settings} destinations={destinations ?? []} />
       </main>
       <Footer />
       <ScrollReveal />

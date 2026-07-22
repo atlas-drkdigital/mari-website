@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { slug } = await params
   // stega: false — see the note in src/app/page.tsx. Metadata must never carry stega encoding.
   const { data } = await sanityFetch({ query: BOAT_QUERY, params: { slug }, stega: false })
-  const { boat } = (data ?? {}) as BoatQueryResult
+  const { boat, settings } = (data ?? {}) as BoatQueryResult
   if (!boat) return {}
 
   // The page's own title/tagline are the fallbacks when the editor leaves the SEO fields blank;
@@ -53,6 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     fallbackDescription: boat.tagline,
     fallbackImage: boat.coverImage,
     path: `/boats/${slug}`,
+    siteName: settings?.siteTitle,
   })
 }
 

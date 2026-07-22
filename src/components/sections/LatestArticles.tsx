@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 import { useDragScroll } from '@/lib/useDragScroll'
 import { sanityImageProps } from '@/sanity/lib/image'
-import type { HomePageData, LatestPostData } from '@/sanity/queries'
+import type { LatestPostData } from '@/sanity/queries'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 // Deterministic (UTC) so server and client render identical markup — no hydration mismatch.
@@ -16,12 +16,22 @@ function formatDate(iso?: string): string {
 }
 
 // Ported from ../v1-static-homepage/sections/latest-articles.html + assets/latest-articles.js.
-// Figma Section/LatestArticles 400:733. The three most recent blog posts are pulled from Sanity
-// (full-wire slice, 2026-07-16) — no hardcoded fallback.
-export function LatestArticles({ home, posts }: { home: HomePageData | null; posts: LatestPostData[] }) {
-  const eyebrow = home?.latestArticlesEyebrow ?? ''
-  const heading = home?.latestArticlesHeading ?? ''
-  const linkText = home?.latestArticlesLinkText ?? ''
+// Figma Section/LatestArticles 400:733; the destination page instances the same section (778:8699,
+// verified 2026-07-22). Props went generic (eyebrow/heading/linkText/posts, was `home`) when the
+// destination page became the second consumer — the homepage passes its homePage fields, the
+// destination page its destinationDefaults fields (with the {destination} token pre-resolved).
+// `linkText` empty → no button (the destination mock has none; the homepage sets one).
+export function LatestArticles({
+  eyebrow = '',
+  heading = '',
+  linkText = '',
+  posts,
+}: {
+  eyebrow?: string
+  heading?: string
+  linkText?: string
+  posts: LatestPostData[]
+}) {
   const articles = (posts ?? []).map((p) => ({
     key: p._id,
     imageProps: sanityImageProps(p.coverImage, '/assets/blog-raja-ampat-guide.webp'),
@@ -45,10 +55,12 @@ export function LatestArticles({ home, posts }: { home: HomePageData | null; pos
           <p className="text-eyebrow uppercase text-action-primary">{eyebrow}</p>
           <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:gap-48">
             <h2 id="latest-articles-heading" className="mr-[40px] max-w-[640px] text-display-h2 text-text-primary lg:mr-0">{heading}</h2>
-            <a href="#" className="group inline-flex h-48 w-fit shrink-0 items-center gap-4 border border-action-primary px-20 py-8 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary/10 lg:ml-auto">
-              {linkText}
-              <span aria-hidden="true" className="block size-[12px] shrink-0 bg-action-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
-            </a>
+            {linkText ? (
+              <a href="#" className="group inline-flex h-48 w-fit shrink-0 items-center gap-4 border border-action-primary px-20 py-8 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary/10 lg:ml-auto">
+                {linkText}
+                <span aria-hidden="true" className="block size-[12px] shrink-0 bg-action-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
+              </a>
+            ) : null}
           </div>
         </div>
 

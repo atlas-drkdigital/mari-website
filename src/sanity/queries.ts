@@ -67,7 +67,7 @@ export const HOMEPAGE_QUERY = groq`{
     coverImage${IMAGE}
   },
   "settings": *[_id == "siteSettings"][0]{
-    contactEyebrow, contactHeading, contactIntro
+    siteTitle, contactEyebrow, contactHeading, contactIntro
   }
 }`
 
@@ -130,7 +130,7 @@ export const BOAT_QUERY = groq`{
     }
   },
   "settings": *[_id == "siteSettings"][0]{
-    contactEyebrow, contactHeading, contactIntro
+    siteTitle, contactEyebrow, contactHeading, contactIntro
   },
   "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
     _id, name, "slug": slug.current
@@ -176,7 +176,10 @@ export const DESTINATION_QUERY = groq`{
   "sharedFaqSections": *[_id == "faqGeneral"][0].categories[showOnDestinationPages == true]{
     _key, title, questions[]{ question, answer }
   },
-  "latestPosts": *[_type == "blogPost" && defined(postDate) && defined(slug.current)] | order(postDate desc)[0...3]{
+  // Unlike the homepage's latest-3, the destination Articles section shows only posts LINKED to
+  // this destination via blogPost.relatedDestination (Adinda, 2026-07-22: "articles & news — but
+  // Komodo only").
+  "latestPosts": *[_type == "blogPost" && relatedDestination->slug.current == $slug && defined(postDate) && defined(slug.current)] | order(postDate desc)[0...3]{
     _id, title, "slug": slug.current, excerpt, postDate,
     "category": category->name,
     coverImage${IMAGE}
@@ -195,7 +198,7 @@ export const DESTINATION_QUERY = groq`{
     }
   },
   "settings": *[_id == "siteSettings"][0]{
-    contactEyebrow, contactHeading, contactIntro
+    siteTitle, contactEyebrow, contactHeading, contactIntro
   },
   "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
     _id, name, "slug": slug.current
@@ -268,6 +271,8 @@ export type DestinationCardData = {
 }
 
 export type SiteSettingsContact = {
+  /** Brand name for the {siteName} token in SEO titles (buildSeoMetadata). */
+  siteTitle?: string
   contactEyebrow?: string
   contactHeading?: string
   contactIntro?: string

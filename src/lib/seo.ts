@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { resolveTokens } from '@/lib/tokens'
 import { urlForImage, type SanityImageWithMeta } from '@/sanity/lib/image'
 import type { SeoData } from '@/sanity/queries'
 
@@ -36,6 +37,7 @@ export function buildSeoMetadata({
   fallbackDescription,
   fallbackImage,
   path,
+  siteName,
 }: {
   seo: SeoData | undefined
   fallbackTitle?: string
@@ -49,12 +51,24 @@ export function buildSeoMetadata({
   fallbackImage?: SanityImageWithMeta
   /** Site-relative path for the default canonical, e.g. `/boats/mari`. */
   path: string
+  /**
+   * Value for the {siteName} token in SEO titles/descriptions (Adinda, 2026-07-22: the site's name
+   * must never be hardcoded per document). Pass `settings.siteTitle` — every page query selects it.
+   * Left unset, an unresolved {siteName} renders literally, which is the visible-bug-over-silent-
+   * blank behaviour resolveTokens locks in.
+   */
+  siteName?: string
 }): Metadata {
-  const title = seo?.title || fallbackTitle
-  const description = seo?.description || fallbackDescription
+  // {siteName} resolves in every editor-facing text field, mirroring the {boat}/{destination}
+  // pattern — resolved here, once, so no caller can forget a field.
+  const tokens = { siteName }
+  const r = (text?: string) => resolveTokens(text, tokens)
 
-  const ogTitle = seo?.ogTitle || title
-  const ogDescription = seo?.ogDescription || description
+  const title = r(seo?.title || fallbackTitle)
+  const description = r(seo?.description || fallbackDescription)
+
+  const ogTitle = r(seo?.ogTitle) || title
+  const ogDescription = r(seo?.ogDescription) || description
   // Social image is NEVER left empty (Adinda, 2026-07-21 — now a standing rule): the editor's
   // ogImage wins, else the page's own hero/cover image is the default. A hero VIDEO can never be an
   // og:image, so callers pass the poster/cover image and this keys off that, not the video.
@@ -65,8 +79,8 @@ export function buildSeoMetadata({
   // FIELD — the alt is generated here, per the documented social-image carve-out).
   const ogImageAlt = ogImageSource?.alt || ogTitle || title
 
-  const twitterTitle = seo?.twitterTitle || ogTitle
-  const twitterDescription = seo?.twitterDescription || ogDescription
+  const twitterTitle = r(seo?.twitterTitle) || ogTitle
+  const twitterDescription = r(seo?.twitterDescription) || ogDescription
   // Falls back to the OG image, per the field's own "Leave blank to reuse the social share image".
   const twitterImageSource = seo?.twitterImage?.asset?._ref ? seo.twitterImage : ogImageSource
   const twitterImage = ogImageUrl(twitterImageSource)

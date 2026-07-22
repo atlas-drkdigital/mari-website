@@ -34,12 +34,12 @@ export async function generateMetadata(): Promise<Metadata> {
   // junk to Google. Visual Editing is off today so this is currently a no-op — it is here so that
   // turning it on later cannot silently corrupt metadata. Per drk-seo/references/technical-seo.md.
   const { data } = await sanityFetch({ query: HOMEPAGE_QUERY, stega: false })
-  const { home } = (data ?? {}) as HomePageQueryResult
+  const { home, settings } = (data ?? {}) as HomePageQueryResult
 
   // Every seo field with a rendering target resolves in buildSeoMetadata — social overrides, OG /
   // Twitter images, the canonical override, and noIndex/noFollow as independent directives. With no
   // title/description set it returns neither key, so layout.tsx's root metadata still applies.
-  return buildSeoMetadata({ seo: home?.seo, fallbackImage: home?.heroImage, path: '/' })
+  return buildSeoMetadata({ seo: home?.seo, fallbackImage: home?.heroImage, path: '/', siteName: settings?.siteTitle })
 }
 
 export default async function Home() {
@@ -72,7 +72,12 @@ export default async function Home() {
         <TheBoat home={home} />
         <WhyUs home={home} />
         <Destinations destinations={dests} />
-        <LatestArticles home={home} posts={latestPosts} />
+        <LatestArticles
+          eyebrow={home?.latestArticlesEyebrow}
+          heading={home?.latestArticlesHeading}
+          linkText={home?.latestArticlesLinkText}
+          posts={latestPosts}
+        />
         <Faq home={home} faq={faq} />
         <Testimonials home={home} />
         <Cta cta={cta} />

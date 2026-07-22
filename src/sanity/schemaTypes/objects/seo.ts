@@ -27,7 +27,7 @@ export const seoType = defineType({
       name: 'title',
       title: 'SEO title',
       type: 'string',
-      description: 'Shown in search results and browser tabs. Aim for 50-60 characters.',
+      description: 'Shown in search results and browser tabs. Aim for 50-60 characters. Type {siteName} to insert the site name from Site Settings.',
       // maxLength is a custom option read by CharCountInput — not part of Sanity's built-in StringOptions typing.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       options: { maxLength: 60 } as any,
