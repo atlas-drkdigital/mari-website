@@ -4,13 +4,13 @@ import { notFound } from 'next/navigation'
 import { Nav } from '@/components/Nav'
 import { ScrollReveal } from '@/components/ScrollReveal'
 import { BoatCabins } from '@/components/sections/boat/BoatCabins'
-import { BoatFaq } from '@/components/sections/boat/BoatFaq'
 import { BoatGallery } from '@/components/sections/boat/BoatGallery'
 import { BoatHero } from '@/components/sections/boat/BoatHero'
 import { BoatOverview } from '@/components/sections/boat/BoatOverview'
 import { BoatSpecs } from '@/components/sections/boat/BoatSpecs'
 import { Contact } from '@/components/sections/Contact'
 import { Cta } from '@/components/sections/Cta'
+import { FaqCategorized } from '@/components/sections/FaqCategorized'
 import { Footer } from '@/components/sections/Footer'
 import { SubNav, type SubNavItem } from '@/components/SubNav'
 import { toPlainText } from '@/lib/portableText'
@@ -156,7 +156,8 @@ export default async function BoatPage({ params }: { params: Promise<Params> }) 
           eyebrow={t(defaults?.specificationsEyebrow)}
           heading={t(defaults?.specificationsHeading)}
         />
-        <BoatFaq
+        {/* FaqCategorized = the extracted BoatFaq (2026-07-22, second consumer arrived). */}
+        <FaqCategorized
           sections={faqSections}
           eyebrow={t(defaults?.faqEyebrow)}
           heading={t(defaults?.faqHeading)}

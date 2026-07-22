@@ -47,6 +47,7 @@ export const boatType = defineType({
   type: 'document',
   groups: [
     { name: 'basicInfo', title: 'Basic Info', default: true },
+    { name: 'cards', title: 'Cards' },
     { name: 'overview', title: 'Overview' },
     { name: 'cabins', title: 'Cabins' },
     { name: 'gallery', title: 'Gallery' },
@@ -58,6 +59,11 @@ export const boatType = defineType({
   // (site-wide convention, locked 2026-07-16 — see CLAUDE.md). Every field declares both.
   fieldsets: [
     { name: 'basicInfoFs', title: 'Basic Info' },
+    {
+      name: 'cardsFs',
+      title: 'Cards',
+      description: 'Only used where this boat appears as a card (listings, the destination page’s boats section) — never on the page itself.',
+    },
     { name: 'overviewFs', title: 'Overview' },
     { name: 'cabinsFs', title: 'Cabins' },
     { name: 'galleryFs', title: 'Gallery' },
@@ -99,7 +105,27 @@ export const boatType = defineType({
       type: 'imageWithAlt',
       group: 'basicInfo',
       fieldset: 'basicInfoFs',
-      description: 'Used as the hero background and wherever this item appears as a card/thumbnail elsewhere.',
+      description: 'Used as the hero background — and on cards, unless a separate card image is set in the Cards tab.',
+    }),
+    // Cards tab — mirrors `destination` (Adinda, 2026-07-22): toggle-to-reveal card image
+    // override, cover image by default. `!== false` keeps existing docs (field undefined) ON.
+    defineField({
+      name: 'useCoverAsCardImage',
+      title: 'Use the cover image on cards',
+      type: 'boolean',
+      group: 'cards',
+      fieldset: 'cardsFs',
+      initialValue: true,
+      description: 'Cards reuse the cover image. Turn off to upload a different image just for cards.',
+    }),
+    defineField({
+      name: 'cardImage',
+      title: 'Card image',
+      type: 'imageWithAlt',
+      group: 'cards',
+      fieldset: 'cardsFs',
+      hidden: ({ parent }) => parent?.useCoverAsCardImage !== false,
+      description: 'Shown wherever this boat appears as a card. Recommended: landscape, at least 1600px wide.',
     }),
     // Optional hero background video (CDN URL, not an upload) — plays over the cover image, which
     // stays as poster + fallback. Shared object type; see objects/heroVideo.ts for the full rationale.

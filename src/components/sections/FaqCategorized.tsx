@@ -7,13 +7,16 @@ import { RichText } from '@/components/RichText'
 import { useDragScroll } from '@/lib/useDragScroll'
 import type { FaqSectionData } from '@/sanity/queries'
 
-// Figma Section/FAQWithCategories = 703:3047 (via 778:8696). REBUILT 2026-07-21 (Adinda) as the
-// `categorized` FAQ layout — the homepage's <Faq> is the `default` variant (two columns, no
-// categories); this is its derivative: category rail left, single accordion column right. The two
-// names are the locked layout-variant values (CLAUDE.md, 2026-07-17) — named for what they do, not
-// their geometry. When the componentization pass runs, these merge into one Faq component with a
-// `layout` prop; until then this file deliberately copies the homepage's expression verbatim
-// (section shell, header, Block/FAQItem rows) so the merge is a diff, not a redesign.
+// The `categorized` FAQ layout variant (CLAUDE.md, locked 2026-07-17) — category rail left, single
+// accordion column right; the homepage's <Faq> is the `default` variant. Figma
+// Section/FAQWithCategories = 703:3047 (boat page 778:8696 and destination page 778:8696 both
+// instance it — verified identical 2026-07-22).
+//
+// EXTRACTED from sections/boat/BoatFaq.tsx on 2026-07-22, the day the destination page became its
+// second consumer — the just-in-time componentization lock in action (extract at the moment of the
+// 2nd use, not before). Nothing here is page-specific: sections arrive COMPOSED from each page
+// (its own categories + the shared General FAQ pulls, which the two pages select differently), and
+// the chrome strings come from each page's Defaults singleton. Registered in COMPONENTS.md.
 //
 // Conventions over Figma (locked, site-wide) — overrides in this file, both values named:
 //   - vertical padding: pt-80/pb-80 mobile, lg pt-[144px]/pb-160 (homepage FAQ rhythm); Figma says
@@ -37,10 +40,7 @@ import type { FaqSectionData } from '@/sanity/queries'
 //
 // Mobile: the category rail becomes horizontally draggable chips, same pattern as Destinations
 // (locked with the variant decision, 2026-07-17) — same track classes, same useDragScroll hook.
-//
-// Sections arrive COMPOSED from the page (boat's own + the General FAQ pulls) — this component
-// renders what it's given and stays reusable for the destination page, which composes differently.
-export function BoatFaq({
+export function FaqCategorized({
   sections,
   eyebrow,
   heading,
@@ -82,7 +82,7 @@ export function BoatFaq({
   const toggle = (id: string) => setOpenId((prev) => (prev === id ? null : id))
 
   return (
-    <section id="faq" aria-labelledby="boat-faq-heading" className="relative isolate w-full scroll-mt-[70px] pt-80 pb-80 lg:min-h-[calc(100dvh-70px)] lg:scroll-mt-[110px] lg:pt-[144px] lg:pb-160">
+    <section id="faq" aria-labelledby="faq-categorized-heading" className="relative isolate w-full scroll-mt-[70px] pt-80 pb-80 lg:min-h-[calc(100dvh-70px)] lg:scroll-mt-[110px] lg:pt-[144px] lg:pb-160">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-dark)] bg-cover bg-center" />
       <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-[36px] page-gutter-x lg:gap-64">
         {/* Header — identical markup to the homepage Faq. The link is a plain <a> like the
@@ -90,7 +90,7 @@ export function BoatFaq({
         <div data-reveal="left" className="flex flex-col gap-24 lg:gap-32">
           <p className="text-eyebrow uppercase text-accent-ondark-primary">{eyebrow}</p>
           <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:gap-48">
-            <h2 id="boat-faq-heading" className="mr-[40px] max-w-[640px] text-display-h2 text-text-ondark-primary lg:mr-0">{heading}</h2>
+            <h2 id="faq-categorized-heading" className="mr-[40px] max-w-[640px] text-display-h2 text-text-ondark-primary lg:mr-0">{heading}</h2>
             <a href="/faq" className="group inline-flex h-48 w-fit shrink-0 items-center gap-4 border border-border-onimage-primary px-20 py-8 text-button-small uppercase text-text-ondark-primary transition-colors duration-300 ease-in-out hover:bg-text-ondark-primary/10 lg:ml-auto">
               {linkText}
               <span aria-hidden="true" className="block size-[12px] shrink-0 bg-text-ondark-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />

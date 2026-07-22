@@ -52,10 +52,10 @@ Status: 🟢 extracted/shared · 🔵 reusable file (single-use here, copy-&-ada
 | Cabins | `sections/boat/BoatCabins.tsx` | 🔵 | Cabin cards + image carousel (carousel = 🟡 inline, see below). |
 | Gallery | `sections/boat/BoatGallery.tsx` | 🔵 | Category-tabbed carousel + combined lightbox. |
 | Specs | `sections/boat/BoatSpecs.tsx` | 🔵 | Tabbed spec accordion + image grid. |
-| FAQ (`default` / `categorized`) | `sections/Faq.tsx`, `sections/boat/BoatFaq.tsx` | 🔵 | Rows share `Accordion`; layouts differ. |
+| FAQ (`default` / `categorized`) | `sections/Faq.tsx`, `sections/FaqCategorized.tsx` | 🟢 | `categorized` EXTRACTED 2026-07-22 (was `boat/BoatFaq.tsx`) when Destination became its 2nd consumer — boat + destination pages now share it. Rows share `Accordion`. |
 | Destinations / WhyUs / Testimonials / LatestArticles / CTA / Contact / Footer | `sections/*.tsx` | 🔵 | Standard marketing sections; copy & adapt. |
 | **Brochure download button** | inline in boat hero/overview | 🟡 | Standard on liveaboard sites → pull into its own small component. |
-| **`TabRail`** (draggable chips / breadcrumbs) | inline in `SubNav`, `BoatFaq`, `Destinations` | 🟡 | Extract when Destination reaches for it (just-in-time). |
+| **`TabRail`** (draggable chips / breadcrumbs) | inline in `SubNav`, `FaqCategorized`, `Destinations` | 🟡 | Extract when Destination reaches for it (just-in-time). |
 | **`SingleImageCarousel`** | inline in `BoatCabins`, `BoatSpecs` | 🟡 | Extract at 2nd cross-page use. |
 
 **Rule going forward:** the moment a 🟡 gets a real second use, extract it (that's when its shape is
@@ -131,24 +131,24 @@ explicit variants over boolean props).
   per-context difference → passed via `className` (FAQ: `bg-text-ondark-primary`, transform only; Specs:
   recolours `accent-subtle`→`action-primary`, so also transitions background-color).
 - **`FaqAccordionItem`** — one row of the **ondark FAQ accordion**, shared by the homepage `Faq` (`default`
-  layout) and boat `BoatFaq` (`categorized` layout). **The row is IDENTICAL between the two FAQ layouts —
+  layout) and `FaqCategorized` (`categorized` layout). **The row is IDENTICAL between the two FAQ layouts —
   the categorization is the ONLY difference** (Adinda, 2026-07-21): `default` = two columns, no categories;
   `categorized` = category rail + single column. So this row is the shared seam; the layout lives in the
   section. Owns wrapper (border/opacity hover — colour treatment only, per the locked rule), `h3>button`,
   title (active swaps to `editorial-h5`), chevron, and the `grid-rows-[0fr↔1fr]` collapse. Answer passed as
   `children` (plain `<p>` on the homepage, `<RichText>` gap-column on the boat page). Optional `id` anchor.
   Button pattern, NOT `<details>/<summary>` (no SEO gain — do not "upgrade").
-- **Consumers:** `Faq` (default), `BoatFaq` (categorized) — both refactored to it. `BoatSpecs` adopts
+- **Consumers:** `Faq` (default), `FaqCategorized` (categorized, ex-`BoatFaq`) — both refactored to it. `BoatSpecs` adopts
   `AccordionChevron` only (its row is the divergent light/weight+colour variant). **Destination FAQ** reuses
   `FaqAccordionItem`.
 - **Verified:** rendered FAQ DOM byte-identical pre/post (only intra-class-attribute order changed, which
   Tailwind treats as equivalent); tsc + eslint clean.
-- **Open:** unifying `Faq` + `BoatFaq` into ONE section component with a `layout: default | categorized`
+- **Open:** unifying `Faq` + `FaqCategorized` into ONE section component with a `layout: default | categorized`
   field (the locked variant values) is the eventual step — they now share the row, which is the hard part.
 
 ## Inline — extraction pending (🧩)
 
-### `TabRail` — in `SubNav.tsx`, `BoatFaq.tsx`, `Destinations.tsx`
+### `TabRail` — in `SubNav.tsx`, `FaqCategorized.tsx`, `Destinations.tsx`
 Horizontally-draggable category chip bar (mobile section nav + categorized-FAQ categories + destinations
 carousel tabs). Active chip = left-border/color treatment; drag-scroll with `scrollIntoView` on select.
 - **Status:** ⏳ pending (extraction #2).

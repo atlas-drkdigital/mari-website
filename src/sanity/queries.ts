@@ -54,8 +54,16 @@ export const HOMEPAGE_QUERY = groq`{
     "category": category->name,
     coverImage${IMAGE}
   },
+  // Card season/duration derive from the hero stats (one source of truth — the separate
+  // seasonNights field was removed 2026-07-22, Adinda). Matched by the seeded stat LABELS: if an
+  // editor renames "Season"/"Duration" on a destination, that part of its card line disappears —
+  // accepted; the labels are seeded and there's no rename-proof key on a freeform stats array.
   "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
-    _id, name, tagline, seasonNights, excerpt, "slug": slug.current,
+    _id, name, tagline, excerpt, "slug": slug.current,
+    "cardSeason": stats[label == "Season"][0].value,
+    "cardDuration": stats[label == "Duration"][0].value,
+    useCoverAsCardImage,
+    cardImage${IMAGE},
     coverImage${IMAGE}
   },
   "settings": *[_id == "siteSettings"][0]{
@@ -129,6 +137,71 @@ export const BOAT_QUERY = groq`{
   }
 }`
 
+// One fetch for a destination page — same composition model as BOAT_QUERY: the destination itself,
+// the destinationDefaults singleton (shared chrome with a {destination} token), plus the auto-queried
+// satellites: itineraries referencing this destination, shared General FAQ categories (via the
+// showOnDestinationPages toggle — the destination twin of showOnBoatPages), the three latest posts
+// (Articles section), every boat (About the Boats section — Mari today, future-proof for more), and
+// the shared CTA/contact chrome.
+//
+// Itineraries are ordered by title for now — the itinerary doc has no `order` field yet; add one at
+// the Itineraries-section build if the title order reads wrong (7-nights-first is the mockup's order).
+export const DESTINATION_QUERY = groq`{
+  "destination": *[_type == "destination" && slug.current == $slug][0]{
+    _id, name, pageTitle, tagline,
+    "slug": slug.current,
+    coverImage${IMAGE},
+    coverVideo{ url, playOnMobile },
+    stats[]{ _key, label, value },
+    overviewHeading, overviewBody,
+    highlights[]{ _key, title, body, image${IMAGE} },
+    gallery[]${IMAGE},
+    faqSections[]{ _key, title, questions[]{ question, answer } },
+    seo
+  },
+  "defaults": *[_id == "destinationDefaults"][0]{
+    overviewEyebrow,
+    galleryEyebrow, galleryTitle,
+    itinerariesEyebrow, itinerariesHeading,
+    upcomingTripsEyebrow, upcomingTripsHeading, upcomingTripsIntro,
+    faqEyebrow, faqHeading, faqLinkText,
+    boatsEyebrow, boatsHeading,
+    articlesEyebrow, articlesHeading,
+    subnavOverviewLabel, subnavGalleryLabel, subnavItinerariesLabel,
+    subnavFaqLabel, subnavTripsLabel
+  },
+  "itineraries": *[_type == "itinerary" && destination->slug.current == $slug] | order(title asc){
+    _id, title, duration, route, highlights, summary
+  },
+  "sharedFaqSections": *[_id == "faqGeneral"][0].categories[showOnDestinationPages == true]{
+    _key, title, questions[]{ question, answer }
+  },
+  "latestPosts": *[_type == "blogPost" && defined(postDate) && defined(slug.current)] | order(postDate desc)[0...3]{
+    _id, title, "slug": slug.current, excerpt, postDate,
+    "category": category->name,
+    coverImage${IMAGE}
+  },
+  "boats": *[_type == "boat" && defined(slug.current)] | order(name asc){
+    _id, name, pageTitle, tagline,
+    "slug": slug.current,
+    coverImage${IMAGE},
+    stats[]{ _key, label, value }
+  },
+  "cta": *[_id == "cta"][0]{
+    cards[]{
+      _key, heading, description, buttonText,
+      buttonLink{ linkType, "internalType": internalLink->_type, "internalSlug": internalLink->slug.current, externalUrl, openInNewTab },
+      image${IMAGE}
+    }
+  },
+  "settings": *[_id == "siteSettings"][0]{
+    contactEyebrow, contactHeading, contactIntro
+  },
+  "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
+    _id, name, "slug": slug.current
+  }
+}`
+
 // The /boats listing. Separate from BOAT_QUERY so the listing doesn't drag every boat's full
 // gallery + specs over the wire for a card it renders four fields of.
 export const BOATS_INDEX_QUERY = groq`{
@@ -185,9 +258,12 @@ export type DestinationCardData = {
   _id: string
   name?: string
   tagline?: string
-  seasonNights?: string
+  cardSeason?: string
+  cardDuration?: string
   excerpt?: string
   slug?: string
+  useCoverAsCardImage?: boolean
+  cardImage?: SanityImageWithMeta
   coverImage?: SanityImageWithMeta
 }
 
@@ -363,6 +439,77 @@ export type BoatQueryResult = {
   defaults: BoatDefaultsData | null
   sharedFaqSections: FaqSectionData[] | null
   cabinTypes: CabinTypeData[]
+  cta: { cards?: CtaCardData[] } | null
+  settings: SiteSettingsContact | null
+  destinations: { _id: string; name?: string; slug?: string }[]
+}
+
+// ----- Destination page -----
+export type DestinationHighlightData = {
+  _key: string
+  title?: string
+  body?: PortableTextBlock[]
+  image?: SanityImageWithMeta
+}
+
+export type DestinationData = {
+  _id: string
+  name?: string
+  pageTitle?: string
+  tagline?: string
+  slug?: string
+  coverImage?: SanityImageWithMeta
+  coverVideo?: HeroVideoData
+  stats?: BoatStat[]
+  overviewHeading?: string
+  overviewBody?: PortableTextBlock[]
+  highlights?: DestinationHighlightData[]
+  gallery?: GalleryImageData[]
+  faqSections?: FaqSectionData[]
+  seo?: SeoData
+}
+
+// Shared section chrome from the destinationDefaults singleton. Every string here may carry a
+// {destination} token — resolve with resolveTokens() before rendering, never pass straight through.
+export type DestinationDefaultsData = {
+  overviewEyebrow?: string
+  galleryEyebrow?: string
+  galleryTitle?: string
+  itinerariesEyebrow?: string
+  itinerariesHeading?: string
+  upcomingTripsEyebrow?: string
+  upcomingTripsHeading?: string
+  upcomingTripsIntro?: string
+  faqEyebrow?: string
+  faqHeading?: string
+  faqLinkText?: string
+  boatsEyebrow?: string
+  boatsHeading?: string
+  articlesEyebrow?: string
+  articlesHeading?: string
+  subnavOverviewLabel?: string
+  subnavGalleryLabel?: string
+  subnavItinerariesLabel?: string
+  subnavFaqLabel?: string
+  subnavTripsLabel?: string
+}
+
+export type ItineraryCardData = {
+  _id: string
+  title?: string
+  duration?: string
+  route?: string
+  highlights?: string[]
+  summary?: string
+}
+
+export type DestinationQueryResult = {
+  destination: DestinationData | null
+  defaults: DestinationDefaultsData | null
+  itineraries: ItineraryCardData[]
+  sharedFaqSections: FaqSectionData[] | null
+  latestPosts: LatestPostData[]
+  boats: BoatCardData[]
   cta: { cards?: CtaCardData[] } | null
   settings: SiteSettingsContact | null
   destinations: { _id: string; name?: string; slug?: string }[]

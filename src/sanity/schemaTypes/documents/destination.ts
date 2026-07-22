@@ -30,6 +30,7 @@ export const destinationType = defineType({
   type: 'document',
   groups: [
     { name: 'basicInfo', title: 'Basic Info', default: true },
+    { name: 'cards', title: 'Cards' },
     { name: 'overview', title: 'Overview' },
     { name: 'gallery', title: 'Gallery' },
     { name: 'faq', title: 'FAQ' },
@@ -37,6 +38,11 @@ export const destinationType = defineType({
   ],
   fieldsets: [
     { name: 'basicInfoFs', title: 'Basic Info' },
+    {
+      name: 'cardsFs',
+      title: 'Cards',
+      description: 'Only used where this destination appears as a card (homepage carousel, lists) — never on the page itself.',
+    },
     { name: 'overviewFs', title: 'Overview' },
     { name: 'galleryFs', title: 'Gallery' },
     { name: 'faqFs', title: 'FAQ' },
@@ -75,7 +81,7 @@ export const destinationType = defineType({
       type: 'imageWithAlt',
       group: 'basicInfo',
       fieldset: 'basicInfoFs',
-      description: 'Used as the hero background and wherever this destination appears as a card/thumbnail elsewhere.',
+      description: 'Used as the hero background — and on cards, unless a separate card image is set in the Cards tab.',
     }),
     // Optional hero background video (CDN URL, not an upload) — plays over the cover image, which
     // stays as poster + fallback. Shared object type; see objects/heroVideo.ts for the full rationale
@@ -97,36 +103,46 @@ export const destinationType = defineType({
       fieldset: 'basicInfoFs',
       description: 'The short punchy line shown under the name on cards and the homepage carousel.',
     }),
-    // seasonNights + excerpt + order added 2026-07-16 for the homepage Destinations carousel
-    // (which reads real destination docs now, not a hardcoded list). INTERIM: seasonNights is a
-    // preformatted string for now; it overlaps with the `stats` Season/Duration values and may be
-    // derived from them (or from itineraries) when the destination page slice is built. `order`
-    // is a simple manual sort key — a proper orderable-list plugin can replace it later. Both are
-    // cheap, re-seedable placeholders per the vertical-slice approach.
-    defineField({
-      name: 'seasonNights',
-      title: 'Season · nights (card line)',
-      type: 'string',
-      group: 'basicInfo',
-      fieldset: 'basicInfoFs',
-      description: 'Short season/duration line shown on cards and the homepage carousel, e.g. “May–September · 12 Nights”.',
-    }),
+    // Cards tab (Adinda, 2026-07-22): everything here is card-only, grouped so that's obvious in
+    // Studio. The old `seasonNights` string was REMOVED the same day — the card's season/duration
+    // line is now derived from the hero `stats` values (Season + Duration), one source of truth.
     defineField({
       name: 'excerpt',
       title: 'Card summary',
       type: 'text',
       rows: 3,
-      group: 'basicInfo',
-      fieldset: 'basicInfoFs',
+      group: 'cards',
+      fieldset: 'cardsFs',
       description: 'A few sentences summarising this destination, shown on the homepage carousel and destination cards.',
     }),
     defineField({
       name: 'order',
       title: 'Sort order',
       type: 'number',
-      group: 'basicInfo',
-      fieldset: 'basicInfoFs',
+      group: 'cards',
+      fieldset: 'cardsFs',
       description: 'Controls the order destinations appear in lists and the homepage carousel (lower first).',
+    }),
+    // Toggle-to-reveal, same mechanism as the eyebrow toggles: cards reuse the cover image by
+    // default; switching the toggle OFF reveals a dedicated card image field (Adinda, 2026-07-22 —
+    // also added to `boat`). `!== false` so existing docs (field undefined) keep the default ON.
+    defineField({
+      name: 'useCoverAsCardImage',
+      title: 'Use the cover image on cards',
+      type: 'boolean',
+      group: 'cards',
+      fieldset: 'cardsFs',
+      initialValue: true,
+      description: 'Cards reuse the cover image. Turn off to upload a different image just for cards.',
+    }),
+    defineField({
+      name: 'cardImage',
+      title: 'Card image',
+      type: 'imageWithAlt',
+      group: 'cards',
+      fieldset: 'cardsFs',
+      hidden: ({ parent }) => parent?.useCoverAsCardImage !== false,
+      description: 'Shown wherever this destination appears as a card. Recommended: landscape, at least 1600px wide.',
     }),
     defineField({
       name: 'stats',

@@ -60,7 +60,8 @@ export function Destinations({ destinations }: { destinations: DestinationCardDa
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         {destinations.map((dest, i) => (
           <div key={dest._id} className={`absolute inset-0 overflow-hidden transition-opacity duration-0 lg:duration-700 ease-in-out ${i === index ? 'opacity-100' : 'opacity-0'}`}>
-            <Image {...sanityImageProps(dest.coverImage, `/assets/destination-${dest.slug}.webp`)} alt="" fill sizes="100vw" className="object-cover transition-transform duration-700 ease-in-out group-hover/dest:scale-105" />
+            {/* Card image = cover image unless the editor toggled the override on (Cards tab). */}
+            <Image {...sanityImageProps(dest.useCoverAsCardImage === false && dest.cardImage ? dest.cardImage : dest.coverImage, `/assets/destination-${dest.slug}.webp`)} alt="" fill sizes="100vw" className="object-cover transition-transform duration-700 ease-in-out group-hover/dest:scale-105" />
             <div className="absolute inset-0 bg-background-ondark-page/40" />
           </div>
         ))}
@@ -124,16 +125,19 @@ export function Destinations({ destinations }: { destinations: DestinationCardDa
           >
             <div className="flex w-full lg:w-[max(520px,42%)] flex-col gap-16">
               <div className="flex items-center gap-8 text-body-medium text-text-ondark-primary">
-                <span>{dest.seasonNights}</span>
+                {/* Derived from the hero stats (Season + Duration) since 2026-07-22 — the
+                    separate card-line field was removed; one source of truth. */}
+                <span>{[dest.cardSeason, dest.cardDuration].filter(Boolean).join(' · ')}</span>
               </div>
               <h3 className="text-display-h2 text-text-ondark-primary">
-                <a href="#" className="transition-opacity duration-300 ease-in-out hover:opacity-80">{dest.name}</a>
+                {/* Real route since the destination page shipped (2026-07-22) — was href="#". */}
+                <a href={`/destinations/${dest.slug}`} className="transition-opacity duration-300 ease-in-out hover:opacity-80">{dest.name}</a>
               </h3>
               <p className="text-body-large text-text-ondark-primary">{dest.tagline}</p>
             </div>
             <div className="flex w-full lg:w-[max(520px,42%)] flex-col gap-24 lg:gap-28">
               <p className="text-body-medium lg:text-body-large text-text-ondark-primary">{dest.excerpt}</p>
-              <a href="#" className="group inline-flex w-fit items-center gap-4 border-b border-text-ondark-primary py-4 text-button-small uppercase text-text-ondark-primary">
+              <a href={`/destinations/${dest.slug}`} className="group inline-flex w-fit items-center gap-4 border-b border-text-ondark-primary py-4 text-button-small uppercase text-text-ondark-primary">
                 Explore {dest.name}
                 <span aria-hidden="true" className="block size-[16px] shrink-0 bg-text-ondark-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
               </a>

@@ -34,8 +34,9 @@ const TOKEN_HINT = 'Type {boat} in any field here to insert the boat’s name au
 // applied: specific/vivid over generic, "premium" + "exceptional value" as the locked phrasings,
 // numerals for specs. Placeholder until Adinda's content pass — tracked in _CONTENT-STATUS.md.
 //
-// Fieldsets (not tabs) give each section a visible header — it's a settings singleton, a single
-// scroll reads better than 4 tabs.
+// Groups (tabs) + matching fieldsets since 2026-07-22 (Adinda: the single scroll outgrew itself).
+// Site-wide convention: every field declares both; the fieldset keeps the header visible in the
+// flat "All Fields" view. Same change applied to destinationDefaults.
 export const boatDefaultsType = defineType({
   name: 'boatDefaults',
   title: 'Boat Defaults',
@@ -43,6 +44,14 @@ export const boatDefaultsType = defineType({
   description:
     'Shared eyebrows and section headings used on every boat page — edit once here. ' +
     'Type {boat} in any field below to drop in the boat’s name automatically.',
+  groups: [
+    { name: 'overview', title: 'Overview', default: true },
+    { name: 'cabins', title: 'Cabins' },
+    { name: 'gallery', title: 'Gallery' },
+    { name: 'specifications', title: 'Specifications' },
+    { name: 'faq', title: 'FAQ' },
+    { name: 'subnav', title: 'Section Nav' },
+  ],
   // The {boat} hint repeats on EVERY fieldset, not just the document description (Adinda,
   // 2026-07-17: "we need to mention it somewhere that I know where it is... because it is
   // confusing"). A token nobody knows about is a token nobody uses, and the document-level
@@ -67,6 +76,7 @@ export const boatDefaultsType = defineType({
       title: 'Overview eyebrow',
       type: 'string',
       fieldset: 'overview',
+      group: 'overview',
       description: 'Kicker above the Overview heading. The Overview heading itself is written per boat.',
       initialValue: 'Premium diving at exceptional value',
     }),
@@ -75,6 +85,7 @@ export const boatDefaultsType = defineType({
       title: 'Key features heading',
       type: 'string',
       fieldset: 'overview',
+      group: 'overview',
       description: 'Heading above the key features list. The features themselves are written per boat.',
       initialValue: 'Key features',
     }),
@@ -83,6 +94,7 @@ export const boatDefaultsType = defineType({
       title: 'Cabins eyebrow',
       type: 'string',
       fieldset: 'cabins',
+      group: 'cabins',
       initialValue: '7 sea-view ensuite cabins',
     }),
     defineField({
@@ -90,6 +102,7 @@ export const boatDefaultsType = defineType({
       title: 'Cabins heading',
       type: 'string',
       fieldset: 'cabins',
+      group: 'cabins',
       initialValue: 'Cabins',
     }),
     defineField({
@@ -97,6 +110,7 @@ export const boatDefaultsType = defineType({
       title: 'Gallery eyebrow',
       type: 'string',
       fieldset: 'gallery',
+      group: 'gallery',
       initialValue: 'Life aboard {boat}',
     }),
     defineField({
@@ -104,6 +118,7 @@ export const boatDefaultsType = defineType({
       title: 'Gallery heading',
       type: 'string',
       fieldset: 'gallery',
+      group: 'gallery',
       initialValue: 'Gallery',
     }),
     // The header button that opens the full image lightbox (Adinda, 2026-07-21 — replaces the
@@ -113,6 +128,7 @@ export const boatDefaultsType = defineType({
       title: 'Gallery CTA label',
       type: 'string',
       fieldset: 'gallery',
+      group: 'gallery',
       description: 'Label on the button that opens the full image gallery.',
       initialValue: 'Open Gallery',
     }),
@@ -121,6 +137,7 @@ export const boatDefaultsType = defineType({
       title: 'Specifications eyebrow',
       type: 'string',
       fieldset: 'specifications',
+      group: 'specifications',
       initialValue: '30m of traditional Phinisi',
     }),
     defineField({
@@ -128,6 +145,7 @@ export const boatDefaultsType = defineType({
       title: 'Specifications heading',
       type: 'string',
       fieldset: 'specifications',
+      group: 'specifications',
       initialValue: 'Layout and specifications',
     }),
     // FAQ section chrome (added 2026-07-21 with the categorized FAQ build). The questions
@@ -138,6 +156,7 @@ export const boatDefaultsType = defineType({
       title: 'FAQ eyebrow',
       type: 'string',
       fieldset: 'faq',
+      group: 'faq',
       initialValue: 'Good to Know',
     }),
     defineField({
@@ -145,6 +164,7 @@ export const boatDefaultsType = defineType({
       title: 'FAQ heading',
       type: 'string',
       fieldset: 'faq',
+      group: 'faq',
       initialValue: '{boat} FAQ',
     }),
     defineField({
@@ -152,6 +172,7 @@ export const boatDefaultsType = defineType({
       title: 'FAQ link label',
       type: 'string',
       fieldset: 'faq',
+      group: 'faq',
       description: 'Label on the button linking to the full FAQ page.',
       initialValue: 'Read All FAQ',
     }),
@@ -164,6 +185,7 @@ export const boatDefaultsType = defineType({
       title: 'Overview label',
       type: 'string',
       fieldset: 'subnav',
+      group: 'subnav',
       initialValue: 'Overview',
     }),
     defineField({
@@ -171,6 +193,7 @@ export const boatDefaultsType = defineType({
       title: 'Cabins label',
       type: 'string',
       fieldset: 'subnav',
+      group: 'subnav',
       initialValue: 'Cabins',
     }),
     defineField({
@@ -178,6 +201,7 @@ export const boatDefaultsType = defineType({
       title: 'Gallery label',
       type: 'string',
       fieldset: 'subnav',
+      group: 'subnav',
       initialValue: 'Gallery',
     }),
     defineField({
@@ -185,6 +209,7 @@ export const boatDefaultsType = defineType({
       title: 'Layout label',
       type: 'string',
       fieldset: 'subnav',
+      group: 'subnav',
       initialValue: 'Layout',
     }),
     defineField({
@@ -192,6 +217,7 @@ export const boatDefaultsType = defineType({
       title: 'Specs label',
       type: 'string',
       fieldset: 'subnav',
+      group: 'subnav',
       initialValue: 'Specs',
     }),
     defineField({
@@ -199,6 +225,7 @@ export const boatDefaultsType = defineType({
       title: 'FAQ label',
       type: 'string',
       fieldset: 'subnav',
+      group: 'subnav',
       initialValue: 'FAQ',
     }),
   ],

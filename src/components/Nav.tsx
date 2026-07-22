@@ -323,15 +323,19 @@ export function Nav() {
                   const active = dest.id === activeDestination
                   return (
                     <li key={dest.id}>
-                      <button
-                        type="button"
+                      {/* Was a hover-only <button> — a Link since the destination page shipped
+                          (2026-07-22, per the incremental link-wiring rule). Hover/focus still
+                          drive the preview; click now actually navigates and closes the menu. */}
+                      <Link
+                        href={`/destinations/${dest.id}`}
                         onMouseEnter={() => setActiveDestination(dest.id)}
                         onFocus={() => setActiveDestination(dest.id)}
+                        onClick={() => closeMega()}
                         className="flex w-full flex-col gap-2 py-12 text-left"
                       >
                         <span className={`text-nav-large transition-colors duration-300 ease-in-out ${active ? 'text-accent-ondark-muted' : 'text-text-ondark-primary'}`}>{dest.name}</span>
                         <span className={`text-caption-label transition-colors duration-300 ease-in-out ${active ? 'text-text-ondark-primary' : 'text-text-ondark-primary/40'}`}>{dest.tagline}</span>
-                      </button>
+                      </Link>
                       {i < DESTINATIONS.length - 1 && <div className="h-[0.5px] w-full bg-accent-ondark-onprimary/15" />}
                     </li>
                   )
@@ -507,10 +511,10 @@ export function Nav() {
                 <ul id="mobile-mega-destinations" aria-label="Destinations" className="flex flex-col divide-y divide-accent-ondark-onprimary/10 pb-16">
                 {DESTINATIONS.map((dest) => (
                   <li key={dest.id}>
-                    <button type="button" className="flex w-full flex-col gap-2 py-12 text-left">
+                    <Link href={`/destinations/${dest.id}`} onClick={() => setMobileMenuOpen(false)} className="flex w-full flex-col gap-2 py-12 text-left">
                       <span className="text-nav-large text-text-ondark-primary">{dest.name}</span>
                       <span className="text-caption-label text-text-ondark-primary/40">{dest.tagline}</span>
-                    </button>
+                    </Link>
                   </li>
                 ))}
                 </ul>

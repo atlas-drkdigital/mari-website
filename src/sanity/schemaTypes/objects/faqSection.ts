@@ -33,6 +33,16 @@ export const faqSectionType = defineType({
       initialValue: false,
       hidden: ({ document }) => document?._type !== 'faqGeneral',
     }),
+    // The destination twin of showOnBoatPages (2026-07-22, destination page slice) — same
+    // rename-proof-toggle reasoning, same faqGeneral-only visibility.
+    defineField({
+      name: 'showOnDestinationPages',
+      title: 'Show on every destination page',
+      type: 'boolean',
+      description: 'Include this category in the FAQ section of every destination page.',
+      initialValue: false,
+      hidden: ({ document }) => document?._type !== 'faqGeneral',
+    }),
     defineField({
       name: 'questions',
       title: 'Questions',

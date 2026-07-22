@@ -102,7 +102,10 @@ export function Hero({ home, destinations }: { home: HomePageData | null; destin
                 <span className="text-display-accent">{headingAccent}</span>
                 <span className="text-display-h1">{headingMain}</span>
               </h1>
-              <p className="max-w-[400px] text-body-medium text-text-ondark-muted lg:text-body-large">
+              {/* Full-opacity white on MOBILE, muted on desktop (Adinda, 2026-07-22, site-wide
+                  hero rule): the muted 75% white is hard to read over a busy photo at phone
+                  sizes. Applies to every hero tagline — Hero, BoatHero, DestinationHero. */}
+              <p className="max-w-[400px] text-body-medium text-text-ondark-primary lg:text-body-large lg:text-text-ondark-muted">
                 {subheading}
               </p>
             </div>

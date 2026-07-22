@@ -116,7 +116,9 @@ export function BoatHero({ boat }: { boat: BoatData }) {
             {boat.pageTitle || boat.name}
           </h1>
           {boat.tagline ? (
-            <p className="max-w-[560px] text-body-medium text-text-ondark-muted lg:text-body-large">
+            // Full-opacity white on MOBILE, muted on desktop (Adinda, 2026-07-22, site-wide hero
+            // rule — see Hero.tsx).
+            <p className="max-w-[560px] text-body-medium text-text-ondark-primary lg:text-body-large lg:text-text-ondark-muted">
               {boat.tagline}
             </p>
           ) : null}

@@ -15,8 +15,9 @@ const TOKEN_HINT = 'Type {destination} in any field here to insert the destinati
 // Eyebrows are rendered as <p>/<span>, never a heading tag (SEO/a11y — see CLAUDE.md); they carry
 // little direct SEO weight, so they're plain editable text, not headings.
 //
-// Fieldsets (not tabs) give each section a visible header — it's a settings singleton, a single
-// scroll reads better than 7 tabs.
+// Groups (tabs) + matching fieldsets since 2026-07-22 (Adinda: the single scroll outgrew itself as
+// sections accumulated). Site-wide convention: every field declares both; the fieldset keeps the
+// header visible in the flat "All Fields" view. Same change applied to boatDefaults.
 export const destinationDefaultsType = defineType({
   name: 'destinationDefaults',
   title: 'Destination Defaults',
@@ -24,6 +25,16 @@ export const destinationDefaultsType = defineType({
   description:
     'Shared eyebrows and section headings used on every destination page — edit once here. ' +
     'Type {destination} in any field below to drop in the destination’s name automatically.',
+  groups: [
+    { name: 'overview', title: 'Overview', default: true },
+    { name: 'gallery', title: 'Gallery' },
+    { name: 'itineraries', title: 'Itineraries' },
+    { name: 'upcomingTrips', title: 'Upcoming Trips' },
+    { name: 'faq', title: 'FAQ' },
+    { name: 'boats', title: 'Boats' },
+    { name: 'articles', title: 'Articles' },
+    { name: 'subnav', title: 'Section Nav' },
+  ],
   // The {destination} hint repeats on EVERY fieldset, not just the document description (Adinda,
   // 2026-07-17). A token nobody knows about is a token nobody uses, and the document-level
   // description scrolls out of view as soon as an editor is working in a section. Mirrors
@@ -36,6 +47,11 @@ export const destinationDefaultsType = defineType({
     { name: 'faq', title: 'FAQ', description: TOKEN_HINT },
     { name: 'boats', title: 'About the Boats', description: TOKEN_HINT },
     { name: 'articles', title: 'Latest Articles', description: TOKEN_HINT },
+    {
+      name: 'subnav',
+      title: 'Section navigation',
+      description: 'Labels in the strip of section links on the destination page hero.',
+    },
   ],
   fields: [
     defineField({
@@ -43,6 +59,7 @@ export const destinationDefaultsType = defineType({
       title: 'Overview eyebrow',
       type: 'string',
       fieldset: 'overview',
+      group: 'overview',
       description: 'Kicker above the Overview heading. The Overview heading itself is written per destination.',
       initialValue: '{destination} Liveaboard Indonesia Overview',
     }),
@@ -51,6 +68,7 @@ export const destinationDefaultsType = defineType({
       title: 'Gallery eyebrow',
       type: 'string',
       fieldset: 'gallery',
+      group: 'gallery',
       initialValue: 'Discover the best',
     }),
     defineField({
@@ -58,6 +76,7 @@ export const destinationDefaultsType = defineType({
       title: 'Gallery heading',
       type: 'string',
       fieldset: 'gallery',
+      group: 'gallery',
       initialValue: 'Gallery',
     }),
     defineField({
@@ -65,12 +84,14 @@ export const destinationDefaultsType = defineType({
       title: 'Itineraries eyebrow',
       type: 'string',
       fieldset: 'itineraries',
+      group: 'itineraries',
     }),
     defineField({
       name: 'itinerariesHeading',
       title: 'Itineraries heading',
       type: 'string',
       fieldset: 'itineraries',
+      group: 'itineraries',
       initialValue: '{destination} liveaboard itineraries',
     }),
     defineField({
@@ -78,6 +99,7 @@ export const destinationDefaultsType = defineType({
       title: 'Upcoming Trips eyebrow',
       type: 'string',
       fieldset: 'upcomingTrips',
+      group: 'upcomingTrips',
       initialValue: 'Availability',
     }),
     defineField({
@@ -85,6 +107,7 @@ export const destinationDefaultsType = defineType({
       title: 'Upcoming Trips heading',
       type: 'string',
       fieldset: 'upcomingTrips',
+      group: 'upcomingTrips',
       initialValue: 'Upcoming {destination} liveaboard trips',
     }),
     defineField({
@@ -93,6 +116,7 @@ export const destinationDefaultsType = defineType({
       type: 'text',
       rows: 2,
       fieldset: 'upcomingTrips',
+      group: 'upcomingTrips',
       initialValue: 'Book directly through our scheduling partner to view real-time availability and reserve your cabin.',
     }),
     defineField({
@@ -100,6 +124,7 @@ export const destinationDefaultsType = defineType({
       title: 'FAQ eyebrow',
       type: 'string',
       fieldset: 'faq',
+      group: 'faq',
       initialValue: 'Good to know',
     }),
     defineField({
@@ -107,13 +132,24 @@ export const destinationDefaultsType = defineType({
       title: 'FAQ heading',
       type: 'string',
       fieldset: 'faq',
+      group: 'faq',
       initialValue: '{destination} FAQ',
+    }),
+    defineField({
+      name: 'faqLinkText',
+      title: 'FAQ button text',
+      type: 'string',
+      fieldset: 'faq',
+      group: 'faq',
+      description: 'Label on the button linking to the full FAQ page.',
+      initialValue: 'Read All FAQ',
     }),
     defineField({
       name: 'boatsEyebrow',
       title: 'Boats eyebrow',
       type: 'string',
       fieldset: 'boats',
+      group: 'boats',
       initialValue: 'Sail {destination} in comfort',
     }),
     defineField({
@@ -121,6 +157,7 @@ export const destinationDefaultsType = defineType({
       title: 'Boats heading',
       type: 'string',
       fieldset: 'boats',
+      group: 'boats',
       initialValue: 'About the boats',
     }),
     defineField({
@@ -128,6 +165,7 @@ export const destinationDefaultsType = defineType({
       title: 'Articles eyebrow',
       type: 'string',
       fieldset: 'articles',
+      group: 'articles',
       initialValue: 'Our journal',
     }),
     defineField({
@@ -135,7 +173,51 @@ export const destinationDefaultsType = defineType({
       title: 'Articles heading',
       type: 'string',
       fieldset: 'articles',
+      group: 'articles',
       initialValue: '{destination} articles & news',
+    }),
+    // Sub-nav labels live HERE rather than hardcoded — same rationale as boatDefaults (2026-07-21):
+    // they ride the singleton's field-level localization when i18n lands. The ITEMS (which sections
+    // exist, their order, their anchors) are structural and stay in code; only the words are editable.
+    defineField({
+      name: 'subnavOverviewLabel',
+      title: 'Overview label',
+      type: 'string',
+      fieldset: 'subnav',
+      group: 'subnav',
+      initialValue: 'Overview',
+    }),
+    defineField({
+      name: 'subnavGalleryLabel',
+      title: 'Gallery label',
+      type: 'string',
+      fieldset: 'subnav',
+      group: 'subnav',
+      initialValue: 'Gallery',
+    }),
+    defineField({
+      name: 'subnavItinerariesLabel',
+      title: 'Itineraries label',
+      type: 'string',
+      fieldset: 'subnav',
+      group: 'subnav',
+      initialValue: 'Itineraries',
+    }),
+    defineField({
+      name: 'subnavFaqLabel',
+      title: 'FAQ label',
+      type: 'string',
+      fieldset: 'subnav',
+      group: 'subnav',
+      initialValue: 'FAQ',
+    }),
+    defineField({
+      name: 'subnavTripsLabel',
+      title: 'Upcoming Trips label',
+      type: 'string',
+      fieldset: 'subnav',
+      group: 'subnav',
+      initialValue: 'Upcoming Trips',
     }),
   ],
   preview: {
