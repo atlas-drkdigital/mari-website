@@ -1,6 +1,7 @@
 import { defineField, defineType } from 'sanity'
 
 import { CharCountInput } from '../../components/CharCountInput'
+import { JsonLdPrefillInput } from '../../components/JsonLdPrefillInput'
 
 // Comprehensive SEO/AEO field set — scanned against Yoast SEO's coverage and
 // DRK's drk-seo skill (technical-seo.md, aeo-considerations.md). Character
@@ -135,12 +136,26 @@ export const seoType = defineType({
       name: 'jsonLd',
       title: 'JSON-LD override',
       type: 'text',
-      rows: 6,
+      rows: 12,
       fieldset: 'advanced',
       hidden: ({ parent }) => !parent?.overrideJsonLd,
+      components: { input: JsonLdPrefillInput },
       description:
-        'Note: this does not yet show you the auto-generated JSON-LD it would replace — that preview ' +
-        'needs the frontend’s structured-data generation to exist first. Ask before using this if unsure.',
+        'Click "Load current structured data" to start from what the page generates, then edit. ' +
+        'Invalid JSON is ignored and the automatic structured data is used instead.',
+      // Warning, not error: the frontend already fails safe (resolveJsonLd falls back to the
+      // generated block on a parse failure) — this just tells the editor their override is
+      // being ignored, which closes the _POLISH-BACKLOG "surface invalid JSON in Studio" item.
+      validation: (Rule) =>
+        Rule.custom((value?: string) => {
+          if (!value?.trim()) return true
+          try {
+            JSON.parse(value)
+            return true
+          } catch {
+            return 'Not valid JSON — the site will ignore this and use the automatic structured data.'
+          }
+        }).warning(),
     }),
   ],
 })
