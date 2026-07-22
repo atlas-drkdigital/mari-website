@@ -41,7 +41,11 @@ export function Faq({ home, faq }: { home: HomePageData | null; faq: { questions
   const eyebrow = home?.faqEyebrow ?? ''
   const heading = home?.faqHeading ?? ''
   const linkText = home?.faqLinkText ?? ''
+  // The null filter is LOAD-BEARING (500'd the homepage 2026-07-22): the query flattens
+  // categories[].questions[...] and a category WITHOUT a questions array projects a literal
+  // null member into the concatenated list. Filter BEFORE slice so nulls don't eat limit slots.
   const allItems: FaqItem[] = (faq?.questions ?? [])
+    .filter((f) => f?.question)
     .slice(0, HOMEPAGE_FAQ_LIMIT)
     .map((f) => ({ q: f.question ?? '', a: toPlainText(f.answer) }))
   const splitAt = Math.ceil(allItems.length / 2)
