@@ -136,7 +136,21 @@ export const boatType = defineType({
       type: 'richTextBasic',
       group: 'cards',
       fieldset: 'cardsFs',
-      description: 'A short paragraph or two shown where this boat appears as a card — not the full overview.',
+      description:
+        'A short paragraph or two shown where this boat appears as a card — not the full overview. About 500 characters fits the card best.',
+      // Recommended length as a WARNING (Adinda, 2026-07-22: Mari's ~470-char summary is the
+      // ideal, "maybe one more line" — not a hard rule). This is rich text, so the plain
+      // CharCountInput can't attach; a custom warning totalling the span text is the equivalent.
+      validation: (Rule) =>
+        Rule.custom((value?: { children?: { text?: string }[] }[]) => {
+          const chars = (value ?? []).reduce(
+            (n, blk) => n + (blk.children ?? []).reduce((m, c) => m + (c.text?.length ?? 0), 0),
+            0,
+          )
+          return chars > 550
+            ? 'Longer than the recommended card length (~500 characters) — extra text crowds the card.'
+            : true
+        }).warning(),
     }),
     // Optional hero background video (CDN URL, not an upload) — plays over the cover image, which
     // stays as poster + fallback. Shared object type; see objects/heroVideo.ts for the full rationale.

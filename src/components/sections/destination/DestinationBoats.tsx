@@ -66,7 +66,8 @@ export function DestinationBoats({
     <section
       id="boats"
       aria-labelledby="destination-boats-heading"
-      className="relative isolate w-full scroll-mt-[70px] overflow-hidden bg-bg-page pt-64 pb-64 lg:scroll-mt-[110px] lg:pt-[120px]"
+      /* lg:pb-[112px] = 64 + the extra 48 Adinda asked for on desktop (2026-07-22). */
+      className="relative isolate w-full scroll-mt-[70px] overflow-hidden bg-bg-page pt-64 pb-64 lg:scroll-mt-[110px] lg:pt-[120px] lg:pb-[112px]"
     >
       {/* Light texture — per the node AND Adinda's explicit "be very careful that we do use the
           light texture here". Itineraries above deliberately has none. */}
@@ -100,22 +101,31 @@ export function DestinationBoats({
             ScrollReveal (which scans once on mount) never observes, so the card swapped to
             PERMANENTLY INVISIBLE ("nothing is loaded, it's just empty" — Adinda's 2026-07-22
             catch). Content must swap IN PLACE inside a reveal-stable wrapper. */}
+        {/* Mobile is FULL-BLEED (Adinda, 2026-07-22): no side gutters, image edge-to-edge at
+            3:2 with the beige card directly beneath as the visual separator (gap-0 — a bg-page
+            strip between them read as a seam, not a separator). Desktop unchanged. */}
         <div
           aria-live="polite"
           data-reveal
-          className="flex w-full flex-col gap-24 page-gutter-x lg:flex-row lg:items-start lg:gap-0 lg:px-0 lg:pl-160"
+          className="flex w-full flex-col lg:flex-row lg:items-start lg:pl-160"
         >
-          {/* Image: mobile first at 3:2 full gutter width; desktop the fixed 640x472 block pushed
-              64px down so the card (top-aligned) reads as sitting ON it. */}
-          <div className="relative aspect-[3/2] w-full shrink-0 overflow-hidden lg:mt-64 lg:aspect-auto lg:h-[472px] lg:w-[640px]">
+          {/* Image: a LINK to the boat's page with the site-wide hover zoom (Adinda, 2026-07-22
+              — same treatment as every non-hero image). Desktop: fixed 640x472 pushed 64px down
+              so the card (top-aligned) reads as sitting ON it. Slug is guaranteed — the query
+              filters on defined(slug.current). */}
+          <a
+            href={`/boats/${boat.slug}`}
+            aria-label={`More about ${boat.name ?? 'this boat'}`}
+            className="group/photo relative block aspect-[3/2] w-full shrink-0 overflow-hidden lg:mt-64 lg:aspect-auto lg:h-[472px] lg:w-[640px]"
+          >
             <Image
               {...sanityImageProps(image, '/assets/placeholder-photo.svg')}
               alt={image?.alt ?? ''}
               fill
               sizes="(min-width: 1024px) 640px, 100vw"
-              className="object-cover"
+              className="object-cover transition-transform duration-[1100ms] ease-in-out group-hover/photo:scale-105"
             />
-          </div>
+          </a>
 
           {/* Card: cream-50 (#f5f0e8 = beige-150 = bg-accent), overlapping the image by 96px
               (node math 99 — scale step wins) and bleeding to the right viewport edge (the row
