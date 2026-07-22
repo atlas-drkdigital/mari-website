@@ -25,11 +25,14 @@ export function LatestArticles({
   eyebrow = '',
   heading = '',
   linkText = '',
+  linkHref = '#',
   posts,
 }: {
   eyebrow?: string
   heading?: string
   linkText?: string
+  /** Button target — the destination page points at /blog; the homepage's stays '#' until its own link pass. */
+  linkHref?: string
   posts: LatestPostData[]
 }) {
   const articles = (posts ?? []).map((p) => ({
@@ -56,7 +59,7 @@ export function LatestArticles({
           <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:gap-48">
             <h2 id="latest-articles-heading" className="mr-[40px] max-w-[640px] text-display-h2 text-text-primary lg:mr-0">{heading}</h2>
             {linkText ? (
-              <a href="#" className="group inline-flex h-48 w-fit shrink-0 items-center gap-4 border border-action-primary px-20 py-8 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary/10 lg:ml-auto">
+              <a href={linkHref} className="group inline-flex h-48 w-fit shrink-0 items-center gap-4 border border-action-primary px-20 py-8 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:bg-action-primary/10 lg:ml-auto">
                 {linkText}
                 <span aria-hidden="true" className="block size-[12px] shrink-0 bg-action-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
               </a>

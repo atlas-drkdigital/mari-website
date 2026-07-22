@@ -120,6 +120,15 @@ export const destinationDefaultsType = defineType({
       initialValue: 'Book directly through our scheduling partner to view real-time availability and reserve your cabin.',
     }),
     defineField({
+      name: 'upcomingTripsCtaText',
+      title: 'Upcoming Trips button text',
+      type: 'string',
+      fieldset: 'upcomingTrips',
+      group: 'upcomingTrips',
+      description: 'Label on the button linking to the full Schedule & Rates page.',
+      initialValue: 'View all trips',
+    }),
+    defineField({
       name: 'faqEyebrow',
       title: 'FAQ eyebrow',
       type: 'string',
@@ -175,6 +184,15 @@ export const destinationDefaultsType = defineType({
       fieldset: 'articles',
       group: 'articles',
       initialValue: '{destination} articles & news',
+    }),
+    defineField({
+      name: 'articlesLinkText',
+      title: 'Articles button text',
+      type: 'string',
+      fieldset: 'articles',
+      group: 'articles',
+      description: 'Label on the button linking to the blog.',
+      initialValue: 'More blog posts',
     }),
     // Sub-nav labels live HERE rather than hardcoded — same rationale as boatDefaults (2026-07-21):
     // they ride the singleton's field-level localization when i18n lands. The ITEMS (which sections

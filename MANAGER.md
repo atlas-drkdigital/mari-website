@@ -55,6 +55,18 @@ in CLAUDE.md for why `COMPONENTS.md` "ports at first use, not up front".
 escalate to Opus only for the portability boundary (what's Mari's vs what's DRK's), which is the one
 genuinely architectural call in it.
 
+### 🆕 QUEUED 2026-07-22 (Adinda) — per-section QA is the LOCKED review method; homepage + boat get it retroactively
+The destination build's rhythm — **every section reviewed TWICE at the moment it ships: (a) the
+rendered page (desktop AND mobile) and (b) its Studio editing surface** — is working well
+(Adinda's words) and is now the standing method:
+1. **Remaining destination sections** (Overview, Gallery, Itineraries, Trips embed, Boats): QA
+   per-section as each lands, same as Hero + FAQ already got. Not batched at the end.
+2. **RETROACTIVE: homepage and boat page never had this pass** — they were reviewed
+   whole-page/abstractly. Queue a section-by-section QA walk (page + Studio per section) for BOTH,
+   after the destination page completes. Cheap per section; catches the "field wired to nothing /
+   form control nobody understands" class the destination reviews keep surfacing (JSON-LD override
+   prefill, card-toggle showing unset, meta-description overflow all came out of exactly this).
+
 ### Order of work (next sessions)
 1. ~~**auto-hide guards + FAQ min-height.**~~ ✅ **DONE 2026-07-17** — see the 2026-07-17 checkpoint below.
    Guards on Why Us / Latest Articles / FAQ / Testimonials (Destinations ✓ CTA ✓ already had them);

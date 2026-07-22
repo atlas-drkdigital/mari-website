@@ -6,6 +6,7 @@ import { ScrollReveal } from '@/components/ScrollReveal'
 import { Contact } from '@/components/sections/Contact'
 import { Cta } from '@/components/sections/Cta'
 import { DestinationHero } from '@/components/sections/destination/DestinationHero'
+import { DestinationTrips } from '@/components/sections/destination/DestinationTrips'
 import { FaqCategorized } from '@/components/sections/FaqCategorized'
 import { Footer } from '@/components/sections/Footer'
 import { LatestArticles } from '@/components/sections/LatestArticles'
@@ -90,12 +91,13 @@ export default async function DestinationPage({ params }: { params: Promise<Para
   const jsonLd = resolveJsonLd(destination.seo, faqJsonLd)
 
   // Subnav items appear only when their section has content to render ("hide what's empty").
-  // Upcoming Trips is absent until the booking-embed field exists (embed section, later today).
+  const hasTripsEmbed = Boolean(destination.upcomingTripsEmbed?.trim())
   const subNavItems: SubNavItem[] = [
     { href: '#overview', targetId: 'overview', label: t(defaults?.subnavOverviewLabel) ?? '' },
     (destination.gallery ?? []).length && { href: '#gallery', targetId: 'gallery', label: t(defaults?.subnavGalleryLabel) ?? '' },
     (itineraries ?? []).length && { href: '#itineraries', targetId: 'itineraries', label: t(defaults?.subnavItinerariesLabel) ?? '' },
     faqSections.length && { href: '#faq', targetId: 'faq', label: t(defaults?.subnavFaqLabel) ?? '' },
+    hasTripsEmbed && { href: '#upcoming-trips', targetId: 'upcoming-trips', label: t(defaults?.subnavTripsLabel) ?? '' },
   ]
     .filter((item): item is SubNavItem => Boolean(item && item.label))
 
@@ -110,6 +112,13 @@ export default async function DestinationPage({ params }: { params: Promise<Para
             className="absolute inset-x-0 bottom-0 z-20 w-full"
           />
         </div>
+        <DestinationTrips
+          eyebrow={t(defaults?.upcomingTripsEyebrow)}
+          heading={t(defaults?.upcomingTripsHeading)}
+          intro={t(defaults?.upcomingTripsIntro)}
+          ctaText={t(defaults?.upcomingTripsCtaText)}
+          embedHtml={destination.upcomingTripsEmbed}
+        />
         <FaqCategorized
           sections={faqSections}
           eyebrow={t(defaults?.faqEyebrow)}
@@ -124,6 +133,8 @@ export default async function DestinationPage({ params }: { params: Promise<Para
         <LatestArticles
           eyebrow={t(defaults?.articlesEyebrow)}
           heading={t(defaults?.articlesHeading)}
+          linkText={t(defaults?.articlesLinkText)}
+          linkHref="/blog"
           posts={latestPosts ?? []}
         />
         <Contact settings={settings} destinations={destinations ?? []} />

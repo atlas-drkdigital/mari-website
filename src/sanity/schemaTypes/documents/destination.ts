@@ -33,6 +33,7 @@ export const destinationType = defineType({
     { name: 'cards', title: 'Cards' },
     { name: 'overview', title: 'Overview' },
     { name: 'gallery', title: 'Gallery' },
+    { name: 'trips', title: 'Upcoming Trips' },
     { name: 'faq', title: 'FAQ' },
     { name: 'seo', title: 'SEO' },
   ],
@@ -45,6 +46,7 @@ export const destinationType = defineType({
     },
     { name: 'overviewFs', title: 'Overview' },
     { name: 'galleryFs', title: 'Gallery' },
+    { name: 'tripsFs', title: 'Upcoming Trips' },
     { name: 'faqFs', title: 'FAQ' },
   ],
   fields: [
@@ -218,6 +220,19 @@ export const destinationType = defineType({
       fieldset: 'galleryFs',
       of: [defineArrayMember({ type: 'galleryImage' })],
       description: 'Drop or select many images at once — they upload straight onto this list.',
+    }),
+
+    // Upcoming Trips — the INSEANQ booking widget, one embed code per destination (filtered by
+    // destination on the INSEANQ side). Empty → the whole section AND its subnav item disappear
+    // ("hide what's empty"). The section chrome (eyebrow/heading/intro/CTA) lives in Destination
+    // Defaults; only the embed code is per-destination.
+    defineField({
+      name: 'upcomingTripsEmbed',
+      title: 'Booking widget embed',
+      type: 'htmlEmbed',
+      group: 'trips',
+      fieldset: 'tripsFs',
+      description: 'The scheduling partner’s embed code for this destination. Leave empty to hide the Upcoming Trips section.',
     }),
 
     // FAQ — this destination's own questions. The page also shows shared categories pulled from the

@@ -156,6 +156,7 @@ export const DESTINATION_QUERY = groq`{
     overviewHeading, overviewBody,
     highlights[]{ _key, title, body, image${IMAGE} },
     gallery[]${IMAGE},
+    "upcomingTripsEmbed": upcomingTripsEmbed.html,
     faqSections[]{ _key, title, questions[]{ question, answer } },
     seo
   },
@@ -163,10 +164,10 @@ export const DESTINATION_QUERY = groq`{
     overviewEyebrow,
     galleryEyebrow, galleryTitle,
     itinerariesEyebrow, itinerariesHeading,
-    upcomingTripsEyebrow, upcomingTripsHeading, upcomingTripsIntro,
+    upcomingTripsEyebrow, upcomingTripsHeading, upcomingTripsIntro, upcomingTripsCtaText,
     faqEyebrow, faqHeading, faqLinkText,
     boatsEyebrow, boatsHeading,
-    articlesEyebrow, articlesHeading,
+    articlesEyebrow, articlesHeading, articlesLinkText,
     subnavOverviewLabel, subnavGalleryLabel, subnavItinerariesLabel,
     subnavFaqLabel, subnavTripsLabel
   },
@@ -470,6 +471,8 @@ export type DestinationData = {
   overviewBody?: PortableTextBlock[]
   highlights?: DestinationHighlightData[]
   gallery?: GalleryImageData[]
+  /** Raw embed HTML (htmlEmbed.html) — the section hides when absent. */
+  upcomingTripsEmbed?: string
   faqSections?: FaqSectionData[]
   seo?: SeoData
 }
@@ -485,6 +488,7 @@ export type DestinationDefaultsData = {
   upcomingTripsEyebrow?: string
   upcomingTripsHeading?: string
   upcomingTripsIntro?: string
+  upcomingTripsCtaText?: string
   faqEyebrow?: string
   faqHeading?: string
   faqLinkText?: string
@@ -492,6 +496,7 @@ export type DestinationDefaultsData = {
   boatsHeading?: string
   articlesEyebrow?: string
   articlesHeading?: string
+  articlesLinkText?: string
   subnavOverviewLabel?: string
   subnavGalleryLabel?: string
   subnavItinerariesLabel?: string
