@@ -189,27 +189,27 @@ export function DestinationOverview({
               ))}
             </div>
 
-            {/* Caption layout (Adinda, 2026-07-22, final): arrows vertically centered on the
-                EYEBROW + HEADING block; the description sits below at the TITLE'S width — the
-                pr matches the arrows column (2 buttons + gaps: 96px mobile, 128px lg, both
-                on-scale) so copy never runs underneath the buttons and the title→description
-                gap stays the standard 16. */}
+            {/* Caption layout (Adinda, 2026-07-22, LOCKED after four iterations — per her
+                screenshot): arrows vertically centered on the TITLE line only (not the eyebrow);
+                eyebrow above the row; description below capped to the TITLE'S width — pr matches
+                the arrows column (2 buttons + gaps: 96 mobile / 128 lg, both on-scale) so copy
+                never runs under the buttons. */}
             <div className="flex flex-col gap-16">
-              <div className="flex items-center gap-12">
-                <div className="flex min-w-0 flex-1 flex-col gap-8">
-                  <p className="text-eyebrow uppercase text-action-primary">
-                    Highlight
-                    {/* beige-400 — no semantic token, see header. */}
-                    <span className="text-[#c9b89a]">/{String(highlightIndex + 1).padStart(2, '0')}</span>
-                  </p>
-                  <h3 className="text-editorial-h3 text-text-primary">{active?.title}</h3>
+              <div className="flex flex-col gap-8">
+                <p className="text-eyebrow uppercase text-action-primary">
+                  Highlight
+                  {/* beige-400 — no semantic token, see header. */}
+                  <span className="text-[#c9b89a]">/{String(highlightIndex + 1).padStart(2, '0')}</span>
+                </p>
+                <div className="flex items-center gap-12">
+                  <h3 className="min-w-0 flex-1 text-editorial-h3 text-text-primary">{active?.title}</h3>
+                  {highlights.length > 1 ? (
+                    <div className="flex shrink-0 gap-12">
+                      <CarouselArrowButton direction="prev" onClick={() => goTo(highlightIndex - 1)} ariaLabel="Previous highlight" />
+                      <CarouselArrowButton direction="next" onClick={() => goTo(highlightIndex + 1)} ariaLabel="Next highlight" />
+                    </div>
+                  ) : null}
                 </div>
-                {highlights.length > 1 ? (
-                  <div className="flex shrink-0 gap-12">
-                    <CarouselArrowButton direction="prev" onClick={() => goTo(highlightIndex - 1)} ariaLabel="Previous highlight" />
-                    <CarouselArrowButton direction="next" onClick={() => goTo(highlightIndex + 1)} ariaLabel="Next highlight" />
-                  </div>
-                ) : null}
               </div>
               {active?.body ? (
                 <div className="flex flex-col gap-16 pr-96 text-body-large text-text-primary lg:pr-128">
