@@ -94,10 +94,13 @@ export function DestinationBoats({
           </div>
         </div>
 
-        {/* aria-live so the arrows announce the swapped boat to screen readers. `key` remounts
-            the pair on step so the reveal animation (if any) and image load state reset cleanly. */}
+        {/* aria-live so the arrows announce the swapped boat to screen readers.
+            🔴 NO `key={boat._id}` and data-reveal ONLY on this STABLE element — the first build
+            keyed this div, and every arrow click remounted it as a fresh [data-reveal] node that
+            ScrollReveal (which scans once on mount) never observes, so the card swapped to
+            PERMANENTLY INVISIBLE ("nothing is loaded, it's just empty" — Adinda's 2026-07-22
+            catch). Content must swap IN PLACE inside a reveal-stable wrapper. */}
         <div
-          key={boat._id}
           aria-live="polite"
           data-reveal
           className="flex w-full flex-col gap-24 page-gutter-x lg:flex-row lg:items-start lg:gap-0 lg:px-0 lg:pl-160"
@@ -124,10 +127,12 @@ export function DestinationBoats({
                 <p className="text-eyebrow uppercase text-text-eyebrow">{statsLine}</p>
               ) : null}
             </div>
-            {boat.overviewBody?.length ? (
-              /* gap-16 = the paragraph-spacing rule: wrapper owns it, 16 for body-large. */
+            {/* excerpt (the boat's Card summary), NOT overviewBody — the full overview is the
+                boat page's own copy and reads far too long here (Adinda, 2026-07-22).
+                gap-16 = the paragraph-spacing rule: wrapper owns it, 16 for body-large. */}
+            {boat.excerpt?.length ? (
               <div className="flex flex-col gap-16 text-body-large text-text-primary">
-                <RichText value={boat.overviewBody} />
+                <RichText value={boat.excerpt} />
               </div>
             ) : null}
             {ctaText && boat.slug ? (

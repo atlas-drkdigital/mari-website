@@ -195,7 +195,7 @@ export const DESTINATION_QUERY = groq`{
     coverImage${IMAGE},
     useCoverAsCardImage,
     cardImage${IMAGE},
-    overviewBody,
+    excerpt,
     stats[]{ _key, label, value }
   },
   "cta": *[_id == "cta"][0]{
@@ -545,7 +545,7 @@ export type BoatCardData = {
   coverImage?: SanityImageWithMeta
   useCoverAsCardImage?: boolean
   cardImage?: SanityImageWithMeta
-  overviewBody?: PortableTextBlock[]
+  excerpt?: PortableTextBlock[]
   stats?: BoatStat[]
 }
 

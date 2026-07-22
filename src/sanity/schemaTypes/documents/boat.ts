@@ -127,6 +127,17 @@ export const boatType = defineType({
       hidden: ({ parent }) => parent?.useCoverAsCardImage !== false,
       description: 'Shown wherever this boat appears as a card. Recommended: landscape, at least 1600px wide.',
     }),
+    // Added 2026-07-22 (Adinda: the destination boats card rendered the FULL overviewBody — far
+    // too long; a card needs its own short copy). richTextBasic per the Portable Text tier rule:
+    // card descriptions are tier 2. Mirrors destination.excerpt in name and purpose.
+    defineField({
+      name: 'excerpt',
+      title: 'Card summary',
+      type: 'richTextBasic',
+      group: 'cards',
+      fieldset: 'cardsFs',
+      description: 'A short paragraph or two shown where this boat appears as a card — not the full overview.',
+    }),
     // Optional hero background video (CDN URL, not an upload) — plays over the cover image, which
     // stays as poster + fallback. Shared object type; see objects/heroVideo.ts for the full rationale.
     defineField({
