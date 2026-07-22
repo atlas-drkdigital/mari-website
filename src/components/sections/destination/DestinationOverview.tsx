@@ -146,8 +146,14 @@ export function DestinationOverview({
             {/* All highlight images stay mounted; the active one fades in — same crossfade model as
                 the homepage Destinations backgrounds, so switching never flashes white. Swipeable
                 like every other carousel on the site. */}
+            {/* group/highlight drives the site-wide subtle hover zoom (scale-105 over 1100ms, same
+                as CTA/Cabins/Gallery). Crossfade opacity lives on a WRAPPER per slide, transform on
+                the image itself — one element can't carry two different durations.
+                draggable={false} on the images: they are the pointer target, and the browser's
+                native image-drag (ghost image) was swallowing the mouse gesture before our handler
+                ran — which is why drag worked on touch but "did nothing" on desktop. */}
             <div
-              className="relative aspect-[458/366.4] w-full cursor-grab overflow-hidden select-none [touch-action:pan-y] active:cursor-grabbing"
+              className="group/highlight relative aspect-[458/366.4] w-full cursor-grab overflow-hidden select-none [touch-action:pan-y] active:cursor-grabbing"
               onPointerDown={(e) => {
                 dragState.current = { dragging: true, startX: e.clientX, moved: 0 }
               }}
@@ -165,41 +171,49 @@ export function DestinationOverview({
               }}
             >
               {highlights.map((h, i) => (
-                <Image
+                <div
                   key={h._key}
-                  {...sanityImageProps(h.image, '/assets/placeholder-photo.svg')}
-                  alt={i === highlightIndex ? (h.image?.alt ?? '') : ''}
-                  fill
-                  sizes="(min-width: 1024px) 458px, 100vw"
-                  className={`object-cover transition-opacity duration-700 ease-in-out ${
+                  className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
                     i === highlightIndex ? 'opacity-100' : 'opacity-0'
                   }`}
-                />
+                >
+                  <Image
+                    {...sanityImageProps(h.image, '/assets/placeholder-photo.svg')}
+                    alt={i === highlightIndex ? (h.image?.alt ?? '') : ''}
+                    fill
+                    draggable={false}
+                    sizes="(min-width: 1024px) 458px, 100vw"
+                    className="object-cover transition-transform duration-[1100ms] ease-in-out group-hover/highlight:scale-105"
+                  />
+                </div>
               ))}
             </div>
 
-            <div className="flex flex-col gap-16">
-              <div className="flex flex-col gap-8">
-                <p className="text-eyebrow uppercase text-action-primary">
-                  Highlight
-                  {/* beige-400 — no semantic token, see header. */}
-                  <span className="text-[#c9b89a]">/{String(highlightIndex + 1).padStart(2, '0')}</span>
-                </p>
-                {/* Arrows sit ON the title row, centered against the heading itself — not the
-                    eyebrow (Adinda, 2026-07-22, matching the section-heading+arrows pattern). */}
-                <div className="flex items-center justify-between gap-12">
-                  <h3 className="min-w-0 flex-1 text-editorial-h3 text-text-primary">{active?.title}</h3>
-                  {highlights.length > 1 ? (
-                    <div className="flex shrink-0 gap-12">
-                      <CarouselArrowButton direction="prev" onClick={() => goTo(highlightIndex - 1)} ariaLabel="Previous highlight" />
-                      <CarouselArrowButton direction="next" onClick={() => goTo(highlightIndex + 1)} ariaLabel="Next highlight" />
-                    </div>
-                  ) : null}
+            {/* Caption layout (Adinda, 2026-07-22, third iteration — this one's hers): the whole
+                text stack (eyebrow + title + description) is ONE left column that never runs under
+                the arrows, and the arrows are a right column vertically centered on that stack.
+                Keeps the tight title→description gap (the title-row-only centering inflated it —
+                the 52px buttons stretched the row). */}
+            <div className="flex items-center gap-12">
+              <div className="flex min-w-0 flex-1 flex-col gap-16">
+                <div className="flex flex-col gap-8">
+                  <p className="text-eyebrow uppercase text-action-primary">
+                    Highlight
+                    {/* beige-400 — no semantic token, see header. */}
+                    <span className="text-[#c9b89a]">/{String(highlightIndex + 1).padStart(2, '0')}</span>
+                  </p>
+                  <h3 className="text-editorial-h3 text-text-primary">{active?.title}</h3>
                 </div>
+                {active?.body ? (
+                  <div className="flex flex-col gap-16 text-body-large text-text-primary">
+                    <RichText value={active.body} />
+                  </div>
+                ) : null}
               </div>
-              {active?.body ? (
-                <div className="flex flex-col gap-16 text-body-large text-text-primary">
-                  <RichText value={active.body} />
+              {highlights.length > 1 ? (
+                <div className="flex shrink-0 gap-12">
+                  <CarouselArrowButton direction="prev" onClick={() => goTo(highlightIndex - 1)} ariaLabel="Previous highlight" />
+                  <CarouselArrowButton direction="next" onClick={() => goTo(highlightIndex + 1)} ariaLabel="Next highlight" />
                 </div>
               ) : null}
             </div>
