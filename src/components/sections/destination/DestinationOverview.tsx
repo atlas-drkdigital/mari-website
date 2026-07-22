@@ -170,16 +170,22 @@ export function DestinationOverview({
                 else if (moved >= THRESHOLD) goTo(highlightIndex - 1)
               }}
             >
+              {/* aria-hidden on INACTIVE slides + the real alt on every image (drk-seo pass,
+                  2026-07-22). The first build blanked inactive slides' alt instead — that kept
+                  screen readers quiet but shipped 6 content images with alt="" in the SSR HTML,
+                  which is what crawlers index. Hiding the invisible slides from the a11y tree is
+                  the correct mechanism; alt stays real for image SEO. */}
               {highlights.map((h, i) => (
                 <div
                   key={h._key}
+                  aria-hidden={i !== highlightIndex || undefined}
                   className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
                     i === highlightIndex ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
                   <Image
                     {...sanityImageProps(h.image, '/assets/placeholder-photo.svg')}
-                    alt={i === highlightIndex ? (h.image?.alt ?? '') : ''}
+                    alt={h.image?.alt ?? ''}
                     fill
                     draggable={false}
                     sizes="(min-width: 1024px) 458px, 100vw"
