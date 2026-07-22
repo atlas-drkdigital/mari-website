@@ -1035,6 +1035,21 @@ via the LAN IP with this error firing, because it breaks the live-updates channe
 
 Skill-wide — queued for `drk-website`'s `references/troubleshooting.md` via `_handoff/drk-website.md`.
 
+## Touch reveal = `pointerup`, never `click` — locked 2026-07-22 (Adinda's "tap twice" catch)
+iOS Safari consumes the FIRST tap on hover-reactive content as hover-emulation and only delivers
+`click` on the second. Any tap-to-reveal interaction rides `pointerup` (pointerType 'touch', ≤10px
+movement test vs swipes, skip targets inside an `<a>` — link-side `stopPropagation` on click does
+NOT cover pointerup). Reference: `DestinationItineraries.tsx`. **Corollary, same day: a draggable
+card track never gets a whole-card link** — every drag attempt becomes a navigation; the CTA inside
+the card is the only link. Skill-wide — queued via `_handoff/drk-website.md`.
+
+## Booking-widget embeds go FULL viewport width on mobile — STANDARD, locked 2026-07-22 (Adinda)
+INSEANQ (and any dense third-party booking embed) is unreadable at phone width inside page gutters.
+The embed container goes full-bleed on mobile, gutters return md+. Implement with negative margins
+canceling the wrapper's own padding (`-mx-24` + `self-stretch`), **never `w-screen`/`100vw`** — vw
+includes the scrollbar and is the horizontal-scroll bug. Applies to the future Schedule & Rates
+page too. Reference: `DestinationTrips.tsx`. Skill-wide — queued via `_handoff/drk-website.md`.
+
 ## `allowedDevOrigins` required for real-device LAN testing, locked 2026-07-15
 `next.config.ts` sets `allowedDevOrigins: ["192.168.0.101"]` (Adinda's Wi-Fi IP — update if it changes,
 check via `ipconfig`). Without it, `next dev` silently blocks the site for any device on the LAN, including

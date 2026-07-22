@@ -5,6 +5,7 @@ import { Nav } from '@/components/Nav'
 import { ScrollReveal } from '@/components/ScrollReveal'
 import { Contact } from '@/components/sections/Contact'
 import { Cta } from '@/components/sections/Cta'
+import { DestinationBoats } from '@/components/sections/destination/DestinationBoats'
 import { DestinationGallery } from '@/components/sections/destination/DestinationGallery'
 import { DestinationHero } from '@/components/sections/destination/DestinationHero'
 import { DestinationItineraries } from '@/components/sections/destination/DestinationItineraries'
@@ -58,7 +59,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function DestinationPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params
-  const { destination, defaults, itineraries, sharedFaqSections, latestPosts, cta, settings, destinations } =
+  const { destination, defaults, itineraries, sharedFaqSections, latestPosts, boats, cta, settings, destinations } =
     await getDestination(slug)
 
   if (!destination) notFound()
@@ -145,10 +146,17 @@ export default async function DestinationPage({ params }: { params: Promise<Para
           heading={t(defaults?.faqHeading)}
           linkText={t(defaults?.faqLinkText)}
         />
-        {/* Section order per the mock (778:8608): FAQ → [About the Boats, pending] → CTA →
-            Articles → Contact. Articles = the homepage component, Komodo-linked posts only, no
-            button (the mock has none — its arrows are deferred; the drag-track convention covers
-            the overflow case). */}
+        {/* Section order per the mock (778:8608): FAQ → About the Boats → CTA → Articles →
+            Contact. Articles = the homepage component, Komodo-linked posts only, no button (the
+            mock has none — its arrows are deferred; the drag-track convention covers the
+            overflow case). */}
+        <DestinationBoats
+          boats={boats ?? []}
+          eyebrow={t(defaults?.boatsEyebrow)}
+          heading={t(defaults?.boatsHeading)}
+          headingSingular={t(defaults?.boatsHeadingSingular)}
+          ctaText={t(defaults?.boatsCtaText)}
+        />
         <Cta cta={cta} />
         <LatestArticles
           eyebrow={t(defaults?.articlesEyebrow)}

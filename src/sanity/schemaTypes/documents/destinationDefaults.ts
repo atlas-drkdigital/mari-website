@@ -169,11 +169,32 @@ export const destinationDefaultsType = defineType({
     }),
     defineField({
       name: 'boatsHeading',
-      title: 'Boats heading',
+      title: 'Boats heading (several boats)',
       type: 'string',
       fieldset: 'boats',
       group: 'boats',
       initialValue: 'About the boats',
+    }),
+    // Singular/plural is TWO explicit fields picked by boat count, not automatic pluralization
+    // (Adinda's question 2026-07-22, answered this way deliberately): an editor — and later each
+    // translation — writes both forms verbatim, so no language ever needs a pluralization rule
+    // the system doesn't have. The frontend shows this one when exactly one boat exists.
+    defineField({
+      name: 'boatsHeadingSingular',
+      title: 'Boats heading (single boat)',
+      type: 'string',
+      fieldset: 'boats',
+      group: 'boats',
+      initialValue: 'About the boat',
+    }),
+    defineField({
+      name: 'boatsCtaText',
+      title: 'Boat card button label',
+      type: 'string',
+      fieldset: 'boats',
+      group: 'boats',
+      description: 'The link on each boat card — goes to that boat’s own page.',
+      initialValue: 'More about the boat',
     }),
     defineField({
       name: 'articlesEyebrow',

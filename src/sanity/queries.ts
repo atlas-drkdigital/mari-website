@@ -166,12 +166,15 @@ export const DESTINATION_QUERY = groq`{
     itinerariesEyebrow, itinerariesHeading, itinerariesCardCtaText,
     upcomingTripsEyebrow, upcomingTripsHeading, upcomingTripsIntro, upcomingTripsCtaText,
     faqEyebrow, faqHeading, faqLinkText,
-    boatsEyebrow, boatsHeading,
+    boatsEyebrow, boatsHeading, boatsHeadingSingular, boatsCtaText,
     articlesEyebrow, articlesHeading, articlesLinkText,
     subnavOverviewLabel, subnavGalleryLabel, subnavItinerariesLabel,
     subnavFaqLabel, subnavTripsLabel
   },
-  "itineraries": *[_type == "itinerary" && destination->slug.current == $slug] | order(coalesce(order, 999) asc, title asc){
+  // The destination's own drag-ordered reference list (2026-07-22) — array order IS display
+  // order, and an itinerary absent from the list is deliberately hidden (curation), so there is
+  // no | order() and no fallback auto-pull by back-reference.
+  "itineraries": *[_type == "destination" && slug.current == $slug][0].itineraries[]->{
     _id, title, season, duration, route, highlights, summary,
     image${IMAGE}
   },
@@ -190,6 +193,9 @@ export const DESTINATION_QUERY = groq`{
     _id, name, pageTitle, tagline,
     "slug": slug.current,
     coverImage${IMAGE},
+    useCoverAsCardImage,
+    cardImage${IMAGE},
+    overviewBody,
     stats[]{ _key, label, value }
   },
   "cta": *[_id == "cta"][0]{
@@ -495,6 +501,8 @@ export type DestinationDefaultsData = {
   faqLinkText?: string
   boatsEyebrow?: string
   boatsHeading?: string
+  boatsHeadingSingular?: string
+  boatsCtaText?: string
   articlesEyebrow?: string
   articlesHeading?: string
   articlesLinkText?: string
@@ -535,6 +543,9 @@ export type BoatCardData = {
   tagline?: string
   slug?: string
   coverImage?: SanityImageWithMeta
+  useCoverAsCardImage?: boolean
+  cardImage?: SanityImageWithMeta
+  overviewBody?: PortableTextBlock[]
   stats?: BoatStat[]
 }
 

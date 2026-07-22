@@ -224,18 +224,28 @@ export const destinationType = defineType({
       description: 'Drop or select many images at once — they upload straight onto this list.',
     }),
 
-    // Itineraries tab is a SIGNPOST only (Adinda, 2026-07-22, editor-intuitiveness rule): the
-    // section auto-pulls `itinerary` documents that reference this destination, so there is
-    // nothing to edit here — but an editor looking for "the itineraries on the Komodo page"
-    // will look in the Komodo document first, and an absent tab reads as "this page has no
-    // itineraries section". Same pattern as the FAQ note above.
+    // Itineraries: a DRAG-ORDERED reference list (Adinda, 2026-07-22 — "leaning towards
+    // dragging", the locked drag-over-manual-numbers principle). This array IS the section:
+    // its order is the display order, and an itinerary NOT in the list simply doesn't show —
+    // which is the hide/highlight curation she asked for, free. Replaced the auto-pull +
+    // numeric `order` field from earlier the same day. The itinerary's own Destination
+    // reference stays as metadata (grouping/breadcrumbs), but this list decides the page.
     sharedComponentNote({
       name: 'itinerariesNote',
       title: 'About this section',
       message:
-        'Itineraries are managed as their own documents (see Itineraries in the sidebar). Every itinerary whose Destination field points at this destination appears here automatically, sorted by its Sort order number.',
+        'Itineraries are managed as their own documents (see Itineraries in the sidebar). Add them to the list below to show them on this page — drag to reorder; anything not in the list stays hidden.',
       group: 'itineraries',
       fieldset: 'itinerariesFs',
+    }),
+    defineField({
+      name: 'itineraries',
+      title: 'Itineraries on this page',
+      type: 'array',
+      group: 'itineraries',
+      fieldset: 'itinerariesFs',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'itinerary' }] })],
+      description: 'Shown in this order. Drag to reorder; remove one to hide it without deleting the itinerary.',
     }),
 
     // Upcoming Trips — the INSEANQ booking widget, one embed code per destination (filtered by

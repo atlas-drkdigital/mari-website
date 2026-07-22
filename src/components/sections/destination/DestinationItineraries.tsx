@@ -252,16 +252,10 @@ export function DestinationItineraries({
                     className={`pointer-events-none absolute inset-0 bg-background-ondark-page/60 transition-opacity duration-500 ease-in-out ${isOpen ? 'opacity-100' : 'opacity-0'}`}
                   />
 
-                  {/* Whole-card link — hover-capable devices only, and only when the trips embed
-                      exists. Sits UNDER the text stack; the stack is pointer-transparent except
-                      the CTA, so clicks anywhere reach this link. */}
-                  {clickable && hasHover && !isClone ? (
-                    <a
-                      href="#upcoming-trips"
-                      aria-label={`${card.title} — view the upcoming trips schedule`}
-                      className="absolute inset-0"
-                    />
-                  ) : null}
+                  {/* NO whole-card link — REMOVED 2026-07-22 (Adinda: "I cannot scroll drag the
+                      itineraries, and that is extremely annoying"). A full-card <a> turns every
+                      drag attempt into a navigation, so the CTA below is the ONLY way to the
+                      trips section, on every device. Do not reintroduce the overlay link. */}
 
                   <div className="pointer-events-none absolute inset-x-0 top-0 bottom-0 flex flex-col justify-between px-24 pt-32 pb-48 lg:px-32 lg:pt-48 lg:pb-64">
                     <div className="flex flex-col gap-16">

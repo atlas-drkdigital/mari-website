@@ -49,14 +49,9 @@ export const itineraryType = defineType({
       group: 'content',
       fieldset: 'contentFs',
     }),
-    defineField({
-      name: 'order',
-      title: 'Sort order',
-      type: 'number',
-      description: 'Controls the order itineraries appear on their destination page (lower first).',
-      group: 'content',
-      fieldset: 'contentFs',
-    }),
+    // `order` (a number field) lived here for a few hours on 2026-07-22 — replaced the same day
+    // by the drag-ordered reference array on `destination.itineraries`, which also gives
+    // hide-by-omission. Don't reintroduce a numeric order; the destination's list is the order.
     defineField({
       name: 'highlights',
       type: 'array',
