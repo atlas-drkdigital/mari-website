@@ -164,6 +164,37 @@ that category's images; the lightbox shows ALL combined. Empty tabs hide (don't 
 name: `default`.
 - **Status:** ⏳ pending (extraction #4). ⚠️ carousel/lightbox split unverified until real photos exist.
 
+### `GridGallery` — in `destination/DestinationGallery.tsx` (registered 2026-07-22, Adinda: "definitely likely on other projects")
+Full-bleed gap-0 square grid (4-col/2-col), every tile opens the shared `SiteLightbox` with ALL images
+combined (grid renders only asset-bearing images so grid index === lightbox index), plus the floating
+"View All Images" pill (rounded solid `bg-surface` + the CarouselArrowButton `surface` shadow recipe,
+bottom-center, 64/48px up). No visible heading by design — sr-only accessible name.
+- **Status:** ⏳ shelf. Extract at second consumer (possible: homepage). ⚠️ Token coupling: pill colors +
+  scrim family are Mari semantic tokens; portable version takes them as props.
+
+### `ItineraryCardCarousel` — in `destination/DestinationItineraries.tsx` (registered 2026-07-22, same ask)
+Hover/tap-reveal photo cards (closed: key-info ✦ line + title + pin route over light scrim; open: hard
+darken + summary + TextButton CTA) in a conditional carousel: static row while cards fit the breakpoint
+(3/2/1), drag + snap + INFINITE loop (3 copies + idle scrollLeft normalization) + paired arrows only when
+they don't. Touch reveal rides POINTERUP (iOS first-tap-hover trap — see CLAUDE.md). NO whole-card link
+ever (fights drag) — CTA-only navigation. Cards fed by a drag-ordered reference array on the parent doc
+(order = display order, omission = hidden).
+- **Status:** ⏳ shelf. The card + the loop mechanism are separable extractions; wait for the second
+  consumer (possible: homepage itineraries band) or the componentization pass.
+
+### `OverlapShowcase` (boats stepper) — in `destination/DestinationBoats.tsx` (registered 2026-07-22)
+One-item-at-a-time stepper: image linked with hover zoom + touch-swipe stepping, cream card overlapping
+the image (desktop asymmetry: image dropped 64px, card −96px overlap, bleeds to right viewport edge),
+arrows hide at 1 item, singular/plural heading via two explicit fields. Mobile: image-first 3:2
+full-bleed stack. ⚠️ data-reveal + keyed remount = invisible content (documented in the file).
+- **Status:** ⏳ shelf. Generic "entity showcase" shape (boats today; could present anything card-like).
+
+### Studio inputs — `JsonLdPrefillInput`, `RichTextCharCountInput`, `CharCountInput` — in `src/sanity/components/`
+DRK-portable Studio UX: (a) JSON-LD override prefill that reads the RENDERED page's ld+json (single
+source, can't drift — needs only a type→route map per project); (b) live char counters for string/text
+AND Portable Text fields (`options.maxLength` + `.warning()` rule contract).
+- **Status:** ✅ effectively portable as-is — copy the files; queued for `drk-website` at the next skill round.
+
 ### `SectionHeader` — recipe across most sections
 Eyebrow + heading + description with the site-standard `gap-24` between heading and description (NOT Figma's
 `gap-8` — convention supersedes). Candidate for a small shared component.

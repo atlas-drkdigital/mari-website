@@ -184,6 +184,52 @@ copy pass doesn't refuse to publish settled facts. Cross-refs cleaned the same d
 mari-website paste block), `_AUDIT-2026-07-20.md` (mari-core lane), and CLAUDE.md's two filename-lesson
 blocks (the lessons stand; the "evidence against the inventory" claims are annotated closed).
 
+### ✅ CHECKPOINT 2026-07-22 (2) — SESSION CLOSE: KOMODO PAGE FEATURE-COMPLETE (slices 5–7 + JSON-LD prefill + drk-seo pass)
+**Model:** Fable 5. `tsc` ✅ · eslint ✅ (0 errors) · `/` `/boats/mari` `/destinations/komodo` `/studio` 200 ·
+9 commits `c8a0a04`→`f6c37e5` (+docs). **Every section QA'd by Adinda per-section (page desktop+mobile+Studio)
+as it shipped.** Dev server LEFT RUNNING at session close — Serge is reviewing via LAN
+(⚠️ Sanity CORS for `192.168.0.101:3000` still un-added → no live updates on his browser; renders fine).
+
+**Shipped this session (afternoon block):**
+1. **Gallery (778:8677, `c8a0a04`/`cd277d9`/`4c8c4ae`):** full-bleed square grid (4/2-col), tiles + a
+   floating "View All Images" pill (rounded solid surface + CarouselArrowButton-surface shadow; px-16
+   compacted from 24, old value recorded) open the combined SiteLightbox. NO visible heading by design —
+   `galleryEyebrow`+`galleryTitle` REMOVED from destinationDefaults → single `galleryCtaText`; sr-only
+   name reuses `subnavGalleryLabel`. 8 images from the Figma fills seeded (+draft captions for QA);
+   `galleryImage.categories` now hidden off non-boat docs (Adinda's catch — boat-tab leak).
+2. **Itineraries (778:8688, `367ae73`/`bc11bf6`/`9fe4985`):** hover/tap-reveal cards; conditional
+   carousel (static when cards fit 3/2/1; drag+snap+infinite loop + arrows when not); mobile card 70dvh +
+   line-clamp-6 + 240-char counter; NO texture (fights Trips below); route line label-sized. Schema:
+   `season`/`image` added; **ordering = DRAG ARRAY `destination.itineraries` (order = display, omission =
+   hidden — the curation ask free); numeric `order` added then REMOVED same day.** 4 more real itineraries
+   seeded from the mari-itineraries library (7 total; seasons 🔴 placeholder); SEO prefilled on all 7.
+   🔴 **iOS first-tap-hover trap fixed: touch reveal rides POINTERUP, never click** (CLAUDE.md + handoff).
+   **Whole-card links REMOVED everywhere — they fight drag; CTA-only navigation (locked).**
+3. **About the Boats (778:8697, `a6f98a9`/`2cb09f9`/`1797ddd`):** one-boat stepper, arrows hide at 1;
+   LIGHT texture section (the dark reference was the Figma-canvas trap again); desktop overlap asymmetry
+   (image +64px down, card −96px overlap, bleeds right edge); mobile image-first 3:2 full-bleed; image =
+   link + hover zoom + touch-swipe steps boats. **`boat.excerpt` (Card summary, richTextBasic, live
+   PT char counter + ~500 warning) — NOT overviewBody** (too long, Adinda). Singular/plural heading = two
+   explicit defaults fields (localization-proof). Test boat `boat-nusa-test` ("Nusa", manta cover) —
+   🔴 DELETE before launch. 🔴 **Bug class logged: `data-reveal` + keyed remount = permanently invisible
+   content** (ScrollReveal scans once on mount) — guard comment in DestinationBoats.
+4. **JSON-LD override prefill (`e63ba41`) — the overdue promise, CLOSED:** `JsonLdPrefillInput` fetches
+   the RENDERED page (same-origin) and extracts its ld+json — single source, can't drift. Invalid-JSON
+   Studio warning added (closes that _POLISH-BACKLOG item).
+5. **drk-seo verify pass (`f6c37e5`) — RUN, page healthy:** 1 h1 / no level skips / FAQPage(16)+
+   Organization valid / canonical+og+twitter present. Fixed: footer `#schedule-rates` dead hash →
+   `/schedule-rates`; Overview highlight slides now aria-hidden-when-inactive with REAL alt (were
+   shipping 6 content images alt="" to crawlers). Remaining bare-`#` links = nav/footer placeholders
+   (global-chrome slice, accepted).
+6. **Standards locked:** booking embeds full-bleed on mobile (negative margins, NEVER 100vw);
+   `_OWNER-HANDBOOK.md` created (living owner-guide source; CLAUDE.md doc-split 8th member).
+   COMPONENTS.md shelf: GridGallery, ItineraryCardCarousel, OverlapShowcase, Studio inputs registered —
+   extraction deferred to second consumer / componentization pass (Adinda's call). Arrow scan PARKED.
+
+**Open after this session:** Serge review feedback · itinerary seasons 🔴 (content pass) · delete
+`boat-nusa-test` after approval · boats-on-route model before a real 2nd boat · retro homepage/boat
+per-section QA (queued 2026-07-22) · skill round + audit + Phase 3 (destination page now DONE — unblocked).
+
 ### ✅ CHECKPOINT 2026-07-21 (4) — SESSION CLOSE: SubNav APPROVED, gallery CTA, lightbox fullscreen
 **Model:** Fable 5. `tsc` ✅ · eslint ✅ · `/` `/boats/mari` 200 · **every item below reviewed +
 approved by Adinda in the browser before this checkpoint. Session closed here; `_RESUME.md`
@@ -2440,6 +2486,7 @@ ones.
 | 2026-07-15 | Full homepage QA pass (every section, desktop + mobile) + fixes | **~2h** (Adinda's own tracked estimate, rounded up from ~1h48m measured mid-session) | **~1h of this was a false-alarm chase** (see below), not real QA/bug-fixing time. Once resolved, the actual QA pass covered all 11 sections (Nav, Hero, The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials, CTA, Contact, Footer) and turned up ~10 real bugs total, all fixed same session. **Calibration takeaway, revises the 2026-07-14 row's own assumption:** that earlier entry expected future sessions to be "meaningfully faster... now that the patterns exist" — true for *coding* patterns, but a full QA pass has its own largely-fixed cost regardless of how established the code conventions are, because QA time is dominated by *discovering* each section's specific bugs, not by applying known patterns. Budget a full single-homepage QA pass at **~2h** even on a well-patterned codebase, not scaled down just because earlier sessions established good conventions. Sub-note: a "barely any content on mobile" report that looked like a WebKit/iOS bug turned out to be `allowedDevOrigins` (dev server blocking LAN-IP requests), unrelated to any browser engine — see `references/troubleshooting.md`'s localhost-vs-LAN-IP check, which exists specifically to prevent this cost recurring. |
 | 2026-07-15 (later, same day) | Boat page full schema build + gallery redesign (3 iterations) + content-model changes (Full Rich Text Block extraction, alt-rule correction) + new tracking docs (`_SCHEMA-SPECS.md`/`_CONTENT-STATUS.md`/`_QA-CHECKLIST.md`) | **~4h30m elapsed, but Adinda estimates only ~70% (~3h10m) was active desk time** — ~30% was her doing other things (learning Japanese, cooking) while background tasks (dev server restarts, Sanity scripts) ran, not actively reviewing/responding. | **New calibration point, distinct from the 2026-07-14 row's caution:** elapsed time and active time diverge meaningfully when a session has real background-task latency (dev server restarts, `sanity exec` scripts, Perplexity/web research) — Adinda could step away during those. **Track both going forward**, not just one figure — elapsed matters for calendar/deadline planning, active time matters for comparing actual effort across sessions. This session's scope was large (full boat schema + 3 gallery redesign iterations + several corrected mistakes), so the ~3h10m active figure is the more honest "how much work was this" number. |
 | 2026-07-21 | Categorized FAQ built+approved · SubNav complete arc (static rail → floating → compact two-row chrome, 4 design pivots) · scroll-top button · gallery CTA + chevrons + lightbox fullscreen · ~10 side-fixes (nav hover/active, accordion hovers, Android accordion leak, paragraph rule, deck-plan border, brochure rebuild) | **~5h elapsed (from commits 09:14–13:22 + pre-commit recap); Adinda's active figure: 4h15m given at ~12:30, plus ~45m of review after — call it ~4h45–5h active.** | Unusually interactive session — nearly all elapsed was active (live design iteration with screenshots, not background waits). Calibration: interactive design-iteration sessions have elapsed ≈ active, unlike build sessions with script latency. The SubNav went through FOUR rejected/revised designs before landing — budget real iteration time for novel interactive chrome, it is not a build-to-spec task. |
+| 2026-07-22 (afternoon) | Komodo page slices 5–7 (Gallery + Itineraries + About the Boats) + JSON-LD prefill + drk-seo pass + ~6 QA rounds live with Adinda | **~3h elapsed** (first dev restart 14:06 → last commit 16:55 + close-out; commits `c8a0a04` 14:14 → `f6c37e5` 16:55). **Active desk time: ASK ADINDA — session closed with a headache, figure not yet given.** | Highly interactive like 2026-07-21 (live per-section QA, 3 sections + 2 tools shipped in one block) but WITH script/restart latency (5 clean restarts, ~8 seed scripts) — expect active < elapsed. Two same-day model reversals (numeric order → drag array; overviewBody → excerpt) both cost ~15 min each because content was re-seedable — the vertical-slice bet paying off, worth citing in estimates. |
 | 2026-07-16 | Session-bookend protocol locked into CLAUDE.md + first full chat-side skills-update round: all 4 skills (drk-website, atlas-website, mari-website, mari-project) ported, installed, verified, archived, handoffs reconciled | **~1h elapsed (Adinda's estimate); active time notably lower** — she finished her kanji reviews in between, so this is an elapsed figure, not active. | **Calibration for skills-update rounds specifically:** a full 4-skill update round is heavily parallelizable with the user's other tasks. The heavy lifting was Claude-side (assembling self-contained payloads, verification greps, install/archive/reconcile), so Adinda's active involvement was mostly the chat-side paste + re-export + Downloads steps — she could step away during payload prep and Claude-side install/verify. Good template for future rounds: elapsed ≈ 1h for 4 skills, active user time a fraction of that. Distinct from the build-session rows above (those need active review/response). |
 
 ---

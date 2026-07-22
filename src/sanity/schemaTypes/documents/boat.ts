@@ -1,6 +1,7 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { AutoSlugInput } from '../../components/AutoSlugInput'
+import { RichTextCharCountInput } from '../../components/RichTextCharCountInput'
 import { sharedComponentNote } from '../../components/SharedComponentNote'
 import { GALLERY_CATEGORIES } from '../galleryCategories'
 
@@ -138,6 +139,10 @@ export const boatType = defineType({
       fieldset: 'cardsFs',
       description:
         'A short paragraph or two shown where this boat appears as a card — not the full overview. About 500 characters fits the card best.',
+      components: { input: RichTextCharCountInput },
+      // maxLength is the custom option the counter reads — same cast as seo.ts.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      options: { maxLength: 500 } as any,
       // Recommended length as a WARNING (Adinda, 2026-07-22: Mari's ~470-char summary is the
       // ideal, "maybe one more line" — not a hard rule). This is rich text, so the plain
       // CharCountInput can't attach; a custom warning totalling the span text is the equivalent.

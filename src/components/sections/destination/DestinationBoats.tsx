@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Image from 'next/image'
 
 import { CarouselArrowButton } from '@/components/CarouselArrowButton'
@@ -44,6 +44,11 @@ export function DestinationBoats({
   ctaText?: string
 }) {
   const [index, setIndex] = useState(0)
+  // Touch swipe on the image steps boats (Adinda, 2026-07-22). The image is a LINK, so a swipe
+  // must also suppress the click that follows pointerup — the ref flag is read (and reset) in
+  // onClick. Touch-only: desktop has the arrows, and a mouse-drag-on-link would fight
+  // click-to-navigate.
+  const swipe = useRef<{ startX: number; suppressClick: boolean } | null>(null)
 
   if (!boats.length) return null
 
@@ -116,7 +121,26 @@ export function DestinationBoats({
           <a
             href={`/boats/${boat.slug}`}
             aria-label={`More about ${boat.name ?? 'this boat'}`}
-            className="group/photo relative block aspect-[3/2] w-full shrink-0 overflow-hidden lg:mt-64 lg:aspect-auto lg:h-[472px] lg:w-[640px]"
+            onPointerDown={(e) => {
+              if (e.pointerType === 'touch') swipe.current = { startX: e.clientX, suppressClick: false }
+            }}
+            onPointerUp={(e) => {
+              if (e.pointerType !== 'touch' || !swipe.current) return
+              const dx = e.clientX - swipe.current.startX
+              if (Math.abs(dx) >= 50 && boats.length > 1) {
+                step(dx < 0 ? 1 : -1)
+                swipe.current.suppressClick = true
+              }
+            }}
+            onClick={(e) => {
+              if (swipe.current?.suppressClick) {
+                e.preventDefault()
+                swipe.current = null
+              }
+            }}
+            /* [touch-action:pan-y]: vertical page scroll stays native, horizontal swipes reach
+               the handlers above. */
+            className="group/photo relative block aspect-[3/2] w-full shrink-0 overflow-hidden [touch-action:pan-y] lg:mt-64 lg:aspect-auto lg:h-[472px] lg:w-[640px]"
           >
             <Image
               {...sanityImageProps(image, '/assets/placeholder-photo.svg')}
