@@ -162,7 +162,7 @@ export const DESTINATION_QUERY = groq`{
   },
   "defaults": *[_id == "destinationDefaults"][0]{
     overviewEyebrow,
-    galleryEyebrow, galleryTitle,
+    galleryCtaText,
     itinerariesEyebrow, itinerariesHeading,
     upcomingTripsEyebrow, upcomingTripsHeading, upcomingTripsIntro, upcomingTripsCtaText,
     faqEyebrow, faqHeading, faqLinkText,
@@ -481,8 +481,7 @@ export type DestinationData = {
 // {destination} token — resolve with resolveTokens() before rendering, never pass straight through.
 export type DestinationDefaultsData = {
   overviewEyebrow?: string
-  galleryEyebrow?: string
-  galleryTitle?: string
+  galleryCtaText?: string
   itinerariesEyebrow?: string
   itinerariesHeading?: string
   upcomingTripsEyebrow?: string

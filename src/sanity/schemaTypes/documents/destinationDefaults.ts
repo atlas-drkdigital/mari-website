@@ -63,21 +63,18 @@ export const destinationDefaultsType = defineType({
       description: 'Kicker above the Overview heading. The Overview heading itself is written per destination.',
       initialValue: '{destination} Liveaboard Indonesia Overview',
     }),
+    // galleryEyebrow + galleryTitle REMOVED 2026-07-22 (Adinda) — the destination gallery is a
+    // full-bleed grid with NO visible heading (mock 778:8677), so both fields were controls wired
+    // to nothing. The section's accessible (sr-only) name reuses subnavGalleryLabel below — one
+    // field, one concept. The button label below is the section's only visible chrome.
     defineField({
-      name: 'galleryEyebrow',
-      title: 'Gallery eyebrow',
+      name: 'galleryCtaText',
+      title: 'Gallery button label',
       type: 'string',
       fieldset: 'gallery',
       group: 'gallery',
-      initialValue: 'Discover the best',
-    }),
-    defineField({
-      name: 'galleryTitle',
-      title: 'Gallery heading',
-      type: 'string',
-      fieldset: 'gallery',
-      group: 'gallery',
-      initialValue: 'Gallery',
+      description: 'The button floating on the gallery grid — opens the full-screen gallery.',
+      initialValue: 'View All Images',
     }),
     defineField({
       name: 'itinerariesEyebrow',

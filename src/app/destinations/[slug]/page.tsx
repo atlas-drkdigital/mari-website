@@ -116,8 +116,14 @@ export default async function DestinationPage({ params }: { params: Promise<Para
         </div>
         <DestinationOverview destination={destination} eyebrow={t(defaults?.overviewEyebrow)} />
         {/* Mock order (778:8608): Overview → Gallery → Itineraries → Trips → FAQ → Boats.
-            Gallery is the full-bleed grid; its subnav item is guarded on the same array above. */}
-        <DestinationGallery images={destination.gallery ?? []} title={t(defaults?.galleryTitle)} />
+            Gallery is the full-bleed grid; its subnav item is guarded on the same array above.
+            `title` is the sr-only accessible name — deliberately the SAME field as the subnav
+            label (no visible heading on this section, and no separate field to orphan). */}
+        <DestinationGallery
+          images={destination.gallery ?? []}
+          title={t(defaults?.subnavGalleryLabel)}
+          ctaText={t(defaults?.galleryCtaText)}
+        />
         <DestinationTrips
           eyebrow={t(defaults?.upcomingTripsEyebrow)}
           heading={t(defaults?.upcomingTripsHeading)}
