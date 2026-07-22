@@ -189,14 +189,14 @@ export function DestinationOverview({
               ))}
             </div>
 
-            {/* Caption layout (Adinda, 2026-07-22, third iteration — this one's hers): the whole
-                text stack (eyebrow + title + description) is ONE left column that never runs under
-                the arrows, and the arrows are a right column vertically centered on that stack.
-                Keeps the tight title→description gap (the title-row-only centering inflated it —
-                the 52px buttons stretched the row). */}
-            <div className="flex items-center gap-12">
-              <div className="flex min-w-0 flex-1 flex-col gap-16">
-                <div className="flex flex-col gap-8">
+            {/* Caption layout (Adinda, 2026-07-22, final): arrows vertically centered on the
+                EYEBROW + HEADING block; the description sits below at the TITLE'S width — the
+                pr matches the arrows column (2 buttons + gaps: 96px mobile, 128px lg, both
+                on-scale) so copy never runs underneath the buttons and the title→description
+                gap stays the standard 16. */}
+            <div className="flex flex-col gap-16">
+              <div className="flex items-center gap-12">
+                <div className="flex min-w-0 flex-1 flex-col gap-8">
                   <p className="text-eyebrow uppercase text-action-primary">
                     Highlight
                     {/* beige-400 — no semantic token, see header. */}
@@ -204,16 +204,16 @@ export function DestinationOverview({
                   </p>
                   <h3 className="text-editorial-h3 text-text-primary">{active?.title}</h3>
                 </div>
-                {active?.body ? (
-                  <div className="flex flex-col gap-16 text-body-large text-text-primary">
-                    <RichText value={active.body} />
+                {highlights.length > 1 ? (
+                  <div className="flex shrink-0 gap-12">
+                    <CarouselArrowButton direction="prev" onClick={() => goTo(highlightIndex - 1)} ariaLabel="Previous highlight" />
+                    <CarouselArrowButton direction="next" onClick={() => goTo(highlightIndex + 1)} ariaLabel="Next highlight" />
                   </div>
                 ) : null}
               </div>
-              {highlights.length > 1 ? (
-                <div className="flex shrink-0 gap-12">
-                  <CarouselArrowButton direction="prev" onClick={() => goTo(highlightIndex - 1)} ariaLabel="Previous highlight" />
-                  <CarouselArrowButton direction="next" onClick={() => goTo(highlightIndex + 1)} ariaLabel="Next highlight" />
+              {active?.body ? (
+                <div className="flex flex-col gap-16 pr-96 text-body-large text-text-primary lg:pr-128">
+                  <RichText value={active.body} />
                 </div>
               ) : null}
             </div>
