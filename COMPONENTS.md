@@ -39,6 +39,7 @@ Status: 🟢 extracted/shared · 🔵 reusable file (single-use here, copy-&-ada
 |---|---|---|---|
 | `SubNav` (+ scroll chrome) | `components/SubNav.tsx` | 🟢 | Locked pattern; reuse as-is. Destination reuses. |
 | `Accordion` (`AccordionChevron`, `FaqAccordionItem`) | `components/Accordion.tsx` | 🟢 | Shared by both FAQ layouts + Specs chevron. Destination FAQ reuses. |
+| `CarouselArrowButton` | `components/CarouselArrowButton.tsx` | 🟢 | THE round prev/next arrow (tailed `icon-arrow-forward`, 36→52px, 3 variants). Extracted 2026-07-22 at 3rd consumer; Testimonials + Destinations + DestinationOverview all use it. NOT the chevron — that's `CarouselChevron`, for controls inside image carousels. |
 | `CarouselChevron` | `components/CarouselChevron.tsx` | 🟢 | Circular arrow; masks the shared nav-chevron asset. |
 | `HeroVideo` | `components/HeroVideo.tsx` | 🟢 | Optional hero bg video island. |
 | `SiteLightbox` | `components/SiteLightbox.tsx` | 🟢 | Fullscreen lightbox wrapper. |

@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
+import { CarouselArrowButton } from '@/components/CarouselArrowButton'
 import { useDragScroll } from '@/lib/useDragScroll'
 import type { HomePageData } from '@/sanity/queries'
 
@@ -213,24 +214,23 @@ export function Testimonials({ home }: { home: HomePageData | null }) {
             ))}
           </div>
 
+          {/* Shared CarouselArrowButton (extracted 2026-07-22) — positioning stays here. */}
           {arrowsVisible && (
             <>
-              <button
-                type="button"
+              <CarouselArrowButton
+                direction="prev"
                 onClick={() => goTo(-1)}
-                aria-label="Previous testimonial"
-                className="group absolute left-0 top-1/2 z-10 grid size-[36px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-bg-surface shadow-[0px_4px_10px_rgba(44,37,34,0.2)] transition-opacity duration-300 ease-in-out hover:opacity-85 lg:size-[52px]"
-              >
-                <span aria-hidden="true" className="block size-[16px] rotate-180 bg-text-primary transition-transform duration-300 ease-in-out group-hover:scale-105 [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
-              </button>
-              <button
-                type="button"
+                ariaLabel="Previous testimonial"
+                variant="surface"
+                className="absolute left-0 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
+              />
+              <CarouselArrowButton
+                direction="next"
                 onClick={() => goTo(1)}
-                aria-label="Next testimonial"
-                className="group absolute right-0 top-1/2 z-10 grid size-[36px] -translate-y-1/2 translate-x-1/2 place-items-center rounded-full bg-bg-surface shadow-[0px_4px_10px_rgba(44,37,34,0.2)] transition-opacity duration-300 ease-in-out hover:opacity-85 lg:size-[52px]"
-              >
-                <span aria-hidden="true" className="block size-[16px] bg-text-primary transition-transform duration-300 ease-in-out group-hover:scale-105 [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
-              </button>
+                ariaLabel="Next testimonial"
+                variant="surface"
+                className="absolute right-0 top-1/2 z-10 -translate-y-1/2 translate-x-1/2"
+              />
             </>
           )}
         </div>

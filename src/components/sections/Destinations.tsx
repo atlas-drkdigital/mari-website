@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
+import { CarouselArrowButton } from '@/components/CarouselArrowButton'
 import { useDragScroll } from '@/lib/useDragScroll'
 import { sanityImageProps } from '@/sanity/lib/image'
 import type { DestinationCardData } from '@/sanity/queries'
@@ -88,13 +89,10 @@ export function Destinations({ destinations }: { destinations: DestinationCardDa
             </button>
           ))}
         </div>
+        {/* Shared CarouselArrowButton (extracted 2026-07-22). */}
         <div className="flex shrink-0 gap-[9px]">
-          <button type="button" onClick={() => goTo(index - 1)} aria-label="Previous destination" className="group grid size-[36px] shrink-0 place-items-center rounded-full border border-bg-surface text-text-ondark-primary transition-colors duration-300 ease-in-out hover:bg-text-ondark-primary/10 lg:size-[52px]">
-            <span aria-hidden="true" className="block size-[16px] rotate-180 bg-text-ondark-primary transition-transform duration-300 ease-in-out group-hover:scale-105 [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
-          </button>
-          <button type="button" onClick={() => goTo(index + 1)} aria-label="Next destination" className="group grid size-[36px] shrink-0 place-items-center rounded-full border border-bg-surface text-text-ondark-primary transition-colors duration-300 ease-in-out hover:bg-text-ondark-primary/10 lg:size-[52px]">
-            <span aria-hidden="true" className="block size-[16px] bg-text-ondark-primary transition-transform duration-300 ease-in-out group-hover:scale-105 [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
-          </button>
+          <CarouselArrowButton direction="prev" onClick={() => goTo(index - 1)} ariaLabel="Previous destination" variant="outline-ondark" />
+          <CarouselArrowButton direction="next" onClick={() => goTo(index + 1)} ariaLabel="Next destination" variant="outline-ondark" />
         </div>
       </div>
 

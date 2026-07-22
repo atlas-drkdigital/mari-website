@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 
-import { CarouselChevron } from '@/components/CarouselChevron'
+import { CarouselArrowButton } from '@/components/CarouselArrowButton'
 import { RichText } from '@/components/RichText'
 import { sanityImageProps } from '@/sanity/lib/image'
 import type { DestinationData } from '@/sanity/queries'
@@ -16,9 +16,10 @@ import type { DestinationData } from '@/sanity/queries'
 //     pattern, copied verbatim — measured max-height collapse, fade mask, collapse-scrolls-to-
 //     section-top, button only when actually clipped.
 //   - RIGHT: the highlights carousel — image + "HIGHLIGHT/NN" caption + title + descriptor, cycled
-//     by the paired 52px outline arrows (homepage Destinations' arrow expression + the shared
-//     CarouselChevron glyph; Figma's heavier arrow icon is deliberately NOT used, see
-//     CarouselChevron.tsx).
+//     by the paired arrows (shared CarouselArrowButton, THE standard tailed-arrow control — a
+//     chevron shipped here first and Adinda caught it, 2026-07-22) AND by swipe on the image
+//     (the homepage Destinations' pointer-drag pattern; arrows and drag both work, per the
+//     site-wide carousel convention). Arrows align to the highlight TITLE line, not the eyebrow.
 //
 // From the node (no established name existed): right column w-[458px], image aspect-[458/366.4],
 // image→caption gap-32, caption block gap-8/16, arrows pt-32. Everything with an established name
@@ -74,6 +75,10 @@ export function DestinationOverview({
     if (!count) return
     setHighlightIndex(((next % count) + count) % count)
   }
+
+  // Swipe on the highlight image — verbatim the homepage Destinations drag pattern (threshold 50,
+  // touch-action:pan-y so vertical page scroll stays native).
+  const dragState = useRef({ dragging: false, startX: 0, moved: 0 })
 
   const active = highlights[highlightIndex]
 
@@ -139,8 +144,26 @@ export function DestinationOverview({
         {highlights.length ? (
           <div data-reveal className="flex w-full flex-col gap-32 lg:w-[458px] lg:shrink-0">
             {/* All highlight images stay mounted; the active one fades in — same crossfade model as
-                the homepage Destinations backgrounds, so switching never flashes white. */}
-            <div className="relative aspect-[458/366.4] w-full overflow-hidden">
+                the homepage Destinations backgrounds, so switching never flashes white. Swipeable
+                like every other carousel on the site. */}
+            <div
+              className="relative aspect-[458/366.4] w-full cursor-grab overflow-hidden select-none [touch-action:pan-y] active:cursor-grabbing"
+              onPointerDown={(e) => {
+                dragState.current = { dragging: true, startX: e.clientX, moved: 0 }
+              }}
+              onPointerMove={(e) => {
+                if (!dragState.current.dragging) return
+                dragState.current.moved = e.clientX - dragState.current.startX
+              }}
+              onPointerUp={() => {
+                if (!dragState.current.dragging) return
+                dragState.current.dragging = false
+                const THRESHOLD = 50
+                const { moved } = dragState.current
+                if (moved <= -THRESHOLD) goTo(highlightIndex + 1)
+                else if (moved >= THRESHOLD) goTo(highlightIndex - 1)
+              }}
+            >
               {highlights.map((h, i) => (
                 <Image
                   key={h._key}
@@ -155,41 +178,28 @@ export function DestinationOverview({
               ))}
             </div>
 
-            <div className="flex items-start gap-12">
-              <div className="flex min-w-0 flex-1 flex-col gap-16">
-                <div className="flex flex-col gap-8">
-                  <p className="text-eyebrow uppercase text-action-primary">
-                    Highlight
-                    {/* beige-400 — no semantic token, see header. */}
-                    <span className="text-[#c9b89a]">/{String(highlightIndex + 1).padStart(2, '0')}</span>
-                  </p>
-                  <h3 className="text-editorial-h3 text-text-primary">{active?.title}</h3>
+            <div className="flex flex-col gap-16">
+              <div className="flex flex-col gap-8">
+                <p className="text-eyebrow uppercase text-action-primary">
+                  Highlight
+                  {/* beige-400 — no semantic token, see header. */}
+                  <span className="text-[#c9b89a]">/{String(highlightIndex + 1).padStart(2, '0')}</span>
+                </p>
+                {/* Arrows sit ON the title row, centered against the heading itself — not the
+                    eyebrow (Adinda, 2026-07-22, matching the section-heading+arrows pattern). */}
+                <div className="flex items-center justify-between gap-12">
+                  <h3 className="min-w-0 flex-1 text-editorial-h3 text-text-primary">{active?.title}</h3>
+                  {highlights.length > 1 ? (
+                    <div className="flex shrink-0 gap-12">
+                      <CarouselArrowButton direction="prev" onClick={() => goTo(highlightIndex - 1)} ariaLabel="Previous highlight" />
+                      <CarouselArrowButton direction="next" onClick={() => goTo(highlightIndex + 1)} ariaLabel="Next highlight" />
+                    </div>
+                  ) : null}
                 </div>
-                {active?.body ? (
-                  <div className="flex flex-col gap-16 text-body-large text-text-primary">
-                    <RichText value={active.body} />
-                  </div>
-                ) : null}
               </div>
-
-              {highlights.length > 1 ? (
-                <div className="flex shrink-0 items-start gap-12 pt-32">
-                  <button
-                    type="button"
-                    onClick={() => goTo(highlightIndex - 1)}
-                    aria-label="Previous highlight"
-                    className="grid size-[52px] shrink-0 place-items-center rounded-full border border-text-primary text-text-primary transition-colors duration-300 ease-in-out hover:bg-text-primary/5"
-                  >
-                    <CarouselChevron direction="left" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => goTo(highlightIndex + 1)}
-                    aria-label="Next highlight"
-                    className="grid size-[52px] shrink-0 place-items-center rounded-full border border-text-primary text-text-primary transition-colors duration-300 ease-in-out hover:bg-text-primary/5"
-                  >
-                    <CarouselChevron direction="right" />
-                  </button>
+              {active?.body ? (
+                <div className="flex flex-col gap-16 text-body-large text-text-primary">
+                  <RichText value={active.body} />
                 </div>
               ) : null}
             </div>
