@@ -163,7 +163,7 @@ export const DESTINATION_QUERY = groq`{
   "defaults": *[_id == "destinationDefaults"][0]{
     overviewEyebrow,
     galleryCtaText,
-    itinerariesEyebrow, itinerariesHeading,
+    itinerariesEyebrow, itinerariesHeading, itinerariesCardCtaText,
     upcomingTripsEyebrow, upcomingTripsHeading, upcomingTripsIntro, upcomingTripsCtaText,
     faqEyebrow, faqHeading, faqLinkText,
     boatsEyebrow, boatsHeading,
@@ -171,8 +171,9 @@ export const DESTINATION_QUERY = groq`{
     subnavOverviewLabel, subnavGalleryLabel, subnavItinerariesLabel,
     subnavFaqLabel, subnavTripsLabel
   },
-  "itineraries": *[_type == "itinerary" && destination->slug.current == $slug] | order(title asc){
-    _id, title, duration, route, highlights, summary
+  "itineraries": *[_type == "itinerary" && destination->slug.current == $slug] | order(coalesce(order, 999) asc, title asc){
+    _id, title, season, duration, route, highlights, summary,
+    image${IMAGE}
   },
   "sharedFaqSections": *[_id == "faqGeneral"][0].categories[showOnDestinationPages == true]{
     _key, title, questions[]{ question, answer }
@@ -484,6 +485,7 @@ export type DestinationDefaultsData = {
   galleryCtaText?: string
   itinerariesEyebrow?: string
   itinerariesHeading?: string
+  itinerariesCardCtaText?: string
   upcomingTripsEyebrow?: string
   upcomingTripsHeading?: string
   upcomingTripsIntro?: string
@@ -506,10 +508,12 @@ export type DestinationDefaultsData = {
 export type ItineraryCardData = {
   _id: string
   title?: string
+  season?: string
   duration?: string
   route?: string
   highlights?: string[]
   summary?: string
+  image?: SanityImageWithMeta
 }
 
 export type DestinationQueryResult = {

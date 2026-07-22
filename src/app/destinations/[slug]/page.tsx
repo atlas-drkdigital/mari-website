@@ -7,6 +7,7 @@ import { Contact } from '@/components/sections/Contact'
 import { Cta } from '@/components/sections/Cta'
 import { DestinationGallery } from '@/components/sections/destination/DestinationGallery'
 import { DestinationHero } from '@/components/sections/destination/DestinationHero'
+import { DestinationItineraries } from '@/components/sections/destination/DestinationItineraries'
 import { DestinationOverview } from '@/components/sections/destination/DestinationOverview'
 import { DestinationTrips } from '@/components/sections/destination/DestinationTrips'
 import { FaqCategorized } from '@/components/sections/FaqCategorized'
@@ -123,6 +124,13 @@ export default async function DestinationPage({ params }: { params: Promise<Para
           images={destination.gallery ?? []}
           title={t(defaults?.subnavGalleryLabel)}
           ctaText={t(defaults?.galleryCtaText)}
+        />
+        <DestinationItineraries
+          itineraries={itineraries ?? []}
+          eyebrow={t(defaults?.itinerariesEyebrow)}
+          heading={t(defaults?.itinerariesHeading)}
+          cardCtaText={t(defaults?.itinerariesCardCtaText)}
+          hasTripsTarget={hasTripsEmbed}
         />
         <DestinationTrips
           eyebrow={t(defaults?.upcomingTripsEyebrow)}

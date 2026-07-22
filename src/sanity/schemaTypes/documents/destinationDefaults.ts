@@ -92,6 +92,15 @@ export const destinationDefaultsType = defineType({
       initialValue: '{destination} liveaboard itineraries',
     }),
     defineField({
+      name: 'itinerariesCardCtaText',
+      title: 'Itinerary card button label',
+      type: 'string',
+      fieldset: 'itineraries',
+      group: 'itineraries',
+      description: 'The link revealed on an itinerary card — jumps to the Upcoming Trips section.',
+      initialValue: 'View Full {destination} Schedule',
+    }),
+    defineField({
       name: 'upcomingTripsEyebrow',
       title: 'Upcoming Trips eyebrow',
       type: 'string',
