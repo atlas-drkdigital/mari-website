@@ -77,6 +77,8 @@ export function DestinationItineraries({
 
   const trackRef = useDragScroll<HTMLDivElement>()
   const settleTimer = useRef<number | null>(null)
+  // Where a touch started, for the tap-vs-swipe test in the pointer handlers below.
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
     const mq = window.matchMedia('(hover: hover) and (pointer: fine)')
@@ -195,9 +197,34 @@ export function DestinationItineraries({
                   aria-hidden={isClone || undefined}
                   onMouseEnter={hasHover ? () => setActiveId(card._id) : undefined}
                   onFocus={hasHover ? () => setActiveId(card._id) : undefined}
-                  onClick={
+                  /* Touch reveal rides POINTERUP, not click (fixed 2026-07-22, Adinda's catch:
+                     "I have to tap twice"). iOS Safari consumes the first tap on hover-reactive
+                     content as hover-emulation and only delivers `click` on the second — pointer
+                     events have no such heuristic, so pointerup fires on every tap. The ≤10px
+                     movement test is what keeps carousel swipes from toggling the card they
+                     started on; taps inside the CTA <a> are skipped so navigating doesn't also
+                     collapse the card (the closest() test replaces the old stopPropagation-on-
+                     click, which pointerup would bypass). */
+                  onPointerDown={
                     !hasHover
-                      ? () => setActiveId((cur) => (cur === card._id ? null : card._id))
+                      ? (e) => {
+                          if (e.pointerType === 'touch') touchStart.current = { x: e.clientX, y: e.clientY }
+                        }
+                      : undefined
+                  }
+                  onPointerUp={
+                    !hasHover
+                      ? (e) => {
+                          if (e.pointerType !== 'touch' || !touchStart.current) return
+                          const moved = Math.hypot(
+                            e.clientX - touchStart.current.x,
+                            e.clientY - touchStart.current.y,
+                          )
+                          touchStart.current = null
+                          if (moved > 10) return
+                          if ((e.target as HTMLElement).closest('a')) return
+                          setActiveId((cur) => (cur === card._id ? null : card._id))
+                        }
                       : undefined
                   }
                   /* Mobile height is dvh-based, not an aspect ratio (Adinda, 2026-07-22): "a
@@ -280,10 +307,6 @@ export function DestinationItineraries({
                         <a
                           href="#upcoming-trips"
                           tabIndex={isClone || !isOpen ? -1 : undefined}
-                          /* stopPropagation: on touch the card's own onClick toggles the open
-                             state — without this, tapping the CTA would close the card in the
-                             same gesture that navigates. */
-                          onClick={(e) => e.stopPropagation()}
                           className={`group/cta border-b border-border-onimage-primary py-4 ${
                             isOpen ? 'pointer-events-auto' : ''
                           }`}

@@ -52,8 +52,13 @@ export function DestinationTrips({
 
         {/* Card chrome mirrors the Testimonials cards (same surface + shadow — Adinda's ask).
             EmbedHtml, not dangerouslySetInnerHTML: the INSEANQ embed is a loader <script>, and
-            innerHTML-inserted scripts never execute — the widget silently stayed blank. */}
-        <div data-reveal className="w-full bg-bg-surface p-16 shadow-[0px_4px_10px_rgba(44,37,34,0.2)] lg:p-24">
+            innerHTML-inserted scripts never execute — the widget silently stayed blank.
+            MOBILE FULL-BLEED (Adinda, 2026-07-22: "feels very narrow"): negative margins exactly
+            cancel the wrapper's px-24, NOT w-screen/100vw — vw includes the scrollbar and is the
+            past horizontal-scroll bug. self-stretch (not w-full) is load-bearing: in this flex
+            column a stretched item's width is container + negative margins, while w-full would
+            pin it to container width and only shift it left. md+ restores the gutters. */}
+        <div data-reveal className="-mx-24 self-stretch bg-bg-surface p-16 shadow-[0px_4px_10px_rgba(44,37,34,0.2)] md:mx-0 lg:p-24">
           <EmbedHtml html={embedHtml} />
         </div>
 
