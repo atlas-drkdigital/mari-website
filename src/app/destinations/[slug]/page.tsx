@@ -5,6 +5,7 @@ import { Nav } from '@/components/Nav'
 import { ScrollReveal } from '@/components/ScrollReveal'
 import { Contact } from '@/components/sections/Contact'
 import { Cta } from '@/components/sections/Cta'
+import { DestinationGallery } from '@/components/sections/destination/DestinationGallery'
 import { DestinationHero } from '@/components/sections/destination/DestinationHero'
 import { DestinationOverview } from '@/components/sections/destination/DestinationOverview'
 import { DestinationTrips } from '@/components/sections/destination/DestinationTrips'
@@ -114,6 +115,9 @@ export default async function DestinationPage({ params }: { params: Promise<Para
           />
         </div>
         <DestinationOverview destination={destination} eyebrow={t(defaults?.overviewEyebrow)} />
+        {/* Mock order (778:8608): Overview → Gallery → Itineraries → Trips → FAQ → Boats.
+            Gallery is the full-bleed grid; its subnav item is guarded on the same array above. */}
+        <DestinationGallery images={destination.gallery ?? []} title={t(defaults?.galleryTitle)} />
         <DestinationTrips
           eyebrow={t(defaults?.upcomingTripsEyebrow)}
           heading={t(defaults?.upcomingTripsHeading)}
