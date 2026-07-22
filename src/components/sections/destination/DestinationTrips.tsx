@@ -1,5 +1,7 @@
-// Figma 774:7626 (Upcoming Trips / booking widget shell). Server Component — no interactivity;
-// the embed's own script (INSEANQ, once real) brings its own.
+import { EmbedHtml } from '@/components/EmbedHtml'
+
+// Figma 774:7626 (Upcoming Trips / booking widget shell). Server Component shell; the embed itself
+// mounts client-side via EmbedHtml (its <script> must execute — see that component's header).
 //
 // This is a SHELL by design (Adinda, 2026-07-22): section chrome from Destination Defaults around
 // a raw per-destination embed slot. The embed area renders whatever HTML the editor pastes —
@@ -35,15 +37,25 @@ export function DestinationTrips({
       className="relative isolate w-full scroll-mt-[70px] bg-bg-page pt-80 pb-80 lg:scroll-mt-[110px] lg:pt-160 lg:pb-160"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] bg-repeat opacity-20" />
-      <div className="mx-auto flex w-full max-w-[1400px] flex-col items-center gap-[36px] page-gutter-x lg:gap-64">
+      {/* Gutter override for THIS section only (Adinda, 2026-07-22, trial — "still not sure"):
+          160px sides on desktop instead of page-gutter's 80, so the widget doesn't run full
+          content width. Mobile/tablet keep the standard page-gutter values (24/48) — she signed
+          off mobile as-is. Not page-gutter-x because a lg:px-* can't reliably override it. */}
+      <div className="mx-auto flex w-full max-w-[1400px] flex-col items-center gap-[36px] px-24 md:px-48 lg:gap-64 lg:px-[160px]">
         <div data-reveal className="flex flex-col items-center gap-24 text-center lg:gap-32">
           <p className="text-eyebrow uppercase text-action-primary">{eyebrow}</p>
-          <h2 id="upcoming-trips-heading" className="max-w-[720px] text-display-h2 text-text-primary">{heading}</h2>
+          {/* 800px cap is a one-off exception (Adinda, 2026-07-22): at 720 the templated heading
+              ("Upcoming {destination} liveaboard trips") wrapped awkwardly. Desktop only. */}
+          <h2 id="upcoming-trips-heading" className="max-w-[720px] text-display-h2 text-text-primary lg:max-w-[800px]">{heading}</h2>
           {intro ? <p className="max-w-[560px] text-body-medium text-text-secondary lg:text-body-large">{intro}</p> : null}
         </div>
 
-        {/* The embed owns everything inside this box — sizing, styling, scripts. */}
-        <div data-reveal className="w-full" dangerouslySetInnerHTML={{ __html: embedHtml }} />
+        {/* Card chrome mirrors the Testimonials cards (same surface + shadow — Adinda's ask).
+            EmbedHtml, not dangerouslySetInnerHTML: the INSEANQ embed is a loader <script>, and
+            innerHTML-inserted scripts never execute — the widget silently stayed blank. */}
+        <div data-reveal className="w-full bg-bg-surface p-16 shadow-[0px_4px_10px_rgba(44,37,34,0.2)] lg:p-24">
+          <EmbedHtml html={embedHtml} />
+        </div>
 
         {ctaText ? (
           <a

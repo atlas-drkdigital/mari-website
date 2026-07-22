@@ -145,10 +145,21 @@ export function SubNav({ items, className = '' }: { items: SubNavItem[]; classNa
     const targets = targetsKey.split(' ')
     const observer = new IntersectionObserver(
       () => {
+        // "Last section whose top has passed the line" must be measured by POSITION, not by items
+        // order — the destination page's subnav lists FAQ before Upcoming Trips (mock order) while
+        // the sections sit Trips-then-FAQ in the document, and the old order-dependent loop kept
+        // Trips active forever once passed (Adinda, 2026-07-22). Picking the max top <= line is
+        // order-independent for any items/DOM arrangement.
         let current: string | null = null
+        let best = -Infinity
         for (const id of targets) {
           const el = document.getElementById(id)
-          if (el && el.getBoundingClientRect().top <= line()) current = id
+          if (!el) continue
+          const top = el.getBoundingClientRect().top
+          if (top <= line() && top > best) {
+            best = top
+            current = id
+          }
         }
         setActiveTarget(current)
       },

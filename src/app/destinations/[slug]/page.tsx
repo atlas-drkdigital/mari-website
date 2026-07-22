@@ -6,6 +6,7 @@ import { ScrollReveal } from '@/components/ScrollReveal'
 import { Contact } from '@/components/sections/Contact'
 import { Cta } from '@/components/sections/Cta'
 import { DestinationHero } from '@/components/sections/destination/DestinationHero'
+import { DestinationOverview } from '@/components/sections/destination/DestinationOverview'
 import { DestinationTrips } from '@/components/sections/destination/DestinationTrips'
 import { FaqCategorized } from '@/components/sections/FaqCategorized'
 import { Footer } from '@/components/sections/Footer'
@@ -112,6 +113,7 @@ export default async function DestinationPage({ params }: { params: Promise<Para
             className="absolute inset-x-0 bottom-0 z-20 w-full"
           />
         </div>
+        <DestinationOverview destination={destination} eyebrow={t(defaults?.overviewEyebrow)} />
         <DestinationTrips
           eyebrow={t(defaults?.upcomingTripsEyebrow)}
           heading={t(defaults?.upcomingTripsHeading)}
