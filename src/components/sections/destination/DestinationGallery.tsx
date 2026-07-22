@@ -118,7 +118,9 @@ export function DestinationGallery({
           <button
             type="button"
             onClick={() => openLightbox(0)}
-            className="group absolute bottom-48 left-1/2 inline-flex h-48 -translate-x-1/2 items-center gap-8 rounded-full bg-bg-surface px-24 text-button-small whitespace-nowrap uppercase text-action-primary shadow-[0px_4px_10px_rgba(44,37,34,0.2)] transition-opacity duration-300 ease-in-out hover:opacity-85 lg:bottom-64"
+            /* px-16 was px-24 — compacted on Adinda's call 2026-07-22 ("not bad, just trying a
+               polish"); if the pill reads cramped, 24 is the value to restore. */
+            className="group absolute bottom-48 left-1/2 inline-flex h-48 -translate-x-1/2 items-center gap-8 rounded-full bg-bg-surface px-16 text-button-small whitespace-nowrap uppercase text-action-primary shadow-[0px_4px_10px_rgba(44,37,34,0.2)] transition-opacity duration-300 ease-in-out hover:opacity-85 lg:bottom-64"
           >
             {ctaText}
             <span

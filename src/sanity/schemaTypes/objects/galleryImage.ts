@@ -44,6 +44,14 @@ export const galleryImageType = defineType({
       options: {
         list: [...GALLERY_CATEGORIES],
       },
+      // BOAT DOCUMENTS ONLY (Adinda's catch, 2026-07-22): categories exist to feed the boat
+      // gallery's tabs. The destination gallery is a flat grid with no tabs, so on a
+      // `destination` doc this field was a control wired to nothing — an editor tagging
+      // "Dining" there would see no effect anywhere. `hidden` gets the whole document as
+      // context, so one shared object type can show the field only where something consumes
+      // it. Opt-IN by type (=== 'boat', not !== 'destination') so any future gallery-bearing
+      // type starts clean and only shows categories once it actually renders tabs.
+      hidden: ({ document }) => document?._type !== 'boat',
       description: 'Which tabs this image appears under. Optional — one image can belong to several.',
     }),
   ],
