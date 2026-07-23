@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-import { CarouselArrowButton } from '@/components/CarouselArrowButton'
+import { CarouselChevron } from '@/components/CarouselChevron'
 import { RichText } from '@/components/RichText'
 import { sanityImageProps, urlForImage } from '@/sanity/lib/image'
 import type { AboutPageData, CrewMemberData } from '@/sanity/queries'
@@ -174,19 +174,12 @@ function CrewBioModal({
       }}
       onClick={onClose}
     >
-      {/* Arrows OUTSIDE the square card (Adinda, QA round 2: the modal is a carousel — step
-          through the crew without closing). stopPropagation lives on this wrapper so arrow
-          clicks never fall through to the scrim's close. */}
+      {/* Sized up from max-w 480 (Adinda: "fill it more"); the dvh term keeps the square on
+          screen on short viewports — width is the square's height. */}
       <div
-        className="flex w-full items-center justify-center gap-8 lg:gap-24"
+        className="relative w-full max-w-[min(640px,calc(100dvh-180px))] overflow-hidden rounded-xs shadow-[0px_4px_10px_rgba(44,37,34,0.2)]"
         onClick={(e) => e.stopPropagation()}
       >
-        {hasSiblings ? (
-          <CarouselArrowButton direction="prev" onClick={onPrev} ariaLabel="Previous crew member" variant="surface" />
-        ) : null}
-        {/* Sized up from max-w 480 (Adinda: "fill it more"); the dvh term keeps the square on
-            screen on short viewports — width is the square's height. */}
-        <div className="relative w-full min-w-0 max-w-[min(640px,calc(100dvh-180px))] overflow-hidden rounded-xs shadow-[0px_4px_10px_rgba(44,37,34,0.2)]">
         {/* The card IS the photo, SQUARE-cropped (Adinda, QA round 2: square card + square
             portrait — easier to provide a square photo; was 3:4); the bio overlays it on the
             bottom gradient band — the SiteLightbox caption treatment, per "overlay ON the image". */}
@@ -215,6 +208,33 @@ function CrewBioModal({
             </div>
             {member.bio ? <p className="text-body-medium text-text-ondark-primary">{member.bio}</p> : null}
           </div>
+
+          {/* On-image chevron pair — THE single-image-carousel standard (the boat gallery pair,
+              copied via ChartersBenefits: bare CarouselChevron + drop-shadow, inline style because
+              the filter's commas/parens mangle Tailwind's parser). Adinda 2026-07-24: replaces the
+              round outside arrows, which looked wrong flanking the card. */}
+          {hasSiblings ? (
+            <div className="pointer-events-none absolute inset-x-16 top-1/2 flex -translate-y-1/2 items-center justify-between">
+              <button
+                type="button"
+                onClick={onPrev}
+                aria-label="Previous crew member"
+                style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
+                className="group pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary"
+              >
+                <CarouselChevron direction="left" sizeClassName="h-[18.19px] w-[24px] transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
+              </button>
+              <button
+                type="button"
+                onClick={onNext}
+                aria-label="Next crew member"
+                style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
+                className="group pointer-events-auto flex size-[44px] items-center justify-center text-text-ondark-primary"
+              >
+                <CarouselChevron direction="right" sizeClassName="h-[18.19px] w-[24px] transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
+              </button>
+            </div>
+          ) : null}
         </div>
 
         <button
@@ -229,11 +249,6 @@ function CrewBioModal({
             className="block size-[16px] bg-current [mask-image:url('/assets/icon-close.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
           />
         </button>
-        </div>
-
-        {hasSiblings ? (
-          <CarouselArrowButton direction="next" onClick={onNext} ariaLabel="Next crew member" variant="surface" />
-        ) : null}
       </div>
     </div>,
     document.body

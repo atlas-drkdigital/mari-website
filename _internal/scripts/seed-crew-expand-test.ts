@@ -32,6 +32,42 @@ const EXTRA: { id: string; from: string; name: string; position: string; bio: st
     position: 'Chief Engineer',
     bio: 'Placeholder bio. Budi keeps Mari’s systems humming below deck, from compressors to generators, on every crossing.',
   },
+  // Round 2 (Adinda: "I need at least 12 — it is 12 people"): five more, photos keep cycling.
+  {
+    id: 'crewMember-placeholder-8',
+    from: 'crewMember-placeholder-4',
+    name: 'Wayan Sudarta',
+    position: 'Captain',
+    bio: 'Placeholder bio. Wayan has sailed the archipelago for two decades and knows every anchorage between Komodo and Raja Ampat.',
+  },
+  {
+    id: 'crewMember-placeholder-9',
+    from: 'crewMember-placeholder-1',
+    name: 'Made Arta',
+    position: 'Tender Driver',
+    bio: 'Placeholder bio. Made runs the tenders — divers dropped on the mark and picked up before they finish waving.',
+  },
+  {
+    id: 'crewMember-placeholder-10',
+    from: 'crewMember-placeholder-2',
+    name: 'Ketut Widana',
+    position: 'Deckhand',
+    bio: 'Placeholder bio. Ketut handles lines, sails and everything on deck, usually before anyone asks.',
+  },
+  {
+    id: 'crewMember-placeholder-11',
+    from: 'crewMember-placeholder-3',
+    name: 'Nyoman Yasa',
+    position: 'Sous Chef',
+    bio: 'Placeholder bio. Nyoman backs up the galley and bakes the bread guests ask about all week.',
+  },
+  {
+    id: 'crewMember-placeholder-12',
+    from: 'crewMember-placeholder-4',
+    name: 'Rizky Ramadhan',
+    position: 'Dive Guide',
+    bio: 'Placeholder bio. Rizky spots the small stuff — pygmy seahorses, candy crabs and the shrimp nobody else finds.',
+  },
 ]
 
 async function run() {
@@ -74,7 +110,18 @@ async function run() {
     console.log(`${docId}: appended ${missing.length} refs`)
   }
 
-  const check = await client.fetch(`*[_id == "aboutPage"][0]{ "crew": count(crewMembers) }`)
+  // Button texts: the dataset still carried "Meet the Team" from an earlier seed — Adinda's call
+  // 2026-07-24 is plain View More / View Less (matches the overview's Read More register).
+  for (const docId of ['aboutPage', 'drafts.aboutPage']) {
+    const exists = await client.fetch(`defined(*[_id == $id][0]._id)`, { id: docId })
+    if (!exists) continue
+    await client.patch(docId).set({ crewViewMoreText: 'View More', crewViewLessText: 'View Less' }).commit()
+    console.log(`${docId}: button texts set to View More / View Less`)
+  }
+
+  const check = await client.fetch(
+    `*[_id == "aboutPage"][0]{ "crew": count(crewMembers), crewViewMoreText, crewViewLessText }`,
+  )
   console.log('verify:', JSON.stringify(check))
 }
 run().then(
