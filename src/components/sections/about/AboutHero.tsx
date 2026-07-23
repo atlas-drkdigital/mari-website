@@ -57,11 +57,15 @@ export function AboutHero({ about }: { about: AboutPageData }) {
           </nav>
 
           <div className="flex flex-col items-center gap-20">
-            <h1 id="about-hero-heading" className="max-w-[480px] text-text-ondark-primary">
+            {/* WIDTH EXCEPTION vs ChartersHero's 480 cap (Adinda, 2026-07-23 QA: "more breathing
+                room, something wider") — 800px so the intro line "The Story of Mari: Built from
+                Tradition." holds ONE line at the sized-up 44px. Subheading widened to match. */}
+            <h1 id="about-hero-heading" className="max-w-[800px] text-text-ondark-primary">
               {about.heroHeadingIntro ? (
                 // Trailing {' '} is LOAD-BEARING — see ChartersHero (crawled h1 text would run the
-                // display:block lines together without it).
-                <span className="block text-[26px] font-extralight leading-[1.2] tracking-[-1.5px] lg:text-[36px] lg:tracking-[-2px]">
+                // display:block lines together without it). 44px is a step up from the charters
+                // hero's 36px intro (her "size it up" call) — still no ramp entry, arbitrary value.
+                <span className="block text-[26px] font-extralight leading-[1.2] tracking-[-1.5px] lg:text-[44px] lg:tracking-[-2px]">
                   {about.heroHeadingIntro}{' '}
                 </span>
               ) : null}
@@ -70,13 +74,29 @@ export function AboutHero({ about }: { about: AboutPageData }) {
               ) : null}
             </h1>
             {about.heroSubheading ? (
-              <p className="max-w-[440px] text-body-medium text-text-ondark-primary lg:text-body-large lg:text-text-ondark-muted">
+              <p className="max-w-[440px] text-body-medium text-text-ondark-primary lg:max-w-[560px] lg:text-body-large lg:text-text-ondark-muted">
                 {about.heroSubheading}
               </p>
             ) : null}
           </div>
         </div>
       </div>
+
+      {/* Scroll-down circle — the homepage Hero's indicator, brought here because this hero has
+          no SubNav rail (Adinda, 2026-07-23). CENTERED on all breakpoints (her call — homepage
+          left-aligns it at lg). A plain anchor, not the homepage's JS button: this is a Server
+          Component, and html's motion-safe:scroll-smooth + PageOverview's scroll-mt give the
+          identical smooth scroll + nav offset natively. */}
+      <a
+        href="#overview"
+        aria-label="Scroll to next section"
+        className="group absolute bottom-32 left-1/2 grid size-[36px] -translate-x-1/2 place-items-center rounded-full border border-bg-surface text-text-ondark-primary transition-colors duration-300 ease-in-out hover:bg-text-ondark-primary/10 lg:bottom-48 lg:size-[52px]"
+      >
+        <span
+          aria-hidden="true"
+          className="block size-[16px] bg-text-ondark-primary transition-transform duration-300 ease-in-out group-hover:scale-105 [mask-image:url('/assets/icon-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+        />
+      </a>
     </section>
   )
 }
