@@ -43,6 +43,15 @@ export const faqSectionType = defineType({
       initialValue: false,
       hidden: ({ document }) => document?._type !== 'faqGeneral',
     }),
+    // Private Charters triplet (2026-07-23, charters page slice) — same pattern again.
+    defineField({
+      name: 'showOnPrivateChartersPage',
+      title: 'Show on the Private Charters page',
+      type: 'boolean',
+      description: 'Include this category in the FAQ section of the Private Charters page.',
+      initialValue: false,
+      hidden: ({ document }) => document?._type !== 'faqGeneral',
+    }),
     defineField({
       name: 'questions',
       title: 'Questions',

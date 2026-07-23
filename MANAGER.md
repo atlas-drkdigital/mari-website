@@ -1006,7 +1006,48 @@ history:
 
 ---
 
-## SESSION CHECKPOINT — 2026-07-17 AM, auto-hide + a real data rescue (READ THIS FIRST)
+## SESSION CHECKPOINT — 2026-07-23 (morning block, ~3h active), PRIVATE CHARTERS PAGE COMPLETE
+
+**The whole `/private-charters` page shipped in one block** — schema (`privateCharters` singleton,
+superseding the pinned generic `page`; old `page-private-charters` doc DELETED with approval) +
+all 9 sections + 4 live QA rounds with Adinda + seeds. Route `/private-charters` (matches
+url-structure.md; `/charters` confirm w/ Serge still open). Nav links wired. drk-seo verify pass +
+JSON-LD prefill for this page: QUEUED, not yet run.
+
+**Sections:** ChartersHero (centered, flat 60% overlay, full dvh after 2 height reversals, real
+sunset-drinks master photo — byte-identical to the library PNG), ChartersOverview (tier-3 body w/
+inline map; Read More desktop cap is CONTENT-based 960px; bg walked beige-100→150→page-50),
+ChartersBenefits (image-driven accordion: 1 image = 1 benefit, title/caption model, carousel↔
+accordion one state, advance-on-close wrapping, editorial-h4/h3 titles, gallery-style bare-chevron
+arrows = THE single-image-carousel standard, light texture, last row borderless), then shared:
+Destinations, DestinationBoats (`texture` prop off here; chrome now from the NEW **boatsSection**
+shared-section singleton — {destination} resolves as "Indonesia" here, "Komodo" there, verified
+live), DestinationTrips as #available-dates (embed copied from Komodo — NO scheduleRates doc
+exists), FaqCategorized (own "Private Charters" category + `showOnPrivateChartersPage` toggle;
+"Booking Terms" RENAMED "Payment & Booking" — was a test name), Contact, Footer.
+
+**Cross-cutting shipped:** RichTextImage (inline rich-text images now click-to-zoom via lightbox;
+caption follows the image's Alignment control, centered by default) · FAQ answer links =
+accent-ondark-primary (chocolate too dark on navy) · Trips intro = heading width + primary navy
+(shared, both pages) · Trips mobile pt 80→48→64 (=standard) · Boats card mobile: uniform 16 rhythm
++ section pb-0 (card touches next section) · SubNav `centerItems` prop · naming GLOSSARY in
+COMPONENTS.md · "Section Nav" = subnav labels ≠ "Section Labels" = eyebrows · Studio reorg: Main
+Pages / Secondary Pages (Itineraries·FAQ·Testimonials) / Blog / slimmed Shared Components;
+boatsSection lives in the BOATS FOLDER (topic beats abstraction — Defaults precedent); `cabin`
+OUT of the sidebar (schema stays, Mari doesn't use it).
+
+**🔴 Reusable lesson — SEED-vs-OPEN-DRAFT CLOBBER:** patches land on the published doc; an editor's
+already-open draft doesn't have them, and their next Publish silently reverts the seed (ate the SEO
+prefill once, "why do I keep asking"). Seeds/migrations now patch `drafts.*` too when present.
+
+**Open:** destinationsSection singleton (drag-curation replaces `destination.order` — Adinda
+approved, ~1–1.5h, NEXT) · rich-text images: one-lightbox-gallery-per-field enhancement (her ask,
+answered, queued) · drk-seo pass + JSON-LD prefill · wording reviews deferred (availability intro/
+eyebrow) · benefits photos #2/#3 placeholders 🔴 · Serge items (Komodo feedback, seasons, /charters).
+**Afternoon block:** FAQ page + Testimonials page (the original Jul 23 slot). **Jul 24 staging push
+needs a re-cut tomorrow AM** — About/S&R/T&C/Blog still unslotted (charters ate today, worth it).
+
+## SESSION CHECKPOINT — 2026-07-17 AM, auto-hide + a real data rescue (superseded by the checkpoint above)
 
 Model: **Opus 4.8 (1M context)**. Verified clean: tsc + eslint + `/` 200, after every change below.
 
@@ -2486,7 +2527,7 @@ ones.
 | 2026-07-15 | Full homepage QA pass (every section, desktop + mobile) + fixes | **~2h** (Adinda's own tracked estimate, rounded up from ~1h48m measured mid-session) | **~1h of this was a false-alarm chase** (see below), not real QA/bug-fixing time. Once resolved, the actual QA pass covered all 11 sections (Nav, Hero, The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials, CTA, Contact, Footer) and turned up ~10 real bugs total, all fixed same session. **Calibration takeaway, revises the 2026-07-14 row's own assumption:** that earlier entry expected future sessions to be "meaningfully faster... now that the patterns exist" — true for *coding* patterns, but a full QA pass has its own largely-fixed cost regardless of how established the code conventions are, because QA time is dominated by *discovering* each section's specific bugs, not by applying known patterns. Budget a full single-homepage QA pass at **~2h** even on a well-patterned codebase, not scaled down just because earlier sessions established good conventions. Sub-note: a "barely any content on mobile" report that looked like a WebKit/iOS bug turned out to be `allowedDevOrigins` (dev server blocking LAN-IP requests), unrelated to any browser engine — see `references/troubleshooting.md`'s localhost-vs-LAN-IP check, which exists specifically to prevent this cost recurring. |
 | 2026-07-15 (later, same day) | Boat page full schema build + gallery redesign (3 iterations) + content-model changes (Full Rich Text Block extraction, alt-rule correction) + new tracking docs (`_SCHEMA-SPECS.md`/`_CONTENT-STATUS.md`/`_QA-CHECKLIST.md`) | **~4h30m elapsed, but Adinda estimates only ~70% (~3h10m) was active desk time** — ~30% was her doing other things (learning Japanese, cooking) while background tasks (dev server restarts, Sanity scripts) ran, not actively reviewing/responding. | **New calibration point, distinct from the 2026-07-14 row's caution:** elapsed time and active time diverge meaningfully when a session has real background-task latency (dev server restarts, `sanity exec` scripts, Perplexity/web research) — Adinda could step away during those. **Track both going forward**, not just one figure — elapsed matters for calendar/deadline planning, active time matters for comparing actual effort across sessions. This session's scope was large (full boat schema + 3 gallery redesign iterations + several corrected mistakes), so the ~3h10m active figure is the more honest "how much work was this" number. |
 | 2026-07-21 | Categorized FAQ built+approved · SubNav complete arc (static rail → floating → compact two-row chrome, 4 design pivots) · scroll-top button · gallery CTA + chevrons + lightbox fullscreen · ~10 side-fixes (nav hover/active, accordion hovers, Android accordion leak, paragraph rule, deck-plan border, brochure rebuild) | **~5h elapsed (from commits 09:14–13:22 + pre-commit recap); Adinda's active figure: 4h15m given at ~12:30, plus ~45m of review after — call it ~4h45–5h active.** | Unusually interactive session — nearly all elapsed was active (live design iteration with screenshots, not background waits). Calibration: interactive design-iteration sessions have elapsed ≈ active, unlike build sessions with script latency. The SubNav went through FOUR rejected/revised designs before landing — budget real iteration time for novel interactive chrome, it is not a build-to-spec task. |
-| 2026-07-22 (afternoon) | Komodo page slices 5–7 (Gallery + Itineraries + About the Boats) + JSON-LD prefill + drk-seo pass + ~6 QA rounds live with Adinda | **~3h elapsed** (first dev restart 14:06 → last commit 16:55 + close-out; commits `c8a0a04` 14:14 → `f6c37e5` 16:55). **Active desk time: ASK ADINDA — session closed with a headache, figure not yet given.** | Highly interactive like 2026-07-21 (live per-section QA, 3 sections + 2 tools shipped in one block) but WITH script/restart latency (5 clean restarts, ~8 seed scripts) — expect active < elapsed. Two same-day model reversals (numeric order → drag array; overviewBody → excerpt) both cost ~15 min each because content was re-seedable — the vertical-slice bet paying off, worth citing in estimates. |
+| 2026-07-22 (afternoon) | Komodo page slices 5–7 (Gallery + Itineraries + About the Boats) + JSON-LD prefill + drk-seo pass + ~6 QA rounds live with Adinda | **~3h elapsed** (first dev restart 14:06 → last commit 16:55 + close-out; commits `c8a0a04` 14:14 → `f6c37e5` 16:55). **Active desk time — Adinda's figure, given 2026-07-23 at day level:** full Jul 22 build ≈ **6h elapsed, active ≈ half (~3h)**; pro-rated, this afternoon block ≈ 1.5h active. | Highly interactive like 2026-07-21 (live per-section QA, 3 sections + 2 tools shipped in one block) but WITH script/restart latency (5 clean restarts, ~8 seed scripts) — expect active < elapsed. Two same-day model reversals (numeric order → drag array; overviewBody → excerpt) both cost ~15 min each because content was re-seedable — the vertical-slice bet paying off, worth citing in estimates. **Adinda's own read (2026-07-23): the day shipped ~5 shared + 4 unique components and felt notably faster than the boat page — partly the established patterns, partly zero context-switching (no skill updates, no feedback rounds interleaved). Calibration: protected single-focus build days genuinely run faster; don't price them like interleaved days.** |
 | 2026-07-16 | Session-bookend protocol locked into CLAUDE.md + first full chat-side skills-update round: all 4 skills (drk-website, atlas-website, mari-website, mari-project) ported, installed, verified, archived, handoffs reconciled | **~1h elapsed (Adinda's estimate); active time notably lower** — she finished her kanji reviews in between, so this is an elapsed figure, not active. | **Calibration for skills-update rounds specifically:** a full 4-skill update round is heavily parallelizable with the user's other tasks. The heavy lifting was Claude-side (assembling self-contained payloads, verification greps, install/archive/reconcile), so Adinda's active involvement was mostly the chat-side paste + re-export + Downloads steps — she could step away during payload prep and Claude-side install/verify. Good template for future rounds: elapsed ≈ 1h for 4 skills, active user time a fraction of that. Distinct from the build-session rows above (those need active review/response). |
 
 ---

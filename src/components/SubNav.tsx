@@ -59,6 +59,11 @@ export type SubNavItem = {
   label: string
 }
 
+// NOTE: an `accent` item flag (Figma Block/SubNav's amber last tab) was built for the Private
+// Charters "Check Availability" item and REMOVED the same day (Adinda, 2026-07-23, on the real
+// render: "'Check Availability' with a different color is very confusing... it does not look
+// great"). Every item renders the same — don't rebuild the amber tab from the node.
+
 // The URL hash as an external store — the React-idiomatic way to read browser state that changes
 // outside React (native anchor clicks fire hashchange; no setState-in-effect needed). The server
 // snapshot is '' so SSR/hydration render the default state deterministically.
@@ -69,7 +74,22 @@ function subscribeHash(cb: () => void) {
 const getHash = () => window.location.hash
 const getServerHash = () => ''
 
-export function SubNav({ items, className = '' }: { items: SubNavItem[]; className?: string }) {
+export function SubNav({
+  items,
+  className = '',
+  centerItems = false,
+}: {
+  items: SubNavItem[]
+  className?: string
+  /**
+   * Centre the STATIC desktop rail's items (Private Charters — its hero is centered, so the rail
+   * follows; Adinda, 2026-07-23). Default false: the boat/destination rails shipped left-aligned
+   * through the 2026-07-21 QA arc and stay that way unless she says otherwise. The floating bar
+   * already centres on lg for every page. Same overflow caveat as the floating track: at high item
+   * counts a centred overflowing rail can't reach its start edge — fine at today's counts.
+   */
+  centerItems?: boolean
+}) {
   // Which section the spy currently sees; the current hash breaks ties between items sharing a
   // targetId (Layout/Specs).
   const [activeTarget, setActiveTarget] = useState<string | null>(null)
@@ -218,7 +238,8 @@ export function SubNav({ items, className = '' }: { items: SubNavItem[]; classNa
   // node — useDragScroll binds its listeners once at mount). In the static state the track IS the
   // whole rail; in the floating state it is the centre lane between the brand and the CTA.
   const trackStatic =
-    'flex w-full items-center cursor-grab overflow-x-auto select-none scrollbar-hidden active:cursor-grabbing md:px-48 lg:cursor-auto lg:overflow-visible lg:select-auto lg:px-80'
+    'flex w-full items-center cursor-grab overflow-x-auto select-none scrollbar-hidden active:cursor-grabbing md:px-48 lg:cursor-auto lg:overflow-visible lg:select-auto lg:px-80' +
+    (centerItems ? ' lg:justify-center' : '')
   // lg keeps overflow-x-auto deliberately: items are nowrap, so a long item list scrolls instead
   // of wrapping (Adinda's requirement). ⚠️ Same caveat as the Cabins tabs: justify-center + an
   // overflowing track makes the start edge unreachable in some browsers — fine at today's item

@@ -36,12 +36,21 @@ export function DestinationBoats({
   heading,
   headingSingular,
   ctaText,
+  texture = true,
 }: {
   boats: BoatCardData[]
   eyebrow?: string
   heading?: string
   headingSingular?: string
   ctaText?: string
+  /**
+   * Light-texture background toggle (Adinda, 2026-07-23): the Private Charters page mounts this
+   * section WITHOUT the texture (plain bg-page) because it clashed with that page's backdrop —
+   * a per-page override, deliberately a prop so the component itself stays one design that
+   * changes everywhere when edited. Destination pages keep the texture (her earlier explicit
+   * "be very careful that we do use the light texture here").
+   */
+  texture?: boolean
 }) {
   const [index, setIndex] = useState(0)
   // Touch swipe on the image steps boats (Adinda, 2026-07-22). The image is a LINK, so a swipe
@@ -71,15 +80,20 @@ export function DestinationBoats({
     <section
       id="boats"
       aria-labelledby="destination-boats-heading"
-      /* lg:pb-[112px] = 64 + the extra 48 Adinda asked for on desktop (2026-07-22). */
-      className="relative isolate w-full scroll-mt-[70px] overflow-hidden bg-bg-page pt-64 pb-64 lg:scroll-mt-[110px] lg:pt-[120px] lg:pb-[112px]"
+      /* lg:pb-[112px] = 64 + the extra 48 Adinda asked for on desktop (2026-07-22).
+         MOBILE pb-0 (Adinda, 2026-07-23): the beige card touches the next section's edge —
+         deliberate full-bleed handoff, not a missing padding. Desktop unchanged. */
+      className="relative isolate w-full scroll-mt-[70px] overflow-hidden bg-bg-page pt-64 pb-0 lg:scroll-mt-[110px] lg:pt-[120px] lg:pb-[112px]"
     >
       {/* Light texture — per the node AND Adinda's explicit "be very careful that we do use the
-          light texture here". Itineraries above deliberately has none. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] [background-size:720px_auto] bg-repeat opacity-20"
-      />
+          light texture here". Itineraries above deliberately has none. Suppressible per page via
+          the `texture` prop (see its doc). */}
+      {texture ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] [background-size:720px_auto] bg-repeat opacity-20"
+        />
+      ) : null}
 
       <div className="flex w-full flex-col gap-[40px]">
         {/* Header — the Itineraries recipe verbatim (page-gutter mobile, 160 desktop). */}
@@ -154,7 +168,10 @@ export function DestinationBoats({
           {/* Card: cream-50 (#f5f0e8 = beige-150 = bg-accent), overlapping the image by 96px
               (node math 99 — scale step wins) and bleeding to the right viewport edge (the row
               has NO right padding on lg). z-10 puts it above the image. */}
-          <div className="z-10 flex flex-col gap-16 bg-bg-accent p-24 lg:-ml-96 lg:flex-1 lg:pt-48 lg:pr-80 lg:pb-80 lg:pl-64">
+          {/* pb-48 on MOBILE (Adinda, 2026-07-23): the CTA sat too close to the card's bottom
+              edge — the bottom inset must read BIGGER than the top one (24). Desktop already
+              has its own pb-80. */}
+          <div className="z-10 flex flex-col gap-16 bg-bg-accent p-24 pb-48 lg:-ml-96 lg:flex-1 lg:pt-48 lg:pr-80 lg:pb-80 lg:pl-64">
             <div className="flex flex-col gap-16">
               {boat.name ? <h3 className="text-display-h3 text-text-primary">{boat.name}</h3> : null}
               {statsLine ? (
@@ -172,7 +189,10 @@ export function DestinationBoats({
             {ctaText && boat.slug ? (
               <a
                 href={`/boats/${boat.slug}`}
-                className="group mt-16 w-fit border-b border-action-primary py-4"
+                /* mt-16 desktop only (Adinda, 2026-07-23): on mobile the description→CTA gap
+                   matches the card's uniform 16px rhythm (name↔stats↔description) instead of
+                   doubling to 32. */
+                className="group w-fit border-b border-action-primary py-4 lg:mt-16"
               >
                 <span className="flex items-center gap-4 text-button-small uppercase text-action-primary">
                   {ctaText}

@@ -82,6 +82,12 @@ export function DestinationOverview({
 
   const active = highlights[highlightIndex]
 
+  // Empty-section guard (Adinda, 2026-07-23 — caught live on Komodo: with overviewBody cleared,
+  // the section still rendered an orphan eyebrow). The standard "hide what's empty" rule: no
+  // heading, no body, no highlights → no section at all. The eyebrow alone is chrome, not
+  // content, so it never justifies rendering. Placed AFTER the hooks (React hook-order rule).
+  if (!destination.overviewHeading && !hasBody && !highlights.length) return null
+
   return (
     <section
       ref={sectionRef}

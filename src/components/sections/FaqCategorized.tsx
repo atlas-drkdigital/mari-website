@@ -166,7 +166,12 @@ export function FaqCategorized({
                           paragraphs inherit the ondark color set on this wrapper. Paragraph spacing
                           rule (Adinda, 2026-07-21): the RichText WRAPPER owns it — gap-12 for
                           body-medium copy, gap-16 for body-large; this answer steps medium→large. */}
-                      <div className="mt-12 flex flex-col gap-12 text-body-medium text-text-ondark-primary lg:gap-16 lg:text-body-large">
+                      {/* [&_a] override: links inside answers use the ON-DARK accent (amber-500
+                          via accent-ondark-primary), not RichText's global text-link chocolate —
+                          too dark on this navy bg (Adinda, 2026-07-23, all FAQ sections). The
+                          descendant selector outranks the link's own class; hover goes full
+                          white like the other on-dark links. */}
+                      <div className="mt-12 flex flex-col gap-12 text-body-medium text-text-ondark-primary lg:gap-16 lg:text-body-large [&_a]:text-accent-ondark-primary [&_a:hover]:text-text-ondark-primary">
                         <RichText value={q.answer} />
                       </div>
                     </FaqAccordionItem>

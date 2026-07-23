@@ -1,8 +1,7 @@
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import type { PortableTextBlock } from 'sanity'
-import Image from 'next/image'
 
-import { sanityImageProps, type SanityImageWithMeta } from '@/sanity/lib/image'
+import { RichTextImage, type RichTextImageValue } from '@/components/RichTextImage'
 
 // Shared renderer for BOTH rich-text tiers (see CLAUDE.md's Portable Text tiers):
 //   tier 2 `richTextBasic` — Normal + bold/italic/link + bullet lists
@@ -68,27 +67,6 @@ function alignClassOf(value: unknown): string {
   const marks = new Set((block?.children ?? []).flatMap((c) => c.marks ?? []))
   const def = defs.find((d) => d._type === 'align' && d._key && marks.has(d._key))
   return def?.align ? ALIGN_CLASS[def.align] ?? '' : ''
-}
-
-const IMAGE_SIZE: Record<string, string> = {
-  full: 'w-full',
-  large: 'w-full lg:w-3/4',
-  medium: 'w-full lg:w-1/2',
-  small: 'w-full lg:w-1/3',
-}
-
-// `center` maps to mx-auto rather than a text-align: the image is a block, so it's centred by its
-// own margins, not by its parent's text alignment.
-const IMAGE_ALIGN: Record<string, string> = {
-  center: 'mx-auto',
-  left: 'mr-auto',
-  right: 'ml-auto',
-}
-
-type InlineImageValue = SanityImageWithMeta & {
-  caption?: string
-  size?: string
-  alignment?: string
 }
 
 // Extra space ABOVE every editorial heading, on top of whatever gap the parent sets. `first:mt-0`
@@ -160,30 +138,10 @@ const components: PortableTextComponents = {
     number: ({ children }) => <ol className="flex list-decimal flex-col gap-4 pl-20">{children}</ol>,
   },
   types: {
-    // Inline image — richTextFull's second array member. Size and alignment are editor choices on
-    // the block itself. Sizing only applies from lg up: a "33%" image on a phone is unreadable, so
-    // every size is full-width on mobile.
-    image: ({ value }: { value: InlineImageValue }) => {
-      if (!value?.asset?._ref) return null
-      const width = IMAGE_SIZE[value.size ?? 'full'] ?? IMAGE_SIZE.full
-      const align = IMAGE_ALIGN[value.alignment ?? 'center'] ?? IMAGE_ALIGN.center
-      return (
-        <figure className={`flex flex-col gap-8 ${width} ${align}`}>
-          <div className="relative aspect-[3/2] w-full overflow-hidden">
-            <Image
-              {...sanityImageProps(value, '/assets/placeholder-photo.svg')}
-              alt={value.alt ?? ''}
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
-          </div>
-          {value.caption ? (
-            <figcaption className="text-caption-label text-text-secondary">{value.caption}</figcaption>
-          ) : null}
-        </figure>
-      )
-    },
+    // Inline image — richTextFull's second array member. Extracted to RichTextImage (client)
+    // 2026-07-23 when it gained click-to-zoom (opens the site lightbox); size/alignment/caption
+    // behaviour unchanged, see that file.
+    image: ({ value }: { value: RichTextImageValue }) => <RichTextImage value={value} />,
     // Raw HTML embed — richTextFull's third member. Author-supplied markup from Studio (booking
     // widgets, maps). dangerouslySetInnerHTML is the point of the field; the trust boundary is
     // Studio access, which is the same boundary that already governs every other field.

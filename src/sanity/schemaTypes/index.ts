@@ -26,6 +26,8 @@ import { boatDefaultsType } from './documents/boatDefaults'
 import { cabinTypeType } from './documents/cabinType'
 import { cabinDocType } from './documents/cabin'
 import { homePageType } from './documents/homePage'
+import { privateChartersType } from './documents/privateCharters'
+import { boatsSectionType } from './documents/boatsSection'
 import { destinationType } from './documents/destination'
 import { destinationDefaultsType } from './documents/destinationDefaults'
 import { ctaType } from './documents/cta'
@@ -68,6 +70,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     cabinTypeType,
     cabinDocType,
     homePageType,
+    privateChartersType,
+    boatsSectionType,
     destinationType,
     destinationDefaultsType,
     ctaType,

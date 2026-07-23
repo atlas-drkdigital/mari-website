@@ -31,7 +31,6 @@ export const destinationDefaultsType = defineType({
     { name: 'itineraries', title: 'Itineraries' },
     { name: 'upcomingTrips', title: 'Upcoming Trips' },
     { name: 'faq', title: 'FAQ' },
-    { name: 'boats', title: 'Boats' },
     { name: 'articles', title: 'Articles' },
     { name: 'subnav', title: 'Section Nav' },
   ],
@@ -45,7 +44,6 @@ export const destinationDefaultsType = defineType({
     { name: 'itineraries', title: 'Itineraries', description: TOKEN_HINT },
     { name: 'upcomingTrips', title: 'Upcoming Trips', description: TOKEN_HINT },
     { name: 'faq', title: 'FAQ', description: TOKEN_HINT },
-    { name: 'boats', title: 'About the Boats', description: TOKEN_HINT },
     { name: 'articles', title: 'Latest Articles', description: TOKEN_HINT },
     {
       name: 'subnav',
@@ -159,43 +157,10 @@ export const destinationDefaultsType = defineType({
       description: 'Label on the button linking to the full FAQ page.',
       initialValue: 'Read All FAQ',
     }),
-    defineField({
-      name: 'boatsEyebrow',
-      title: 'Boats eyebrow',
-      type: 'string',
-      fieldset: 'boats',
-      group: 'boats',
-      initialValue: 'Sail {destination} in comfort',
-    }),
-    defineField({
-      name: 'boatsHeading',
-      title: 'Boats heading (several boats)',
-      type: 'string',
-      fieldset: 'boats',
-      group: 'boats',
-      initialValue: 'About the boats',
-    }),
-    // Singular/plural is TWO explicit fields picked by boat count, not automatic pluralization
-    // (Adinda's question 2026-07-22, answered this way deliberately): an editor — and later each
-    // translation — writes both forms verbatim, so no language ever needs a pluralization rule
-    // the system doesn't have. The frontend shows this one when exactly one boat exists.
-    defineField({
-      name: 'boatsHeadingSingular',
-      title: 'Boats heading (single boat)',
-      type: 'string',
-      fieldset: 'boats',
-      group: 'boats',
-      initialValue: 'About the boat',
-    }),
-    defineField({
-      name: 'boatsCtaText',
-      title: 'Boat card button label',
-      type: 'string',
-      fieldset: 'boats',
-      group: 'boats',
-      description: 'The link on each boat card — goes to that boat’s own page.',
-      initialValue: 'More about the boat',
-    }),
+    // The boats* chrome (eyebrow/heading/headingSingular/ctaText) MOVED to the shared
+    // `boatsSection` singleton 2026-07-23 (Adinda's shared-sections model — the same chrome also
+    // served the Private Charters page, duplicated; now edited once for every page). Migration:
+    // _scripts/migrate-boats-section.ts. The singular/plural two-field reasoning lives on there.
     defineField({
       name: 'articlesEyebrow',
       title: 'Articles eyebrow',

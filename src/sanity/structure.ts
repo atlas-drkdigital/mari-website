@@ -2,13 +2,15 @@ import type { StructureResolver } from 'sanity/structure'
 
 // Singletons are enforced here (fixed document ID), not via a schema option —
 // see sanity-best-practices skill's studio-structure.md.
-const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage', 'destinationDefaults', 'boatDefaults', 'cta', 'faqGeneral']
-// Pinned single-instance `page` documents (About, Private Charters) — schema type is still the
-// generic `page` (Private Charters' dedicated-vs-generic decision isn't locked, About never
-// needed its own type), but each gets a fixed sidebar slot by document ID so they're easy to
-// find, same technique as `singleton()` below just without enforcing only-one-can-exist.
+const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage', 'privateCharters', 'destinationDefaults', 'boatDefaults', 'boatsSection', 'cta', 'faqGeneral']
+// Pinned single-instance `page` documents (About) — schema type is still the generic `page`
+// (About never needed its own type), but each gets a fixed sidebar slot by document ID so
+// they're easy to find, same technique as `singleton()` below just without enforcing
+// only-one-can-exist. Private Charters left this list 2026-07-23: the mockup made it a
+// structured section page, so it's now the dedicated `privateCharters` singleton. The old
+// placeholder doc `page-private-charters` may still exist in the dataset (visible under Pages)
+// until it's deleted.
 const PINNED_PAGE_IDS: Array<{ id: string; title: string }> = [
-  { id: 'page-private-charters', title: 'Private Charters' },
   { id: 'page-about', title: 'About' },
 ]
 const PLACED_TYPES = [
@@ -55,13 +57,14 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title('Content')
     .items([
-      // --- Main Page Content ---
+      // --- MAIN PAGES (reorg 2026-07-23, Adinda: Studio was getting cluttered; main pages,
+      // secondary pages, blog, and shared components each get their own band) ---
       singleton(S, 'homePage', 'Homepage'),
 
-      // Destinations nested folder: the list of destination docs + the shared "Destination
-      // Defaults" singleton (edit-once eyebrows/headings with a {destination} token), same nesting
-      // pattern as Boats. Keeps the two destination-related things under one entry instead of
-      // stacking two top-level pages (Adinda's ask 2026-07-16).
+      // Destinations nested folder: docs + the type's shared chrome. The shared-SECTION singleton
+      // (Destinations Section — carousel curation/order) joins this folder when built, NOT the
+      // Shared Components band: topic beats abstraction for findability, and Destination Defaults
+      // set that precedent (Adinda's call, 2026-07-23).
       S.listItem()
         .title('Destinations')
         .child(
@@ -73,10 +76,10 @@ export const structure: StructureResolver = (S) =>
             ])
         ),
 
-      // Nested under one "Boats" entry rather than 3 top-level items — cabinType/cabin only
-      // make sense in relation to a boat, same reasoning as not giving them their own root-level
-      // slot. Grouping only; field/name-level decisions (the part that's costly to redo later)
-      // are unaffected — see CLAUDE.md's "Studio editor-organization" note.
+      // Boats folder, order per Adinda 2026-07-23: boats → both shared-chrome singletons → cabin
+      // types. `cabin` (individual physical cabins) LEFT the sidebar the same day — Mari doesn't
+      // use it (cabin TYPES carry the content); the schema type stays registered as a
+      // future-website affordance, this is declutter-only.
       S.listItem()
         .title('Boats')
         .child(
@@ -84,32 +87,38 @@ export const structure: StructureResolver = (S) =>
             .title('Boats')
             .items([
               S.documentTypeListItem('boat').title('Boats'),
-              S.documentTypeListItem('cabinType').title('Cabin Types'),
-              S.documentTypeListItem('cabin').title('Cabins'),
               singleton(S, 'boatDefaults', 'Boat Defaults'),
+              singleton(S, 'boatsSection', 'Boats Section'),
+              S.documentTypeListItem('cabinType').title('Cabin Types'),
             ])
         ),
 
-      ...PINNED_PAGE_IDS.map(({ id, title }) => pinnedPage(S, id, title)),
+      // Dedicated singleton (was a pinned generic `page` until 2026-07-23 — see PINNED_PAGE_IDS).
+      singleton(S, 'privateCharters', 'Private Charters'),
 
       // Its own top-level entry, not nested under Pages — more variants of this
       // shape are coming (Specials, etc.), each will likely get its own entry too.
       S.documentTypeListItem('scheduleRates').title('Schedule & Rates'),
 
+      ...PINNED_PAGE_IDS.map(({ id, title }) => pinnedPage(S, id, title)),
+
+      // Generic `page` catch-all (T&C, Onboard Prices) goes LAST in this section, per Adinda's
+      // explicit ordering ask 2026-07-16.
+      S.documentTypeListItem('page').title('Pages'),
+
+      S.divider(),
+
+      // --- SECONDARY PAGES (Adinda, 2026-07-23): content-listing pages, one band below the main
+      // pages. Testimonials sits here as a PAGE-to-be — the `testimonialsPage` singleton (queued,
+      // shares the FAQ-page slot) turns this into a folder like Destinations when it lands. ---
       S.documentTypeListItem('itinerary').title('Itineraries'),
 
-      // The FAQ is a PAGE, not a shared component — moved here from the shared-components section
-      // 2026-07-16 (Adinda's call). It backs the /faq hub, carries its own `seo`, and will carry
-      // page-level section toggles (contact form, CTA), so it describes a page rather than a
-      // reusable content item. Destination/boat pages PULLING categories from it doesn't make it a
-      // component: the homepage pulls Destinations and Blog Posts, which live here too.
-      // Labelled "FAQ", not "General FAQ": every neighbour here is named after the page it IS, and
-      // "General" only ever described how it differed from a sibling list that no longer exists.
+      // The FAQ is a PAGE, not a shared component (2026-07-16, Adinda) — it backs the /faq hub,
+      // carries `seo` + page-level settings. Destination/boat/charters pages PULLING categories
+      // from it doesn't make it a component.
       singleton(S, 'faqGeneral', 'FAQ'),
 
-      // Generic `page` catch-all (T&C, Onboard Prices, and anything else not pinned above) goes
-      // LAST in this section, per Adinda's explicit ordering ask 2026-07-16.
-      S.documentTypeListItem('page').title('Pages'),
+      S.documentTypeListItem('testimonial').title('Testimonials'),
 
       S.divider(),
 
@@ -132,10 +141,9 @@ export const structure: StructureResolver = (S) =>
         .title('Announcements')
         .child(S.documentTypeList('announcementBar').title('Announcements')),
       S.documentTypeListItem('whyUsItem').title('Why Us Items'),
-      // FAQ is NOT here — it moved up to Main Page Content (it has `seo` and page-level settings, so
-      // it describes a page, not a shared component). Destination- and boat-specific questions are
-      // inline `faqSections` arrays on those documents.
-      S.documentTypeListItem('testimonial').title('Testimonials'),
+      // NOT here (all moved out in the 2026-07-23 declutter): FAQ + Testimonials → Secondary
+      // Pages; Boats Section → the Boats folder (shared-SECTION singletons live with their topic,
+      // not with the abstraction — Adinda's call, Destination Defaults set the precedent).
       // Crew members (shown on the About page) — a repeatable shared component, placed here per
       // Adinda's ask 2026-07-16.
       S.documentTypeListItem('crewMember').title('Crew Members'),

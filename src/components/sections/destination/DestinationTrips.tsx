@@ -21,20 +21,26 @@ export function DestinationTrips({
   intro,
   ctaText,
   embedHtml,
+  id = 'upcoming-trips',
 }: {
   eyebrow?: string
   heading?: string
   intro?: string
   ctaText?: string
   embedHtml?: string
+  /** Section anchor id — the Private Charters page mounts this same component as #available-dates. */
+  id?: string
 }) {
   if (!embedHtml?.trim()) return null
 
   return (
     <section
-      id="upcoming-trips"
+      id={id}
       aria-labelledby="upcoming-trips-heading"
-      className="relative isolate w-full scroll-mt-[70px] bg-bg-page pt-80 pb-80 lg:scroll-mt-[110px] lg:pt-160 lg:pb-160"
+      /* Mobile pt: 80 → 48 read as touching the top edge (Adinda, same day) → 64, the standard
+         mobile section top (Overview/Benefits/Boats all pt-64). Shared component — both the
+         destination and charters pages get it. */
+      className="relative isolate w-full scroll-mt-[70px] bg-bg-page pt-64 pb-80 lg:scroll-mt-[110px] lg:pt-160 lg:pb-160"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] bg-repeat opacity-20" />
       {/* Gutter override for THIS section only (Adinda, 2026-07-22, trial — "still not sure"):
@@ -47,7 +53,10 @@ export function DestinationTrips({
           {/* 800px cap is a one-off exception (Adinda, 2026-07-22): at 720 the templated heading
               ("Upcoming {destination} liveaboard trips") wrapped awkwardly. Desktop only. */}
           <h2 id="upcoming-trips-heading" className="max-w-[720px] text-display-h2 text-text-primary lg:max-w-[800px]">{heading}</h2>
-          {intro ? <p className="max-w-[560px] text-body-medium text-text-secondary lg:text-body-large">{intro}</p> : null}
+          {/* Intro matches the HEADING's max-width and reads in primary navy (Adinda, 2026-07-23:
+              560px was "way too tight" and text-secondary "not visible enough" — shared component,
+              one change, both pages). */}
+          {intro ? <p className="max-w-[720px] text-body-medium text-text-primary lg:max-w-[800px] lg:text-body-large">{intro}</p> : null}
         </div>
 
         {/* Card chrome mirrors the Testimonials cards (same surface + shadow — Adinda's ask).

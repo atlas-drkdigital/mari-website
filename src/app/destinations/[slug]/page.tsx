@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function DestinationPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params
-  const { destination, defaults, itineraries, sharedFaqSections, latestPosts, boats, cta, settings, destinations } =
+  const { destination, defaults, itineraries, sharedFaqSections, boatsSection, latestPosts, boats, cta, settings, destinations } =
     await getDestination(slug)
 
   if (!destination) notFound()
@@ -96,8 +96,13 @@ export default async function DestinationPage({ params }: { params: Promise<Para
 
   // Subnav items appear only when their section has content to render ("hide what's empty").
   const hasTripsEmbed = Boolean(destination.upcomingTripsEmbed?.trim())
+  // Overview's guard mirrors DestinationOverview's own empty test (added with the empty-section
+  // fix, 2026-07-23 — an unguarded item pointed at a section that now hides itself).
+  const hasOverview = Boolean(
+    destination.overviewHeading || destination.overviewBody?.length || destination.highlights?.length,
+  )
   const subNavItems: SubNavItem[] = [
-    { href: '#overview', targetId: 'overview', label: t(defaults?.subnavOverviewLabel) ?? '' },
+    hasOverview && { href: '#overview', targetId: 'overview', label: t(defaults?.subnavOverviewLabel) ?? '' },
     (destination.gallery ?? []).length && { href: '#gallery', targetId: 'gallery', label: t(defaults?.subnavGalleryLabel) ?? '' },
     (itineraries ?? []).length && { href: '#itineraries', targetId: 'itineraries', label: t(defaults?.subnavItinerariesLabel) ?? '' },
     faqSections.length && { href: '#faq', targetId: 'faq', label: t(defaults?.subnavFaqLabel) ?? '' },
@@ -150,12 +155,14 @@ export default async function DestinationPage({ params }: { params: Promise<Para
             Contact. Articles = the homepage component, Komodo-linked posts only, no button (the
             mock has none — its arrows are deferred; the drag-track convention covers the
             overflow case). */}
+        {/* Chrome from the SHARED boatsSection singleton (2026-07-23, moved off
+            destinationDefaults) — {destination} still resolves through t() as before. */}
         <DestinationBoats
           boats={boats ?? []}
-          eyebrow={t(defaults?.boatsEyebrow)}
-          heading={t(defaults?.boatsHeading)}
-          headingSingular={t(defaults?.boatsHeadingSingular)}
-          ctaText={t(defaults?.boatsCtaText)}
+          eyebrow={t(boatsSection?.eyebrow)}
+          heading={t(boatsSection?.heading)}
+          headingSingular={t(boatsSection?.headingSingular)}
+          ctaText={t(boatsSection?.ctaText)}
         />
         <Cta cta={cta} />
         <LatestArticles

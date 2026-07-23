@@ -166,7 +166,6 @@ export const DESTINATION_QUERY = groq`{
     itinerariesEyebrow, itinerariesHeading, itinerariesCardCtaText,
     upcomingTripsEyebrow, upcomingTripsHeading, upcomingTripsIntro, upcomingTripsCtaText,
     faqEyebrow, faqHeading, faqLinkText,
-    boatsEyebrow, boatsHeading, boatsHeadingSingular, boatsCtaText,
     articlesEyebrow, articlesHeading, articlesLinkText,
     subnavOverviewLabel, subnavGalleryLabel, subnavItinerariesLabel,
     subnavFaqLabel, subnavTripsLabel
@@ -181,6 +180,7 @@ export const DESTINATION_QUERY = groq`{
   "sharedFaqSections": *[_id == "faqGeneral"][0].categories[showOnDestinationPages == true]{
     _key, title, questions[]{ question, answer }
   },
+  "boatsSection": *[_id == "boatsSection"][0]{ eyebrow, heading, headingSingular, ctaText },
   // Unlike the homepage's latest-3, the destination Articles section shows only posts LINKED to
   // this destination via blogPost.relatedDestination (Adinda, 2026-07-22: "articles & news — but
   // Komodo only").
@@ -221,6 +221,53 @@ export const BOATS_INDEX_QUERY = groq`{
     "slug": slug.current,
     coverImage${IMAGE},
     stats[]{ _key, label, value }
+  }
+}`
+
+// One fetch for the Private Charters page (singleton — no $slug). Same composition model as the
+// other page queries. 🚧 Built section by section from 2026-07-23: satellites (destinations,
+// boats, FAQ, CTA) join this query as their sections land, mirroring how the destination build ran.
+export const PRIVATE_CHARTERS_QUERY = groq`{
+  "charters": *[_id == "privateCharters"][0]{
+    name,
+    heroHeadingIntro, heroHeadingMain, heroSubheading,
+    heroImage${IMAGE},
+    heroVideo{ url, playOnMobile },
+    "brochureUrl": brochurePdf.asset->url,
+    overviewEyebrow, overviewHeading, overviewBody,
+    benefitsEyebrow, benefitsHeading,
+    benefits[]${IMAGE},
+    availabilityEyebrow, availabilityHeading, availabilityIntro, availabilityCtaText,
+    "availabilityEmbed": availabilityEmbed.html,
+    faqEyebrow, faqHeading, faqLinkText,
+    faqSections[]{ _key, title, questions[]{ question, answer } },
+    subnavOverviewLabel, subnavBenefitsLabel, subnavDestinationsLabel,
+    subnavBoatsLabel, subnavFaqLabel, subnavCheckAvailabilityLabel,
+    seo
+  },
+  "sharedFaqSections": *[_id == "faqGeneral"][0].categories[showOnPrivateChartersPage == true]{
+    _key, title, questions[]{ question, answer }
+  },
+  "boatsSection": *[_id == "boatsSection"][0]{ eyebrow, heading, headingSingular, ctaText },
+  "boats": *[_type == "boat" && defined(slug.current)] | order(name asc){
+    _id, name, pageTitle, tagline,
+    "slug": slug.current,
+    coverImage${IMAGE},
+    useCoverAsCardImage,
+    cardImage${IMAGE},
+    excerpt,
+    stats[]{ _key, label, value }
+  },
+  "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
+    _id, name, tagline, excerpt, "slug": slug.current,
+    "cardSeason": stats[label == "Season"][0].value,
+    "cardDuration": stats[label == "Duration"][0].value,
+    useCoverAsCardImage,
+    cardImage${IMAGE},
+    coverImage${IMAGE}
+  },
+  "settings": *[_id == "siteSettings"][0]{
+    siteTitle, contactEyebrow, contactHeading, contactIntro
   }
 }`
 
@@ -499,10 +546,6 @@ export type DestinationDefaultsData = {
   faqEyebrow?: string
   faqHeading?: string
   faqLinkText?: string
-  boatsEyebrow?: string
-  boatsHeading?: string
-  boatsHeadingSingular?: string
-  boatsCtaText?: string
   articlesEyebrow?: string
   articlesHeading?: string
   articlesLinkText?: string
@@ -529,6 +572,7 @@ export type DestinationQueryResult = {
   defaults: DestinationDefaultsData | null
   itineraries: ItineraryCardData[]
   sharedFaqSections: FaqSectionData[] | null
+  boatsSection: BoatsSectionData | null
   latestPosts: LatestPostData[]
   boats: BoatCardData[]
   cta: { cards?: CtaCardData[] } | null
@@ -551,6 +595,65 @@ export type BoatCardData = {
 
 export type BoatsIndexQueryResult = {
   boats: BoatCardData[]
+}
+
+// Shared "About the Boats" section chrome (boatsSection singleton, 2026-07-23) — one doc serves
+// every page mounting the component; {destination} resolves per page.
+export type BoatsSectionData = {
+  eyebrow?: string
+  heading?: string
+  headingSingular?: string
+  ctaText?: string
+}
+
+// ----- Private Charters page -----
+// One image = one benefit (locked 2026-07-23): title = accordion heading, caption = accordion body
+// + lightbox caption. Plain-text caption by Adinda's explicit call.
+export type BenefitImageData = SanityImageWithMeta & {
+  _key: string
+  title?: string
+  caption?: string
+}
+
+export type PrivateChartersData = {
+  name?: string
+  heroHeadingIntro?: string
+  heroHeadingMain?: string
+  heroSubheading?: string
+  heroImage?: SanityImageWithMeta
+  heroVideo?: HeroVideoData
+  brochureUrl?: string
+  overviewEyebrow?: string
+  overviewHeading?: string
+  overviewBody?: PortableTextBlock[]
+  benefitsEyebrow?: string
+  benefitsHeading?: string
+  benefits?: BenefitImageData[]
+  availabilityEyebrow?: string
+  availabilityHeading?: string
+  availabilityIntro?: string
+  availabilityCtaText?: string
+  availabilityEmbed?: string
+  faqEyebrow?: string
+  faqHeading?: string
+  faqLinkText?: string
+  faqSections?: FaqSectionData[]
+  subnavOverviewLabel?: string
+  subnavBenefitsLabel?: string
+  subnavDestinationsLabel?: string
+  subnavBoatsLabel?: string
+  subnavFaqLabel?: string
+  subnavCheckAvailabilityLabel?: string
+  seo?: SeoData
+}
+
+export type PrivateChartersQueryResult = {
+  charters: PrivateChartersData | null
+  sharedFaqSections: FaqSectionData[] | null
+  boatsSection: BoatsSectionData | null
+  boats: BoatCardData[]
+  destinations: DestinationCardData[]
+  settings: SiteSettingsContact | null
 }
 
 export type HomePageQueryResult = {

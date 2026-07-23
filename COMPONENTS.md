@@ -31,6 +31,28 @@ So the **reuse shelf is basically all of `src/components/`** already. This catal
 cross-project vehicle is a **starter template** that carries these files + this catalog; you clone it, swap
 tokens, and pull pieces off the shelf. See `_handoff/drk-website.md` → "Cross-project reuse workflow (DRAFT)".
 
+## 📖 Naming glossary — the ONE vocabulary for content parts (Adinda's ask, 2026-07-23)
+Started after "Section Labels" was reused for two different things. **Use these exact names in schema
+titles, Studio groups/fieldsets, code comments, and when explaining anything to a client.** Add a row
+whenever a new nameable part ships; if a name here conflicts with an older surface, this table wins and
+the older surface gets renamed opportunistically (same model as the colour-rename rule).
+
+| Term | Means | NOT to be confused with |
+|---|---|---|
+| **Eyebrow** | The small uppercase kicker line ABOVE a section heading (`text-eyebrow`, usually accent-coloured) | The breadcrumb (that's navigation, lives in the hero) |
+| **Heading** | The section's own visible title (`display-h2` for sections, `display-h1` for the page/hero) | Editorial headings (H2–H6 an editor types INSIDE rich text — `editorial-*` ramp) |
+| **Tagline / Subheading** | The one-to-two-line supporting sentence under a hero heading | Excerpt (below) |
+| **Excerpt / Card summary** | Short copy shown where a document appears AS A CARD elsewhere — never on its own page | The page's own body/overview copy |
+| **Section Labels** | The homepage's Studio tab holding its per-section EYEBROW texts | Section Nav (below) — the two were almost merged once |
+| **Section Nav** | The sub-navigation TAB LABELS (SubNav items) — a Studio group on `destinationDefaults`, `boatDefaults`, `privateCharters` | Section Labels (eyebrows); the main site Nav |
+| **Breadcrumb** | The `Home / …` trail in a hero; current page label = `seo.breadcrumbTitle` else the doc's Short name | Eyebrow |
+| **Short name** | A doc's compact reference name (`name` field) — breadcrumbs, cards, cross-references | Full title / `pageTitle` (the page's H1-scale heading) |
+| **Overview** | A page's intro body section (eyebrow + heading + rich-text body, usually with Read More) | Excerpt |
+| **Gallery** | A flat image array on a page with per-image category tags (bulk-upload capable) | Highlights / carousel images owned by a specific section |
+| **Read More** | The measured truncate/expand on a section's own body (returns to section top on collapse) | Accordion (a list where items open independently and closing doesn't scroll) |
+| **Defaults singleton** | Shared per-TYPE chrome edited once (`boatDefaults`, `destinationDefaults`) — carries `{boat}`/`{destination}` tokens | A singleton PAGE's own fields (homepage, Private Charters — those live on the page doc) |
+| **Shared Section singleton** | Chrome for ONE section that repeats across page TYPES, edited once in Shared Components (`boatsSection`) — tokens resolve per page | Defaults singletons (per-type, not per-section); the section's auto-queried content (cards come from their own docs) |
+
 ## 🗂️ Reuse shelf — at-a-glance catalog
 Status: 🟢 extracted/shared · 🔵 reusable file (single-use here, copy-&-adapt) · 🟡 inline candidate
 (embedded in a section — extract when a 2nd use appears).
