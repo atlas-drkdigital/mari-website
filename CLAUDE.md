@@ -1231,6 +1231,11 @@ At the start of every session, check whether the dev server is listening on :300
 `npm run dev` in the background if it isn't — without being asked. Idempotent check first
 (`Get-NetTCPConnection -LocalPort 3000 -State Listen`), never stack a second server. Composes with
 the existing Studio-staleness rule: a clean restart is still required after heavy schema changes.
+🔴 **Start it OUTSIDE the sandbox (`dangerouslyDisableSandbox: true`) — learned 2026-07-24.** A dev
+server inheriting Claude's sandboxed shell serves every normal route but 404s `/studio` specifically:
+the sandbox layer mishandles the `[[...tool]]` folder (brackets are glob characters, and Studio is the
+only bracketed route). Symptom signature: site fine + Studio clean-404 + `--localstorage-file` warning
+in the server output = sandboxed server; kill it and restart unsandboxed. Don't debug the route.
 
 ## Commands
 ```
