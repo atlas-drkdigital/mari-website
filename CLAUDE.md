@@ -1216,6 +1216,12 @@ ritual only counts if it can actually fail": a ritual that *falsely* fails is ju
   learnings (the relevant `drk-website` skill reference + a `_handoff/drk-website.md` entry). Full
   spec: `drk-website` skill's `references/workflow.md`, "End-of-session retrospective."
 
+## Dev server at session start — always bring localhost up (locked 2026-07-24, Adinda)
+At the start of every session, check whether the dev server is listening on :3000 and start
+`npm run dev` in the background if it isn't — without being asked. Idempotent check first
+(`Get-NetTCPConnection -LocalPort 3000 -State Listen`), never stack a second server. Composes with
+the existing Studio-staleness rule: a clean restart is still required after heavy schema changes.
+
 ## Commands
 ```
 npm run dev      # Turbopack dev server
