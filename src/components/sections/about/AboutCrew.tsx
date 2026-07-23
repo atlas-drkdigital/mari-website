@@ -1,23 +1,25 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { RichText } from '@/components/RichText'
-import { sanityImageProps } from '@/sanity/lib/image'
-import type { AboutPageData } from '@/sanity/queries'
+import { sanityImageProps, urlForImage } from '@/sanity/lib/image'
+import type { AboutPageData, CrewMemberData } from '@/sanity/queries'
 
-// Crew section — NEW build for the About page (spec: _PAGE-SPECS.md #1 + aboutPage.ts's field
-// notes: circular portraits, 4 per row, click opens the bio, section disappears while the list is
-// empty). No mockup exists — layout PROPOSED within conventions, shown to Adinda before polishing.
+// Crew section — About page (spec: _PAGE-SPECS.md #1 + aboutPage.ts's field notes: circular
+// portraits, 4 per row, click opens the bio, section disappears while the list is empty). No
+// mockup — layout proposed within conventions, iterated with Adinda per-QA-round.
 //
-// Interaction: each portrait is a real <button> toggling that member's bio in ONE panel below the
-// grid (per-cell expansion would ragged the 4-up rows). Buttons get first-tap activation on iOS —
-// the pointerup rule exists for hover-reactive NON-interactive elements (DestinationItineraries'
-// articles); the site's accordions (FaqAccordionItem) already ride button+onClick the same way.
+// Bio = a centered MODAL (Adinda, QA round 1: the below-grid panel "looks wrong. It needs to be a
+// lightbox that appears in the middle with an X button… an overlay ON the image, not a pure
+// lightbox"): the member's photo as the card, name/role/bio overlaid on a bottom gradient band —
+// the SiteLightbox caption treatment — on the site's lightbox scrim (92% + blur). Hand-rolled, not
+// YARL: this is one bio card, not an image-slide gallery, and pulling the YARL boundary in for it
+// would load ~40KB of gallery chrome for a dialog.
 //
-// Mobile: 2-up grid, first 4 members shown, the rest behind the "View More" reveal (the
-// crewViewMoreText field). Desktop shows everyone — rows of 4.
+// Portrait buttons are real <button>s — first-tap activation on iOS; the pointerup rule is for
+// hover-reactive NON-interactive elements (see DestinationItineraries).
 const MOBILE_VISIBLE = 4
 
 export function AboutCrew({ about }: { about: AboutPageData }) {
@@ -25,10 +27,25 @@ export function AboutCrew({ about }: { about: AboutPageData }) {
   const [openId, setOpenId] = useState<string | null>(null)
   const [showAll, setShowAll] = useState(false)
 
+  const open = members.find((m) => m._id === openId) ?? null
+
+  // Esc closes + body scroll locks while the modal is open (the standard dialog contract).
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenId(null)
+    }
+    document.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [open])
+
   // Below the hooks — an early return above them changes hook order (the locked guard pattern).
   if (members.length === 0) return null
-
-  const open = members.find((m) => m._id === openId) ?? null
 
   return (
     <section
@@ -54,64 +71,36 @@ export function AboutCrew({ about }: { about: AboutPageData }) {
         </div>
 
         <ul data-reveal className="grid w-full grid-cols-2 gap-x-24 gap-y-32 lg:grid-cols-4 lg:gap-x-48 lg:gap-y-48">
-          {members.map((member, i) => {
-            const isOpen = member._id === openId
-            return (
-              <li
-                key={member._id}
-                className={`${i >= MOBILE_VISIBLE && !showAll ? 'hidden lg:block' : ''}`}
+          {members.map((member, i) => (
+            <li key={member._id} className={`${i >= MOBILE_VISIBLE && !showAll ? 'hidden lg:block' : ''}`}>
+              <button
+                type="button"
+                onClick={() => setOpenId(member._id)}
+                aria-haspopup="dialog"
+                className="group flex w-full flex-col items-center gap-16 text-center"
               >
-                <button
-                  type="button"
-                  onClick={() => setOpenId(isOpen ? null : member._id)}
-                  aria-expanded={isOpen}
-                  aria-controls="crew-bio"
-                  className="group flex w-full flex-col items-center gap-16 text-center"
-                >
-                  {/* Circular portrait — ring lights up on the open member, and on hover with the
-                      same treatment (the accordion hover rule: hover = the active look's colors). */}
-                  <span
-                    className={`block aspect-square w-full max-w-[200px] overflow-hidden rounded-full border-2 transition-colors duration-300 ease-in-out ${isOpen ? 'border-action-primary' : 'border-border-default group-hover:border-action-primary'}`}
-                  >
-                    <Image
-                      {...sanityImageProps(member.photo, '/assets/placeholder-photo.svg')}
-                      alt={member.photo?.alt ?? ''}
-                      width={400}
-                      height={400}
-                      sizes="(min-width: 1024px) 200px, 45vw"
-                      className="size-full object-cover"
-                    />
-                  </span>
-                  <span className="flex flex-col gap-4">
-                    <span className="text-body-large font-bold text-text-primary">{member.name}</span>
-                    {member.position ? (
-                      <span className="text-caption-label uppercase text-text-secondary">
-                        {member.position}
-                      </span>
-                    ) : null}
-                  </span>
-                </button>
-              </li>
-            )
-          })}
+                {/* Circular portrait — hover takes the active color treatment (the accordion
+                    hover rule: colors only, no size/typography change). */}
+                <span className="block aspect-square w-full max-w-[200px] overflow-hidden rounded-full border-2 border-border-default transition-colors duration-300 ease-in-out group-hover:border-action-primary">
+                  <Image
+                    {...sanityImageProps(member.photo, '/assets/placeholder-photo.svg')}
+                    alt={member.photo?.alt ?? ''}
+                    width={400}
+                    height={400}
+                    sizes="(min-width: 1024px) 200px, 45vw"
+                    className="size-full object-cover"
+                  />
+                </span>
+                <span className="flex flex-col gap-4">
+                  <span className="text-body-large font-bold text-text-primary">{member.name}</span>
+                  {member.position ? (
+                    <span className="text-caption-label uppercase text-text-secondary">{member.position}</span>
+                  ) : null}
+                </span>
+              </button>
+            </li>
+          ))}
         </ul>
-
-        {/* ONE bio panel under the grid (not per-cell) — keeps the portrait rows even. */}
-        <div id="crew-bio" aria-live="polite" className="w-full">
-          {open?.bio ? (
-            <div className="mx-auto flex max-w-[720px] flex-col gap-8 border-l-2 border-action-primary bg-bg-surface px-24 py-20 text-left lg:px-32 lg:py-24">
-              <p className="text-body-large font-bold text-text-primary">
-                {open.name}
-                {open.position ? (
-                  <span className="ml-8 text-caption-label font-normal uppercase text-text-secondary">
-                    {open.position}
-                  </span>
-                ) : null}
-              </p>
-              <p className="text-body-medium text-text-primary">{open.bio}</p>
-            </div>
-          ) : null}
-        </div>
 
         {members.length > MOBILE_VISIBLE && !showAll ? (
           <button
@@ -123,6 +112,78 @@ export function AboutCrew({ about }: { about: AboutPageData }) {
           </button>
         ) : null}
       </div>
+
+      {open ? <CrewBioModal member={open} onClose={() => setOpenId(null)} /> : null}
     </section>
+  )
+}
+
+function CrewBioModal({ member, onClose }: { member: CrewMemberData; onClose: () => void }) {
+  // Portrait at modal size through the Sanity CDN pipeline (fit max so it never upscales).
+  const photoUrl = member.photo?.asset?._ref
+    ? urlForImage(member.photo).width(960).fit('max').quality(75).auto('format').url()
+    : null
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={member.name ? `About ${member.name}` : 'Crew member bio'}
+      // Scrim recipe = SiteLightbox's container verbatim (92% lightbox scrim + 12px blur), so the
+      // two overlays read as one system.
+      className="fixed inset-0 z-50 flex items-center justify-center p-24 lg:p-48"
+      style={{
+        backgroundColor: 'color-mix(in srgb, var(--color-background-lightbox-scrim) 92%, transparent)',
+        backdropFilter: 'blur(12px)',
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-[480px] overflow-hidden rounded-xs shadow-[0px_4px_10px_rgba(44,37,34,0.2)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* The card IS the photo, portrait-cropped; the bio overlays it on the bottom gradient
+            band — the SiteLightbox caption treatment, per Adinda's "overlay ON the image". */}
+        <div className="relative aspect-[3/4] w-full bg-background-ondark-page">
+          {photoUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element -- CDN-sized URL built above;
+               next/image adds nothing but a second optimizer pass here (the double-encode trap). */
+            <img src={photoUrl} alt={member.photo?.alt ?? ''} className="absolute inset-0 size-full object-cover" />
+          ) : (
+            <Image src="/assets/placeholder-photo.svg" alt="" fill className="object-cover" />
+          )}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 h-[75%]"
+            style={{
+              background:
+                'linear-gradient(to top, rgba(10,17,31,0.95) 0%, rgba(10,17,31,0.75) 40%, rgba(10,17,31,0) 100%)',
+            }}
+          />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-8 p-24 lg:p-32">
+            <div className="flex flex-col gap-4">
+              <p className="text-body-large font-bold text-text-ondark-primary">{member.name}</p>
+              {member.position ? (
+                <p className="text-caption-label uppercase text-accent-ondark-primary">{member.position}</p>
+              ) : null}
+            </div>
+            {member.bio ? <p className="text-body-medium text-text-ondark-primary">{member.bio}</p> : null}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close bio"
+          autoFocus
+          className="absolute right-12 top-12 grid size-[38px] place-items-center rounded-full bg-background-ondark-page/60 text-text-ondark-primary transition-colors duration-300 ease-in-out hover:bg-background-ondark-page/85"
+        >
+          <span
+            aria-hidden="true"
+            className="block size-[16px] bg-current [mask-image:url('/assets/icon-close.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+          />
+        </button>
+      </div>
+    </div>
   )
 }

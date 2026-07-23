@@ -902,3 +902,14 @@ For `references/workflow.md` + `references/pre-launch.md` — DRK-wide, every cl
   Fallback if it fails (failure mode = stored on Vercel, visible to project members, NOT public): deploy
   via CLI/GitHub Actions where `.vercelignore` filters before upload, or a stripped deploy branch.
   Fold the check into the pre-launch no-AI-traces pass — same concern, same timing.
+
+## PageOverview is a DRK-wide section pattern + sentence-case headings convention (Adinda, 2026-07-23)
+Two items from the About build:
+1. **PageOverview** (centered eyebrow + display-h2 + tier-3 rich body with the site Read More
+   collapse — content-based desktop cap, 60dvh mobile cap) is now a shared component with two
+   consumers (Private Charters + About) and Adinda called it a **DRK-website-wide pattern** —
+   register it in the component conventions alongside SubNav/TabRail/etc. at the next skill round.
+2. **Headings in website copy are SENTENCE CASE, not Title Case** — H2 section headings AND
+   h3+ headings inside rich-text body copy (the editorial standard; proper nouns keep capitals;
+   hero H1s and short card titles may deviate as exceptions). Belongs in the copy/content
+   conventions so every DRK site and every copy-drafting agent (Codex included) inherits it.

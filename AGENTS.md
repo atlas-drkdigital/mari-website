@@ -22,6 +22,19 @@ found at the path above, say so and use the repository's existing content as a f
 invent missing Mari facts. On another computer, restore or sync the Claude skills separately, or
 update the path in this file.
 
+## Copywriting conventions (Adinda, 2026-07-23)
+
+Headings in website copy use SENTENCE CASE, not Title Case — this applies to section headings
+(H2) and to headings inside body/rich-text content (H3 and below): "A traditional Indonesian
+Phinisi with diving at its heart", never "A Traditional Indonesian Phinisi With Diving at Its
+Heart". Proper nouns (Mari Liveaboard, Phinisi, Komodo, Raja Ampat, Indonesia) keep their
+capitals. Hero titles (H1) and short card/benefit titles may deviate — exceptions exist here and
+there — but the default for any heading in body copy is sentence case. When drafting copy files
+in `content/`, write headings this way so they can be seeded verbatim.
+
+`content/` at the repo root is the canonical, git-TRACKED home for copy drafts — do not move it
+or rename it (it was once swept into the ignored `_content/` scratch folder and nearly lost work).
+
 ## Repository continuity
 
 Keep `AGENTS.md` tracked in Git. It contains shared project instructions needed to resume work after
