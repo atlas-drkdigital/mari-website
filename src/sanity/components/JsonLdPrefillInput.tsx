@@ -12,12 +12,20 @@ import type { TextInputProps } from 'sanity'
 // the single source of truth, so the prefill can never drift from reality. Consequence worth
 // knowing: it reads the PUBLISHED page — unsaved Studio edits aren't in it yet, which is fine
 // for a starting point.
+// SITEWIDE (Adinda, 2026-07-23): every page-bearing type maps here — the button already appears on
+// every `seo` field, this map is what lets it resolve a route. A type whose page isn't built yet
+// (e.g. Schedule & Rates pre-build) just gets the honest "responded 404" message until it ships.
+// Types with seo but NO page of their own (itineraries) stay unmapped on purpose — the "no live
+// page" message is the correct answer there, not a gap.
 const ROUTE_BY_TYPE: Record<string, (slug?: string) => string | null> = {
   homePage: () => '/',
   destination: (slug) => (slug ? `/destinations/${slug}` : null),
   boat: (slug) => (slug ? `/boats/${slug}` : null),
   blogPost: (slug) => (slug ? `/blog/${slug}` : null),
   page: (slug) => (slug ? `/${slug}` : null),
+  privateCharters: () => '/private-charters',
+  faqGeneral: () => '/faq',
+  scheduleRates: () => '/schedule-rates',
 }
 
 export function JsonLdPrefillInput(props: TextInputProps) {
