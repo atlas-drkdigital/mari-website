@@ -54,6 +54,7 @@ export const HOMEPAGE_QUERY = groq`{
     "category": category->name,
     coverImage${IMAGE}
   },
+  "destinationsSectionCta": *[_id == "destinationsSection"][0].ctaText,
   // The Destinations CAROUSEL pulls the destinationsSection singleton's drag-curated array
   // (2026-07-23, Adinda — order = array order, omission hides). The all-list below stays for the
   // hero search + contact dropdown, which must never hide a destination.
@@ -192,6 +193,15 @@ export const DESTINATION_QUERY = groq`{
     _key, title, questions[]{ question, answer }
   },
   "boatsSection": *[_id == "boatsSection"][0]{ eyebrow, heading, headingSingular, ctaText },
+  "curatedBoats": coalesce(*[_id == "boatsSection"][0].boats[]->{
+    _id, name, pageTitle, tagline,
+    "slug": slug.current,
+    coverImage${IMAGE},
+    useCoverAsCardImage,
+    cardImage${IMAGE},
+    excerpt,
+    stats[]{ _key, label, value }
+  }, []),
   // Unlike the homepage's latest-3, the destination Articles section shows only posts LINKED to
   // this destination via blogPost.relatedDestination (Adinda, 2026-07-22: "articles & news — but
   // Komodo only").
@@ -260,6 +270,17 @@ export const PRIVATE_CHARTERS_QUERY = groq`{
     _key, title, questions[]{ question, answer }
   },
   "boatsSection": *[_id == "boatsSection"][0]{ eyebrow, eyebrowGeneric, heading, headingSingular, ctaText },
+  // Curated boats list (boatsSection.boats drag array, 2026-07-23) — order = array order,
+  // omission hides; all-list fallback in the page when unseeded/empty.
+  "curatedBoats": coalesce(*[_id == "boatsSection"][0].boats[]->{
+    _id, name, pageTitle, tagline,
+    "slug": slug.current,
+    coverImage${IMAGE},
+    useCoverAsCardImage,
+    cardImage${IMAGE},
+    excerpt,
+    stats[]{ _key, label, value }
+  }, []),
   "boats": *[_type == "boat" && defined(slug.current)] | order(name asc){
     _id, name, pageTitle, tagline,
     "slug": slug.current,
@@ -269,6 +290,7 @@ export const PRIVATE_CHARTERS_QUERY = groq`{
     excerpt,
     stats[]{ _key, label, value }
   },
+  "destinationsSectionCta": *[_id == "destinationsSection"][0].ctaText,
   // The CAROUSEL's list = the destinationsSection singleton's drag-curated array (order = array
   // order, omission hides). Coalesced to [] so an unseeded singleton degrades to the all-list
   // fallback in the page, never a crash.
@@ -563,7 +585,7 @@ export type DestinationDefaultsData = {
   itinerariesCardCtaText?: string
   upcomingTripsEyebrow?: string
   upcomingTripsHeading?: string
-  upcomingTripsIntro?: string
+  upcomingTripsIntro?: PortableTextBlock[]
   upcomingTripsCtaText?: string
   faqEyebrow?: string
   faqHeading?: string
@@ -596,6 +618,7 @@ export type DestinationQueryResult = {
   sharedFaqSections: FaqSectionData[] | null
   boatsSection: BoatsSectionData | null
   latestPosts: LatestPostData[]
+  curatedBoats: BoatCardData[]
   boats: BoatCardData[]
   cta: { cards?: CtaCardData[] } | null
   settings: SiteSettingsContact | null
@@ -656,7 +679,7 @@ export type PrivateChartersData = {
   benefits?: BenefitImageData[]
   availabilityEyebrow?: string
   availabilityHeading?: string
-  availabilityIntro?: string
+  availabilityIntro?: PortableTextBlock[]
   availabilityCtaText?: string
   availabilityEmbed?: string
   faqEyebrow?: string
@@ -676,7 +699,9 @@ export type PrivateChartersQueryResult = {
   charters: PrivateChartersData | null
   sharedFaqSections: FaqSectionData[] | null
   boatsSection: BoatsSectionData | null
+  curatedBoats: BoatCardData[]
   boats: BoatCardData[]
+  destinationsSectionCta: string | null
   curatedDestinations: DestinationCardData[]
   destinations: DestinationCardData[]
   settings: SiteSettingsContact | null
@@ -686,6 +711,7 @@ export type HomePageQueryResult = {
   home: HomePageData | null
   cta: { cards?: CtaCardData[] } | null
   latestPosts: LatestPostData[]
+  destinationsSectionCta: string | null
   curatedDestinations: DestinationCardData[]
   destinations: DestinationCardData[]
   settings: SiteSettingsContact | null

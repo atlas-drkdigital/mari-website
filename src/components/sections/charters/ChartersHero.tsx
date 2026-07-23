@@ -83,8 +83,11 @@ export function ChartersHero({ charters }: { charters: PrivateChartersData }) {
                 other heroes) — that let the intro run long and read worse. */}
             <h1 id="charters-hero-heading" className="max-w-[480px] text-text-ondark-primary">
               {charters.heroHeadingIntro ? (
+                // The trailing {' '} is LOAD-BEARING (drk-seo pass, 2026-07-23): both spans are
+                // display:block so the break is visual-only — without an explicit space the
+                // extracted/crawled h1 text runs the lines together ("…Charters inIndonesia").
                 <span className="block text-[26px] font-extralight leading-[1.2] tracking-[-1.5px] lg:text-[36px] lg:tracking-[-2px]">
-                  {charters.heroHeadingIntro}
+                  {charters.heroHeadingIntro}{' '}
                 </span>
               ) : null}
               {/* Optional (Adinda, 2026-07-23) — an intro-only heading is a valid state. */}

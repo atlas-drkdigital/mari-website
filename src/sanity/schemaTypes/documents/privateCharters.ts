@@ -232,11 +232,13 @@ export const privateChartersType = defineType({
       group: 'availability',
       fieldset: 'availabilityFs',
     }),
+    // richTextBasic, not plain text (Adinda, 2026-07-23): embed-section intros support links /
+    // bold / multi-paragraph — e.g. "contact us" links to the #contact section. Applies to every
+    // embed-holding section (destinationDefaults.upcomingTripsIntro upgraded in the same pass).
     defineField({
       name: 'availabilityIntro',
       title: 'Intro text',
-      type: 'text',
-      rows: 4,
+      type: 'richTextBasic',
       group: 'availability',
       fieldset: 'availabilityFs',
       description: 'Shown above the booking widget — explain how to find and book charter dates.',

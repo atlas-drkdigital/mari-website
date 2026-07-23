@@ -44,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
   const { data } = await sanityFetch({ query: HOMEPAGE_QUERY })
-  const { home, cta, latestPosts, curatedDestinations, destinations, settings, faq } = (data ?? {}) as HomePageQueryResult
+  const { home, cta, latestPosts, destinationsSectionCta, curatedDestinations, destinations, settings, faq } = (data ?? {}) as HomePageQueryResult
   const dests = destinations ?? []
   // The CAROUSEL takes the destinationsSection singleton's drag-curated list (2026-07-23);
   // an unseeded/empty singleton degrades to the all-list so the section never silently vanishes.
@@ -78,7 +78,7 @@ export default async function Home() {
         <Hero home={home} destinations={dests} />
         <TheBoat home={home} />
         <WhyUs home={home} />
-        <Destinations destinations={carouselDests} />
+        <Destinations destinations={carouselDests} ctaText={destinationsSectionCta ?? undefined} />
         <LatestArticles
           eyebrow={home?.latestArticlesEyebrow}
           heading={home?.latestArticlesHeading}

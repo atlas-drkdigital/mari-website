@@ -1,4 +1,4 @@
-import { defineField, defineType } from 'sanity'
+import { defineArrayMember, defineField, defineType } from 'sanity'
 
 // "About the Boats" SHARED SECTION singleton (2026-07-23, Adinda's shared-sections model): the
 // section's chrome edited ONCE for every page that mounts the component — today the destination
@@ -50,6 +50,16 @@ export const boatsSectionType = defineType({
       title: 'Card button text',
       type: 'string',
       description: 'The link on each boat card — goes to that boat\'s own page.',
+    }),
+    // Drag-curated list, the destinationsSection twin (Adinda, 2026-07-23: "exactly like the
+    // destination section"): drag = display order, omission hides the boat from this section.
+    defineField({
+      name: 'boats',
+      title: 'Boats',
+      type: 'array',
+      description:
+        'Drag to set the order the section shows boats in. A boat left off this list is hidden from the section.',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'boat' }] })],
     }),
   ],
   preview: {

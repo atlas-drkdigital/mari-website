@@ -117,11 +117,12 @@ export const destinationDefaultsType = defineType({
     defineField({
       name: 'upcomingTripsIntro',
       title: 'Upcoming Trips intro',
-      type: 'text',
-      rows: 2,
+      // richTextBasic since 2026-07-23 (Adinda: embed-section intros support links/bold/
+      // multi-paragraph, site-wide). Existing string value migrated to blocks by
+      // _scripts/migrate-embed-intros.ts.
+      type: 'richTextBasic',
       fieldset: 'upcomingTrips',
       group: 'upcomingTrips',
-      initialValue: 'Book directly through our scheduling partner to view real-time availability and reserve your cabin.',
     }),
     defineField({
       name: 'upcomingTripsCtaText',

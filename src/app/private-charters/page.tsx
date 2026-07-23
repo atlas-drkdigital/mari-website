@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PrivateChartersPage() {
-  const { charters, sharedFaqSections, boatsSection, boats, curatedDestinations, destinations, settings } =
+  const { charters, sharedFaqSections, boatsSection, curatedBoats, boats, destinationsSectionCta, curatedDestinations, destinations, settings } =
     await getCharters()
 
   if (!charters) notFound()
@@ -69,6 +69,9 @@ export default async function PrivateChartersPage() {
   // homepage's identical note, incl. why .filter(Boolean) guards null deref members).
   const curated = (curatedDestinations ?? []).filter(Boolean)
   const carouselDests = curated.length ? curated : (destinations ?? [])
+  // Boats: same curated-with-fallback model (boatsSection.boats drag array, 2026-07-23).
+  const curatedBoatsList = (curatedBoats ?? []).filter(Boolean)
+  const boatsList = curatedBoatsList.length ? curatedBoatsList : (boats ?? [])
 
   // FAQ composition mirrors the boat/destination pages: this page's own categories first, then
   // shared General FAQ categories (showOnPrivateChartersPage toggle, filtered in the query).
@@ -130,7 +133,7 @@ export default async function PrivateChartersPage() {
         />
         {/* Shared sections (Adinda, 2026-07-23): Destinations = the homepage component verbatim;
             Boats = the destination page's component with this page's own chrome fields. */}
-        <Destinations destinations={carouselDests} />
+        <Destinations destinations={carouselDests} ctaText={destinationsSectionCta ?? undefined} />
         {/* texture={false}: plain page background on THIS page only (Adinda, 2026-07-23) — the
             component itself stays shared, so design edits still propagate everywhere. Chrome from
             the shared boatsSection singleton (same day). */}
@@ -138,7 +141,7 @@ export default async function PrivateChartersPage() {
             and the wording is editor-owned on the boatsSection doc (no hardcoded token values;
             Adinda, 2026-07-23). */}
         <DestinationBoats
-          boats={boats ?? []}
+          boats={boatsList}
           eyebrow={boatsSection?.eyebrowGeneric}
           heading={boatsSection?.heading}
           headingSingular={boatsSection?.headingSingular}

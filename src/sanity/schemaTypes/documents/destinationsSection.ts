@@ -15,6 +15,14 @@ export const destinationsSectionType = defineType({
   type: 'document',
   description: 'The destinations carousel shown across pages — edited once, changes everywhere.',
   fields: [
+    // Card CTA (Adinda, 2026-07-23 — "what is missing is the call to action text"): replaces the
+    // component's hardcoded "Explore {name}". {destination} resolves per card.
+    defineField({
+      name: 'ctaText',
+      title: 'Card button text',
+      type: 'string',
+      description: 'The link text on each destination card. Type {destination} to insert that card\'s destination name.',
+    }),
     defineField({
       name: 'destinations',
       title: 'Destinations',

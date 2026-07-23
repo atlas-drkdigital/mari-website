@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
 import { CarouselArrowButton } from '@/components/CarouselArrowButton'
+import { resolveTokens } from '@/lib/tokens'
 import { useDragScroll } from '@/lib/useDragScroll'
 import { sanityImageProps } from '@/sanity/lib/image'
 import type { DestinationCardData } from '@/sanity/queries'
@@ -22,7 +23,17 @@ import type { DestinationCardData } from '@/sanity/queries'
 // tagline and the card summary are Sanity fields, not the old hardcoded maps. The card links
 // still point at "#" until the destination page slice ships (nav/footer links un-hardcode per
 // slice); the card image falls back to the matching local asset only if a doc has no coverImage.
-export function Destinations({ destinations }: { destinations: DestinationCardData[] }) {
+export function Destinations({
+  destinations,
+  ctaText,
+}: {
+  destinations: DestinationCardData[]
+  /**
+   * Card CTA text from the destinationsSection singleton (2026-07-23 — replaced the hardcoded
+   * "Explore {name}"). Carries a {destination} token resolved PER CARD. Hidden when empty.
+   */
+  ctaText?: string
+}) {
   const [index, setIndex] = useState(0)
   const stageRef = useRef<HTMLDivElement>(null)
   const dragState = useRef({ dragging: false, startX: 0, moved: 0 })
@@ -135,10 +146,12 @@ export function Destinations({ destinations }: { destinations: DestinationCardDa
             </div>
             <div className="flex w-full lg:w-[max(520px,42%)] flex-col gap-24 lg:gap-28">
               <p className="text-body-medium lg:text-body-large text-text-ondark-primary">{dest.excerpt}</p>
-              <a href={`/destinations/${dest.slug}`} className="group inline-flex w-fit items-center gap-4 border-b border-text-ondark-primary py-4 text-button-small uppercase text-text-ondark-primary">
-                Explore {dest.name}
-                <span aria-hidden="true" className="block size-[16px] shrink-0 bg-text-ondark-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
-              </a>
+              {ctaText ? (
+                <a href={`/destinations/${dest.slug}`} className="group inline-flex w-fit items-center gap-4 border-b border-text-ondark-primary py-4 text-button-small uppercase text-text-ondark-primary">
+                  {resolveTokens(ctaText, { destination: dest.name }) ?? ''}
+                  <span aria-hidden="true" className="block size-[16px] shrink-0 bg-text-ondark-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow-forward.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
+                </a>
+              ) : null}
             </div>
           </article>
         ))}

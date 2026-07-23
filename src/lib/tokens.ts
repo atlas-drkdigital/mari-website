@@ -15,6 +15,28 @@
 // Unknown tokens are left ALONE rather than blanked: a stray "{foo}" surviving to the page is a
 // visible bug an editor can report, whereas silently deleting it hides the mistake.
 
+/**
+ * resolveTokens over a Portable Text value: maps every span's text through the same replacement
+ * (2026-07-23, for the rich embed-section intros — a PT field can carry {destination} just like
+ * a string field). Non-block members (images, embeds) pass through untouched.
+ */
+export function resolvePortableTextTokens<T extends { _type?: string; children?: unknown }[]>(
+  blocks: T | undefined | null,
+  values: Record<string, string | undefined | null>,
+): T | undefined {
+  if (!blocks?.length) return blocks ?? undefined
+  return blocks.map((block) => {
+    const children = (block as { children?: { text?: string }[] }).children
+    if (block._type !== 'block' || !Array.isArray(children)) return block
+    return {
+      ...block,
+      children: children.map((c) =>
+        typeof c.text === 'string' ? { ...c, text: resolveTokens(c.text, values) ?? c.text } : c,
+      ),
+    }
+  }) as T
+}
+
 /** Replaces every `{key}` with its value. Unknown tokens are left untouched, by design. */
 export function resolveTokens(
   text: string | undefined | null,

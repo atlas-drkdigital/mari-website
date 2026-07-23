@@ -17,7 +17,7 @@ import { LatestArticles } from '@/components/sections/LatestArticles'
 import { SubNav, type SubNavItem } from '@/components/SubNav'
 import { toPlainText } from '@/lib/portableText'
 import { buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
-import { resolveTokens } from '@/lib/tokens'
+import { resolvePortableTextTokens, resolveTokens } from '@/lib/tokens'
 import { sanityFetch } from '@/sanity/lib/live'
 import { DESTINATION_QUERY, type DestinationQueryResult } from '@/sanity/queries'
 
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function DestinationPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params
-  const { destination, defaults, itineraries, sharedFaqSections, boatsSection, latestPosts, boats, cta, settings, destinations } =
+  const { destination, defaults, itineraries, sharedFaqSections, boatsSection, curatedBoats, latestPosts, boats, cta, settings, destinations } =
     await getDestination(slug)
 
   if (!destination) notFound()
@@ -93,6 +93,11 @@ export default async function DestinationPage({ params }: { params: Promise<Para
     : null
 
   const jsonLd = resolveJsonLd(destination.seo, faqJsonLd)
+
+  // Boats: curated drag list (boatsSection.boats) with all-list fallback; .filter(Boolean)
+  // guards null deref members (unpublished ref targets).
+  const curatedBoatsList = (curatedBoats ?? []).filter(Boolean)
+  const boatsList = curatedBoatsList.length ? curatedBoatsList : (boats ?? [])
 
   // Subnav items appear only when their section has content to render ("hide what's empty").
   const hasTripsEmbed = Boolean(destination.upcomingTripsEmbed?.trim())
@@ -141,7 +146,7 @@ export default async function DestinationPage({ params }: { params: Promise<Para
         <DestinationTrips
           eyebrow={t(defaults?.upcomingTripsEyebrow)}
           heading={t(defaults?.upcomingTripsHeading)}
-          intro={t(defaults?.upcomingTripsIntro)}
+          intro={resolvePortableTextTokens(defaults?.upcomingTripsIntro, tokens)}
           ctaText={t(defaults?.upcomingTripsCtaText)}
           embedHtml={destination.upcomingTripsEmbed}
         />
@@ -155,10 +160,11 @@ export default async function DestinationPage({ params }: { params: Promise<Para
             Contact. Articles = the homepage component, Komodo-linked posts only, no button (the
             mock has none — its arrows are deferred; the drag-track convention covers the
             overflow case). */}
-        {/* Chrome from the SHARED boatsSection singleton (2026-07-23, moved off
-            destinationDefaults) — {destination} still resolves through t() as before. */}
+        {/* Chrome + curated list from the SHARED boatsSection singleton (2026-07-23, moved off
+            destinationDefaults) — {destination} still resolves through t() as before. Curated
+            drag array with all-list fallback; .filter(Boolean) guards null deref members. */}
         <DestinationBoats
-          boats={boats ?? []}
+          boats={boatsList}
           eyebrow={t(boatsSection?.eyebrow)}
           heading={t(boatsSection?.heading)}
           headingSingular={t(boatsSection?.headingSingular)}

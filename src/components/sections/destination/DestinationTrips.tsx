@@ -1,4 +1,7 @@
+import type { PortableTextBlock } from 'sanity'
+
 import { EmbedHtml } from '@/components/EmbedHtml'
+import { RichText } from '@/components/RichText'
 
 // Figma 774:7626 (Upcoming Trips / booking widget shell). Server Component shell; the embed itself
 // mounts client-side via EmbedHtml (its <script> must execute — see that component's header).
@@ -25,7 +28,8 @@ export function DestinationTrips({
 }: {
   eyebrow?: string
   heading?: string
-  intro?: string
+  /** Rich text (tier 2) since 2026-07-23 — links/bold/multi-paragraph supported. */
+  intro?: PortableTextBlock[]
   ctaText?: string
   embedHtml?: string
   /** Section anchor id — the Private Charters page mounts this same component as #available-dates. */
@@ -55,8 +59,13 @@ export function DestinationTrips({
           <h2 id="upcoming-trips-heading" className="max-w-[720px] text-display-h2 text-text-primary lg:max-w-[800px]">{heading}</h2>
           {/* Intro matches the HEADING's max-width and reads in primary navy (Adinda, 2026-07-23:
               560px was "way too tight" and text-secondary "not visible enough" — shared component,
-              one change, both pages). */}
-          {intro ? <p className="max-w-[720px] text-body-medium text-text-primary lg:max-w-[800px] lg:text-body-large">{intro}</p> : null}
+              one change, both pages). Rich text since the same day (links/bold/multi-paragraph —
+              e.g. "contact us" → #contact); the flex-gap wrapper is the paragraph-spacing rule. */}
+          {intro?.length ? (
+            <div className="flex max-w-[720px] flex-col gap-12 text-body-medium text-text-primary lg:max-w-[800px] lg:gap-16 lg:text-body-large">
+              <RichText value={intro} />
+            </div>
+          ) : null}
         </div>
 
         {/* Card chrome mirrors the Testimonials cards (same surface + shadow — Adinda's ask).
