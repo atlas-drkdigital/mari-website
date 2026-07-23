@@ -45,3 +45,11 @@ next-env.d.ts
 # App Router uses "_"-prefixed folders inside src/app/ as a real, committed routing convention
 # (e.g. _components/, _lib/), and this must never touch those.
 /_*
+
+# EXCEPTIONS (Adinda, 2026-07-23): the load-bearing working docs ARE committed — git+GitHub is the
+# project's real backup (repo is private, DRK-internal; none of this is served by the deployed site).
+# Still ignored on purpose: _backup/ (stale file copies), _image-test/ + _content/ images (masters
+# live in Google Drive + Sanity), logs, zips, and any future _* scratch.
+!/_*.md
+!/_handoff/
+!/_scripts/

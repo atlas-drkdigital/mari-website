@@ -1,0 +1,37 @@
+{
+  "_id": "boat-mari",
+  "gallery": [
+    {
+      "_key": "3007cd3e07a0",
+      "_type": "galleryImage",
+      "asset": {
+        "_ref": "image-78c987baad9b2710e491db08022184f457c6dfe3-1068x1473-jpg",
+        "_type": "reference"
+      }
+    },
+    {
+      "_key": "27ed5e1ff41f",
+      "_type": "galleryImage",
+      "asset": {
+        "_ref": "image-e05b2f3968b5eb0b59e0729a95810b3f84ae1811-1176x784-jpg",
+        "_type": "reference"
+      }
+    },
+    {
+      "_key": "462526766e34",
+      "_type": "galleryImage",
+      "asset": {
+        "_ref": "image-c78199ab38732324984491426da3b00056654fb7-1264x843-jpg",
+        "_type": "reference"
+      }
+    },
+    {
+      "_key": "5f6a247b660f",
+      "_type": "galleryImage",
+      "asset": {
+        "_ref": "image-ba83f0718d0a8ccc6e490c680ffe569e309829f6-1448x1086-jpg",
+        "_type": "reference"
+      }
+    }
+  ]
+}

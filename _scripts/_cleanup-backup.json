@@ -1,0 +1,1229 @@
+{
+  "boat": {
+    "_createdAt": "2026-07-15T12:17:05Z",
+    "_id": "boat-mari",
+    "_rev": "jR36JPyYnZ2kFBEbLOg1jw",
+    "_type": "boat",
+    "_updatedAt": "2026-07-16T22:22:21Z",
+    "cabinsHeading": "Cabins",
+    "cabinsIntro": [
+      {
+        "_key": "k7",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "k8",
+            "_type": "span",
+            "marks": [],
+            "text": "Step straight from the ocean to sea views and easy access to the rest of the boat — all from the comfort of your cabin. All three Deluxe and four Superior cabins come with private air conditioning and an ensuite bathroom with hot water, ready whenever you need to recharge between dives."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      }
+    ],
+    "coverImage": {
+      "_type": "imageWithAlt",
+      "alt": "Mari Liveaboard underway at sea",
+      "asset": {
+        "_ref": "image-ba83f0718d0a8ccc6e490c680ffe569e309829f6-1448x1086-jpg",
+        "_type": "reference"
+      }
+    },
+    "faqSections": [
+      {
+        "_key": "f56",
+        "_type": "faqSection",
+        "questions": [
+          {
+            "_key": "f57",
+            "_type": "faqItem",
+            "answer": [
+              {
+                "_key": "f58",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f59",
+                    "_type": "span",
+                    "text": "Mari is built for serious divers who want a premium liveaboard at exceptional value. It carries a maximum of 14 guests, so the boat stays uncrowded and the diving stays the focus."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              },
+              {
+                "_key": "f60",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f61",
+                    "_type": "span",
+                    "text": "It suits certified divers who would rather spend their time in the water than on a large, busy vessel. Non-diving partners are welcome, though the program is built around the dive schedule."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              }
+            ],
+            "isFeatured": true,
+            "question": "Who is Mari suitable for?"
+          },
+          {
+            "_key": "f62",
+            "_type": "faqItem",
+            "answer": [
+              {
+                "_key": "f63",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f64",
+                    "_type": "span",
+                    "text": "Yes. Nitrox is produced on board with an NRC membrane system and is available to certified Nitrox divers at additional cost."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              },
+              {
+                "_key": "f65",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f66",
+                    "_type": "span",
+                    "text": "Bring your Nitrox certification card. Fills are charged per day and can be paid in cash on board."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              }
+            ],
+            "isFeatured": true,
+            "question": "Is Nitrox available on board?"
+          },
+          {
+            "_key": "f67",
+            "_type": "faqItem",
+            "answer": [
+              {
+                "_key": "f68",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f69",
+                    "_type": "span",
+                    "text": "Open Water certification with at least 30 logged dives is required on every Mari cruise."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              },
+              {
+                "_key": "f70",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f71",
+                    "_type": "span",
+                    "text": "Many of the sites we visit carry real current, so this baseline applies regardless of destination. Proof of certification is checked before your first dive."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              }
+            ],
+            "isFeatured": true,
+            "question": "What is the minimum diving experience required?"
+          },
+          {
+            "_key": "f72",
+            "_type": "faqItem",
+            "answer": [
+              {
+                "_key": "f73",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f74",
+                    "_type": "span",
+                    "text": "Mari carries 14 crew for a maximum of 14 guests, a ratio of 1:1."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              },
+              {
+                "_key": "f75",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f76",
+                    "_type": "span",
+                    "text": "Four of them are dive staff: a cruise director and three dive guides. That works out to up to four divers per guide in the water."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              }
+            ],
+            "isFeatured": true,
+            "question": "What is the crew-to-guest ratio?"
+          },
+          {
+            "_key": "f77",
+            "_type": "faqItem",
+            "answer": [
+              {
+                "_key": "f78",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f79",
+                    "_type": "span",
+                    "text": "Yes. Regulators, BCDs, wetsuits, fins, boots, computers, torches and reef hooks are all available to rent on board, charged per day."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              },
+              {
+                "_key": "f80",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f81",
+                    "_type": "span",
+                    "text": "Rental gear must be requested in advance so we can confirm sizes and availability before you travel."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              }
+            ],
+            "question": "Is dive equipment available to rent?"
+          },
+          {
+            "_key": "f82",
+            "_type": "faqItem",
+            "answer": [
+              {
+                "_key": "f83",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f84",
+                    "_type": "span",
+                    "text": "Wi-Fi is free on board and works whenever the boat is within range of a mobile network."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              },
+              {
+                "_key": "f85",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f86",
+                    "_type": "span",
+                    "text": "Many of the best dive sites are remote, so expect stretches of the cruise with no signal at all."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              }
+            ],
+            "question": "Is there Wi-Fi on board?"
+          },
+          {
+            "_key": "f87",
+            "_type": "faqItem",
+            "answer": [
+              {
+                "_key": "f88",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f89",
+                    "_type": "span",
+                    "text": "Up to four dives a day: typically at 7:00am, 10:00am and 2:00pm, plus a night dive at 6:30pm when one is scheduled."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              },
+              {
+                "_key": "f90",
+                "_type": "block",
+                "children": [
+                  {
+                    "_key": "f91",
+                    "_type": "span",
+                    "text": "An 11-night cruise runs up to 33 dives in total. Maximum dive time is 70 minutes and maximum depth is 40m (131ft)."
+                  }
+                ],
+                "markDefs": [],
+                "style": "normal"
+              }
+            ],
+            "question": "How many dives are there per day?"
+          }
+        ],
+        "title": "General Information"
+      }
+    ],
+    "galleryDescription": [
+      {
+        "_key": "k9",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "k10",
+            "_type": "span",
+            "marks": [],
+            "text": "A closer look at life aboard Mari — the boat itself, the food, and the spaces built for unwinding between dives."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      }
+    ],
+    "galleryTitle": "Gallery",
+    "keyFeatures": [
+      "Max. 14 guests for a relaxed, uncrowded atmosphere",
+      "7 ensuite, air-conditioned sea-view cabins, all on the main deck",
+      "14 experienced crew members, including 3 dive guides and a dedicated cruise director",
+      "Spacious outdoor dining, lounge, and sun decks",
+      "Large dive deck, nitrox, and quality rental equipment",
+      "3 tenders, including one dedicated to snorkelers and excursions"
+    ],
+    "keyFeaturesHeading": "Key features",
+    "keyFeaturesImage": {
+      "_type": "imageWithAlt",
+      "alt": "Mari Liveaboard, key features",
+      "asset": {
+        "_ref": "image-dd9a1de34b0ed851df31e1a2ac3b3af26b614299-1535x1024-jpg",
+        "_type": "reference"
+      }
+    },
+    "name": "Mari",
+    "overviewBody": [
+      {
+        "_key": "k5",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "k6",
+            "_type": "span",
+            "marks": [],
+            "text": "Explore Indonesia's most renowned dive destinations, from Raja Ampat, Komodo, and Flores to the Banda Sea, and beyond. Mari Liveaboard is a 30m traditional Indonesian ironwood Phinisi built for serious divers who value comfort, space, and exceptional value."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      }
+    ],
+    "overviewHeading": "Traditional phinisi liveaboard for serious divers",
+    "pageTitle": "Mari Liveaboard",
+    "specifications": [
+      {
+        "_key": "k513",
+        "_type": "specCategory",
+        "body": [
+          {
+            "_key": "k501",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k502",
+                "_type": "span",
+                "marks": [],
+                "text": "Type: Traditional Indonesian Phinisi"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k503",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k504",
+                "_type": "span",
+                "marks": [],
+                "text": "Length: 30m / Beam: 6.5m / Draft: 2.3m / Weight: 120t"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k505",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k506",
+                "_type": "span",
+                "marks": [],
+                "text": "Built: 2008"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k507",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k508",
+                "_type": "span",
+                "marks": [],
+                "text": "Cruising speed: 8 knots / Range: 4,000nm"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k509",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k510",
+                "_type": "span",
+                "marks": [],
+                "text": "14 guests / 7 cabins (3 Deluxe, 4 Superior)"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k511",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k512",
+                "_type": "span",
+                "marks": [],
+                "text": "All cabins: ensuite, A/C, hot water, main deck, sea view"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        ],
+        "category": "Vessel & Accommodation"
+      },
+      {
+        "_key": "k520",
+        "_type": "specCategory",
+        "body": [
+          {
+            "_key": "k514",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k515",
+                "_type": "span",
+                "marks": [],
+                "text": "Total crew: 14"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k516",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k517",
+                "_type": "span",
+                "marks": [],
+                "text": "Dive staff: 4 (Cruise Director + 3 Dive Guides)"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k518",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k519",
+                "_type": "span",
+                "marks": [],
+                "text": "Ratio: 1:1 crew-to-guest"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        ],
+        "category": "Crew"
+      },
+      {
+        "_key": "k529",
+        "_type": "specCategory",
+        "body": [
+          {
+            "_key": "k521",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k522",
+                "_type": "span",
+                "marks": [],
+                "text": "Dive tanks: 29 tanks (12L and 15L)"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k523",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k524",
+                "_type": "span",
+                "marks": [],
+                "text": "Compressors: 2x CAT 9 (240 L/min), 1x ASTRA (200 L/min)"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k525",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k526",
+                "_type": "span",
+                "marks": [],
+                "text": "Nitrox: available via NRC membrane system (500 L/min), extra charge"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k527",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k528",
+                "_type": "span",
+                "marks": [],
+                "text": "Rental gear: available on board, advance request required"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        ],
+        "category": "Diving Equipment"
+      },
+      {
+        "_key": "k538",
+        "_type": "specCategory",
+        "body": [
+          {
+            "_key": "k530",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k531",
+                "_type": "span",
+                "marks": [],
+                "text": "Fleet: 3 fiberglass dinghies"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k532",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k533",
+                "_type": "span",
+                "marks": [],
+                "text": "Large tenders: 2x 6.5m / 40PS Yamaha"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k534",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k535",
+                "_type": "span",
+                "marks": [],
+                "text": "Small tender: 1x 4m / 15PS Yamaha"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k536",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k537",
+                "_type": "span",
+                "marks": [],
+                "text": "One tender dedicated to snorkelers and excursions"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        ],
+        "category": "Tenders"
+      },
+      {
+        "_key": "k549",
+        "_type": "specCategory",
+        "body": [
+          {
+            "_key": "k539",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k540",
+                "_type": "span",
+                "marks": [],
+                "text": "Engines: Nissan RD8 / 280PS"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k541",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k542",
+                "_type": "span",
+                "marks": [],
+                "text": "Generators: 1x Yanmar 26.4kW, 1x Yanmar 16kW"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k543",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k544",
+                "_type": "span",
+                "marks": [],
+                "text": "Fuel tank: 16,000L / Water tank: 6,000L"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k545",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k546",
+                "_type": "span",
+                "marks": [],
+                "text": "Desalinators: 2x reverse-osmosis, 10,000L/day total"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k547",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k548",
+                "_type": "span",
+                "marks": [],
+                "text": "Voltage: 220V / 50Hz"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        ],
+        "category": "Machinery & Power"
+      },
+      {
+        "_key": "k554",
+        "_type": "specCategory",
+        "body": [
+          {
+            "_key": "k550",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k551",
+                "_type": "span",
+                "marks": [],
+                "text": "Radar / Ecosounder / GPS chartplotter"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k552",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k553",
+                "_type": "span",
+                "marks": [],
+                "text": "Radio: VHF & SSB"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        ],
+        "category": "Navigation & Communication"
+      },
+      {
+        "_key": "k563",
+        "_type": "specCategory",
+        "body": [
+          {
+            "_key": "k555",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k556",
+                "_type": "span",
+                "marks": [],
+                "text": "Life rafts: 2"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k557",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k558",
+                "_type": "span",
+                "marks": [],
+                "text": "Lifejackets, fire extinguishers, EPIRB, SART"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k559",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k560",
+                "_type": "span",
+                "marks": [],
+                "text": "Satellite phone"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k561",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k562",
+                "_type": "span",
+                "marks": [],
+                "text": "Oxygen and first aid kit on board"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        ],
+        "category": "Safety Equipment"
+      },
+      {
+        "_key": "k574",
+        "_type": "specCategory",
+        "body": [
+          {
+            "_key": "k564",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k565",
+                "_type": "span",
+                "marks": [],
+                "text": "Al fresco dining area (50 sqm, bar, 270° sea views)"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k566",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k567",
+                "_type": "span",
+                "marks": [],
+                "text": "Sky deck with sun loungers, shaded lounge deck"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k568",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k569",
+                "_type": "span",
+                "marks": [],
+                "text": "Kayaks available"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k570",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k571",
+                "_type": "span",
+                "marks": [],
+                "text": "Wi-Fi free when mobile network in range"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          },
+          {
+            "_key": "k572",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "k573",
+                "_type": "span",
+                "marks": [],
+                "text": "Camera charging (3 stations) and rinse tank available"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        ],
+        "category": "Amenities & Others"
+      }
+    ],
+    "specificationsHeading": "Layout and specifications",
+    "stats": [
+      {
+        "_key": "k1",
+        "label": "Cabins",
+        "value": "7"
+      },
+      {
+        "_key": "k2",
+        "label": "Guests",
+        "value": "14"
+      },
+      {
+        "_key": "k3",
+        "label": "Boat Size",
+        "value": "30m"
+      },
+      {
+        "_key": "k4",
+        "label": "Crew",
+        "value": "14"
+      }
+    ],
+    "tagline": "World-class scuba diving meets the legendary Komodo dragon in this UNESCO World Heritage national park."
+  },
+  "ghost": {
+    "_createdAt": "2026-07-15T08:21:20Z",
+    "_id": "drafts.boatPage-mari",
+    "_rev": "297891c1-fbdc-4ebf-af93-e2ebf9234a9d",
+    "_system": {
+      "base": {
+        "id": "boatPage-mari",
+        "rev": "a9Y8eHiPTfUHeKKUBgAM0M"
+      }
+    },
+    "_type": "boatPage",
+    "_updatedAt": "2026-07-15T10:23:24Z",
+    "cabinsHeading": "Cabins",
+    "cabinsIntro": [
+      {
+        "_key": "k7",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "k8",
+            "_type": "span",
+            "marks": [],
+            "text": "Step straight from the ocean to sea views and easy access to the rest of the boat — all from the comfort of your cabin. All three Deluxe and four Superior cabins come with private air conditioning and an ensuite bathroom with hot water, ready whenever you need to recharge between dives."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      }
+    ],
+    "coverImage": {
+      "_type": "imageWithAlt",
+      "alt": "Mari Liveaboard underway at sea",
+      "asset": {
+        "_ref": "image-ba83f0718d0a8ccc6e490c680ffe569e309829f6-1448x1086-jpg",
+        "_type": "reference"
+      }
+    },
+    "gallery": [
+      {
+        "_key": "3007cd3e07a0",
+        "_type": "galleryImage",
+        "asset": {
+          "_ref": "image-78c987baad9b2710e491db08022184f457c6dfe3-1068x1473-jpg",
+          "_type": "reference"
+        }
+      },
+      {
+        "_key": "27ed5e1ff41f",
+        "_type": "galleryImage",
+        "asset": {
+          "_ref": "image-e05b2f3968b5eb0b59e0729a95810b3f84ae1811-1176x784-jpg",
+          "_type": "reference"
+        }
+      },
+      {
+        "_key": "462526766e34",
+        "_type": "galleryImage",
+        "asset": {
+          "_ref": "image-c78199ab38732324984491426da3b00056654fb7-1264x843-jpg",
+          "_type": "reference"
+        }
+      },
+      {
+        "_key": "5f6a247b660f",
+        "_type": "galleryImage",
+        "asset": {
+          "_ref": "image-ba83f0718d0a8ccc6e490c680ffe569e309829f6-1448x1086-jpg",
+          "_type": "reference"
+        }
+      }
+    ],
+    "galleryDescription": [
+      {
+        "_key": "k9",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "k10",
+            "_type": "span",
+            "marks": [],
+            "text": "A closer look at life aboard Mari — the boat itself, the food, and the spaces built for unwinding between dives."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      }
+    ],
+    "galleryTitle": "Gallery",
+    "keyFeatures": [
+      "Max. 14 guests for a relaxed, uncrowded atmosphere",
+      "7 ensuite, air-conditioned sea-view cabins, all on the main deck",
+      "14 experienced crew members, including 3 dive guides and a dedicated cruise director",
+      "Spacious outdoor dining, lounge, and sun decks",
+      "Large dive deck, nitrox, and quality rental equipment",
+      "3 tenders, including one dedicated to snorkelers and excursions"
+    ],
+    "keyFeaturesHeading": "Key features",
+    "keyFeaturesImage": {
+      "_type": "imageWithAlt",
+      "alt": "Mari Liveaboard, key features",
+      "asset": {
+        "_ref": "image-dd9a1de34b0ed851df31e1a2ac3b3af26b614299-1535x1024-jpg",
+        "_type": "reference"
+      }
+    },
+    "name": "Mari",
+    "overviewBody": [
+      {
+        "_key": "k5",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "k6",
+            "_type": "span",
+            "marks": [],
+            "text": "Explore Indonesia's most renowned dive destinations, from Raja Ampat, Komodo, and Flores to the Banda Sea, and beyond. Mari Liveaboard is a 30m traditional Indonesian ironwood Phinisi built for serious divers who value comfort, space, and exceptional value."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      }
+    ],
+    "overviewHeading": "Traditional phinisi liveaboard for serious divers",
+    "pageTitle": "Mari Liveaboard",
+    "showGalleryEyebrow": false,
+    "showSpecificationsEyebrow": false,
+    "slug": {
+      "_type": "slug",
+      "current": "mari"
+    },
+    "specifications": [
+      {
+        "_key": "k11",
+        "_type": "specCategory",
+        "category": "Vessel & Accommodation",
+        "items": [
+          {
+            "_key": "k12",
+            "_type": "specItem",
+            "label": "Type",
+            "value": "Traditional Indonesian Phinisi"
+          },
+          {
+            "_key": "k13",
+            "_type": "specItem",
+            "label": "Length / Beam / Draft / Weight",
+            "value": "30m / 6.5m / 2.3m / 120t"
+          },
+          {
+            "_key": "k14",
+            "_type": "specItem",
+            "label": "Built",
+            "value": "2008"
+          },
+          {
+            "_key": "k15",
+            "_type": "specItem",
+            "label": "Cruising speed / Range",
+            "value": "8 knots / 4,000nm"
+          },
+          {
+            "_key": "k16",
+            "_type": "specItem",
+            "label": "Guests / Cabins",
+            "value": "14 guests / 7 cabins (3 Deluxe, 4 Superior)"
+          }
+        ]
+      },
+      {
+        "_key": "k17",
+        "_type": "specCategory",
+        "category": "Crew",
+        "items": [
+          {
+            "_key": "k18",
+            "_type": "specItem",
+            "label": "Total crew",
+            "value": "14"
+          },
+          {
+            "_key": "k19",
+            "_type": "specItem",
+            "label": "Dive staff",
+            "value": "4 (Cruise Director + 3 Dive Guides)"
+          },
+          {
+            "_key": "k20",
+            "_type": "specItem",
+            "label": "Ratio",
+            "value": "1:1 crew-to-guest"
+          }
+        ]
+      }
+    ],
+    "specificationsHeading": "Layout and specifications",
+    "stats": [
+      {
+        "_key": "k1",
+        "label": "Cabins",
+        "value": "7"
+      },
+      {
+        "_key": "k2",
+        "label": "Guests",
+        "value": "14"
+      },
+      {
+        "_key": "k3",
+        "label": "Boat Size",
+        "value": "30m"
+      },
+      {
+        "_key": "k4",
+        "label": "Crew",
+        "value": "14"
+      }
+    ],
+    "tagline": "World-class scuba diving meets the legendary Komodo dragon in this UNESCO World Heritage national park."
+  },
+  "langDraft": {
+    "_createdAt": "2026-07-15T02:34:40Z",
+    "_id": "drafts.language-en",
+    "_rev": "30d4179b-bd46-48ea-a06d-873fc8b5f75b",
+    "_system": {
+      "base": {
+        "id": "language-en",
+        "rev": "tgV5p4sNg9Q2AEoVAi9ybz"
+      }
+    },
+    "_type": "language",
+    "_updatedAt": "2026-07-16T07:32:12Z",
+    "default": true,
+    "fallback": {
+      "_ref": "language-en",
+      "_type": "reference"
+    },
+    "name": "English",
+    "tag": "en-US"
+  },
+  "langPub": {
+    "_createdAt": "2026-07-15T02:34:40Z",
+    "_id": "language-en",
+    "_rev": "tgV5p4sNg9Q2AEoVAi9ybz",
+    "_type": "language",
+    "_updatedAt": "2026-07-15T02:34:40Z",
+    "default": true,
+    "name": "English",
+    "tag": "en"
+  },
+  "orphans": [
+    {
+      "_createdAt": "2026-07-15T09:13:55Z",
+      "_id": "drafts.553c4e28-ff62-490c-a8f0-026396ca3cfc",
+      "_rev": "2793a839-c2b4-4bc4-a42e-1d116ca6c7d3",
+      "_type": "page",
+      "_updatedAt": "2026-07-15T09:13:55Z",
+      "seo": {
+        "_type": "seo",
+        "noFollow": false,
+        "noIndex": false,
+        "overrideJsonLd": false
+      },
+      "showContactSection": true
+    },
+    {
+      "_createdAt": "2026-07-16T01:47:01Z",
+      "_id": "drafts.964a259f-5d5a-4fd6-b92d-f1a2447350f0",
+      "_rev": "48aaf6b0-5fec-4ff3-a269-c399c26c59e4",
+      "_type": "destination",
+      "_updatedAt": "2026-07-16T01:47:18Z",
+      "galleryTitle": "Gallery",
+      "seo": {
+        "_type": "seo",
+        "noFollow": false,
+        "noIndex": false,
+        "overrideJsonLd": false
+      },
+      "showArticlesEyebrow": false,
+      "showBoatsEyebrow": false,
+      "showFaqEyebrow": false,
+      "showGalleryEyebrow": false,
+      "showItinerariesEyebrow": false,
+      "showOverviewEyebrow": false,
+      "showUpcomingTripsEyebrow": false,
+      "stats": [
+        {
+          "_key": "072e6f7ff47db933f6da0726a83ff548",
+          "label": "Season",
+          "value": ""
+        },
+        {
+          "_key": "48231284f7f995ba5dc8e99da8e40a06",
+          "label": "Duration",
+          "value": ""
+        },
+        {
+          "_key": "6631529196476fa536f6a98c22f14ed8",
+          "label": "Minimum Skill Level",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "_createdAt": "2026-07-14T08:06:28Z",
+      "_id": "drafts.a620e957-020c-4c51-be4f-a1a43748af64",
+      "_rev": "b267a046-a9f1-401f-ae36-c92196ad6dfa",
+      "_type": "locale",
+      "_updatedAt": "2026-07-14T08:06:20Z",
+      "default": false
+    },
+    {
+      "_createdAt": "2026-07-14T08:04:57Z",
+      "_id": "drafts.c64083a5-25a0-471a-ae11-e76a9de37609",
+      "_rev": "5cbaf011-761f-4824-9eb4-bc56a135d972",
+      "_type": "siteSettings",
+      "_updatedAt": "2026-07-14T08:04:51Z",
+      "defaultSeo": {
+        "_type": "seo",
+        "noIndex": false,
+        "overrideJsonLd": false
+      },
+      "socialLinks": [
+        {
+          "_key": "b3dc9ca4f30e",
+          "_type": "linkItem"
+        }
+      ]
+    },
+    {
+      "_createdAt": "2026-07-14T08:02:10Z",
+      "_id": "drafts.e18f3963-e654-446d-9b9f-da318805ddd6",
+      "_rev": "6732f306-2e7d-4543-8463-fcd403375085",
+      "_type": "navigation",
+      "_updatedAt": "2026-07-14T08:03:38Z"
+    },
+    {
+      "_createdAt": "2026-07-15T08:13:43Z",
+      "_id": "drafts.f8fedf5c-7cf2-45d0-a603-597ad5fe5910",
+      "_rev": "0e41384c-3ddd-4fd5-8ae8-96d1185a12ea",
+      "_type": "scheduleRates",
+      "_updatedAt": "2026-07-15T08:13:52Z",
+      "seo": {
+        "_type": "seo",
+        "noFollow": false,
+        "noIndex": false,
+        "overrideJsonLd": false
+      },
+      "slug": {
+        "_type": "slug",
+        "current": "schedu"
+      },
+      "title": "Schedule & Rates"
+    }
+  ]
+}
