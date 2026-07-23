@@ -835,8 +835,60 @@ Field `title`/`description`/tab-grouping and the Structure Builder (sidebar navi
 ## Doc split (replicate the static-build pattern — see `drk-website/references/claude-code.md`)
 This file = prose rules + active decisions. `MANAGER.md` (session/decision log, created 2026-07-14) and `COMPONENTS.md` (reusable component specs, **not yet created** — ports from the static build's `COMPONENTS.md` at first use, not up front) follow the same convention as the old repo. Check `MANAGER.md` for today's active task scope and session history before re-deriving it. `_SCHEMA-SPECS.md` (created 2026-07-15) is a fourth doc in this split — a flat, checkable field-by-field spec per Sanity page type, distinct from MANAGER.md's dated log: Adinda marks fields approved there as they're tested in a real build, without re-reading history to find "did we settle this." Update it alongside any schema change, same habit as the other docs. `_CONTENT-STATUS.md` (created 2026-07-15) is the fifth — tracks whether the *value* in a field is real vs. placeholder (Figma-sourced copy preferred by default, stock/Pexels fallback for images Figma doesn't have enough of), a different axis from _SCHEMA-SPECS.md's field-existence tracking. Zero remaining 🔴 rows in it is a hard pre-launch gate, same weight as the other pre-launch checks already in this file. `_QA-CHECKLIST.md` (created 2026-07-15) is the sixth — for an external human reviewer's click-through pass, distinct from both: open design decisions worth a second opinion (e.g. eyebrow-toggle placement), not field approval or content-placeholder tracking. `_POLISH-BACKLOG.md` (created 2026-07-16) is the seventh — page-by-page deferred cosmetic/interaction polish from the vertical-slice build (see "Build approach"), burned down later in one polish block; distinct from _QA-CHECKLIST (that's open *decisions* for a reviewer; this is *known* polish we chose to defer). `_OWNER-HANDBOOK.md` (created 2026-07-22, Adinda's ask) is the eighth — a LIVING list of correct-by-design behaviours a site owner can't guess from Studio alone (e.g. the itinerary Destination field doesn't place it on a page; the list does). **Add an entry the moment such a quirk ships** — it is the source material for the final owner handoff guide, written as we go, not reconstructed at handoff.
 
-## Local-only files — underscore prefix convention, locked 2026-07-15
-Any folder or file that is internal/scratch (not real project output — handoff docs, skill-build packaging, test images, throwaway scripts) gets a leading `_` **at the repo root**. That prefix is the standing signal for "never commit this, not a real working file" — `.gitignore`'s `/_*` rule enforces it automatically. Root-anchored only, deliberately not recursive (`/_*`, not `**/_*`): Next.js App Router uses `_`-prefixed folders inside `src/app/` as a real, committed routing convention (private folders like `_components/`, `_lib/` that opt out of routing) — this rule must never touch those. When creating a new scratch file/folder, default to the `_` prefix rather than inventing a new naming scheme per task.
+## Underscore prefix = internal working file, NOT build input — AMENDED 2026-07-23 (was "never commit", locked 2026-07-15)
+Any folder or file that is internal (not real project output — handoff docs, working docs, skill-build
+packaging, test images, throwaway scripts) gets a leading `_` **at the repo root**. **The prefix's meaning
+changed 2026-07-23 (Adinda): it no longer means "never commit" — it marks the DEPLOYMENT boundary, not the
+commit boundary.** Load-bearing working docs (`_*.md`, `_handoff/`, `_scripts/`) ARE committed and pushed:
+git + the private GitHub repo is the project's living backup (Adinda's framing: "a living, breathing backup
+of everything"). What the prefix buys now is that ONE glob covers all of them everywhere:
+- `.vercelignore`'s `/_*` line keeps every `_`-prefixed file off Vercel automatically — a new `_whatever.md`
+  needs zero per-file maintenance to stay off the deployment (see "Deployment boundary" below).
+- `.gitignore`'s `/_*` + targeted `!` exceptions still keep genuine scratch UNcommitted (`_backup/`,
+  `_image-test/`, logs, zips — stale copies and generated junk, where Drive/Sanity hold the masters).
+Root-anchored only, deliberately not recursive (`/_*`, not `**/_*`): Next.js App Router uses `_`-prefixed
+folders inside `src/app/` as a real, committed routing convention (private folders like `_components/`,
+`_lib/`) — neither ignore file may ever touch those. When creating a new internal file/folder, default to
+the `_` prefix — it's what makes the boundary self-maintaining; a NON-underscored internal file at root
+(like `MANAGER.md`) has to be added to `.vercelignore` by hand, which is exactly the failure mode the
+prefix exists to avoid.
+
+## Deployment boundary — GitHub holds EVERYTHING, Vercel gets only build input (locked 2026-07-23, Adinda — ⚠️ UNVERIFIED until first deploys are checked)
+The repo now serves two different masters, and the boundary between them is explicit:
+- **GitHub (private) = the living backup.** Everything is committed and pushed — source, internal docs,
+  handoffs, MANAGER.md, CLAUDE.md. Safe because the repo is private, DRK-internal-only (the standing
+  no-AI-traces condition already requires that and is unchanged: repo never goes public, client never
+  gets access).
+- **Vercel = the deploy target, and it gets ONLY what the build needs.** `.vercelignore` (repo root,
+  created 2026-07-23) excludes `_*`, `CLAUDE.md`, `AGENTS.md`, `MANAGER.md`, `COMPONENTS.md`,
+  `SANITY-SETUP.md`, `README.md`, `content/`, `skills-lock.json`, `.claude/`, `.agents/`, `.vscode/` —
+  per Vercel's docs these are never uploaded, never in the deployment's source snapshot, never served,
+  and never stored on Vercel at all.
+
+**Why (the reasoning, so it isn't re-derived):** the *serving* layer was never the risk — only build
+output + `/public` are ever web-visible; a repo markdown file is unreachable at any URL regardless. The
+`.vercelignore` exists because Adinda's requirement is stronger than "not served": the internal docs must
+not **live inside Vercel at all** (not in the build upload, not in the dashboard's Source view, not
+retained anywhere on their platform). Defense in depth: (1) build-output-only serving, (2) `.vercelignore`
+keeps the files out of the pipeline entirely, (3) the private GitHub repo is the only place the docs exist
+outside this machine.
+
+**⚠️ VERIFICATION REQUIRED — Adinda is deliberately testing this over the first few deploys; treat the
+mechanism as UNPROVEN until then.** Vercel's own docs only explicitly document `.vercelignore` for CLI
+uploads; the Git-integration behaviour ("acts as an extension of `.gitignore`") is community-confirmed
+(vercel/vercel discussion #4679), not officially stated. **The check that can actually fail: after each of
+the first few deploys, open the deployment in the Vercel dashboard → Source tab → confirm `_handoff/`,
+`CLAUDE.md`, and `MANAGER.md` are ABSENT.** Repeat until trusted, then note the result here. If the files
+DO appear: the failure mode is "stored on Vercel, visible to Vercel project members" — NOT public — and
+the fallback is deploying via CLI/GitHub Actions (where `.vercelignore` filters before upload ever
+happens) or a stripped deploy branch. Fold this check into the pre-launch no-AI-traces pass — same
+concern, same timing.
+
+**Maintenance rules:** (a) new internal doc → underscore prefix, auto-covered forever; (b) a new
+non-underscored internal file at root must be added to `.vercelignore` by hand — prefer the prefix;
+(c) `content/` is excluded and nothing in `src` reads it today — if a build ever imports from it, the
+build fails loudly at build time; delete that one line then. Skill-wide (every DRK site wants this exact
+split) — queued for `drk-website` via `_handoff/drk-website.md`.
 
 ## Daily recap template — standing format, locked 2026-07-16
 Whenever Adinda asks for a session/day recap ("give me today's recap," "what did we do," "where are we"),

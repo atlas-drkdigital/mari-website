@@ -1059,6 +1059,25 @@ Seeds referencing docs must filter `!(_id in path("drafts.**"))`; curated arrays
 `.filter(Boolean)` at the page. · Queued for next session: rich-text one-lightbox-per-field
 gallery, drk-seo pass + JSON-LD prefill for charters, wording reviews (availability intro/eyebrow).
 
+## 2026-07-23 (later block) — GitHub-backup + Vercel-boundary workflow locked; wip JSON-LD groundwork pushed
+
+Model: **Fable 5** (trial). Adinda's calls, all shipped + pushed to `origin/main`:
+1. **Everything now pushes to GitHub** — 130 accumulated local commits pushed; the private repo is the
+   living backup of source AND internal docs (`_*.md`, `_handoff/`, CLAUDE.md, MANAGER.md). The old
+   "commits stay local" posture is superseded; the repo-stays-private condition is unchanged.
+2. **`.vercelignore` created (718d7ff)** — internal docs are excluded from Vercel deployments entirely
+   (not uploaded / not in the Source snapshot / not stored), because Adinda's requirement is "must not
+   live inside Vercel at all," not merely "not served." Full reasoning + the ⚠️ first-deploys Source-tab
+   verification checklist: CLAUDE.md's new "Deployment boundary" section. UNVERIFIED until Vercel is
+   actually connected — she is explicitly test-verifying the first few deploys.
+3. **Underscore convention AMENDED** — `_` prefix now marks the deployment boundary, not the commit
+   boundary (CLAUDE.md section rewritten). Scratch exceptions (`_backup/`, `_image-test/`, logs) stay
+   gitignored.
+4. **wip commit `bf09013`** — another session's in-flight JSON-LD pass groundwork (`JsonLd.tsx`
+   component + `buildBreadcrumbJsonLd()`, both consumer-less) committed honestly as wip at Adinda's
+   explicit ask, to get the tree onto GitHub. Wiring is still that workstream's next step.
+DRK-wide: the GitHub-backup/Vercel-boundary split queued for `drk-website` via `_handoff/drk-website.md`.
+
 ## SESSION CHECKPOINT — 2026-07-17 AM, auto-hide + a real data rescue (superseded by the checkpoint above)
 
 Model: **Opus 4.8 (1M context)**. Verified clean: tsc + eslint + `/` 200, after every change below.

@@ -881,3 +881,24 @@ later SEO verify pass).
   first-line, named step of the page slice itself — done during the build, before the post-slice SEO
   pass; the SEO pass then VERIFIES it** (a check that can actually fail, not the place it's first
   remembered). Also write the rule into `sitemap.ts`'s own header comment so the file self-documents.
+
+## Deployment boundary: private GitHub = full backup, Vercel gets ONLY build input (Adinda, 2026-07-23)
+For `references/workflow.md` + `references/pre-launch.md` — DRK-wide, every client site.
+- **Commit + push EVERYTHING to the private GitHub repo**, including internal working docs (`_*.md`,
+  handoffs, CLAUDE.md, MANAGER.md). Git+GitHub is the living backup; "local-only" is no longer a doc tier.
+  Precondition unchanged: repo stays private, DRK-internal, never client-accessible (no-AI-traces rule).
+- **`.vercelignore` at repo root excludes all internal docs from every deployment** — `/_*` plus the named
+  non-underscored docs (CLAUDE.md, AGENTS.md, MANAGER.md, COMPONENTS.md, README.md, `.claude/`, etc.).
+  Per Vercel docs, excluded files are never uploaded, never in the deployment Source snapshot, never
+  served, never stored on Vercel. The requirement this serves: internal docs must not LIVE on Vercel at
+  all — "only build output is served" was already true and was not enough.
+- **The underscore prefix is what makes the boundary self-maintaining**: one `/_*` glob in `.vercelignore`
+  covers every current and future `_`-file with zero upkeep. A non-underscored internal file needs a
+  hand-added line — prefer the prefix.
+- **Verification is part of the workflow, not optional** (a check that can actually fail): on each of the
+  first few deploys of a project, open the deployment in the Vercel dashboard, Source tab, and confirm the
+  internal docs are ABSENT. Caveat driving this: Vercel officially documents `.vercelignore` for CLI
+  uploads; Git-integration behaviour is community-confirmed only (vercel/vercel discussion #4679).
+  Fallback if it fails (failure mode = stored on Vercel, visible to project members, NOT public): deploy
+  via CLI/GitHub Actions where `.vercelignore` filters before upload, or a stripped deploy branch.
+  Fold the check into the pre-launch no-AI-traces pass — same concern, same timing.
