@@ -40,16 +40,16 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Local-only / internal, never committed — standard convention: prefix with "_" at repo ROOT
-# (handoff docs, skill packaging, scratch/test output, etc.). Root-anchored only (no /**/_*) — Next.js
-# App Router uses "_"-prefixed folders inside src/app/ as a real, committed routing convention
-# (e.g. _components/, _lib/), and this must never touch those.
-/_*
-
-# EXCEPTIONS (Adinda, 2026-07-23): the load-bearing working docs ARE committed — git+GitHub is the
-# project's real backup (repo is private, DRK-internal; none of this is served by the deployed site).
-# Still ignored on purpose: _backup/ (stale file copies), _image-test/ + _content/ images (masters
-# live in Google Drive + Sanity), logs, zips, and any future _* scratch.
-!/_*.md
-!/_handoff/
-!/_scripts/
+# Internal working files live in /_internal/ (root cleanup refactor, 2026-07-24 — replaces the old
+# root-level /_* + "!" exception scheme). _internal/ itself IS tracked: git + the private GitHub repo
+# is the project's living backup (repo is private, DRK-internal; none of this is served by the
+# deployed site — .vercelignore keeps it off Vercel). Only true scratch inside it stays ignored:
+# stale file copies, test images, content-scratch images (masters live in Google Drive + Sanity),
+# skill packaging, logs, zips. Note: "_"-prefixed folders inside src/app/ are a real, committed
+# Next.js routing convention (e.g. _components/, _lib/) — nothing here touches those.
+/_internal/backup/
+/_internal/image-test/
+/_internal/content-scratch/
+/_internal/skill-image-retouch/
+/_internal/*.zip
+/_internal/*.log

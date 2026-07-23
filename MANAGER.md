@@ -10,10 +10,10 @@ forward — this file is now the live one.
 
 ---
 
-## ▶ RESUME POINT — see `_RESUME.md` (checkpoint 2026-07-20)
-**When Adinda asks "what's next," `_RESUME.md` is the single source.** In brief: boat Instance-1 mobile bug
+## ▶ RESUME POINT — see `_internal/RESUME.md` (checkpoint 2026-07-20)
+**When Adinda asks "what's next," `_internal/RESUME.md` is the single source.** In brief: boat Instance-1 mobile bug
 FIXED; `mari-project` skill REMOVED (MANAGER now sole tracker); 3 urgent skill-fix chat prompts queued for
-Adinda, then full skill round → 2nd audit → Phase 3 (slim CLAUDE.md). Full findings: `_AUDIT-2026-07-20.md`.
+Adinda, then full skill round → 2nd audit → Phase 3 (slim CLAUDE.md). Full findings: `_internal/AUDIT-2026-07-20.md`.
 
 ## 🔴 ACTIVE QUEUE — AUTHORITATIVE, THE SOLE TRACKER (the `mari-project` skill was REMOVED 2026-07-20; MANAGER now owns status/queue/ordering)
 
@@ -45,7 +45,7 @@ in CLAUDE.md for why `COMPONENTS.md` "ports at first use, not up front".
 - **Create `COMPONENTS.md`** — the fourth doc in the split that CLAUDE.md has always described as "not yet
   created, ports from the static build's `COMPONENTS.md` at first use". This is that moment.
 - **Split Mari-specific from DRK-reusable as you go** and queue the reusable half into
-  `_handoff/drk-website.md` — per the daily-recap classification rule (local vs `atlas-website`-wide vs
+  `_internal/handoff/drk-website.md` — per the daily-recap classification rule (local vs `atlas-website`-wide vs
   `drk-website`-wide). A component is only reusable across projects if its *spec* travels with it.
 - ⚠️ **Watch the token coupling.** These components read semantic tokens (`action-primary`, `bg-page`)
   that are Mari's. A genuinely portable component takes the token as input rather than hardcoding it —
@@ -55,33 +55,29 @@ in CLAUDE.md for why `COMPONENTS.md` "ports at first use, not up front".
 escalate to Opus only for the portability boundary (what's Mari's vs what's DRK's), which is the one
 genuinely architectural call in it.
 
-### 🔵 GATED ITEM — root cleanup: consolidate all `_*` files into one `_internal/` folder (queued 2026-07-23, Adinda)
-**Trigger (re-cut 2026-07-23 evening, Adinda): the ABOUT PAGE is finished (round-2 review + her queued
-refinements) and its fixes are COMMITTED. Run the refactor immediately after that commit and BEFORE
-starting any other page.** (Original gate — the parallel editor session finishing — has cleared; its
-About/SEO checkpoint is committed at `2ee0d98`.)
-⚠️ **`content/` MOVES TOO (Adinda's re-cut, 2026-07-23 evening — supersedes the AGENTS.md
-"do not move it" rule): no stray folders at root, everything internal goes under `_internal/`.** The
-lesson from the `ad06118` near-loss is about TRACKING, not location — `content/` was nearly lost
-because it got swept into a *gitignored* folder. So the move is `git mv content _internal/content`
-(stays tracked), with THREE hard sub-steps: (1) **verify tracking after the move** — `git ls-files
-_internal/content/` must be non-empty; (2) **amend AGENTS.md in the same commit** — it currently
-instructs Codex "do not move or rename content/"; rewrite that paragraph to point at
-`_internal/content/` as the canonical tracked copy-drafts home, or Codex recreates `content/` at
-root; (3) **name collision**: the OLD `_content/` scratch images (gitignored, masters in
-Drive/Sanity) go to `_internal/content-scratch/` (stays gitignored), NOT `_internal/content/` —
-tracked drafts and ignored scratch must not share a folder, that's the near-loss recipe.
-
-**Scope when it runs (proposal accepted as-is):** move every root `_*` entry into `_internal/`
-(`handoff/`, `scripts/`, `content/`, `backup/`, `image-test/`, and all the `_*.md` docs, inner
-underscores dropped). **Stays at root: `CLAUDE.md`, `AGENTS.md` (tool-loading conventions require it)
-+ `MANAGER.md`, `COMPONENTS.md` (the daily working set).** Use `git mv` (history preserved). Then:
-(a) reference sweep — search/replace old paths across CLAUDE.md/MANAGER.md/`_internal/` itself, final
-grep proving zero stale `_handoff|_RESUME`-style paths; (b) simplify `.gitignore` (glob+exceptions →
-`/_internal/` + targeted ignores for `backup/`/`image-test/`/`content/` images) and `.vercelignore`
-(one `/_internal/` line replaces `/_*`); (c) chat-side skills still say `_handoff/` until the next
-skill round — note the rename IN the handoff doc itself so the round picks it up, CLAUDE.md states
-the new path authoritatively meanwhile. **Estimate: ~30–45 min, Sonnet-high (mechanical).**
+### ✅ DONE 2026-07-24 — root cleanup: all root `_*` entries consolidated into `_internal/` (queued 2026-07-23, Adinda; executed 2026-07-24)
+**Executed as specced (the original gated-item spec is preserved in git history before this commit).
+What moved (historical old names → new):** `_handoff/` → `_internal/handoff/`, `_scripts/` →
+`_internal/scripts/`, `content/` → `_internal/content/` (git mv, TRACKING VERIFIED: `git ls-files
+_internal/content/` returns the 3 copy drafts — the `ad06118` near-loss lesson was about tracking,
+not location), and all 14 root `_*.md` docs with inner underscores dropped (`_RESUME.md` →
+`_internal/RESUME.md`, `_PAGE-SPECS.md` → `_internal/PAGE-SPECS.md`, etc.). Gitignored scratch moved
+by plain filesystem move: `_backup/` → `_internal/backup/`, `_image-test/` → `_internal/image-test/`,
+the old `_content/` image scratch → `_internal/content-scratch/` (NOT `_internal/content/` — tracked
+drafts and ignored scratch never share a folder), plus `_skill-image-retouch/` (+ .zip) and
+`_dev-out.log`. **Stays at root: `CLAUDE.md`, `AGENTS.md`, `MANAGER.md`, `COMPONENTS.md`,
+`README.md`, `SANITY-SETUP.md`, `skills-lock.json`, and all real build input.**
+Same-commit amendments: AGENTS.md's "do not move content/" paragraph rewritten to name
+`_internal/content/` as the canonical tracked copy-drafts home (so Codex doesn't recreate `content/`
+at root); `.gitignore` rewritten from the `/_*` + `!` exception scheme to `/_internal/`-scoped
+targeted ignores; `.vercelignore` simplified to one `/_internal/` line (root doc exclusions kept);
+reference sweep across CLAUDE.md/AGENTS.md/MANAGER.md/COMPONENTS.md/`_internal/` itself (final grep
+clean); `_internal/README.md` created (plain-language folder map + deployment boundary, Adinda's
+ask). Chat-side skills still say `_handoff/` until the next skill round — the rename is noted inside
+`_internal/handoff/drk-website.md` so the round picks it up; CLAUDE.md states the new path
+authoritatively meanwhile. ⚠️ Deliberately NOT touched: `src/` and `public/` (a handful of code
+comments still cite old doc names like `_PAGE-SPECS.md` — cosmetic, fix opportunistically when those
+files are next edited; the dev server was left running throughout).
 
 ### 🆕 QUEUED 2026-07-22 (Adinda) — per-section QA is the LOCKED review method; homepage + boat get it retroactively
 The destination build's rhythm — **every section reviewed TWICE at the moment it ships: (a) the
@@ -126,7 +122,7 @@ rendered page (desktop AND mobile) and (b) its Studio editing surface** — is w
      under two naming generations. Rename declined by Adinda: zero user impact, and the cost does NOT grow
      over time. The verified Figma→CSS mapping (plus **3 traps** where a naive rename silently swaps colours)
      is written into `globals.css`'s primitives header. **Rule: match tokens by HEX, never by NAME.**
-     Prevention for future builds queued in `_handoff/drk-website.md`.
+     Prevention for future builds queued in `_internal/handoff/drk-website.md`.
 2. ~~**`boatDefaults` singleton**~~ ✅ **DONE 2026-07-17** — see the checkpoint below. Estimate was ~0.5h
    and it held (Adinda's earlier de-padding correction was right again). Nothing referenced the moved
    fields, so it was a free move — which is exactly what "schema before frontend" was buying.
@@ -136,7 +132,7 @@ rendered page (desktop AND mobile) and (b) its Studio editing surface** — is w
    for), so doing them back-to-back while the pattern is loaded costs far less than a separate slot.
    **This closes the "Testimonials has no slot" gap** that had been pushing Jul 23 over capacity — it is
    no longer additive. Still ⚠️ **NOT in the `mari-project` skill's sprint page table** — that's a
-   skill-round item (already queued in `_handoff/mari-project.md`), not a scheduling one.
+   skill-round item (already queued in `_internal/handoff/mari-project.md`), not a scheduling one.
    - **The gap:** we have `testimonial` documents but **no Testimonials page**. Same realization as the FAQ
      ("a thing with SEO + page settings is a page, not a component"). The `atlas-website` skill already
      specs a Testimonials hub; it was never added to the page inventory or the sprint.
@@ -146,7 +142,7 @@ rendered page (desktop AND mobile) and (b) its Studio editing surface** — is w
      FAQ they are genuinely cross-page (Home + About), so this is a real component + a page that lists it,
      not a page that owns its content.
    - No mockup exists ("simple, not designed yet"); copy needs writing. Adinda expects it to be quick.
-   - **⚠️ Blind spot worth remembering:** `_STUDIO-ORGANIZATION-AUDIT.md` checked every EXISTING type for
+   - **⚠️ Blind spot worth remembering:** `_internal/STUDIO-ORGANIZATION-AUDIT.md` checked every EXISTING type for
      "page or component?" — it could never surface a page that doesn't exist yet. When auditing structure,
      also ask what's MISSING, not just what's misplaced. Check the rest of the page inventory for the same
      gap (does anything else have documents but no page?).
@@ -200,16 +196,16 @@ the overhead once, and don't price the user's own review time as build time.**
      ⚠️ **Do not build speculatively** — this is the `isFeatured` / section-toggles trap. Research, propose,
      get Adinda's call, then build. A Perplexity prompt was drafted for her on 2026-07-17.
 
-### 🔵 NOTE 2026-07-21 — `_handoff/mari-core.md` RETIRED (Adinda: mari-core is correct, all four items dropped)
+### 🔵 NOTE 2026-07-21 — `_internal/handoff/mari-core.md` RETIRED (Adinda: mari-core is correct, all four items dropped)
 Adinda confirmed the mari-core facts questioned on 2026-07-17 are correct as locked: the 3-outdoor-space
 inventory, the sky-deck naming, and the equipment ✅s (oxygen / first aid / camera rinse tank); the hull
-colour question was dropped as a non-issue. **`_handoff/mari-core.md` DELETED — no mari-core skill round
-needed, now or later.** Follow-through moved into `_handoff/mari-website.md`: (a) the two stale "sun deck"
+colour question was dropped as a non-issue. **`_internal/handoff/mari-core.md` DELETED — no mari-core skill round
+needed, now or later.** Follow-through moved into `_internal/handoff/mari-website.md`: (a) the two stale "sun deck"
 lines in `private-charters.md` L71/L96 are now a **safe straight replace** (the old Serge gate is closed),
 (b) flip mari-website's 🔴 "unverified" flags on oxygen/first-aid/rinse-tank to match mari-core's ✅ — so a
-copy pass doesn't refuse to publish settled facts. Cross-refs cleaned the same day in `_ADINDA-TODOS.md`
-(items 3/5/8), `_RESUME.md`, `_SKILL-ROUND-PLAN.md` (§5 + cleanup checklist), `_STEP2-READY.md` (§5 + the
-mari-website paste block), `_AUDIT-2026-07-20.md` (mari-core lane), and CLAUDE.md's two filename-lesson
+copy pass doesn't refuse to publish settled facts. Cross-refs cleaned the same day in `_internal/ADINDA-TODOS.md`
+(items 3/5/8), `_internal/RESUME.md`, `_internal/SKILL-ROUND-PLAN.md` (§5 + cleanup checklist), `_internal/STEP2-READY.md` (§5 + the
+mari-website paste block), `_internal/AUDIT-2026-07-20.md` (mari-core lane), and CLAUDE.md's two filename-lesson
 blocks (the lessons stand; the "evidence against the inventory" claims are annotated closed).
 
 ### ✅ CHECKPOINT 2026-07-22 (2) — SESSION CLOSE: KOMODO PAGE FEATURE-COMPLETE (slices 5–7 + JSON-LD prefill + drk-seo pass)
@@ -243,14 +239,14 @@ as it shipped.** Dev server LEFT RUNNING at session close — Serge is reviewing
    content** (ScrollReveal scans once on mount) — guard comment in DestinationBoats.
 4. **JSON-LD override prefill (`e63ba41`) — the overdue promise, CLOSED:** `JsonLdPrefillInput` fetches
    the RENDERED page (same-origin) and extracts its ld+json — single source, can't drift. Invalid-JSON
-   Studio warning added (closes that _POLISH-BACKLOG item).
+   Studio warning added (closes that _internal/POLISH-BACKLOG.md item).
 5. **drk-seo verify pass (`f6c37e5`) — RUN, page healthy:** 1 h1 / no level skips / FAQPage(16)+
    Organization valid / canonical+og+twitter present. Fixed: footer `#schedule-rates` dead hash →
    `/schedule-rates`; Overview highlight slides now aria-hidden-when-inactive with REAL alt (were
    shipping 6 content images alt="" to crawlers). Remaining bare-`#` links = nav/footer placeholders
    (global-chrome slice, accepted).
 6. **Standards locked:** booking embeds full-bleed on mobile (negative margins, NEVER 100vw);
-   `_OWNER-HANDBOOK.md` created (living owner-guide source; CLAUDE.md doc-split 8th member).
+   `_internal/OWNER-HANDBOOK.md` created (living owner-guide source; CLAUDE.md doc-split 8th member).
    COMPONENTS.md shelf: GridGallery, ItineraryCardCarousel, OverlapShowcase, Studio inputs registered —
    extraction deferred to second consumer / componentization pass (Adinda's call). Arrow scan PARKED.
 
@@ -260,7 +256,7 @@ per-section QA (queued 2026-07-22) · skill round + audit + Phase 3 (destination
 
 ### ✅ CHECKPOINT 2026-07-21 (4) — SESSION CLOSE: SubNav APPROVED, gallery CTA, lightbox fullscreen
 **Model:** Fable 5. `tsc` ✅ · eslint ✅ · `/` `/boats/mari` 200 · **every item below reviewed +
-approved by Adinda in the browser before this checkpoint. Session closed here; `_RESUME.md`
+approved by Adinda in the browser before this checkpoint. Session closed here; `_internal/RESUME.md`
 rewritten as the next session's automatic kickoff.**
 
 **SubNav — FINAL, APPROVED, LOCKED AS A PATTERN (site-wide + future DRK sites; queued for
@@ -286,14 +282,14 @@ Mobile: nav always visible, light chip bar, approved unchanged.
   only); mobile keeps the tab-row arrows AND gains the button (homepage section-header recipe
   verbatim — LatestArticles/Testimonials/FAQ share one structure). Opens the LightboxGallery with
   ALL images at the currently-shown photo. Label editable: `boatDefaults.galleryCtaText`
-  (seeded "Open Gallery"; `_scripts/seed-gallery-cta.ts`); **destinationDefaults gets its twin at
+  (seeded "Open Gallery"; `_internal/scripts/seed-gallery-cta.ts`); **destinationDefaults gets its twin at
   destination-build time — Adinda's "both defaults" was speech-to-text for BOAT defaults.**
 - **Lightbox fullscreen** — YARL's official plugin in the shared `SiteLightbox` config → all
   lightboxes at once; enter/exit icons in our mask style. ⚠️ iPhones have no fullscreen API — the
   button correctly doesn't render there; not a bug.
 
 **Session total:** see the Time Log row (≈5h elapsed ≈ active — interactive design iteration).
-Open items and next actions: `_RESUME.md` (rewritten this checkpoint).
+Open items and next actions: `_internal/RESUME.md` (rewritten this checkpoint).
 
 ### ✅ CHECKPOINT 2026-07-21 (3) — SubNav FINAL FORM (two-row compact chrome) + scroll-top + fixes
 **Model:** Fable 5. `tsc` ✅ · eslint ✅ · `/` `/boats/mari` 200 · **iterated live with Adinda through
@@ -328,7 +324,7 @@ Rail scrolling is reveal-only (fully visible items never move). Layout/Specs syn
 the DOWNLOAD glyph (Adinda's override of the node's arrow_forward; icon-download.svg — the iOS
 grey-square saga ended by matching the proven Figma asset format: positive viewBox + %-dims);
 opens new tab. Stats+brochure grouped at gap-24 (node 778:8723). Placeholder brochure PDF seeded
-(`_scripts/seed-brochure-placeholder.ts`) — replace with the real one in Studio. Accordion hover =
+(`_internal/scripts/seed-brochure-placeholder.ts`) — replace with the real one in Studio. Accordion hover =
 active's colour treatment, site-wide (subagent; locked in CLAUDE.md). Android large-font accordion
 leak fixed (grid-item padding rule — documented in Nav.tsx). Hero bottom scrim. Mobile rail flush
 left. `lg:page-gutter-x` variant-on-@utility compiled wrong — plain utilities now (documented).
@@ -350,7 +346,7 @@ nav colours both states ✓, cabins rhythm ✓, chevrons ✓).
   BoatSpecs; its hashchange listener pre-selects the matching tab. Deep links work (`#specs` opens
   scrolled + tab active).
 - Items hide when their section would (guards mirror each section's empty test). NOTE: dataset has
-  23 gallery images — `_RESUME.md`'s "gallery renders nothing" was STALE.
+  23 gallery images — `_internal/RESUME.md`'s "gallery renders nothing" was STALE.
 - Labels editable in `boatDefaults` → "Section navigation" fieldset (seeded; rides field-level i18n
   later). Item styling = TabRail chip sized up (p-16), inactive at the TabRail 40% (Figma's 55/60
   overridden, Adinda). **Pending: floating/compact state + the mobile pass (started next).**
@@ -371,7 +367,7 @@ componentization. Nav's own 7×6 glyph untouched (Adinda asked — colours/trans
 **Tab-strip gap-4 between tabs was tried and REJECTED same-day** (seam in the continuous underline
 track "looks very strange") — comment in BoatCabins warns against reintroducing it.
 
-Seeds: `_scripts/seed-subnav-labels.ts`. Open: SubNav mobile (in progress) → floating state → final
+Seeds: `_internal/scripts/seed-subnav-labels.ts`. Open: SubNav mobile (in progress) → floating state → final
 boat review → post-slice drk-seo pass.
 
 ### ✅ CHECKPOINT 2026-07-21 — categorized FAQ built + reviewed, rename-proof composition, paragraph rule
@@ -395,7 +391,7 @@ ADINDA on the rendered page** (FAQ look ✓, spacing ✓, rename test ✓) — n
   is shared. Same pattern available for destination pages later (`showOnDestinationPages`, not built).
 - `boatDefaults` + FAQ fieldset (`faqEyebrow`/`faqHeading` `{boat} FAQ`/`faqLinkText`), seeded via patch;
   page JSON-LD + rendered DOM now built from ONE composed list so they cannot disagree (11 questions).
-- Seeds: `_scripts/seed-faq-defaults.ts`, `_scripts/seed-faq-share-toggles.ts`.
+- Seeds: `_internal/scripts/seed-faq-defaults.ts`, `_internal/scripts/seed-faq-share-toggles.ts`.
 
 **Rules locked this session (Adinda):**
 - **Paragraph spacing: the RichText WRAPPER owns it — `gap-16` body-large / `gap-12` body-medium**,
@@ -490,7 +486,7 @@ both preserved.
   `seo.ogImage` → **hero/cover image** → `siteSettings` default OG image, inside `buildSeoMetadata`,
   for the homepage and every page type. NOT now — this is a backend-pass item.
   **DRK-reusable** (sensible default for every DRK site, not Mari-specific) → queue into
-  `_handoff/drk-website.md` when the backend pass runs.
+  `_internal/handoff/drk-website.md` when the backend pass runs.
 - 🔵 Session time log for 2026-07-20 STILL not filled.
 
 ### ✅ CHECKPOINT 2026-07-20 (2) — SEO wiring fixed end-to-end + boat page polish pass
@@ -514,7 +510,7 @@ Commits `cf9d42e` (fix) · `8c8e587` (doc corrections) · `f400188` (stega).
 - `stega: false` added to both metadata fetches (no-op today; prevents silent corruption when Visual
   Editing is enabled).
 - **Verified end-to-end against served HTML**, not source: both titles now come from Sanity. Seeded via
-  `_scripts/seed-seo.ts`. Copy is **drafted, not approved** — `mari-website` had both as TBD. Adinda:
+  `_internal/scripts/seed-seo.ts`. Copy is **drafted, not approved** — `mari-website` had both as TBD. Adinda:
   *"I'm ok with anything for now as long as the SEO works"*, to be redone at real-content time.
 
 #### 2. Boat page polish (commit `437ece1` + follow-ups)
@@ -551,7 +547,7 @@ which matters because `cabinType.images` uses `imageWithAlt`, which has no title
   extracted the pattern out of the documentation and tried to generate a real rule for it. The site 500'd
   with an identical error, from a Markdown file, with no code change. **Never paste a literal
   arbitrary-value class into a tracked doc** — describe it, or break the token up. Same trap applies to
-  `CLAUDE.md`, `_SCHEMA-SPECS.md`, and any doc Tailwind can see. (`_handoff/*` is safe only because
+  `CLAUDE.md`, `_internal/SCHEMA-SPECS.md`, and any doc Tailwind can see. (`_internal/handoff/*` is safe only because
   `/_*` is gitignored.)
 
 #### Open / owed
@@ -562,8 +558,8 @@ which matters because `cabinType.images` uses `imageWithAlt`, which has no title
 - 🔵 `data-reveal` remains **opt-in with no failure mode**; the structural fix (wrapper component) is
   deferred to the componentization block.
 - 🔵 Session time log NOT filled for 2026-07-20 (Adinda stepped away mid-session) — owed at next bookend.
-- Handoff staged this session: SEO silent-omission trap → `_handoff/drk-website.md`; scroll-reveal opt-in
-  rule → `_handoff/atlas-website.md`. **Both staged only, not merged into the skills.**
+- Handoff staged this session: SEO silent-omission trap → `_internal/handoff/drk-website.md`; scroll-reveal opt-in
+  rule → `_internal/handoff/atlas-website.md`. **Both staged only, not merged into the skills.**
 
 ### ✅ CHECKPOINT 2026-07-17 (3) — Overview refinements + the "mobile read-more" bug was CACHE, not code
 **Model:** Opus 4.8 (1M context). `tsc` ✅. Dev server restarted clean; `/` 200 + `/boats/mari` 200.
@@ -638,7 +634,7 @@ enter** — even though `RichText.tsx` has always branched on `external = /^http
 hrefs as same-tab internal links. **That branch was unreachable: the frontend was ready for a value the
 schema refused to accept.** Now `Rule.uri({ allowRelative: true, scheme: ['http','https','mailto','tel'] })`
 — a strict superset, so every previously-valid URL still validates and nothing needs migrating.
-- ⚠️ **OPEN, ADINDA'S CALL (in `_ADINDA-TODOS.md` #14):** a *typed* internal path silently 404s if a slug
+- ⚠️ **OPEN, ADINDA'S CALL (in `_internal/ADINDA-TODOS.md` #14):** a *typed* internal path silently 404s if a slug
   changes. The robust model is a **document picker** (reference → slug resolves automatically, survives
   renames). Real work; **flagged, not built.** Fine as-is pre-launch.
 
@@ -673,7 +669,7 @@ metadata consuming `seo`, JSON-LD, canonical, links resolving) → fix/log → t
    ⚠️ The boat page's `<title>` also reads "Mari Liveaboard" — that is the `pageTitle` **fallback working
    correctly**, not the homepage bug. Don't "fix" it.
 
-Skill-wide — queued in `_handoff/drk-website.md` for `references/workflow.md`.
+Skill-wide — queued in `_internal/handoff/drk-website.md` for `references/workflow.md`.
 
 ### 🔁 STANDING TO-DO — ask Adinda at the end of every work block: "do we want manual section toggles yet?"
 Her explicit ask 2026-07-16: **don't let this evaporate, and don't build it speculatively.** Raise it as a
@@ -691,7 +687,7 @@ specced and confirmed earlier the same day, then Adinda pulled them back: they'r
   speculative, reinstated hours later once a real surface existed. Same rule applies: **build it when a
   concrete need shows up.**
 - It also defuses the "toggles get invented twice, differently" risk flagged in
-  `_STUDIO-ORGANIZATION-AUDIT.md` (the FAQ page wants contact-form/CTA toggles; the homepage wanted its own).
+  `_internal/STUDIO-ORGANIZATION-AUDIT.md` (the FAQ page wants contact-form/CTA toggles; the homepage wanted its own).
   If/when toggles ARE built, settle ONE convention across all page types in the same pass.
 
 **Adinda still wants to review the Studio organization/section structure** before any of this is revisited.
@@ -707,7 +703,7 @@ on *"a big-bang rename would have to GUESS at the unconfirmed names."* The momen
 the variable panels, **confirmation stopped being expensive and the objection evaporated.** The strategy
 had silently assumed the designer was a scarce resource and never tested it. All three traps turned out
 REAL (stone→500 not 400, red→700 not 600, and `teal` was a family that never existed in Figma — invented
-at port time). Corrections queued for `drk-website` in `_handoff/drk-website.md`.
+at port time). Corrections queued for `drk-website` in `_internal/handoff/drk-website.md`.
 
 ### 🔴 OWED BY ADINDA — update Figma's code-syntax bindings. NOT code work; Claude cannot do it.
 **Mark this into the next round.** A palette rename is a **two-sided job** and only the code side shipped.
@@ -715,7 +711,7 @@ Figma's code-syntax field on each renamed variable still says `--primitive-…` 
 exist** — which is why Figma's MCP hands back `var(--primitive-cream-10)`.
 - **Until it's fixed:** treat ANY CSS custom-property name returned by the Figma MCP as **STALE**, and
   resolve it through the map in `src/app/globals.css`'s primitives header. Don't trust it in a component.
-- **Full mapping table + the three traps:** `_handoff/figma.md` Pending (top item).
+- **Full mapping table + the three traps:** `_internal/handoff/figma.md` Pending (top item).
 - **When doing it: match each variable BY HEX, never by its old name** — three are traps where the obvious
   target name belongs to a genuinely different colour.
 - Not blocking any build work. It costs nothing until someone reads a token name out of Figma — at which
@@ -730,7 +726,7 @@ exist** — which is why Figma's MCP hands back `var(--primitive-cream-10)`.
 Published had 4, draft had 0. Cleared published, unset on both, **verified by querying BOTH `boat-mari`
 AND `drafts.boat-mari` independently** (`count(gallery)` = 0 on each) — the specific failure that caused
 this (verifying against the same side you patched) did not recur. Asset refs backed up to
-`_scripts/_gallery-backup-boat-mari.json` before the unset.
+`_internal/scripts/_gallery-backup-boat-mari.json` before the unset.
 - **The inspect confirmed the "smoke-test residue" read rather than assuming it:** `mari-hero-smoketest.jpg`
   719KB, `exterior-001` + `-001-edited` the same shot twice, all four with null alt/title. Verifying *what*
   was rescued, not just *that* it was — the lesson from this morning, applied.
@@ -753,7 +749,7 @@ eyebrows ("Discover Mari", "Every detail") — precisely the tourist-board fille
 bans. Her call: **inventing copy is fine (a content pass follows), but pull from `mari-core` /
 `mari-itineraries` / related skills FIRST** when Figma has no copy or looks like a wrong copy-paste.
 Redone against the locked positioning; three of four now have a real mari-core anchor, `galleryEyebrow`
-doesn't. All tagged in `_CONTENT-STATUS.md`. **This generalizes beyond eyebrows — queued for the skills.**
+doesn't. All tagged in `_internal/CONTENT-STATUS.md`. **This generalizes beyond eyebrows — queued for the skills.**
 
 **⚠️ NOT VERIFIED — Adinda's reload is the only real test.** Studio resolves structure client-side, so
 `curl /studio` 200 and `schema validate` **cannot** fail on a broken sidebar. The new "Boat Defaults" entry
@@ -766,7 +762,7 @@ construction (`.id('boatDefaults')` is unique in that list), but that is an argu
 
 **Model:** Opus 4.8 (1M context). **Repo clean at `e2dc87a`.** Adinda ended the session here (tired) — a
 deliberate stop at a committed boundary, not a mid-arc drop.
-**▶ RESUME FROM `_handoff/_NEXT-SESSION-boat.md` — it OPENS with a ready-to-paste kickoff prompt.**
+**▶ RESUME FROM `_internal/handoff/_NEXT-SESSION-boat.md` — it OPENS with a ready-to-paste kickoff prompt.**
 
 **Shipped this block:**
 - **`85ef714`** — `boatDefaults` singleton + `boat-mari` gallery cleared on both sides.
@@ -797,7 +793,7 @@ early next session.**
 
 **Uncommitted at session end, deliberately:** `CLAUDE.md` (Adinda's own commit-cadence amendment) and
 `.vscode/` — **not this session's work, so not this session's to commit**, per the amendment's own
-parallel-sessions rule. `_handoff/`, `_SCHEMA-SPECS.md`, `_CONTENT-STATUS.md` are gitignored by `/_*` and
+parallel-sessions rule. `_internal/handoff/`, `_internal/SCHEMA-SPECS.md`, `_internal/CONTENT-STATUS.md` are gitignored by `/_*` and
 live on disk only — that's the convention, not a loss.
 
 ### ✅ RESOLVED 2026-07-17 — four boat-page decisions, all locked by Adinda before the sections build
@@ -828,7 +824,7 @@ rendered output.** The only real (non-comment) occurrence of the word is `'Ameni
 - **The mismatch is between our code and FIGMA, not inside our code.** Figma's frame `778:8845` is labelled
   Amenities; we render Gallery. **Our code supersedes Figma** (Adinda's standing position: follow Figma
   where sensible, but what we decide here wins). Relabelling the Figma frame is **optional and undecided** —
-  noted in `_handoff/figma.md`, deliberately NOT a to-do.
+  noted in `_internal/handoff/figma.md`, deliberately NOT a to-do.
 - **Gallery is the better name on the merits, not just the cheaper one:** titling the photo section
   "Amenities" would put an **Amenities** section and an **Amenities & Others** specs row on the same page.
   Adinda caught this. There is no rename to do and no migration to pay — it was already correct.
@@ -1011,7 +1007,7 @@ because they make no sense apart from a boat, which is the same reason Boat Defa
 **UPDATE:** originally flagged as separate unscheduled pre-launch passes; Adinda's call is to **fold SEO
 structure + the image pipeline INTO each page slice** (cheap while the page is fresh + most photos are final),
 keeping only a **light final SEO review**. See CLAUDE.md "SEO + image pipeline fold INTO each slice" +
-`_SCHEMA-SPECS.md` FAQ SEO/AEO decision record. **Sprint reconciliation flag:** the installed `mari-project`
+`_internal/SCHEMA-SPECS.md` FAQ SEO/AEO decision record. **Sprint reconciliation flag:** the installed `mari-project`
 sprint still has SEO as a separate QA-Pass-1 (Jul 24) + a Content pass (Jul 28–29) — update it to per-slice
 + light-review when the skill is next re-updated. Homepage retroactive application (it's already built): SEO
 structure (JSON-LD, semantic FAQ, `seo` fields) + verify/tighten the heavier design images (halmahera 667KB,
@@ -1033,6 +1029,23 @@ history:
    Both are per-image content-pass work, distinct from the built `urlForImage` system (which is done).
 
 ---
+
+## SESSION CHECKPOINT — 2026-07-24, `_internal/` ROOT CLEANUP REFACTOR EXECUTED (one commit)
+The gated root-cleanup item ran and is DONE — full detail in the ✅ DONE entry in the ACTIVE QUEUE
+above (what moved, same-commit amendments, what was deliberately left alone). Verification results:
+- `git ls-files _internal/content/` → the 3 copy drafts (about-page, private-charters-copy,
+  charters-current-copy) — tracking preserved through the move.
+- All tracked moves done with `git mv` (history preserved, ~105 renames); gitignored scratch
+  (`backup/`, `image-test/`, `content-scratch/`, `skill-image-retouch/`, `dev-out.log`) moved by
+  plain filesystem move and stays ignored under the new `/_internal/`-scoped `.gitignore` rules.
+- Stale-path grep across CLAUDE.md/AGENTS.md/MANAGER.md/COMPONENTS.md/`_internal/` → clean (only
+  deliberate historical mentions of the old names remain, e.g. this checkpoint and the DONE entry).
+- `src/` and `public/` untouched (dev server left running); a few code comments still cite old doc
+  names — cosmetic, fix opportunistically.
+- `_internal/README.md` created (plain-language folder map + deployment-boundary explanation +
+  the "verify via Vercel Source tab" caveat — Adinda's ask).
+Next per `_internal/RESUME.md`: new pages (Schedule & Rates, Testimonials, FAQ) per
+`_internal/PAGE-SPECS.md`.
 
 ## SESSION CHECKPOINT — 2026-07-23 (afternoon block), ABOUT PAGE BUILT + SITE-WIDE SEO FIXES + CHARTERS COPY v2
 
@@ -1062,11 +1075,12 @@ per-slice step, in sitemap.ts's header + drk-website handoff). Charters post-sli
 artifacts gone; CTA label corrected to "View All Trips" (Adinda: links to Schedule&Rates = ALL
 trips); **inline destinations map restored** after ¶2 (the body swap had wiped it — map master
 uploaded full-res 2000×1414). About body re-seeded from Adinda's OWN edit of
-content/about-page.md (she removed the management-names section — private info).
+_internal/content/about-page.md (she removed the management-names section — private info).
 
-**Infra/process this block:** working docs now COMMITTED (`_*.md`, `_handoff/`, `_scripts/` —
+**Infra/process this block:** working docs now COMMITTED (`_*.md`, `_internal/handoff/`, `_internal/scripts/` —
 backup decision; `.gitignore` exceptions) · `content/` = canonical TRACKED copy-drafts folder
-(a parallel session moved it to ignored `_content/` and the About commit swept the deletion —
+[since 2026-07-24: moved to `_internal/content/`, still tracked]
+(a parallel session moved it to ignored `_content/` — now `_internal/content-scratch/` — and the About commit swept the deletion —
 recovered `ad06118`; Codex's rewrite was nearly lost) · `.vercelignore` + backup/deploy-boundary
 docs by the terminal session · GitHub in sync (origin/main = local).
 
@@ -1138,7 +1152,7 @@ gallery, drk-seo pass + JSON-LD prefill for charters, wording reviews (availabil
 
 Model: **Fable 5** (trial). Adinda's calls, all shipped + pushed to `origin/main`:
 1. **Everything now pushes to GitHub** — 130 accumulated local commits pushed; the private repo is the
-   living backup of source AND internal docs (`_*.md`, `_handoff/`, CLAUDE.md, MANAGER.md). The old
+   living backup of source AND internal docs (`_*.md`, `_internal/handoff/`, CLAUDE.md, MANAGER.md). The old
    "commits stay local" posture is superseded; the repo-stays-private condition is unchanged.
 2. **`.vercelignore` created (718d7ff)** — internal docs are excluded from Vercel deployments entirely
    (not uploaded / not in the Source snapshot / not stored), because Adinda's requirement is "must not
@@ -1146,12 +1160,12 @@ Model: **Fable 5** (trial). Adinda's calls, all shipped + pushed to `origin/main
    verification checklist: CLAUDE.md's new "Deployment boundary" section. UNVERIFIED until Vercel is
    actually connected — she is explicitly test-verifying the first few deploys.
 3. **Underscore convention AMENDED** — `_` prefix now marks the deployment boundary, not the commit
-   boundary (CLAUDE.md section rewritten). Scratch exceptions (`_backup/`, `_image-test/`, logs) stay
+   boundary (CLAUDE.md section rewritten). Scratch exceptions (`_internal/backup/`, `_internal/image-test/`, logs) stay
    gitignored.
 4. **wip commit `bf09013`** — another session's in-flight JSON-LD pass groundwork (`JsonLd.tsx`
    component + `buildBreadcrumbJsonLd()`, both consumer-less) committed honestly as wip at Adinda's
    explicit ask, to get the tree onto GitHub. Wiring is still that workstream's next step.
-DRK-wide: the GitHub-backup/Vercel-boundary split queued for `drk-website` via `_handoff/drk-website.md`.
+DRK-wide: the GitHub-backup/Vercel-boundary split queued for `drk-website` via `_internal/handoff/drk-website.md`.
 
 ## SESSION CHECKPOINT — 2026-07-17 AM, auto-hide + a real data rescue (superseded by the checkpoint above)
 
@@ -1197,7 +1211,7 @@ singleton in `queries.ts` is selected by explicit `_id`. Audited. Queued for `dr
 ### Decisions taken
 - **`isFeatured` is STANDARD + ON BY DEFAULT** (Adinda) — supersedes "only add it when a surface consumes
   it". Cheap to add, nothing gained by removing, an editor who doesn't want it doesn't tick it. Corrected in
-  `_handoff/drk-website.md` + `_handoff/atlas-website.md` before the skill round could install the old rule.
+  `_internal/handoff/drk-website.md` + `_internal/handoff/atlas-website.md` before the skill round could install the old rule.
 - **`boatDefaults` = the singleton (option A)**, eyebrow toggles dropped to match `destinationDefaults`.
 - **Sub-nav spec (Adinda, 2026-07-17)** — floating sticky sub-nav on boat AND destination, same component
   and behaviour, different section lists. Today's nav is 2 rows (logo+CTA / menu items); stacking a sub-nav
@@ -1208,7 +1222,7 @@ singleton in `queries.ts` is selected by explicit `_id`. Audited. Queued for `dr
 
 ### Still open
 - The 70px nav offset used by the FAQ min-height came from the Destinations section, **not** Figma —
-  worth confirming against `778-8603`. In `_POLISH-BACKLOG.md`.
+  worth confirming against `778-8603`. In `_internal/POLISH-BACKLOG.md`.
 - `navigation` has **no published doc** (both copies are drafts, one a 1-item stub, one empty and now
   deleted). Nothing to publish — the nav content is hardcoded in the frontend. The global-chrome slice
   authors it. **Not an issue, do not re-flag.**
@@ -1218,10 +1232,10 @@ singleton in `queries.ts` is selected by explicit `_id`. Audited. Queued for `dr
 ## SESSION CHECKPOINT — 2026-07-16, FAQ RESTRUCTURE v2
 
 ### What this session did
-Executed the locked FAQ restructure brief (`_handoff/_NEXT-SESSION-faq.md`) end to end. Model: **Opus
+Executed the locked FAQ restructure brief (`_internal/handoff/_NEXT-SESSION-faq.md`) end to end. Model: **Opus
 throughout** (Adinda's call). Verified clean: tsc + eslint + `sanity schema validate` (0 errors/0 warnings)
 + GROQ query-back + `/` and `/studio` 200 after a clean restart, with the homepage confirmed rendering
-featured questions from both sources. Field-level detail lives in `_SCHEMA-SPECS.md` — this is the log.
+featured questions from both sources. Field-level detail lives in `_internal/SCHEMA-SPECS.md` — this is the log.
 
 ### DONE + verified
 1. **`faqSection` — one reusable object** (`title` + `questions[]` of question/answer/`isFeatured`), used
@@ -1235,14 +1249,14 @@ featured questions from both sources. Field-level detail lives in `_SCHEMA-SPECS
 5. **`faq` document type RETIRED** — Komodo's 6 FAQs migrated to `destination-komodo.faqSections`, all 7
    docs deleted, type removed from schema index + structure, file deleted. Sidebar has ONE FAQ entry.
 6. **Re-seeded answer-first** from `mari-core` (General 11 Qs, boat 7 Qs, Komodo 6 migrated), voice rules
-   applied (no em dashes, "premium", metric-first). Seed: `_scripts/seed-faq.ts` (idempotent).
+   applied (no em dashes, "premium", metric-first). Seed: `_internal/scripts/seed-faq.ts` (idempotent).
 7. **Quick fixes folded in:** `whyUsItems` min 2→1; **SEO double-nesting fixed site-wide** (dropped the
    single-field `seoFs` fieldset + explicit `title: 'SEO'` on the field, across 8 types).
 
 ### Decisions + findings worth keeping
 - **`isFeatured` was REINSTATED after being dropped** — and the installed `mari-website` skill still says
   "dropped, do not add to schema." Caught by reading the skill against the brief. The drop was correct when
-  made (no consuming UI); the homepage FAQ section is now that UI. **Generalized into `_handoff/drk-website.md`
+  made (no consuming UI); the homepage FAQ section is now that UI. **Generalized into `_internal/handoff/drk-website.md`
   as a DRK-wide pattern + decision rule** (Adinda's ask): a featured flag is only worth adding when a concrete
   surface consumes it; and hide a shared object's field in contexts where it has no effect rather than
   showing it inert.
@@ -1251,15 +1265,15 @@ featured questions from both sources. Field-level detail lives in `_SCHEMA-SPECS
   Found by testing the missing-source case against the real dataset, not by assuming. Queued for `drk-website`.
 - **Fieldset convention nuance:** "every group gets a matching fieldset" exists so headers show in "All
   Fields" — it does NOT apply to a group holding one self-describing field (that's the SEO double-nesting
-  Adinda flagged). Recorded in `_SCHEMA-SPECS.md`.
+  Adinda flagged). Recorded in `_internal/SCHEMA-SPECS.md`.
 - **Category titles are editor-editable defaults** seeded via `initialValue`, not a fixed code list (same
   approach as `boat.specifications`). Adinda approved.
 
 ### Open / flagged (nothing broken)
-- **⭐ FAQ v2 is ready for Adinda's Studio review** — see `_QA-CHECKLIST.md` for what to look at (incl. mobile).
+- **⭐ FAQ v2 is ready for Adinda's Studio review** — see `_internal/QA-CHECKLIST.md` for what to look at (incl. mobile).
 - **⚠️ Commercial figures in the FAQ answers are unverified** — deposit/cancellation/park+fuel fees/single
   supplement come from `mari-core`'s self-declared non-evergreen `commercial.md` (last verified 2026-06-09).
-  Wrong terms on a public page is a real problem. Verify with Serge before launch — see `_CONTENT-STATUS.md`.
+  Wrong terms on a public page is a real problem. Verify with Serge before launch — see `_internal/CONTENT-STATUS.md`.
 - **Komodo's "What is included in a Mari trip?" duplicates** the What's Included the destination page will
   pull from General FAQ. Migrated per the brief; decide in the destination slice.
 - **Stable identity for cross-page pulls** — still deferred to the destination slice, per the brief.
@@ -1301,7 +1315,7 @@ wired"), plus several content-model decisions. Model: Opus throughout. Verified 
    Deleted the 8 obsolete general `faq` docs. **Destination FAQs kept** as `faq` docs, relabeled in Studio
    **"FAQ (Destination-specific)"** vs the new **"FAQ (General)"** singleton, so the split is obvious.
 
-### New STANDING rules locked this session (all in CLAUDE.md; DRK-wide ones queued in _handoff/drk-website.md)
+### New STANDING rules locked this session (all in CLAUDE.md; DRK-wide ones queued in _internal/handoff/drk-website.md)
 - **Full-wire-per-slice** (no hardcoded fallbacks; seed placeholder; UNDER TEST, confirm at end of build).
 - **Guiding principle: the CMS/admin experience is a product surface** — editor-intuitiveness beats
   developer-clean modeling unless there's a real technical reason; FLAG divergences. (Also a memory.)
@@ -1313,7 +1327,7 @@ wired"), plus several content-model decisions. Model: Opus throughout. Verified 
 
 ### STILL TO DO / open (nothing broken — all logged)
 - **Theme tweak (near-term, NOT the Jul polish block):** primary bg → `beige/100` (too white); accent color
-  must stay readable vs BOTH light + dark font (grey caption was unreadable on it). In `_POLISH-BACKLOG.md`.
+  must stay readable vs BOTH light + dark font (grey caption was unreadable on it). In `_internal/POLISH-BACKLOG.md`.
 - **FAQ page frontend** — only the *homepage* FAQ is wired; the dedicated FAQ page (renders faqGeneral
   categories as sections) isn't built. Homepage "Read More" link → `#` until then.
 - **Destination FAQ remodel** — destination FAQs are still `faq` docs; move to inline arrays on destination
@@ -1346,7 +1360,7 @@ New batch, NOT in the commit above — the next task. Two distinct mechanisms pe
    CTA, Contact (Hero always on). "queue" = Why Us; "Destinations and the boat need to be there" = they get
    toggles too. **FAQ min-height when shown** = ~viewport minus nav via `dvh` (verify Figma node 778-8603).
    **Also:** `homePage.whyUsItems` min 2→1 (Adinda's catch). Read More = link to FAQ page (built). Bundle
-   with the theme tweak in ONE pass. FULL confirmed brief → `_handoff/_NEXT-SESSION-toggles-theme.md`.
+   with the theme tweak in ONE pass. FULL confirmed brief → `_internal/handoff/_NEXT-SESSION-toggles-theme.md`.
 
 ### Repo state: clean + committed (full-wire + FAQ remodel folded into ONE commit, Adinda's ask). Reviewable.
 
@@ -1378,12 +1392,12 @@ schema tasks also queued: required-field markers (done ✓), Boat Defaults (stil
    Testimonials→Testimonials, Latest Articles→Blog Posts). Why Us/FAQ/Testimonials use reference arrays
    (editor picks which items show); Latest Articles auto-pulls latest 3 posts. Legacy `ctaHeading`/`ctaSubline`
    removed (no data to migrate — homePage doc was empty).
-4. **Content seeded + verified** (`_scripts/seed-homepage.ts`, run via `sanity exec --with-user-token`):
+4. **Content seeded + verified** (`_internal/scripts/seed-homepage.ts`, run via `sanity exec --with-user-token`):
    homePage singleton + 4 `whyUsItem` + 8 general `faq` + 4 `testimonial` docs, **11 images uploaded** to
    Sanity (hero, the-boat, 4 why-us, 2 cta, 3 blog covers), cta re-seeded with images, 3 blog posts patched
    with cover images. Copy lifted verbatim from the built components; 2 brand-voice fixes applied in-flight
    (a "--" → period, an em dash → comma). Stray empty homePage + blog drafts deleted. GROQ query-back
-   confirms all content + images + references resolve. Tracked in `_CONTENT-STATUS.md` (new homePage section,
+   confirms all content + images + references resolve. Tracked in `_internal/CONTENT-STATUS.md` (new homePage section,
    all 🟡 design-sourced).
 
 ### Design decisions made this slice (flagged to Adinda, cheap to change — homePage content is re-seedable)
@@ -1407,7 +1421,7 @@ schema tasks also queued: required-field markers (done ✓), Boat Defaults (stil
    - **Bug caught + fixed by end-to-end verify:** a next/image `loader` *function* can't cross the RSC
      boundary in Server Components (TheBoat, CTA) → "Functions cannot be passed to Client Components".
      Removed the per-image loader; Next's own optimizer handles Sanity URLs (via cdn.sanity.io
-     remotePatterns). CDN-side resizing via a global `images.loaderFile` deferred to `_POLISH-BACKLOG.md`.
+     remotePatterns). CDN-side resizing via a global `images.loaderFile` deferred to `_internal/POLISH-BACKLOG.md`.
 
 ### STILL TO DO (queued)
 - **Boat Defaults** (queued schema task) — `boatDefaults` singleton + slim `boat`, same pattern as
@@ -1430,7 +1444,7 @@ schema tasks also queued: required-field markers (done ✓), Boat Defaults (stil
     touch/remove it — exactly the "I control it, not them" outcome she wanted (a `readOnly` field would still
     expose it to them). **Link target = `atlas@drkdigital.studio`** (the studio), NOT her personal
     `adinda.patty@gmail.com` (explicitly rejected). Ties to the "Atlas credit is desired branding" convention.
-- Polish backlog (`_POLISH-BACKLOG.md`): Sanity CDN loaderFile, LQIP blur, Why-Us focal point, rich-text in
+- Polish backlog (`_internal/POLISH-BACKLOG.md`): Sanity CDN loaderFile, LQIP blur, Why-Us focal point, rich-text in
   FAQ/Why-Us, testimonial star rating.
 
 ### Repo state: homepage vertical slice COMPLETE and committed. The rendered homepage is now Sanity-driven
@@ -1443,11 +1457,11 @@ and reviewable (checkpoint #2). Frontend falls back to hardcoded copy if any fie
 ### What this session was
 Not a build session — a process/skills-infrastructure session. Two things: (1) locked a new standing
 **session-bookend protocol**, (2) ran the first real **chat-side skills-update round** off the accumulated
-`_handoff/*.md` backlog.
+`_internal/handoff/*.md` backlog.
 
 ### New standing protocol — locked into CLAUDE.md ("Session bookend protocol")
 Runs at BOTH session start (recap/"good morning") AND session end, every time. Order: (1) **skills-backlog
-check FIRST** — check `_handoff/*.md`, if there's a backlog ask "update skills now in chat?", hand off ONE
+check FIRST** — check `_internal/handoff/*.md`, if there's a backlog ask "update skills now in chat?", hand off ONE
 skill at a time (paste-prompt + full content), remind to drop the re-export in Downloads, install, then
 clean the handoff docs; (2) **state the current model**; (3) every task proposal carries **plan + est.
 hours + recommended model/effort** (no Haiku/Fable; Sonnet-high default; Sonnet-medium menial; Opus
@@ -1459,8 +1473,8 @@ architecture-tier); (4) **ask available work-blocks**, adapt, flag sprint impact
 The chat-side skill session **cannot see the local installed skill copy** (`.claude/skills/...`). Several
 drk-website handoff items said "landed in LOCAL copy" — that drafted text is invisible to chat. So a
 skills-update handoff must **lift and inline** any local-only reference content, not just point at it. Built
-self-contained payload files for this: `_handoff/_drk-website-chat-payload.md` (done) and
-`_handoff/_atlas-website-chat-payload.md` (ready). Each = every pending item + all local drafted content,
+self-contained payload files for this: `_internal/handoff/_drk-website-chat-payload.md` (done) and
+`_internal/handoff/_atlas-website-chat-payload.md` (ready). Each = every pending item + all local drafted content,
 generalized, organized by target reference file, with a matching paste-prompt.
 
 ### drk-website — UPDATED + INSTALLED + ARCHIVED + reconciled
@@ -1468,7 +1482,7 @@ Adinda updated it in chat from the payload, re-exported, Claude installed from D
 the freshly-installed files (not the changelog): new `troubleshooting.md` + `image-editing.md` exist;
 `workflow.md`/`sanity-cms.md`/`components.md`/`stack.md`/`pre-launch.md`/`claude-code.md` all grew. Archived
 to `OneDrive/Desktop/claude/drk-skills/` (canonical + dated snapshot), Downloads copy deleted.
-`_handoff/drk-website.md` reconciled — everything moved to a dated Done section; only the named-component
+`_internal/handoff/drk-website.md` reconciled — everything moved to a dated Done section; only the named-component
 catalog stays open (needs Mari's `COMPONENTS.md`, which doesn't exist as a file yet). Minor: ~13
 illustrative "Mari" mentions remain in the skill (acceptable, incident references).
 
@@ -1492,9 +1506,9 @@ handoffs reconciled to Done:
 - **mari-project** — status/sprint/skills-infra refreshed; scope items folded; contract set to Aug 10.
 
 **`is_featured` — DROPPED for v1** (Adinda confirmed 2026-07-16). Stopgap-edited into the installed
-`mari-website` faq.md; queued in `_handoff/mari-website.md` to persist chat-side next round.
+`mari-website` faq.md; queued in `_internal/handoff/mari-website.md` to persist chat-side next round.
 
-**All 5 `_handoff/*.md` files reconciled** (drk-website, atlas-website, mari-website, mari-project to Done;
+**All 5 `_internal/handoff/*.md` files reconciled** (drk-website, atlas-website, mari-website, mari-project to Done;
 figma.md untouched — it's Figma-file syncs, a separate track, still Pending).
 
 ### Destination schema pass — done 2026-07-16 (against the real mockup)
@@ -1511,7 +1525,7 @@ Adinda gave the actual Figma frame — **`778:8608` (`Page/Destination`)**, newe
 - **Flag (not fixed — belongs to the FAQ pass):** the mockup's destination FAQ categories are
   **Diving / Traveling / General Information**, but `faq.ts` lists the 3rd as `"The Liveaboard"`. The proper
   general-vs-destination category split is still pending (atlas-website). Fix during the FAQ pass, not now.
-- **Flag (Figma drift, queued in `_handoff/figma.md`):** hero breadcrumb reads "Boats" not "Destinations";
+- **Flag (Figma drift, queued in `_internal/handoff/figma.md`):** hero breadcrumb reads "Boats" not "Destinations";
   destination node refs in the skills should update `675-2363` → `778:8608`.
 
 ### Cover video + FAQ split + hybrid workflow — decided 2026-07-16 (all verified: tsc/eslint/schema-validate 0/0)
@@ -1519,7 +1533,7 @@ Adinda gave the actual Figma frame — **`778:8608` (`Page/Destination`)**, newe
   doubles as Adinda's checklist) → THEN **vertical slices per page** (schema depth + frontend + content
   together, review the real page). Driver: abstract Studio-form review kept hitting "feels so abstract, I'm
   not going to say anything." Guardrail: build functional-not-polished, defer cosmetics to new
-  `_POLISH-BACKLOG.md`, one polish block later. Migration risk accepted (re-seedable placeholder content +
+  `_internal/POLISH-BACKLOG.md`, one polish block later. Migration risk accepted (re-seedable placeholder content +
   standardizing conventions). Slice order: **homepage first** (frontend exists → wire it), then destination.
   Skill-wide, queued for `drk-website`.
 - **Two Studio conventions locked (CLAUDE.md, skill-wide):** (1) every group mirrored by a titled `fieldset`
@@ -1539,7 +1553,7 @@ Adinda gave the actual Figma frame — **`778:8608` (`Page/Destination`)**, newe
   Tier 4 checkpoint below). This skills round was infrastructure, not build progress.
 - Open slugs/URL confirms (Private Charters, Schedule & Rates, `/boats/mari`), `author.bio`, required-field
   markers — all still open from the Tier 4 session.
-- `_handoff/figma.md` drift-syncs (Figma-file edits) whenever a Figma session happens.
+- `_internal/handoff/figma.md` drift-syncs (Figma-file edits) whenever a Figma session happens.
 
 ---
 
@@ -1559,13 +1573,13 @@ types: `destination`, `itinerary` (stub), `faq` (built with real depth — quest
 conditional destination-or-boat reference), `testimonial`, `blogPost`, `blogCategory`, `author`,
 `homePage` (singleton, deliberately shallow — homepage content is still 100% hardcoded), `whyUsItem` (own
 document type, referenced from `homePage.whyUsItems` with `Rule.min(2).max(4)`). Full field-by-field spec
-in `_SCHEMA-SPECS.md`'s new "Tier 4 shells" section.
+in `_internal/SCHEMA-SPECS.md`'s new "Tier 4 shells" section.
 
 ### Rename: `boatPage`/`destinationPage` → `boat`/`destination`, 2026-07-16
 Adinda asked why the "Page" suffix existed. Real answer: it wasn't an actual convention — `scheduleRates`
 and `blogPost` don't have it either, so it was just how the first two types happened to get named, not a
 deliberate rule. Renamed both. `destination` was free (zero content existed). `boat` needed a real
-migration since `boatPage-mari` had real content: wrote `_scripts/rename-boatpage-to-boat.ts` (`_type` is
+migration since `boatPage-mari` had real content: wrote `_internal/scripts/rename-boatpage-to-boat.ts` (`_type` is
 immutable in Sanity, so this creates `boat-mari` fresh, repoints `cabinType-mari-deluxe.boat` to it, then
 deletes the old document) — ran via `npx sanity exec ... --with-user-token`, verified via GROQ: `boat-mari`
 exists with correct data, `cabinType-mari-deluxe`'s reference correctly repointed, zero `boatPage`
@@ -1607,7 +1621,7 @@ robots.txt/llms.txt are separate static Next.js route files, not Sanity content 
 ### Daily recap template — locked into CLAUDE.md this session
 Adinda wants a consistent recap structure every time she asks ("today/tomorrow/sprint status"), so it
 isn't reinvented per ask. Full spec now in CLAUDE.md's "Daily recap template" section; generalized version
-queued for `drk-website`'s `references/workflow.md` via `_handoff/drk-website.md`.
+queued for `drk-website`'s `references/workflow.md` via `_internal/handoff/drk-website.md`.
 
 ---
 
@@ -1617,7 +1631,7 @@ queued for `drk-website`'s `references/workflow.md` via `_handoff/drk-website.md
 Clean and verified — `tsc`, `eslint`, fresh dev server (cache cleared, `Ready in ~2.4s`), Studio 200,
 zero `SchemaError` in the fresh log, all confirmed as the last actions. Nothing half-done in the
 committable sense. Dev server IS running. Sanity has one real `boatPage-mari` document with mostly-real
-content (see _CONTENT-STATUS.md for the real-vs-placeholder breakdown).
+content (see _internal/CONTENT-STATUS.md for the real-vs-placeholder breakdown).
 
 ### What Adinda should REVIEW first, in Studio (the human-eyes part I can't do)
 1. **Hard-reload Studio first** (`Ctrl+Shift+R`, or an incognito tab on `localhost:3000/studio`). Your
@@ -1647,8 +1661,8 @@ content (see _CONTENT-STATUS.md for the real-vs-placeholder breakdown).
   + caption**, all optional. Saved as a memory + corrected in CLAUDE.md + handoff.
 - **Gallery images now carry an upload recommendation** in the field description: landscape 4:3, ≥
   1600×1200px (retina-ready, bigger than it displays), web-optimized JPEG/WebP under ~500KB.
-- **New tracking docs created this session:** `_SCHEMA-SPECS.md` (per-field approval checklist),
-  `_CONTENT-STATUS.md` (real-vs-placeholder content), `_QA-CHECKLIST.md` (external-reviewer open
+- **New tracking docs created this session:** `_internal/SCHEMA-SPECS.md` (per-field approval checklist),
+  `_internal/CONTENT-STATUS.md` (real-vs-placeholder content), `_internal/QA-CHECKLIST.md` (external-reviewer open
   decisions). All part of the doc-split, all listed in CLAUDE.md.
 
 ### What Adinda needs to DECIDE / DO next (prioritized)
@@ -1659,9 +1673,9 @@ content (see _CONTENT-STATUS.md for the real-vs-placeholder breakdown).
    drag-and-drop-only for now. (Open Sanity feature requests confirm it's a known gap: GH #1547, #4483.)
 2. **Validate the experimental gallery** — the drag-many test above. If it feels right, we promote it out
    of EXPERIMENTAL; if the category-per-batch grouping is awkward with real content, we adjust.
-3. **Eyebrow toggle: global vs. per-section** — still pending Serge's input (in _QA-CHECKLIST.md).
+3. **Eyebrow toggle: global vs. per-section** — still pending Serge's input (in _internal/QA-CHECKLIST.md).
 4. **Social image alt** — `seo.ts`'s ogImage/twitterImage are bare images with no alt field, a technical
-   exception to the alt rule. Decide whether to add alt there (in _QA-CHECKLIST.md).
+   exception to the alt rule. Decide whether to add alt there (in _internal/QA-CHECKLIST.md).
 
 ### Gallery FLATTENED — drag-drop was failing on the grouped structure (fixed 2026-07-15, same session)
 Adinda hard-refreshed and tried to drag 4 jpegs into the gallery → *"no known conversion from content
@@ -1705,7 +1719,7 @@ Not launch-blocking (drag works). Adinda's call on whether/when to build; slotte
    `references/pages/tc.md` into an actual `page` document, using the new `richTextFull` editor. This was
    deliberately held to avoid rushing a 16-section import at end-of-session. Clear #1.
 2. **Specifications content** — the live doc has all 8 category labels; verify/reload the bodies during
-   the content pass (Adinda's call to do it then, not now — see _CONTENT-STATUS.md).
+   the content pass (Adinda's call to do it then, not now — see _internal/CONTENT-STATUS.md).
 3. **Destination page + Private Charters** Figma passes — links already shared, never got started (this
    whole session was boat-page + gallery). These are the next real page-schema builds.
 4. If Adinda greenlights it: the custom multi-select gallery upload button component.
@@ -1721,17 +1735,17 @@ mechanism to set *this session's* reasoning-effort level (vs. sub-agent effort) 
 confirmed — worth checking `/config` or asking directly before treating that part as fully actionable.
 
 ### Contract timeline — RESOLVED 2026-07-15, do not re-raise as a concern
-Earlier notes (this file and `_handoff/mari-project.md`) flagged an apparent conflict: "contract end
+Earlier notes (this file and `_internal/handoff/mari-project.md`) flagged an apparent conflict: "contract end
 ~Jul 24" vs. the internally-planned Jul 28–Aug 1 launch window. **Corrected directly by Adinda: that was
 wrong.** Contract signed ~May 10, 12-week term, real target is **Aug 10**. We're on schedule. The Type A
 brochure (~1 week) was extra work Adinda chose to take on, outside contracted scope — that's what created
 the earlier appearance of time pressure, not an actual scheduling conflict. **Stop mentioning the
 contract-vs-launch-window concern in future sessions** — it was never a real problem. Corrected in
-`_handoff/mari-project.md` too (marked resolved there).
+`_internal/handoff/mari-project.md` too (marked resolved there).
 
 ### Tracking docs renamed with underscore prefix — 2026-07-15, so they auto-gitignore going forward
-`SCHEMA-SPECS.md` → `_SCHEMA-SPECS.md`, `CONTENT-STATUS.md` → `_CONTENT-STATUS.md`, `QA-CHECKLIST.md` →
-`_QA-CHECKLIST.md` — Adinda didn't want these build-process tracking docs committed to git, and didn't
+`SCHEMA-SPECS.md` → `_internal/SCHEMA-SPECS.md`, `CONTENT-STATUS.md` → `_internal/CONTENT-STATUS.md`, `QA-CHECKLIST.md` →
+`_internal/QA-CHECKLIST.md` — Adinda didn't want these build-process tracking docs committed to git, and didn't
 want to have to remember to gitignore each new one individually. Applied the convention already locked
 in this repo (`CLAUDE.md`'s "Local-only files" section, `.gitignore` line 47: `/_*`) rather than invent a
 new mechanism — any root-level file/folder starting with `_` is automatically excluded, no per-file
@@ -1770,12 +1784,12 @@ to try, not a code investigation.
    unified `specifications` array with 8 categories, each `{category, body: richTextBasic}`,
    `initialValue` seeding all 8 on every new boatPage. Real mari-core content loaded into all 8,
    formatted as flat lines (no bullets) matching the mockup's actual visual style exactly — see
-   `_scripts/smoke-test-fix-specs.ts`, verified via GROQ query-back (categories list confirmed).
+   `_internal/scripts/smoke-test-fix-specs.ts`, verified via GROQ query-back (categories list confirmed).
 2. **`overviewCta` field deleted — was a modeling mistake, not a refinement.** Adinda: there's no
    separate CTA/link here at all. `overviewBody`'s "Read More" is a truncate-and-expand on the SAME
    text (identical pattern to the homepage Testimonials cards), not navigation anywhere. Removed the
    `link`-type field entirely; the truncate/expand behavior is a frontend requirement, not yet built
-   (no boat page component exists), flagged in-file and in _SCHEMA-SPECS.md.
+   (no boat page component exists), flagged in-file and in _internal/SCHEMA-SPECS.md.
 3. **`overviewBody` upgraded from tier-2 (`richTextBasic`) to tier-3** — same editor as the T&C page.
 4. **New shared type: `objects/richTextFull.ts`, named "Full Rich Text Block" per Adinda's explicit
    naming request.** Extracted from `page.ts`'s previously-inline body config. Spec: H1 through H6
@@ -1801,8 +1815,8 @@ to try, not a code investigation.
    to `boatPage` AND retrofitted `page.ts`/`scheduleRates.ts` (their `settings` groups removed
    entirely, `slug` now lives next to `title`) — "for every page type," per Adinda's explicit ask, not
    boatPage-only.
-10. **New `_QA-CHECKLIST.md`** — for an external human reviewer, distinct from _SCHEMA-SPECS.md (field
-    approval) and _CONTENT-STATUS.md (content-placeholder tracking). One item so far: whether the
+10. **New `_internal/QA-CHECKLIST.md`** — for an external human reviewer, distinct from _internal/SCHEMA-SPECS.md (field
+    approval) and _internal/CONTENT-STATUS.md (content-placeholder tracking). One item so far: whether the
     eyebrow-toggle should be global or per-section (currently per-section) — explicitly left open,
     Adinda is checking with Serge.
 
@@ -1823,7 +1837,7 @@ to try, not a code investigation.
   (keep external for now). Logged as an explicit **post-launch backlog item**: a custom Studio tool
   hosting docs, "looks more professional," possibly paired with an intro Loom video — a bonus, not
   pre-launch scope.
-- **SEO auto-population tracking** — confirmed it IS tracked (_SCHEMA-SPECS.md's `boatPage` SEO row:
+- **SEO auto-population tracking** — confirmed it IS tracked (_internal/SCHEMA-SPECS.md's `boatPage` SEO row:
   "real frontend `generateMetadata` work, not schema, not built yet") — same bucket as the JSON-LD
   auto-generation, both blocked on the eventual Sanity-wiring pass, not lost or forgotten.
 - **T&C page "is gone"** — real gap, not a bug: the `page` document TYPE exists but no actual T&C
@@ -1970,8 +1984,8 @@ drop works) and the documented way to attach per-image alt.
   expensive post-launch, so the right time to change.
 - **Locked into CLAUDE.md** (new "Galleries" section, with the full reasoning + the load-bearing "must be
   `image` type not a wrapper object" gotcha, per Adinda's ask to document the why) and **queued for the
-  `drk-website` skill** (`_handoff/drk-website.md`) as a reusable DRK-wide pattern.
-- **Status EXPERIMENTAL** — the category-per-batch grouping is an untested UX bet; _SCHEMA-SPECS.md has an
+  `drk-website` skill** (`_internal/handoff/drk-website.md`) as a reusable DRK-wide pattern.
+- **Status EXPERIMENTAL** — the category-per-batch grouping is an untested UX bet; _internal/SCHEMA-SPECS.md has an
   explicit "verify with real multi-file drop in Studio" checkbox. Adinda: "we're still trying this out."
 
 Verified: `tsc`, `eslint` clean; dev server restarted fresh (cache cleared), Studio 200, zero
@@ -1985,7 +1999,7 @@ a field-list review alone couldn't have caught:
   descriptions are what an actual editor reads, and none of that context is useful or evergreen to
   them. Rewrote every description across `boatPage`/`cabinType`/`cabin`/`galleryImage`/
   `galleryCategory` to be short and generic; decision history stays in code comments and
-  MANAGER.md/_SCHEMA-SPECS.md only. Verified: Sanity's `description` renders as always-visible
+  MANAGER.md/_internal/SCHEMA-SPECS.md only. Verified: Sanity's `description` renders as always-visible
   inline text by default (confirmed via search — no built-in tooltip/info-icon, would need a custom
   field component, not worth building for this) — tight text is the actual fix, not a UI feature.
 - **Cabins moved to its own Studio group**, out of Overview — confirmed `cabinsHeading` should
@@ -2000,7 +2014,7 @@ a field-list review alone couldn't have caught:
   match. `specifications`'s fixed category list dropped to 6 or the remaining categories; now seeded
   via `initialValue` on every new boatPage doc (same pattern as `stats`), not built from empty.
   Real mari-core data loaded for all 6 remaining categories + the new prose field via
-  `_scripts/smoke-test-update-specs.ts`, verified via GROQ query-back.
+  `_internal/scripts/smoke-test-update-specs.ts`, verified via GROQ query-back.
 - **Slug repositioning, locked as a convention for every page type, not just boatPage:** short
   name → full title → slug, WordPress-style, always together near the top of the main content
   group — not buried in a separate Settings tab. Applied to `boatPage` (new Basic Info order) AND
@@ -2015,7 +2029,7 @@ Verified throughout: `tsc`, `eslint` clean, Studio confirmed loading with no sch
 every file change (checked the dev log directly for `SchemaError`, not just HTTP 200).
 
 ### Smoke test executed — real documents populated in Sanity, 2026-07-15
-Ran `_scripts/smoke-test-content.ts` via `npx sanity exec ... --with-user-token` (underscore-prefix
+Ran `_internal/scripts/smoke-test-content.ts` via `npx sanity exec ... --with-user-token` (underscore-prefix
 throwaway script, not a real project file). Created: 1 `boatPage` (Mari), 1 `cabinType` (Deluxe
 only), 3 `galleryCategory`, 3 `galleryImage`. Images: 3 uploaded from Figma's own embedded assets
 (hero, key features, one gallery photo — all still-valid short-lived Figma asset URLs fetched
@@ -2024,7 +2038,7 @@ PLACEHOLDER alt text on each). Verified via GROQ query-back, not just "script ex
 `coverImage`'s `_type` correctly resolved to `imageWithAlt` (not the base `image` type), and
 `galleryImage.categories[]->name` correctly dereferenced multi-category assignment (one image
 tagged to both Relaxation and The Boat). `tsc`/`eslint`/Studio all still clean afterward.
-`_CONTENT-STATUS.md` filled in field-by-field with what's real vs. Figma-sourced vs. Claude-authored
+`_internal/CONTENT-STATUS.md` filled in field-by-field with what's real vs. Figma-sourced vs. Claude-authored
 placeholder — see that file for the honest per-field breakdown, including a few Claude-authored
 stand-ins (cabinsHeading, galleryDescription, 2 of 3 gallery category blurbs) that aren't Figma text
 and shouldn't be mistaken for it.
@@ -2057,13 +2071,13 @@ Verified throughout: `tsc`, `eslint` clean; Studio hit one transient HMR error r
 file, self-healed on the next compile, confirmed via a second curl after the auto-reload). Not a
 real bug.
 
-### `_SCHEMA-SPECS.md` created — new root doc, checkbox spec per Sanity page type, 2026-07-15
+### `_internal/SCHEMA-SPECS.md` created — new root doc, checkbox spec per Sanity page type, 2026-07-15
 Adinda: wants the boat page's Sanity field spec documented somewhere durable, checkable per field
 ("this is approved, this is approved"), distinct from MANAGER.md's dated log — and eventually
 promoted to `atlas-website` as a reusable pattern once validated, not before (Mari is explicitly the
 pilot). New file, 4th in the CLAUDE.md-documented doc split. 🟡 Draft status on every field right
 now — Adinda hasn't approved anything yet, this session just gave her something to approve *against*.
-Promotion path staged in `_handoff/atlas-website.md` (new "Sanity schema patterns" reference category
+Promotion path staged in `_internal/handoff/atlas-website.md` (new "Sanity schema patterns" reference category
 that skill doesn't have yet) — not promoted now, correctly held for validated-at-scale status.
 
 ### Gallery, layout diagrams, alt text — reworked same session, before the URL question got answered
@@ -2104,7 +2118,7 @@ old URL. Still flagged as pending Adinda's actual confirm, not silently locked.
 
 ### Alt text + SEO filenames — escalated to a hard, site-wide AND skill-wide rule, locked 2026-07-15
 Adinda: bake this in so she never has to repeat it, for this project or future DRK ones. Written into
-CLAUDE.md as a standing rule (new "Images" section) and staged in `_handoff/drk-website.md` tagged
+CLAUDE.md as a standing rule (new "Images" section) and staged in `_internal/handoff/drk-website.md` tagged
 `[DRK]` for the skill itself. Retrofitted the two pre-existing image fields that predated `imageWithAlt`
 (`page.body`'s inline image — added required validation to its existing `alt` field; `siteSettings.logo`/
 `favicon` — switched to `imageWithAlt`). `tsc`/`eslint` clean after the retrofit.
@@ -2262,7 +2276,7 @@ guessing one now.
   grouping, singleton lock, slug/char-count components, shared `link` object, exclusive-active validation,
   SEO checklist, Studio branding boundaries — what's realistic vs. not); its `workflow.md` now has the
   session-time-tracking convention. CLAUDE.md has the handoff-doc-reading instruction + Destinations
-  mega-menu reminder. `_handoff/mari-website.md`'s announcement-bar conflict is reconciled.
+  mega-menu reminder. `_internal/handoff/mari-website.md`'s announcement-bar conflict is reconciled.
 
 ### Homepage markup port — DONE this session too (was the top "what's next" item, now complete)
 All 11 static sections (Nav, Hero, The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials, CTA,
@@ -2373,7 +2387,7 @@ captured, `scrollY` stays `0`; (2) re-confirmed clicking a tab still auto-scroll
 (North Sulawesi test from the original fix, unchanged result). Verified clean: `tsc --noEmit`, `eslint`.
 
 **General rule, not just this component** — logged in `references/components.md` (local `drk-website`
-skill copy) and queued in `_handoff/drk-website.md` for the real skill: any `useEffect` that calls
+skill copy) and queued in `_internal/handoff/drk-website.md` for the real skill: any `useEffect` that calls
 `scrollIntoView`/`scrollTo` and is keyed on a piece of state must explicitly guard against firing on the
 initial mount, unless a mount-time scroll is actually the intended behavior. `useEffect` always runs at
 least once after first render — an effect keyed on a value that starts at its "default active" state
@@ -2631,7 +2645,7 @@ ones.
 |---|---|---|---|
 | 2026-07-14 | Sanity schema pass + Studio branding + theme.css port | ~2h15–2h30 | First full backend session on this build — established schema/Studio/branding conventions from scratch. Expect meaningfully faster on similar future sessions now that the patterns exist. |
 | 2026-07-15 | Full homepage QA pass (every section, desktop + mobile) + fixes | **~2h** (Adinda's own tracked estimate, rounded up from ~1h48m measured mid-session) | **~1h of this was a false-alarm chase** (see below), not real QA/bug-fixing time. Once resolved, the actual QA pass covered all 11 sections (Nav, Hero, The Boat, Why Us, Destinations, Latest Articles, FAQ, Testimonials, CTA, Contact, Footer) and turned up ~10 real bugs total, all fixed same session. **Calibration takeaway, revises the 2026-07-14 row's own assumption:** that earlier entry expected future sessions to be "meaningfully faster... now that the patterns exist" — true for *coding* patterns, but a full QA pass has its own largely-fixed cost regardless of how established the code conventions are, because QA time is dominated by *discovering* each section's specific bugs, not by applying known patterns. Budget a full single-homepage QA pass at **~2h** even on a well-patterned codebase, not scaled down just because earlier sessions established good conventions. Sub-note: a "barely any content on mobile" report that looked like a WebKit/iOS bug turned out to be `allowedDevOrigins` (dev server blocking LAN-IP requests), unrelated to any browser engine — see `references/troubleshooting.md`'s localhost-vs-LAN-IP check, which exists specifically to prevent this cost recurring. |
-| 2026-07-15 (later, same day) | Boat page full schema build + gallery redesign (3 iterations) + content-model changes (Full Rich Text Block extraction, alt-rule correction) + new tracking docs (`_SCHEMA-SPECS.md`/`_CONTENT-STATUS.md`/`_QA-CHECKLIST.md`) | **~4h30m elapsed, but Adinda estimates only ~70% (~3h10m) was active desk time** — ~30% was her doing other things (learning Japanese, cooking) while background tasks (dev server restarts, Sanity scripts) ran, not actively reviewing/responding. | **New calibration point, distinct from the 2026-07-14 row's caution:** elapsed time and active time diverge meaningfully when a session has real background-task latency (dev server restarts, `sanity exec` scripts, Perplexity/web research) — Adinda could step away during those. **Track both going forward**, not just one figure — elapsed matters for calendar/deadline planning, active time matters for comparing actual effort across sessions. This session's scope was large (full boat schema + 3 gallery redesign iterations + several corrected mistakes), so the ~3h10m active figure is the more honest "how much work was this" number. |
+| 2026-07-15 (later, same day) | Boat page full schema build + gallery redesign (3 iterations) + content-model changes (Full Rich Text Block extraction, alt-rule correction) + new tracking docs (`_internal/SCHEMA-SPECS.md`/`_internal/CONTENT-STATUS.md`/`_internal/QA-CHECKLIST.md`) | **~4h30m elapsed, but Adinda estimates only ~70% (~3h10m) was active desk time** — ~30% was her doing other things (learning Japanese, cooking) while background tasks (dev server restarts, Sanity scripts) ran, not actively reviewing/responding. | **New calibration point, distinct from the 2026-07-14 row's caution:** elapsed time and active time diverge meaningfully when a session has real background-task latency (dev server restarts, `sanity exec` scripts, Perplexity/web research) — Adinda could step away during those. **Track both going forward**, not just one figure — elapsed matters for calendar/deadline planning, active time matters for comparing actual effort across sessions. This session's scope was large (full boat schema + 3 gallery redesign iterations + several corrected mistakes), so the ~3h10m active figure is the more honest "how much work was this" number. |
 | 2026-07-21 | Categorized FAQ built+approved · SubNav complete arc (static rail → floating → compact two-row chrome, 4 design pivots) · scroll-top button · gallery CTA + chevrons + lightbox fullscreen · ~10 side-fixes (nav hover/active, accordion hovers, Android accordion leak, paragraph rule, deck-plan border, brochure rebuild) | **~5h elapsed (from commits 09:14–13:22 + pre-commit recap); Adinda's active figure: 4h15m given at ~12:30, plus ~45m of review after — call it ~4h45–5h active.** | Unusually interactive session — nearly all elapsed was active (live design iteration with screenshots, not background waits). Calibration: interactive design-iteration sessions have elapsed ≈ active, unlike build sessions with script latency. The SubNav went through FOUR rejected/revised designs before landing — budget real iteration time for novel interactive chrome, it is not a build-to-spec task. |
 | 2026-07-22 (afternoon) | Komodo page slices 5–7 (Gallery + Itineraries + About the Boats) + JSON-LD prefill + drk-seo pass + ~6 QA rounds live with Adinda | **~3h elapsed** (first dev restart 14:06 → last commit 16:55 + close-out; commits `c8a0a04` 14:14 → `f6c37e5` 16:55). **Active desk time — Adinda's figure, given 2026-07-23 at day level:** full Jul 22 build ≈ **6h elapsed, active ≈ half (~3h)**; pro-rated, this afternoon block ≈ 1.5h active. | Highly interactive like 2026-07-21 (live per-section QA, 3 sections + 2 tools shipped in one block) but WITH script/restart latency (5 clean restarts, ~8 seed scripts) — expect active < elapsed. Two same-day model reversals (numeric order → drag array; overviewBody → excerpt) both cost ~15 min each because content was re-seedable — the vertical-slice bet paying off, worth citing in estimates. **Adinda's own read (2026-07-23): the day shipped ~5 shared + 4 unique components and felt notably faster than the boat page — partly the established patterns, partly zero context-switching (no skill updates, no feedback rounds interleaved). Calibration: protected single-focus build days genuinely run faster; don't price them like interleaved days.** |
 | 2026-07-23 (morning) | Private Charters page complete (9 sections, 4 QA rounds) + shared-section singletons (boatsSection, destinationsSection) + Studio reorg + naming glossary + Payment & Booking rename | **~3h elapsed ≈ ~3h active (Adinda's own figure, "we've only worked for about three hours"; highly interactive live-QA session, elapsed ≈ active per the 2026-07-21 calibration).** | Fastest full-page slice yet — one morning for what the boat page took ~2 days: every pattern (hero, overview read-more, accordion, subnav, FAQ composition, seeds) already existed, and 4 live QA rounds replaced the build-then-review cycle. Two seed pitfalls found + hardened same-day: seed-vs-open-draft clobber; CLI raw perspective returning drafts.* ids. Afternoon block planned: FAQ + Testimonials pages. |
@@ -2697,7 +2711,7 @@ duplicated here. Summary: Next.js 16.2.10 + Sanity v6.4.0 confirmed correct (not
 skill still says); `cacheComponents` decided OFF for launch; embedded Studio confirmed to need no custom
 auth (Sanity's own SSO+CORS); localization plugin compatibility only partially verified, smoke-test before
 relying on it. All queued for the next `drk-website` skill-update round in
-`_handoff/drk-website.md` (moved here from the old repo 2026-07-14 — this is now the single live copy).
+`_internal/handoff/drk-website.md` (moved here from the old repo 2026-07-14 — this is now the single live copy).
 
 ## Today's work session — 3pm–6pm (3h), schema-pass day
 

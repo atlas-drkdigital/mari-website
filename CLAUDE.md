@@ -9,7 +9,7 @@ other page directly against Figma/spec (no static intermediate step for non-home
 ## Working principle — ship fast, document everything, avoid costly-to-reverse decisions (locked 2026-07-15)
 Locked explicitly by Adinda, this governs every decision in this file and in MANAGER.md: the goal is
 a working website presented as quickly as possible, with every decision made along the way written
-down (MANAGER.md, this file, `_handoff/*.md`) so no work is ever lost — not a goal of getting every
+down (MANAGER.md, this file, `_internal/handoff/*.md`) so no work is ever lost — not a goal of getting every
 field, label, or edge case perfect on the first pass. 80/20 governs where time actually goes: spend
 real time on what's genuinely expensive to redo later (field `name` keys and document type `name`s
 once real content exists, URL slugs once real traffic/backlinks exist, anything needing a data
@@ -38,7 +38,7 @@ editor-friendly model is an inline array — here's the tradeoff") and let Adind
 optimizing for the code. Precedent: the FAQ remodel 2026-07-16 (reference documents → inline array) was chosen
 on exactly this basis — the reference pile forced editors to open a whole document per Q&A and hand-manage a
 display cap, which is unintuitive; an inline array is what a non-dev expects. Skill-wide (DRK philosophy) —
-queued for `drk-website` via `_handoff/drk-website.md`.
+queued for `drk-website` via `_internal/handoff/drk-website.md`.
 
 ## MANAGER.md's ACTIVE QUEUE overrides the skill's sprint — locked 2026-07-16
 `mari-project`'s `working/sprint.md` is a **planning artifact that drifts**: it can't know about work queued
@@ -62,7 +62,7 @@ stale. When a deviation pushes a dated sprint item, **say so explicitly** rather
   chat-side skill source still exists; reinstall only if a non-repo context ever needs it.
 Load `atlas-destinations` / `mari-itineraries` only for destination or itinerary work specifically.
 
-## 🔑 Precedence — TWO layers, and `_handoff/` is NOT one of them (locked 2026-07-20, Adinda)
+## 🔑 Precedence — TWO layers, and `_internal/handoff/` is NOT one of them (locked 2026-07-20, Adinda)
 > **`CLAUDE.md` + `rules/*.md` (project) — SUPERSEDES → skills (portable)**
 
 **Placement test, one question: "would this be true on another DRK project?"** Yes → the skill. No → here.
@@ -73,13 +73,13 @@ Yes-but-we-differ → here, as a one-line override that **names what it override
 hypothetical: `drk-website`'s Figma rule once said the *opposite* of the locked "conventions always win" and
 silently produced an over-literal boat page. With no local assertion there was nothing to catch it against.
 
-**`_handoff/*.md` is an OUTBOX, not a knowledge layer** — write-only staging for decisions not yet merged
+**`_internal/handoff/*.md` is an OUTBOX, not a knowledge layer** — write-only staging for decisions not yet merged
 into the chat-side skills (there is no live bridge). **Do not read it to decide what is true**; merge it
-promptly instead. Full routing rule: `_PHASE3-PLAN.md` §1b.
+promptly instead. Full routing rule: `_internal/PHASE3-PLAN.md` §1b.
 ⚠️ **Until Phase 3 lands, the old behaviour still applies as a stopgap:** skills may be stale relative to
-`_handoff/*.md`, so when a skill's content is load-bearing and looks outdated, check the handoff and flag
+`_internal/handoff/*.md`, so when a skill's content is load-bearing and looks outdated, check the handoff and flag
 the conflict to Adinda rather than silently picking one. **Verify a chat-side item's status against
-`~/.claude/skills/` directly — repo docs go stale silently** (on 2026-07-20 both `_RESUME.md` and
+`~/.claude/skills/` directly — repo docs go stale silently** (on 2026-07-20 both `_internal/RESUME.md` and
 `MANAGER.md` still called the 3 urgent skill fixes "queued" days after they had shipped).
 
 ## Stack — verified live 2026-07-14, corrects `drk-website/references/stack.md` (stale, dated 2026-06-10)
@@ -201,7 +201,7 @@ built from node *names* and guesses instead of `get_design_context`. **Still pul
 The rule is about which side wins a *conflict*, not about skipping the pull. And when you override Figma,
 **say so in a code comment naming both values** — otherwise the next session "fixes" it back.
 
-Skill-wide (Adinda's explicit ask, 2026-07-17) — queued for `drk-website` via `_handoff/_payload/drk-website.md`.
+Skill-wide (Adinda's explicit ask, 2026-07-17) — queued for `drk-website` via `_internal/handoff/_payload/drk-website.md`.
 
 ## Tailwind: THE CLASS NAME MUST EXIST. Verify against `globals.css` — locked 2026-07-17
 **Tailwind emits nothing for a class it doesn't recognise. It does not warn, does not error, does not
@@ -285,15 +285,15 @@ rigorous lock; alt is a full descriptive sentence and makes a poor filename):
 3. else the **`alt`** text slugified, as a last resort;
 4. else **omit** the vanity segment entirely (the image still serves fine, just no SEO name).
 Not built yet — no components consume Sanity images today. Skill-wide, not Mari-only (queued for
-`drk-website` via `_handoff/drk-website.md`).
+`drk-website` via `_internal/handoff/drk-website.md`).
 
 **Known follow-up:** `seo.ts`'s `ogImage`/`twitterImage`/`siteSettings` social images are still bare
 `type: 'image'` without an alt field — technically an exception to "every image has editable alt."
 Social meta images use a separate `og:image:alt` mechanism, so it's a judgment call whether to add
-alt there; flagged for review, not yet changed (see _QA-CHECKLIST.md).
+alt there; flagged for review, not yet changed (see _internal/QA-CHECKLIST.md).
 
 **Also queued for the `drk-website` skill** (this is a DRK-wide convention, not Mari-specific) — see
-`_handoff/drk-website.md`.
+`_internal/handoff/drk-website.md`.
 
 ## Sanity image pipeline — UPLOAD FULL-RES, DO NOT PRE-COMPRESS. Measured 2026-07-17, not assumed.
 **Supersedes the old "compress/resize BEFORE upload" rule, which was wrong.** Every number below was
@@ -397,7 +397,7 @@ win. **Benchmark against a JPEG source; a WebP-source measurement will lie to yo
   **The fix is `images.loaderFile` in `next.config.ts`**, NOT a per-`<Image>` `loader` prop — the code
   comment in `image.ts` correctly notes a `loader` function can't cross the RSC boundary from a Server
   Component, but a *global* `loaderFile` is config, not a prop, so it sidesteps that entirely. Deferred to
-  `_POLISH-BACKLOG.md`. **Until it lands, everything above is theory.**
+  `_internal/POLISH-BACKLOG.md`. **Until it lands, everything above is theory.**
 - **Centralise `urlFor()` in one helper.** The CDN cache key is the exact URL string; inconsistent param
   order across components = cache misses + repeated transform cost.
 - `fit('crop')` is what honours the editor's hotspot — and requires querying `hotspot`/`crop` alongside
@@ -462,7 +462,7 @@ closed.** The read-the-filename lesson itself still applies.) Our rename to
 `common-006-sundeck-1-sunbeds` dropped "Main Deck" and lost that. **Read the original filename before
 naming a photo.**
 
-Skill-wide — this is DRK-wide, not Mari-specific. Queued for `drk-website` via `_handoff/drk-website.md`.
+Skill-wide — this is DRK-wide, not Mari-specific. Queued for `drk-website` via `_internal/handoff/drk-website.md`.
 
 ## Image size targets come from the COMPONENT, never from an assumption — locked 2026-07-17
 **The whole session's image audit was computed twice because the first pass guessed the viewport
@@ -512,7 +512,7 @@ Drive for Desktop syncs `My Drive` (here `G:\My Drive`) but **not** "Shared with
 becomes locally readable only after **right-click → Organise → Add shortcut to Drive**, which mounts it
 under `G:\.shortcut-targets-by-id\<id>\`. Until then it is invisible to every local tool.
 **The Drive MCP connector is NOT a substitute** — two hard limits, both hit this session:
-1. `download_file_content` returns **base64 into context** (~350k tokens per MB). Not viable for even
+1. `download_file_internal/content-scratch` returns **base64 into context** (~350k tokens per MB). Not viable for even
    one photo, let alone a folder.
 2. **File metadata carries NO pixel dimensions** — only name, bytes, MIME. So "is this file
    higher-resolution?" is **unanswerable** from the connector. Bytes are a hint, not an answer: a
@@ -549,7 +549,7 @@ per-image busywork.
 
 **Status: EXPERIMENTAL** — the category-per-batch grouping is being tried, not proven; revisit once real
 editors actually use it. Reusable beyond Mari (every Atlas liveaboard/destination gallery) — queued for
-the skill in `_handoff/drk-website.md`.
+the skill in `_internal/handoff/drk-website.md`.
 
 ## SubNav scroll chrome — LOCKED PATTERN, site-wide + future DRK sites (2026-07-21, Adinda)
 The in-page section navigation and its scroll ladder are a locked pattern; the behavior contract
@@ -559,7 +559,7 @@ nav over hero → ONE switch to compact light nav row + navy-glass section row; 
 states, no scroll-direction logic. Mobile: nav always visible, chip bar beneath.** Registered
 component names for the componentization pass: `SubNav`, `TabRail`, `SingleImageCarousel`,
 `LightboxGallery` (variant `default`), `CarouselChevron`. Queued for `drk-website` via
-`_handoff/drk-website.md`.
+`_internal/handoff/drk-website.md`.
 
 ## FAQ section layout variants — `default` / `categorized` (locked 2026-07-17, Adinda)
 The FAQ section repeats site-wide in two shapes, and they are ONE component with a `layout` field, not two
@@ -615,7 +615,7 @@ Refines the earlier strict phase-gate (all schema, then all frontend). Two phase
    about it") — seeing the real page with real content is what makes her judgment meaningful and lets her
    approve definitively instead of hedging on empty forms.
    - **Guardrail against rabbit-holing (Adinda's own concern):** build each slice to "structurally matches
-     the mockup + functional," and defer all purely-cosmetic polish to `_POLISH-BACKLOG.md` — burned down
+     the mockup + functional," and defer all purely-cosmetic polish to `_internal/POLISH-BACKLOG.md` — burned down
      later in one polish block, not mid-slice. Flag immediately if a slice overruns its timebox.
    - **Migration risk is acceptable, confirmed:** a cross-page learning that forces a shared-field rename
      after content exists needs a migration — but during the build our Sanity content is re-seedable
@@ -633,7 +633,7 @@ Refines the earlier strict phase-gate (all schema, then all frontend). Two phase
      `"placeholder"` / lorem ipsum / a stock image) so the section renders from Sanity, never blank — the
      content being incomplete is fine, the wiring being incomplete is not. Then a page reviews as the *actual*
      Sanity-driven page, and the only end-of-build check is "which fields are still placeholder" (tracked in
-     `_CONTENT-STATUS.md`), never "which components were never connected." **Carve-out:** genuinely global
+     `_internal/CONTENT-STATUS.md`), never "which components were never connected." **Carve-out:** genuinely global
      chrome (Nav, Footer, global contact details) is NOT page content — it belongs to `siteSettings`/
      `navigation` and is wired in a dedicated global-chrome slice, so it may stay hardcoded on a page slice
      until that slice runs. The render must still degrade gracefully (empty reference array → section hides,
@@ -647,7 +647,7 @@ Refines the earlier strict phase-gate (all schema, then all frontend). Two phase
      here. (Footer *content* — newsletter/disclaimer/copyright/brand-alias — is its own small siteSettings
      pass, separate from both.)
 Skill-wide (Adinda's ask) — queued for `drk-website`'s `references/workflow.md` (refines its Phase 6→7 order).
-The full-wire-per-slice rule is ALSO queued for `drk-website` (see `_handoff/drk-website.md`), marked
+The full-wire-per-slice rule is ALSO queued for `drk-website` (see `_internal/handoff/drk-website.md`), marked
 under-test until the build confirms it end-to-end.
    - **SEO + image pipeline fold INTO each slice, not a separate end-pass (locked 2026-07-16, Adinda).**
      Every page slice also does, in-slice: (a) **SEO structure** — fill the `seo` field, emit page-scoped
@@ -732,7 +732,7 @@ Studio and confirm the browser tab changes.** Do that before trusting this.
 does nothing. The homepage still serves **0 JSON-LD blocks and no `og:image`**. This is the
 "schema field nothing renders is a promise, not a feature" rule at its widest; needs a real slot.
 
-Skill-wide (Adinda's ask) — queued for `drk-website` via `_handoff/drk-website.md`.
+Skill-wide (Adinda's ask) — queued for `drk-website` via `_internal/handoff/drk-website.md`.
 
 ## Studio form section headers — every group gets a matching titled fieldset (site-wide, locked 2026-07-16)
 Distinct from "editor-organization deferred to last" below (that's field titles/descriptions/sidebar polish
@@ -753,7 +753,7 @@ Fixed site-wide by dropping the single-field `seoFs` fieldset and giving the `se
 ## Load real/placeholder content into every schema so it's reviewable (locked 2026-07-16)
 An empty form is too abstract to judge. Whenever a document type is built or filled out, populate at least
 one real document with content — pull copy from the mockup where it exists, use clear placeholder (and the
-homepage's own titles/copy) where it doesn't, tag placeholders in `_CONTENT-STATUS.md`. Pairs with the
+homepage's own titles/copy) where it doesn't, tag placeholders in `_internal/CONTENT-STATUS.md`. Pairs with the
 vertical-slice approach: real content + real rendered page = meaningful review. Applies to every type.
 
 ## Decluttering the editing form — separate fields by how often they're touched (locked 2026-07-16)
@@ -803,7 +803,7 @@ fresh conversation, and proactively OFFER it (with a handoff note)** when EITHER
    long. Claude Code guidance: checkpoint around **~60% context** (not 90%) and keep a focused session under
    **~120k input tokens**. Claude can't read an exact context %, so use these as the *spirit* — lean on the
    heuristics + the task-boundary test above.
-**Always pair the offer with (a) a written handoff note** (like `_handoff/_NEXT-SESSION-*.md`) **AND (b) a
+**Always pair the offer with (a) a written handoff note** (like `_internal/handoff/_NEXT-SESSION-*.md`) **AND (b) a
 ready-to-paste kickoff prompt** for the new conversation — skills to load, first steps (restart-clean +
 verify), and the task — so the fresh session starts in a single paste (Adinda's ask 2026-07-16). Not just
 the note. A deliberate handoff captures decisions/state precisely, which is strictly better than riding
@@ -833,25 +833,32 @@ This is presentational Studio config, no schema change — and the Defaults+toke
 Field `title`/`description`/tab-grouping and the Structure Builder (sidebar navigation/grouping) are presentational metadata — changing them later costs no data migration. What needs to be reasonably right from the schema-pass itself: the actual field `name` keys and document type `name`s, since renaming those after real content exists needs a migration script. Polish the editor experience last, once every type exists and the full picture is visible — don't front-load it.
 
 ## Doc split (replicate the static-build pattern — see `drk-website/references/claude-code.md`)
-This file = prose rules + active decisions. `MANAGER.md` (session/decision log, created 2026-07-14) and `COMPONENTS.md` (reusable component specs, **not yet created** — ports from the static build's `COMPONENTS.md` at first use, not up front) follow the same convention as the old repo. Check `MANAGER.md` for today's active task scope and session history before re-deriving it. `_SCHEMA-SPECS.md` (created 2026-07-15) is a fourth doc in this split — a flat, checkable field-by-field spec per Sanity page type, distinct from MANAGER.md's dated log: Adinda marks fields approved there as they're tested in a real build, without re-reading history to find "did we settle this." Update it alongside any schema change, same habit as the other docs. `_CONTENT-STATUS.md` (created 2026-07-15) is the fifth — tracks whether the *value* in a field is real vs. placeholder (Figma-sourced copy preferred by default, stock/Pexels fallback for images Figma doesn't have enough of), a different axis from _SCHEMA-SPECS.md's field-existence tracking. Zero remaining 🔴 rows in it is a hard pre-launch gate, same weight as the other pre-launch checks already in this file. `_QA-CHECKLIST.md` (created 2026-07-15) is the sixth — for an external human reviewer's click-through pass, distinct from both: open design decisions worth a second opinion (e.g. eyebrow-toggle placement), not field approval or content-placeholder tracking. `_POLISH-BACKLOG.md` (created 2026-07-16) is the seventh — page-by-page deferred cosmetic/interaction polish from the vertical-slice build (see "Build approach"), burned down later in one polish block; distinct from _QA-CHECKLIST (that's open *decisions* for a reviewer; this is *known* polish we chose to defer). `_OWNER-HANDBOOK.md` (created 2026-07-22, Adinda's ask) is the eighth — a LIVING list of correct-by-design behaviours a site owner can't guess from Studio alone (e.g. the itinerary Destination field doesn't place it on a page; the list does). **Add an entry the moment such a quirk ships** — it is the source material for the final owner handoff guide, written as we go, not reconstructed at handoff.
+This file = prose rules + active decisions. `MANAGER.md` (session/decision log, created 2026-07-14) and `COMPONENTS.md` (reusable component specs, **not yet created** — ports from the static build's `COMPONENTS.md` at first use, not up front) follow the same convention as the old repo. Check `MANAGER.md` for today's active task scope and session history before re-deriving it. `_internal/SCHEMA-SPECS.md` (created 2026-07-15) is a fourth doc in this split — a flat, checkable field-by-field spec per Sanity page type, distinct from MANAGER.md's dated log: Adinda marks fields approved there as they're tested in a real build, without re-reading history to find "did we settle this." Update it alongside any schema change, same habit as the other docs. `_internal/CONTENT-STATUS.md` (created 2026-07-15) is the fifth — tracks whether the *value* in a field is real vs. placeholder (Figma-sourced copy preferred by default, stock/Pexels fallback for images Figma doesn't have enough of), a different axis from _internal/SCHEMA-SPECS.md's field-existence tracking. Zero remaining 🔴 rows in it is a hard pre-launch gate, same weight as the other pre-launch checks already in this file. `_internal/QA-CHECKLIST.md` (created 2026-07-15) is the sixth — for an external human reviewer's click-through pass, distinct from both: open design decisions worth a second opinion (e.g. eyebrow-toggle placement), not field approval or content-placeholder tracking. `_internal/POLISH-BACKLOG.md` (created 2026-07-16) is the seventh — page-by-page deferred cosmetic/interaction polish from the vertical-slice build (see "Build approach"), burned down later in one polish block; distinct from _internal/QA-CHECKLIST.md (that's open *decisions* for a reviewer; this is *known* polish we chose to defer). `_internal/OWNER-HANDBOOK.md` (created 2026-07-22, Adinda's ask) is the eighth — a LIVING list of correct-by-design behaviours a site owner can't guess from Studio alone (e.g. the itinerary Destination field doesn't place it on a page; the list does). **Add an entry the moment such a quirk ships** — it is the source material for the final owner handoff guide, written as we go, not reconstructed at handoff.
 
-## Underscore prefix = internal working file, NOT build input — AMENDED 2026-07-23 (was "never commit", locked 2026-07-15)
-Any folder or file that is internal (not real project output — handoff docs, working docs, skill-build
-packaging, test images, throwaway scripts) gets a leading `_` **at the repo root**. **The prefix's meaning
-changed 2026-07-23 (Adinda): it no longer means "never commit" — it marks the DEPLOYMENT boundary, not the
-commit boundary.** Load-bearing working docs (`_*.md`, `_handoff/`, `_scripts/`) ARE committed and pushed:
-git + the private GitHub repo is the project's living backup (Adinda's framing: "a living, breathing backup
-of everything"). What the prefix buys now is that ONE glob covers all of them everywhere:
-- `.vercelignore`'s `/_*` line keeps every `_`-prefixed file off Vercel automatically — a new `_whatever.md`
-  needs zero per-file maintenance to stay off the deployment (see "Deployment boundary" below).
-- `.gitignore`'s `/_*` + targeted `!` exceptions still keep genuine scratch UNcommitted (`_backup/`,
-  `_image-test/`, logs, zips — stale copies and generated junk, where Drive/Sanity hold the masters).
-Root-anchored only, deliberately not recursive (`/_*`, not `**/_*`): Next.js App Router uses `_`-prefixed
-folders inside `src/app/` as a real, committed routing convention (private folders like `_components/`,
-`_lib/`) — neither ignore file may ever touch those. When creating a new internal file/folder, default to
-the `_` prefix — it's what makes the boundary self-maintaining; a NON-underscored internal file at root
-(like `MANAGER.md`) has to be added to `.vercelignore` by hand, which is exactly the failure mode the
-prefix exists to avoid.
+## `_internal/` = internal working files, NOT build input — REFACTORED 2026-07-24 (was root-level `_*` prefix; "never commit" dropped 2026-07-23)
+**2026-07-24: the root cleanup landed — every internal file/folder now lives inside ONE folder,
+`_internal/`, at the repo root** (handoff docs, working docs, copy drafts, skill-build packaging, test
+images, throwaway scripts — inner underscores dropped: `_handoff/` → `_internal/handoff/`, `_RESUME.md`
+→ `_internal/RESUME.md`, etc.). This replaces the old per-file `_` prefix convention; new internal
+files go in `_internal/`, never `_whatever` at root. **The 2026-07-23 meaning change still holds: this
+marks the DEPLOYMENT boundary, not the commit boundary.** Load-bearing working docs (`_internal/*.md`,
+`_internal/handoff/`, `_internal/scripts/`, `_internal/content/`) ARE committed and pushed: git + the
+private GitHub repo is the project's living backup (Adinda's framing: "a living, breathing backup of
+everything"). What the single folder buys is that ONE line covers all of them everywhere:
+- `.vercelignore`'s `/_internal/` line keeps everything internal off Vercel automatically — a new
+  `_internal/whatever.md` needs zero per-file maintenance to stay off the deployment (see "Deployment
+  boundary" below).
+- `.gitignore` tracks `_internal/` in general but keeps genuine scratch UNcommitted via targeted ignores
+  (`_internal/backup/`, `_internal/image-test/`, `_internal/content-scratch/`,
+  `_internal/skill-image-retouch/`, logs, zips — stale copies and generated junk, where Drive/Sanity
+  hold the masters). ⚠️ `_internal/content/` (tracked copy drafts) and `_internal/content-scratch/`
+  (ignored images) are deliberately SEPARATE — tracked drafts and ignored scratch must never share a
+  folder (the `ad06118` near-loss recipe).
+Next.js App Router still uses `_`-prefixed folders inside `src/app/` as a real, committed routing
+convention (private folders like `_components/`, `_lib/`) — neither ignore file touches those. A
+NON-underscored internal file at root (like `MANAGER.md`) still has to be added to `.vercelignore` by
+hand — prefer putting new internal files in `_internal/` instead, which is what makes the boundary
+self-maintaining.
 
 ## Deployment boundary — GitHub holds EVERYTHING, Vercel gets only build input (locked 2026-07-23, Adinda — ⚠️ UNVERIFIED until first deploys are checked)
 The repo now serves two different masters, and the boundary between them is explicit:
@@ -860,10 +867,12 @@ The repo now serves two different masters, and the boundary between them is expl
   no-AI-traces condition already requires that and is unchanged: repo never goes public, client never
   gets access).
 - **Vercel = the deploy target, and it gets ONLY what the build needs.** `.vercelignore` (repo root,
-  created 2026-07-23) excludes `_*`, `CLAUDE.md`, `AGENTS.md`, `MANAGER.md`, `COMPONENTS.md`,
-  `SANITY-SETUP.md`, `README.md`, `content/`, `skills-lock.json`, `.claude/`, `.agents/`, `.vscode/` —
-  per Vercel's docs these are never uploaded, never in the deployment's source snapshot, never served,
-  and never stored on Vercel at all.
+  created 2026-07-23; simplified 2026-07-24 when the `_internal/` refactor landed) excludes
+  `_internal/`, `CLAUDE.md`, `AGENTS.md`, `MANAGER.md`, `COMPONENTS.md`, `SANITY-SETUP.md`,
+  `README.md`, `skills-lock.json`, `.claude/`, `.agents/`, `.vscode/` — per Vercel's docs these are
+  never uploaded, never in the deployment's source snapshot, never served, and never stored on Vercel
+  at all. (The old `/_*` + `content/` lines are gone: everything internal, copy drafts included, now
+  lives under `_internal/`.)
 
 **Why (the reasoning, so it isn't re-derived):** the *serving* layer was never the risk — only build
 output + `/public` are ever web-visible; a repo markdown file is unreachable at any URL regardless. The
@@ -877,18 +886,19 @@ outside this machine.
 mechanism as UNPROVEN until then.** Vercel's own docs only explicitly document `.vercelignore` for CLI
 uploads; the Git-integration behaviour ("acts as an extension of `.gitignore`") is community-confirmed
 (vercel/vercel discussion #4679), not officially stated. **The check that can actually fail: after each of
-the first few deploys, open the deployment in the Vercel dashboard → Source tab → confirm `_handoff/`,
+the first few deploys, open the deployment in the Vercel dashboard → Source tab → confirm `_internal/handoff/`,
 `CLAUDE.md`, and `MANAGER.md` are ABSENT.** Repeat until trusted, then note the result here. If the files
 DO appear: the failure mode is "stored on Vercel, visible to Vercel project members" — NOT public — and
 the fallback is deploying via CLI/GitHub Actions (where `.vercelignore` filters before upload ever
 happens) or a stripped deploy branch. Fold this check into the pre-launch no-AI-traces pass — same
 concern, same timing.
 
-**Maintenance rules:** (a) new internal doc → underscore prefix, auto-covered forever; (b) a new
-non-underscored internal file at root must be added to `.vercelignore` by hand — prefer the prefix;
-(c) `content/` is excluded and nothing in `src` reads it today — if a build ever imports from it, the
-build fails loudly at build time; delete that one line then. Skill-wide (every DRK site wants this exact
-split) — queued for `drk-website` via `_handoff/drk-website.md`.
+**Maintenance rules (updated 2026-07-24 for the `_internal/` refactor):** (a) new internal doc → put it
+in `_internal/`, auto-covered forever; (b) a new internal file at repo root must be added to
+`.vercelignore` by hand — prefer `_internal/`; (c) copy drafts live in `_internal/content/` (tracked)
+and nothing in `src` reads them — if a build ever imports from there, it fails loudly at build time.
+Skill-wide (every DRK site wants this exact split) — queued for `drk-website` via
+`_internal/handoff/drk-website.md`.
 
 ## Daily recap template — standing format, locked 2026-07-16
 Whenever Adinda asks for a session/day recap ("give me today's recap," "what did we do," "where are we"),
@@ -912,11 +922,11 @@ Don't wait to be asked for each section; include all of them.
 5. **Learnings to document** — classify anything worth keeping into: **local-only** (stays in this
    repo's CLAUDE.md/MANAGER.md, Mari-specific), **`atlas-website`-wide** (reusable across any Atlas
    liveaboard/destination site build, not just Mari), or **`drk-website`-wide** (reusable across any DRK
-   client site, not just Atlas). Queue DRK-wide and Atlas-wide items into the matching `_handoff/*.md`
+   client site, not just Atlas). Queue DRK-wide and Atlas-wide items into the matching `_internal/handoff/*.md`
    file immediately, don't batch it for later.
 
 Full spec for this format lives here; the generalized (non-Mari) version is queued for `drk-website`'s
-`references/workflow.md` — see `_handoff/drk-website.md`.
+`references/workflow.md` — see `_internal/handoff/drk-website.md`.
 
 ## Commit cadence — commit at every checkpoint + remind at session end, locked 2026-07-16
 ### ⚠️ AMENDED 2026-07-17 (Adinda) — read this first, it changes how the preconditions below are read
@@ -957,7 +967,7 @@ her). Two triggers:
 - **Repo is verified-clean** — `tsc`/`eslint`/dev-server actually run and green, not assumed. NEVER
   commit a mid-repair or known-broken state (the reverted `useDelayedUnmount` work on 2026-07-15 is the
   precedent — that correctly stayed uncommitted).
-- **Open to-dos are clearly logged** — the checkpoint (or MANAGER.md / `_SCHEMA-SPECS.md`) spells out
+- **Open to-dos are clearly logged** — the checkpoint (or MANAGER.md / `_internal/SCHEMA-SPECS.md`) spells out
   what's still undecided, unreviewed, or half-done, so an incomplete-but-clean state is committed
   honestly, not as if it were finished. Committing mid-arc is fine *as long as the "what's left" is
   written down* — that's the whole trade that makes this safe.
@@ -968,7 +978,7 @@ this decision if that ever changes** (a push-to-remote habit, the repo going pub
 — same condition already attached to the "no AI-authorship traces / repo stays private" rule above.
 
 Skill-wide for all DRK sites (Adinda's explicit ask) — queued for `drk-website`'s `references/workflow.md`
-via `_handoff/drk-website.md`, generalized (drop the Mari-specific file names).
+via `_internal/handoff/drk-website.md`, generalized (drop the Mari-specific file names).
 
 ## Session bookend protocol — skills-backlog check + model + task-proposal format, locked 2026-07-16
 Standing procedure that runs at BOTH triggers, every time, not on request: (a) the start of a session
@@ -978,9 +988,9 @@ or planning any work.
 
 ### 1. Skills-backlog check — FIRST, before any work is proposed
 The skills live in the chat-side containers; there is **no live bridge** from this repo to them (see
-`_handoff/drk-website.md`'s own explanation), so merging a handoff into a skill happens manually, in chat.
+`_internal/handoff/drk-website.md`'s own explanation), so merging a handoff into a skill happens manually, in chat.
 Procedure:
-- Check `_handoff/*.md` for content queued into the skills but not yet merged.
+- Check `_internal/handoff/*.md` for content queued into the skills but not yet merged.
 - If there's a backlog, ask: **"Would you like to update those skills now in chat?"**
 - If yes: hand off **one skill at a time**. For each skill give (a) a ready-to-paste prompt for the
   chat-side skill-update session, and (b) pointers to the exact handoff document(s)/sections that feed it.
@@ -989,7 +999,7 @@ Procedure:
   when they're done, and I'll install them."** She updates + downloads in chat; the packages land in
   Downloads; Claude installs from there (per the skill install/update procedure).
 - Once she confirms they're updated/installed (or says they're already done): **clean up the handoff docs**
-  — strip the now-merged content out of `_handoff/*.md` and any MANAGER.md staging so the backlog doesn't
+  — strip the now-merged content out of `_internal/handoff/*.md` and any MANAGER.md staging so the backlog doesn't
   accumulate. (Verify what actually landed before cutting anything — same care as the existing handoff
   reconciliation habit.)
 
@@ -1016,7 +1026,7 @@ Adinda is running a deliberate productivity experiment — how long things actua
 where time leaks. The tooling for this already existed (MANAGER.md's "Session Time Log" + the daily-recap
 template) **but was not being filled** — Jul 16's full build day and all of Jul 17 went unlogged, the two
 biggest days of the week. So this is now an **enforced close-out step**, not a habit to remember. The
-`drk-work-tracker` skill owns the mechanics (authored chat-side, payload in `_handoff/_payload/drk-work-tracker.md`);
+`drk-work-tracker` skill owns the mechanics (authored chat-side, payload in `_internal/handoff/_payload/drk-work-tracker.md`);
 this rule is what makes it fire. **Verification-ritual principle applies: a log that can be silently skipped
 is not a log.**
 - **At session CLOSE (every session, before wrap-up is called done):** run the LOG flow. (a) Derive the
@@ -1035,8 +1045,8 @@ is not a log.**
   self-report** — only she knows when she stepped away. Enforced every session is the win, not measured-to-the-minute.
 
 Generalized (non-Mari) version queued for `drk-website`'s `references/workflow.md` via
-`_handoff/drk-website.md`, alongside the daily-recap-template + commit-cadence workflow conventions. The
-`drk-work-tracker` skill itself is a NEW DRK-wide skill — payload staged in `_handoff/_payload/drk-work-tracker.md`,
+`_internal/handoff/drk-website.md`, alongside the daily-recap-template + commit-cadence workflow conventions. The
+`drk-work-tracker` skill itself is a NEW DRK-wide skill — payload staged in `_internal/handoff/_payload/drk-work-tracker.md`,
 authored chat-side per the standard skill workflow.
 
 ## Review requests must always call out mobile explicitly, locked 2026-07-15
@@ -1085,7 +1095,7 @@ via the LAN IP with this error firing, because it breaks the live-updates channe
 - **The dev log is the diagnostic for both** — it is where the 2026-07-15 incident was "sitting the whole
   time," and it is where this one was too. **Read `.next/dev/logs/next-development.log` before theorizing.**
 
-Skill-wide — queued for `drk-website`'s `references/troubleshooting.md` via `_handoff/drk-website.md`.
+Skill-wide — queued for `drk-website`'s `references/troubleshooting.md` via `_internal/handoff/drk-website.md`.
 
 ## Touch reveal = `pointerup`, never `click` — locked 2026-07-22 (Adinda's "tap twice" catch)
 iOS Safari consumes the FIRST tap on hover-reactive content as hover-emulation and only delivers
@@ -1093,14 +1103,14 @@ iOS Safari consumes the FIRST tap on hover-reactive content as hover-emulation a
 movement test vs swipes, skip targets inside an `<a>` — link-side `stopPropagation` on click does
 NOT cover pointerup). Reference: `DestinationItineraries.tsx`. **Corollary, same day: a draggable
 card track never gets a whole-card link** — every drag attempt becomes a navigation; the CTA inside
-the card is the only link. Skill-wide — queued via `_handoff/drk-website.md`.
+the card is the only link. Skill-wide — queued via `_internal/handoff/drk-website.md`.
 
 ## Booking-widget embeds go FULL viewport width on mobile — STANDARD, locked 2026-07-22 (Adinda)
 INSEANQ (and any dense third-party booking embed) is unreadable at phone width inside page gutters.
 The embed container goes full-bleed on mobile, gutters return md+. Implement with negative margins
 canceling the wrapper's own padding (`-mx-24` + `self-stretch`), **never `w-screen`/`100vw`** — vw
 includes the scrollbar and is the horizontal-scroll bug. Applies to the future Schedule & Rates
-page too. Reference: `DestinationTrips.tsx`. Skill-wide — queued via `_handoff/drk-website.md`.
+page too. Reference: `DestinationTrips.tsx`. Skill-wide — queued via `_internal/handoff/drk-website.md`.
 
 ## `allowedDevOrigins` required for real-device LAN testing, locked 2026-07-15
 `next.config.ts` sets `allowedDevOrigins: ["192.168.0.101"]` (Adinda's Wi-Fi IP — update if it changes,
@@ -1153,7 +1163,7 @@ Skill-wide (the opportunistic-reconciliation pattern generalizes) — queued for
 
 ## Check the docs BEFORE debugging — locked 2026-07-16 (Adinda)
 When ANY bug appears, **first check whether it's already documented**, before experimenting: this file,
-`MANAGER.md`, `_handoff/*.md`, and `drk-website`'s `references/troubleshooting.md`. Trying things out when
+`MANAGER.md`, `_internal/handoff/*.md`, and `drk-website`'s `references/troubleshooting.md`. Trying things out when
 the answer is already written down wastes the session and risks re-introducing a fix we already know is
 wrong. This is the read half of a habit we've only been doing the write half of — the troubleshooting file
 is only worth keeping if it's consulted first, not just appended to. Skill-wide — queued for `drk-website`.
@@ -1161,7 +1171,7 @@ is only worth keeping if it's consulted first, not just appended to. Skill-wide 
 **Corollary — write BOTH halves down.** When a bug is logged, record how to *fix* it AND how to *avoid
 re-introducing* it. Precedent: the Studio "List items with same ID found" bug (2026-07-16) — the fix was
 deleting a duplicate, but the prevention was setting `.id()` explicitly in `structure.ts`, which is what
-actually stops it recurring. See `_handoff/drk-website.md`.
+actually stops it recurring. See `_internal/handoff/drk-website.md`.
 
 ## A verification ritual only counts if it can actually fail — locked 2026-07-16
 The "restart clean + curl `/studio` 200 + GROQ query-back" ritual **does not verify Structure Builder
@@ -1213,7 +1223,7 @@ ritual only counts if it can actually fail": a ritual that *falsely* fails is ju
   they're wrapping up, or the session having accumulated a lot without one yet (3+ real bugs fixed,
   several logged decisions, conversation clearly grown long). Propose it as a question, not an automatic
   action. Covers time logging + project-specific learnings (this file/MANAGER.md) + reusable DRK-wide
-  learnings (the relevant `drk-website` skill reference + a `_handoff/drk-website.md` entry). Full
+  learnings (the relevant `drk-website` skill reference + a `_internal/handoff/drk-website.md` entry). Full
   spec: `drk-website` skill's `references/workflow.md`, "End-of-session retrospective."
 
 ## Dev server at session start — always bring localhost up (locked 2026-07-24, Adinda)

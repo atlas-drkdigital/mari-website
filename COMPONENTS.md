@@ -29,7 +29,7 @@ Two different things, and conflating them is what made componentization feel lik
 
 So the **reuse shelf is basically all of `src/components/`** already. This catalog is the shelf list. The
 cross-project vehicle is a **starter template** that carries these files + this catalog; you clone it, swap
-tokens, and pull pieces off the shelf. See `_handoff/drk-website.md` → "Cross-project reuse workflow (DRAFT)".
+tokens, and pull pieces off the shelf. See `_internal/handoff/drk-website.md` → "Cross-project reuse workflow (DRAFT)".
 
 ## 📖 Naming glossary — the ONE vocabulary for content parts (Adinda's ask, 2026-07-23)
 Started after "Section Labels" was reused for two different things. **Use these exact names in schema

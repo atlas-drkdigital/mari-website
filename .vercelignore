@@ -3,11 +3,12 @@
 # the deployment's source snapshot, and never served. The build needs none of them.
 # Note: serving was never the risk (only build output + /public are ever served); this file
 # exists so these files don't LIVE on Vercel at all.
-/_*
+# 2026-07-24: root cleanup landed — everything internal (handoff docs, copy drafts, scratch,
+# scripts) now lives under /_internal/, so one line covers it all.
+/_internal/
 /.agents
 /.claude
 /.vscode
-/content
 CLAUDE.md
 AGENTS.md
 MANAGER.md

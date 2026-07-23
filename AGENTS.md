@@ -30,10 +30,14 @@ Phinisi with diving at its heart", never "A Traditional Indonesian Phinisi With 
 Heart". Proper nouns (Mari Liveaboard, Phinisi, Komodo, Raja Ampat, Indonesia) keep their
 capitals. Hero titles (H1) and short card/benefit titles may deviate — exceptions exist here and
 there — but the default for any heading in body copy is sentence case. When drafting copy files
-in `content/`, write headings this way so they can be seeded verbatim.
+in `_internal/content/`, write headings this way so they can be seeded verbatim.
 
-`content/` at the repo root is the canonical, git-TRACKED home for copy drafts — do not move it
-or rename it (it was once swept into the ignored `_content/` scratch folder and nearly lost work).
+`_internal/content/` is the canonical, git-TRACKED home for copy drafts (moved from root-level
+`content/` in the 2026-07-24 root cleanup — everything internal now lives under `_internal/`).
+Do NOT recreate a `content/` folder at the repo root, and do not move copy drafts anywhere else.
+The folder must stay git-tracked: it was once swept into an ignored scratch folder and nearly
+lost work (that scratch folder is now `_internal/content-scratch/`, which stays gitignored —
+tracked drafts and ignored scratch must never share a folder).
 
 ## Repository continuity
 
