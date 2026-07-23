@@ -122,6 +122,29 @@ export function buildSeoMetadata({
 }
 
 /**
+ * schema.org BreadcrumbList for a page's breadcrumb trail (site-wide SEO pass, 2026-07-23).
+ *
+ * The crumbs MUST mirror the page's VISUAL breadcrumb exactly (the hero `<nav aria-label=
+ * "Breadcrumb">` trail, including the seo.breadcrumbTitle override on the last item) — Google
+ * cross-checks structured data against visible content, and a trail that disagrees with the page
+ * is worse than none. Emitted as its own ld+json script alongside the page's other JSON-LD via
+ * `<JsonLd>`; positions are 1-based per schema.org, URLs absolute via SITE_URL.
+ */
+export function buildBreadcrumbJsonLd(crumbs: { name: string; path: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((crumb, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: crumb.name,
+      // Home is SITE_URL itself (no trailing slash — matches layout.tsx's Organization `url`).
+      item: crumb.path === '/' ? SITE_URL : `${SITE_URL}${crumb.path}`,
+    })),
+  }
+}
+
+/**
  * Returns what should actually be emitted as JSON-LD for a page.
  *
  * When the editor has flipped `overrideJsonLd` on AND `jsonLd` holds parseable JSON, their block

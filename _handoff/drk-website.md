@@ -868,3 +868,16 @@ Title-only hero → full-rich-text body → CTA → Contact → Footer.
 Inline rich-text images: click-to-zoom lightbox, caption follows the image's alignment control,
 one combined gallery per field. Embed-section intros are tier-2 rich text (links/bold/
 multi-paragraph), e.g. "contact us" linking the page's #contact section.
+
+## Sitemap upkeep is a NAMED first-line step of every page slice (Adinda, 2026-07-23)
+For `references/workflow.md` (the per-slice checklist) — locked after the gap bit twice on Mari
+(destination + private-charters slices both shipped without their sitemap entries; found only by a
+later SEO verify pass).
+- The DRK sitemap is always **code** (Next.js `sitemap.ts` serving `/sitemap.xml`), querying the CMS
+  — so CONTENT urls (new destination/boat/post documents) auto-update with zero code changes, and
+  `noIndex` docs drop out automatically. That half needs no process.
+- The half that CANNOT be automatic: a **new page type / new route** only exists when its code is
+  written, so nothing can list it beforehand. Therefore: **"add the new route to `sitemap.ts`" is a
+  first-line, named step of the page slice itself — done during the build, before the post-slice SEO
+  pass; the SEO pass then VERIFIES it** (a check that can actually fail, not the place it's first
+  remembered). Also write the rule into `sitemap.ts`'s own header comment so the file self-documents.
