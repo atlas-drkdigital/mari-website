@@ -1023,6 +1023,53 @@ history:
 
 ---
 
+## SESSION CHECKPOINT — 2026-07-23 (afternoon block), ABOUT PAGE BUILT + SITE-WIDE SEO FIXES + CHARTERS COPY v2
+
+**About `/about` is LIVE and through QA rounds 1–2** (commits `0aee2e6` → `d612e60`, all pushed —
+git push now allowed via Adinda's permission rule). Built INLINE after both background build
+agents **died silently without notification** (~40 min of nothing; lesson: agent silence ≠
+progress — check task status, don't trust the quiet). Sections: AboutHero (ChartersHero sibling,
+no brochure/subnav, width EXCEPTION 800px cap + 44px intro line so "The Story of Mari: Built from
+Tradition." holds one line, homepage scroll-circle centered) · PageOverview (parity with charters
+confirmed BY CONSTRUCTION — same component) · WhyUs (homepage doc verbatim, per spec) · AboutCrew
+(NEW: circular portraits 4-up, bio = centered MODAL — photo card, gradient-band overlay text,
+lightbox scrim, X/Esc/backdrop close; 4 Pexels placeholder crew seeded 🔴) · CTA ·
+**Testimonials → now the `testimonialsSection` SINGLETON** (chrome + curated list migrated OFF
+homePage, fields unset, schema notes point to the new home) · Contact/Footer. Hero photo + body
+sail-up photo uploaded full-res. Sentence-case headings convention LOCKED (H2s AND body h3s;
+documented in AGENTS.md for Codex + drk-website handoff). Post-slice drk-seo pass RAN and passed.
+
+**Site-wide SEO fixes shipped (`8d44089`):** JsonLd component = the ONE escaped injection path
+(layout + all 4 pages) · BreadcrumbList JSON-LD on boat/destination/charters (mirrors visual
+trails) · DestinationTrips chrome guards · richTextFull H1 style REMOVED (hero owns the page H1;
+owner-handbook entry) · siteSettings.siteTitle → "Mari Liveaboard" (SEO titles now ≤60ch) ·
+sitemap now lists ALL routes (was homepage+boats only — "add route to sitemap" is now a NAMED
+per-slice step, in sitemap.ts's header + drk-website handoff). Charters post-slice SEO pass:
+**passed clean**, sitemap was its only real finding.
+
+**Charters copy v2 (Codex's rewrite) SEEDED** (published+draft): first-round-approved copy, test
+artifacts gone; CTA label corrected to "View All Trips" (Adinda: links to Schedule&Rates = ALL
+trips); **inline destinations map restored** after ¶2 (the body swap had wiped it — map master
+uploaded full-res 2000×1414). About body re-seeded from Adinda's OWN edit of
+content/about-page.md (she removed the management-names section — private info).
+
+**Infra/process this block:** working docs now COMMITTED (`_*.md`, `_handoff/`, `_scripts/` —
+backup decision; `.gitignore` exceptions) · `content/` = canonical TRACKED copy-drafts folder
+(a parallel session moved it to ignored `_content/` and the About commit swept the deletion —
+recovered `ad06118`; Codex's rewrite was nearly lost) · `.vercelignore` + backup/deploy-boundary
+docs by the terminal session · GitHub in sync (origin/main = local).
+
+**OPEN / NEXT:** 🔴 Adinda's round-2 review pending: /about desktop → mobile → Studio (About doc,
+Testimonials Section, no-H1 menu) + charters copy read-through. **She has MORE small refinements
+queued for the About page — today or tomorrow, her call.** Flagged: "Mari liveaboard" lowercase-l
+in her edited ¶ (possible typo, seeded verbatim). Still open: fake crew 🔴 + [DRAFT] testimonials
+🔴 + benefits photos #2/#3 🔴 · /charters vs /private-charters (Serge) · skills handoff round
+(growing) · homepage+boat retroactive per-section QA · one-lightbox-per-field · FAQ +
+Testimonials PAGES (displaced from today's slot by About — sprint deviation, named) · Jul 24
+staging re-cut tomorrow AM · session time-log runs at actual close (checkpoint ≠ close).
+**The PARALLEL terminal session will append its own additions below/near this checkpoint** —
+Adinda's instruction; don't treat its edits here as conflicts.
+
 ## SESSION CHECKPOINT — 2026-07-23 (morning block, ~3h active), PRIVATE CHARTERS PAGE COMPLETE
 
 **The whole `/private-charters` page shipped in one block** — schema (`privateCharters` singleton,
