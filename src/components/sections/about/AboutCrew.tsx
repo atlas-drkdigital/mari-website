@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
+import { CarouselArrowButton } from '@/components/CarouselArrowButton'
 import { RichText } from '@/components/RichText'
 import { sanityImageProps, urlForImage } from '@/sanity/lib/image'
 import type { AboutPageData, CrewMemberData } from '@/sanity/queries'
@@ -25,16 +26,24 @@ const MOBILE_VISIBLE = 4
 
 export function AboutCrew({ about }: { about: AboutPageData }) {
   const members = (about.crewMembers ?? []).filter(Boolean)
-  const [openId, setOpenId] = useState<string | null>(null)
+  // Index-based (was _id-based) since the modal became a carousel (Adinda, QA round 2):
+  // prev/next just steps the index, wrapping at the ends.
+  const [openIdx, setOpenIdx] = useState<number | null>(null)
   const [showAll, setShowAll] = useState(false)
 
-  const open = members.find((m) => m._id === openId) ?? null
+  const open = openIdx !== null ? (members[openIdx] ?? null) : null
+  const memberCount = members.length
 
-  // Esc closes + body scroll locks while the modal is open (the standard dialog contract).
+  // Esc closes, arrow keys step the carousel, body scroll locks while the modal is open
+  // (the standard dialog contract).
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpenId(null)
+      if (e.key === 'Escape') setOpenIdx(null)
+      if (memberCount > 1 && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        const delta = e.key === 'ArrowLeft' ? -1 : 1
+        setOpenIdx((i) => (i === null ? i : (i + delta + memberCount) % memberCount))
+      }
     }
     document.addEventListener('keydown', onKey)
     const prev = document.body.style.overflow
@@ -43,7 +52,7 @@ export function AboutCrew({ about }: { about: AboutPageData }) {
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = prev
     }
-  }, [open])
+  }, [open, memberCount])
 
   // Below the hooks — an early return above them changes hook order (the locked guard pattern).
   if (members.length === 0) return null
@@ -76,14 +85,14 @@ export function AboutCrew({ about }: { about: AboutPageData }) {
             <li key={member._id} className={`${i >= MOBILE_VISIBLE && !showAll ? 'hidden lg:block' : ''}`}>
               <button
                 type="button"
-                onClick={() => setOpenId(member._id)}
+                onClick={() => setOpenIdx(i)}
                 aria-haspopup="dialog"
                 className="group flex w-full flex-col items-center gap-16 text-center"
               >
                 {/* Circular portrait — no border; the testimonial-card shadow instead, and the
                     site-wide image zoom on hover (Adinda, QA round 2: match the cards, zoom like
                     everywhere else — replaced the earlier border + hover-border-color treatment). */}
-                <span className="block aspect-square w-full max-w-[200px] overflow-hidden rounded-full shadow-[0px_4px_10px_rgba(44,37,34,0.2)]">
+                <span className="block aspect-square w-full max-w-[200px] overflow-hidden rounded-full shadow-[0px_4px_10px_rgba(44,37,34,0.12)]">
                   <Image
                     {...sanityImageProps(member.photo, '/assets/placeholder-photo.svg')}
                     alt={member.photo?.alt ?? ''}
@@ -104,26 +113,46 @@ export function AboutCrew({ about }: { about: AboutPageData }) {
           ))}
         </ul>
 
-        {members.length > MOBILE_VISIBLE && !showAll ? (
+        {members.length > MOBILE_VISIBLE ? (
           <button
             type="button"
-            onClick={() => setShowAll(true)}
+            onClick={() => setShowAll((v) => !v)}
             className="inline-flex h-48 w-fit items-center rounded-xs bg-background-ondark-page px-20 py-8 text-button-small uppercase text-text-ondark-primary transition-opacity duration-300 ease-in-out hover:opacity-85 lg:hidden"
           >
-            {about.crewViewMoreText || 'View More'}
+            {showAll ? about.crewViewLessText || 'View Less' : about.crewViewMoreText || 'View More'}
           </button>
         ) : null}
       </div>
 
-      {open ? <CrewBioModal member={open} onClose={() => setOpenId(null)} /> : null}
+      {open && openIdx !== null ? (
+        <CrewBioModal
+          member={open}
+          hasSiblings={memberCount > 1}
+          onPrev={() => setOpenIdx((openIdx + memberCount - 1) % memberCount)}
+          onNext={() => setOpenIdx((openIdx + 1) % memberCount)}
+          onClose={() => setOpenIdx(null)}
+        />
+      ) : null}
     </section>
   )
 }
 
-function CrewBioModal({ member, onClose }: { member: CrewMemberData; onClose: () => void }) {
+function CrewBioModal({
+  member,
+  hasSiblings,
+  onPrev,
+  onNext,
+  onClose,
+}: {
+  member: CrewMemberData
+  hasSiblings: boolean
+  onPrev: () => void
+  onNext: () => void
+  onClose: () => void
+}) {
   // Portrait at modal size through the Sanity CDN pipeline (fit max so it never upscales).
   const photoUrl = member.photo?.asset?._ref
-    ? urlForImage(member.photo).width(960).fit('max').quality(75).auto('format').url()
+    ? urlForImage(member.photo).width(1280).fit('max').quality(75).auto('format').url()
     : null
 
   // PORTALED to <body> with z-[70]: the section's `isolate` traps any z-index inside its own
@@ -145,10 +174,19 @@ function CrewBioModal({ member, onClose }: { member: CrewMemberData; onClose: ()
       }}
       onClick={onClose}
     >
+      {/* Arrows OUTSIDE the square card (Adinda, QA round 2: the modal is a carousel — step
+          through the crew without closing). stopPropagation lives on this wrapper so arrow
+          clicks never fall through to the scrim's close. */}
       <div
-        className="relative w-full max-w-[480px] overflow-hidden rounded-xs shadow-[0px_4px_10px_rgba(44,37,34,0.2)]"
+        className="flex w-full items-center justify-center gap-8 lg:gap-24"
         onClick={(e) => e.stopPropagation()}
       >
+        {hasSiblings ? (
+          <CarouselArrowButton direction="prev" onClick={onPrev} ariaLabel="Previous crew member" variant="surface" />
+        ) : null}
+        {/* Sized up from max-w 480 (Adinda: "fill it more"); the dvh term keeps the square on
+            screen on short viewports — width is the square's height. */}
+        <div className="relative w-full min-w-0 max-w-[min(640px,calc(100dvh-180px))] overflow-hidden rounded-xs shadow-[0px_4px_10px_rgba(44,37,34,0.2)]">
         {/* The card IS the photo, SQUARE-cropped (Adinda, QA round 2: square card + square
             portrait — easier to provide a square photo; was 3:4); the bio overlays it on the
             bottom gradient band — the SiteLightbox caption treatment, per "overlay ON the image". */}
@@ -191,6 +229,11 @@ function CrewBioModal({ member, onClose }: { member: CrewMemberData; onClose: ()
             className="block size-[16px] bg-current [mask-image:url('/assets/icon-close.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
           />
         </button>
+        </div>
+
+        {hasSiblings ? (
+          <CarouselArrowButton direction="next" onClick={onNext} ariaLabel="Next crew member" variant="surface" />
+        ) : null}
       </div>
     </div>,
     document.body

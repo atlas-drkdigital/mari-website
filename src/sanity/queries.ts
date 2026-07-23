@@ -330,7 +330,7 @@ export const ABOUT_QUERY = groq`{
     heroImage${IMAGE},
     heroVideo{ url, playOnMobile },
     overviewEyebrow, overviewHeading, overviewBody,
-    crewEyebrow, crewHeading, crewIntro, crewViewMoreText,
+    crewEyebrow, crewHeading, crewIntro, crewViewMoreText, crewViewLessText,
     crewMembers[]->{ _id, name, position, bio, photo${IMAGE} },
     seo
   },
@@ -777,6 +777,7 @@ export type AboutPageData = {
   crewHeading?: string
   crewIntro?: PortableTextBlock[]
   crewViewMoreText?: string
+  crewViewLessText?: string
   crewMembers?: CrewMemberData[]
   seo?: SeoData
 }

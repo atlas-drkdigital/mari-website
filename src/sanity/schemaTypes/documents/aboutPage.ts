@@ -141,6 +141,15 @@ export const aboutPageType = defineType({
         'Label for the mobile-only button that reveals the rest of the crew. Only appears on phones when more than four members are listed.',
       initialValue: 'View More',
     }),
+    defineField({
+      name: 'crewViewLessText',
+      title: 'View Less button text',
+      type: 'string',
+      group: 'crew',
+      fieldset: 'crewFs',
+      description: 'Label for the same button once the list is expanded, to collapse it again.',
+      initialValue: 'View Less',
+    }),
 
     defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
   ],

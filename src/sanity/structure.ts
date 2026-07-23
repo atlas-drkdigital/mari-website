@@ -91,7 +91,21 @@ export const structure: StructureResolver = (S) =>
 
       // Dedicated singletons (were pinned generic `page` docs until 2026-07-23 — see PINNED_PAGE_IDS).
       singleton(S, 'privateCharters', 'Private Charters'),
-      singleton(S, 'aboutPage', 'About'),
+
+      // About folder: the page + its crew members (Adinda, 2026-07-24 declutter: crew appears
+      // nowhere but the About page, so it lives WITH it — topic beats abstraction, the same
+      // precedent as Destination Defaults / Boats Section; moved out of Shared Components).
+      S.listItem()
+        .id('about')
+        .title('About')
+        .child(
+          S.list()
+            .title('About')
+            .items([
+              singleton(S, 'aboutPage', 'About Page'),
+              S.documentTypeListItem('crewMember').title('Crew Members'),
+            ])
+        ),
 
       // Its own top-level entry, not nested under Pages — more variants of this
       // shape are coming (Specials, etc.), each will likely get its own entry too.
@@ -152,9 +166,8 @@ export const structure: StructureResolver = (S) =>
       // NOT here (all moved out in the 2026-07-23 declutter): FAQ + Testimonials → Secondary
       // Pages; Boats Section → the Boats folder (shared-SECTION singletons live with their topic,
       // not with the abstraction — Adinda's call, Destination Defaults set the precedent).
-      // Crew members (shown on the About page) — a repeatable shared component, placed here per
-      // Adinda's ask 2026-07-16.
-      S.documentTypeListItem('crewMember').title('Crew Members'),
+      // Crew Members LEFT this band 2026-07-24 (Adinda): they only appear on the About page, so
+      // they live in the About folder now — same topic-beats-abstraction call as the others above.
       // Shared two-card CTA section (Private Charter / Shared Trip) reused across pages — a
       // singleton, placed here with the other shared components per Adinda's ask 2026-07-16.
       singleton(S, 'cta', 'CTA Section'),
