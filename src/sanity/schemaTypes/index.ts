@@ -29,6 +29,8 @@ import { homePageType } from './documents/homePage'
 import { privateChartersType } from './documents/privateCharters'
 import { boatsSectionType } from './documents/boatsSection'
 import { destinationsSectionType } from './documents/destinationsSection'
+import { aboutPageType } from './documents/aboutPage'
+import { testimonialsSectionType } from './documents/testimonialsSection'
 import { destinationType } from './documents/destination'
 import { destinationDefaultsType } from './documents/destinationDefaults'
 import { ctaType } from './documents/cta'
@@ -74,6 +76,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     privateChartersType,
     boatsSectionType,
     destinationsSectionType,
+    aboutPageType,
+    testimonialsSectionType,
     destinationType,
     destinationDefaultsType,
     ctaType,

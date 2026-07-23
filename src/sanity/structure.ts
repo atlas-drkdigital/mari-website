@@ -2,17 +2,12 @@ import type { StructureResolver } from 'sanity/structure'
 
 // Singletons are enforced here (fixed document ID), not via a schema option —
 // see sanity-best-practices skill's studio-structure.md.
-const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage', 'privateCharters', 'destinationDefaults', 'destinationsSection', 'boatDefaults', 'boatsSection', 'cta', 'faqGeneral']
-// Pinned single-instance `page` documents (About) — schema type is still the generic `page`
-// (About never needed its own type), but each gets a fixed sidebar slot by document ID so
-// they're easy to find, same technique as `singleton()` below just without enforcing
-// only-one-can-exist. Private Charters left this list 2026-07-23: the mockup made it a
-// structured section page, so it's now the dedicated `privateCharters` singleton. The old
-// placeholder doc `page-private-charters` may still exist in the dataset (visible under Pages)
-// until it's deleted.
-const PINNED_PAGE_IDS: Array<{ id: string; title: string }> = [
-  { id: 'page-about', title: 'About' },
-]
+const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage', 'privateCharters', 'aboutPage', 'destinationDefaults', 'destinationsSection', 'boatDefaults', 'boatsSection', 'testimonialsSection', 'cta', 'faqGeneral']
+// Pinned single-instance `page` documents — NOW EMPTY (kept as the mechanism): Private Charters
+// left 2026-07-23 (dedicated `privateCharters` singleton), About left the same day (dedicated
+// `aboutPage` singleton — the spec made it a structured section page too). Old placeholder docs
+// deleted with Adinda's approval.
+const PINNED_PAGE_IDS: Array<{ id: string; title: string }> = []
 const PLACED_TYPES = [
   ...SINGLETON_TYPES,
   'page',
@@ -94,8 +89,9 @@ export const structure: StructureResolver = (S) =>
             ])
         ),
 
-      // Dedicated singleton (was a pinned generic `page` until 2026-07-23 — see PINNED_PAGE_IDS).
+      // Dedicated singletons (were pinned generic `page` docs until 2026-07-23 — see PINNED_PAGE_IDS).
       singleton(S, 'privateCharters', 'Private Charters'),
+      singleton(S, 'aboutPage', 'About'),
 
       // Its own top-level entry, not nested under Pages — more variants of this
       // shape are coming (Specials, etc.), each will likely get its own entry too.
@@ -119,7 +115,18 @@ export const structure: StructureResolver = (S) =>
       // from it doesn't make it a component.
       singleton(S, 'faqGeneral', 'FAQ'),
 
-      S.documentTypeListItem('testimonial').title('Testimonials'),
+      // Testimonials folder: the docs + the shared-section singleton; the Testimonials Page
+      // singleton joins here when built (spec #3).
+      S.listItem()
+        .title('Testimonials')
+        .child(
+          S.list()
+            .title('Testimonials')
+            .items([
+              S.documentTypeListItem('testimonial').title('Testimonials'),
+              singleton(S, 'testimonialsSection', 'Testimonials Section'),
+            ])
+        ),
 
       S.divider(),
 

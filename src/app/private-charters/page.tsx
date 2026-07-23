@@ -5,7 +5,7 @@ import { Nav } from '@/components/Nav'
 import { ScrollReveal } from '@/components/ScrollReveal'
 import { ChartersBenefits } from '@/components/sections/charters/ChartersBenefits'
 import { ChartersHero } from '@/components/sections/charters/ChartersHero'
-import { ChartersOverview } from '@/components/sections/charters/ChartersOverview'
+import { PageOverview } from '@/components/sections/PageOverview'
 import { Contact } from '@/components/sections/Contact'
 import { DestinationBoats } from '@/components/sections/destination/DestinationBoats'
 import { DestinationTrips } from '@/components/sections/destination/DestinationTrips'
@@ -125,7 +125,14 @@ export default async function PrivateChartersPage() {
           {/* centerItems: this hero is centered, the rail follows (Adinda, 2026-07-23). */}
           <SubNav items={items} centerItems className="absolute inset-x-0 bottom-0 z-20 w-full" />
         </div>
-        <ChartersOverview charters={charters} />
+        {/* PageOverview = the generalized ChartersOverview (2026-07-23, when About became its
+            second identical consumer). Same render, generic props. */}
+        <PageOverview
+          headingId="charters-overview-heading"
+          eyebrow={charters.overviewEyebrow}
+          heading={charters.overviewHeading}
+          body={charters.overviewBody}
+        />
         <ChartersBenefits
           eyebrow={charters.benefitsEyebrow}
           heading={charters.benefitsHeading}
