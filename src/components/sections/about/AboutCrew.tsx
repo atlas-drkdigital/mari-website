@@ -185,8 +185,10 @@ function CrewBioModal({
       aria-modal="true"
       aria-label={member.name ? `About ${member.name}` : 'Crew member bio'}
       // Scrim recipe = SiteLightbox's container verbatim (92% lightbox scrim + 12px blur), so the
-      // two overlays read as one system.
-      className="fixed inset-0 z-[70] flex items-center justify-center p-24 lg:p-48"
+      // two overlays read as one system. Mobile: NO padding — the square card takes the full
+      // viewport width (Adinda, QA 2026-07-24: the padded card read too small on phones); the
+      // dvh cap on the card below keeps it on screen either way.
+      className="fixed inset-0 z-[70] flex items-center justify-center p-0 lg:p-48"
       style={{
         backgroundColor: 'color-mix(in srgb, var(--color-background-lightbox-scrim) 92%, transparent)',
         backdropFilter: 'blur(12px)',
