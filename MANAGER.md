@@ -56,10 +56,14 @@ escalate to Opus only for the portability boundary (what's Mari's vs what's DRK'
 genuinely architectural call in it.
 
 ### 🔵 GATED ITEM — root cleanup: consolidate all `_*` files into one `_internal/` folder (queued 2026-07-23, Adinda)
-**Trigger: the currently-running parallel/editor session's in-flight work is DONE and the tree is at a
-clean, committed boundary.** Adinda approved the approach 2026-07-23 ("we'll do it once I finish the
-other things that the editor is doing") — explicitly NOT now, because file moves + another session's
-edits collide.
+**Trigger (re-cut 2026-07-23 evening, Adinda): the ABOUT PAGE is finished (round-2 review + her queued
+refinements) and its fixes are COMMITTED. Run the refactor immediately after that commit and BEFORE
+starting any other page.** (Original gate — the parallel editor session finishing — has cleared; its
+About/SEO checkpoint is committed at `2ee0d98`.)
+⚠️ **`content/` (NO underscore) is the canonical git-TRACKED copy-drafts folder and must NOT be swept
+into `_internal/`** — AGENTS.md rule; a parallel session already moved it into ignored `_content/` and
+nearly lost Codex's charters rewrite (recovered `ad06118`). The `content/` named in the scope below
+means the OLD `_content/` scratch folder only.
 
 **Scope when it runs (proposal accepted as-is):** move every root `_*` entry into `_internal/`
 (`handoff/`, `scripts/`, `content/`, `backup/`, `image-test/`, and all the `_*.md` docs, inner
