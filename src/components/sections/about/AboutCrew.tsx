@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 import { RichText } from '@/components/RichText'
 import { sanityImageProps, urlForImage } from '@/sanity/lib/image'
@@ -79,22 +80,23 @@ export function AboutCrew({ about }: { about: AboutPageData }) {
                 aria-haspopup="dialog"
                 className="group flex w-full flex-col items-center gap-16 text-center"
               >
-                {/* Circular portrait — hover takes the active color treatment (the accordion
-                    hover rule: colors only, no size/typography change). */}
-                <span className="block aspect-square w-full max-w-[200px] overflow-hidden rounded-full border-2 border-border-default transition-colors duration-300 ease-in-out group-hover:border-action-primary">
+                {/* Circular portrait — no border; the testimonial-card shadow instead, and the
+                    site-wide image zoom on hover (Adinda, QA round 2: match the cards, zoom like
+                    everywhere else — replaced the earlier border + hover-border-color treatment). */}
+                <span className="block aspect-square w-full max-w-[200px] overflow-hidden rounded-full shadow-[0px_4px_10px_rgba(44,37,34,0.2)]">
                   <Image
                     {...sanityImageProps(member.photo, '/assets/placeholder-photo.svg')}
                     alt={member.photo?.alt ?? ''}
                     width={400}
                     height={400}
                     sizes="(min-width: 1024px) 200px, 45vw"
-                    className="size-full object-cover"
+                    className="size-full object-cover transition-transform duration-[1100ms] ease-in-out group-hover:scale-105"
                   />
                 </span>
                 <span className="flex flex-col gap-4">
                   <span className="text-body-large font-bold text-text-primary">{member.name}</span>
                   {member.position ? (
-                    <span className="text-caption-label uppercase text-text-secondary">{member.position}</span>
+                    <span className="text-caption-label uppercase text-action-primary">{member.position}</span>
                   ) : null}
                 </span>
               </button>
@@ -124,14 +126,19 @@ function CrewBioModal({ member, onClose }: { member: CrewMemberData; onClose: ()
     ? urlForImage(member.photo).width(960).fit('max').quality(75).auto('format').url()
     : null
 
-  return (
+  // PORTALED to <body> with z-[70]: the section's `isolate` traps any z-index inside its own
+  // stacking context, so however high the modal's z, the fixed z-50 nav always painted above it —
+  // nav visible over the scrim, and on short viewports the opaque light nav swallowed the card's
+  // X button (Adinda, QA round 2). z-[70] clears the nav (50) and the mobile menu (60). Safe to
+  // touch document here: the modal only ever renders after a click, so we're client-side.
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label={member.name ? `About ${member.name}` : 'Crew member bio'}
       // Scrim recipe = SiteLightbox's container verbatim (92% lightbox scrim + 12px blur), so the
       // two overlays read as one system.
-      className="fixed inset-0 z-50 flex items-center justify-center p-24 lg:p-48"
+      className="fixed inset-0 z-[70] flex items-center justify-center p-24 lg:p-48"
       style={{
         backgroundColor: 'color-mix(in srgb, var(--color-background-lightbox-scrim) 92%, transparent)',
         backdropFilter: 'blur(12px)',
@@ -142,9 +149,10 @@ function CrewBioModal({ member, onClose }: { member: CrewMemberData; onClose: ()
         className="relative w-full max-w-[480px] overflow-hidden rounded-xs shadow-[0px_4px_10px_rgba(44,37,34,0.2)]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* The card IS the photo, portrait-cropped; the bio overlays it on the bottom gradient
-            band — the SiteLightbox caption treatment, per Adinda's "overlay ON the image". */}
-        <div className="relative aspect-[3/4] w-full bg-background-ondark-page">
+        {/* The card IS the photo, SQUARE-cropped (Adinda, QA round 2: square card + square
+            portrait — easier to provide a square photo; was 3:4); the bio overlays it on the
+            bottom gradient band — the SiteLightbox caption treatment, per "overlay ON the image". */}
+        <div className="relative aspect-square w-full bg-background-ondark-page">
           {photoUrl ? (
             /* eslint-disable-next-line @next/next/no-img-element -- CDN-sized URL built above;
                next/image adds nothing but a second optimizer pass here (the double-encode trap). */
@@ -184,6 +192,7 @@ function CrewBioModal({ member, onClose }: { member: CrewMemberData; onClose: ()
           />
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

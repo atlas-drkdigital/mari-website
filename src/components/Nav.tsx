@@ -269,7 +269,10 @@ export function Nav() {
           </div>
         ) : (
           <>
-        <div className="flex items-center border-b-[0.25px] border-accent-ondark-onprimary page-gutter-x py-16 group-data-[nav=light]/nav:border-border-default">
+        {/* Light-mode row separator: a shadow hairline IDENTICAL to the header's own bottom line
+            (0_1px_0_0 black/6%), not border-border-default — the beige border read as a different
+            colour than the greyish bottom hairline (Adinda, 2026-07-24: both lines one colour). */}
+        <div className="flex items-center border-b-[0.25px] border-accent-ondark-onprimary page-gutter-x py-16 group-data-[nav=light]/nav:border-transparent group-data-[nav=light]/nav:shadow-[0_1px_0_0_rgb(0_0_0/0.06)]">
           <div className="flex w-[480px] items-center">
             <Link
               href="/"

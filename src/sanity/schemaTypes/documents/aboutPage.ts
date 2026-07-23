@@ -137,7 +137,8 @@ export const aboutPageType = defineType({
       type: 'string',
       group: 'crew',
       fieldset: 'crewFs',
-      description: 'Shown on smaller screens when more crew members are available than initially visible.',
+      description:
+        'Label for the mobile-only button that reveals the rest of the crew. Only appears on phones when more than four members are listed.',
       initialValue: 'View More',
     }),
 
