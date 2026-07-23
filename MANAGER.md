@@ -55,6 +55,23 @@ in CLAUDE.md for why `COMPONENTS.md` "ports at first use, not up front".
 escalate to Opus only for the portability boundary (what's Mari's vs what's DRK's), which is the one
 genuinely architectural call in it.
 
+### 🔵 GATED ITEM — root cleanup: consolidate all `_*` files into one `_internal/` folder (queued 2026-07-23, Adinda)
+**Trigger: the currently-running parallel/editor session's in-flight work is DONE and the tree is at a
+clean, committed boundary.** Adinda approved the approach 2026-07-23 ("we'll do it once I finish the
+other things that the editor is doing") — explicitly NOT now, because file moves + another session's
+edits collide.
+
+**Scope when it runs (proposal accepted as-is):** move every root `_*` entry into `_internal/`
+(`handoff/`, `scripts/`, `content/`, `backup/`, `image-test/`, and all the `_*.md` docs, inner
+underscores dropped). **Stays at root: `CLAUDE.md`, `AGENTS.md` (tool-loading conventions require it)
++ `MANAGER.md`, `COMPONENTS.md` (the daily working set).** Use `git mv` (history preserved). Then:
+(a) reference sweep — search/replace old paths across CLAUDE.md/MANAGER.md/`_internal/` itself, final
+grep proving zero stale `_handoff|_RESUME`-style paths; (b) simplify `.gitignore` (glob+exceptions →
+`/_internal/` + targeted ignores for `backup/`/`image-test/`/`content/` images) and `.vercelignore`
+(one `/_internal/` line replaces `/_*`); (c) chat-side skills still say `_handoff/` until the next
+skill round — note the rename IN the handoff doc itself so the round picks it up, CLAUDE.md states
+the new path authoritatively meanwhile. **Estimate: ~30–45 min, Sonnet-high (mechanical).**
+
 ### 🆕 QUEUED 2026-07-22 (Adinda) — per-section QA is the LOCKED review method; homepage + boat get it retroactively
 The destination build's rhythm — **every section reviewed TWICE at the moment it ships: (a) the
 rendered page (desktop AND mobile) and (b) its Studio editing surface** — is working well
