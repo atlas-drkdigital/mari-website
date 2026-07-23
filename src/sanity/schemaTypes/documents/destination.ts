@@ -110,14 +110,17 @@ export const destinationType = defineType({
     // Cards tab (Adinda, 2026-07-22): everything here is card-only, grouped so that's obvious in
     // Studio. The old `seasonNights` string was REMOVED the same day — the card's season/duration
     // line is now derived from the hero `stats` values (Season + Duration), one source of truth.
+    // Moved Cards → Basic Info, retitled "Summary" (Adinda, 2026-07-23): the summary is core
+    // content, not card plumbing. Field KEY stays `excerpt` — title/group moves are free, key
+    // renames need a migration.
     defineField({
       name: 'excerpt',
-      title: 'Card summary',
+      title: 'Summary',
       type: 'text',
       rows: 3,
-      group: 'cards',
-      fieldset: 'cardsFs',
-      description: 'A few sentences summarising this destination, shown on the homepage carousel and destination cards.',
+      group: 'basicInfo',
+      fieldset: 'basicInfoFs',
+      description: 'A few sentences summarising this destination — used wherever it appears as a card (carousels, listings), and reusable elsewhere.',
     }),
     defineField({
       name: 'order',

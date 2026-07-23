@@ -15,7 +15,6 @@ import { Footer } from '@/components/sections/Footer'
 import { SubNav, type SubNavItem } from '@/components/SubNav'
 import { toPlainText } from '@/lib/portableText'
 import { buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
-import { resolveTokens } from '@/lib/tokens'
 import { sanityFetch } from '@/sanity/lib/live'
 import { PRIVATE_CHARTERS_QUERY, type PrivateChartersQueryResult } from '@/sanity/queries'
 
@@ -61,14 +60,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PrivateChartersPage() {
-  const { charters, sharedFaqSections, boatsSection, boats, destinations, settings } = await getCharters()
+  const { charters, sharedFaqSections, boatsSection, boats, curatedDestinations, destinations, settings } =
+    await getCharters()
 
   if (!charters) notFound()
 
-  // Shared-section tokens: on this page {destination} means the whole country — the boatsSection
-  // singleton's "Sail {destination} in comfort" renders as "Sail Indonesia in comfort" here and
-  // as the destination's name on destination pages. One shared doc, page-appropriate output.
-  const t = (text?: string) => resolveTokens(text, { destination: 'Indonesia' })
+  // Carousel = the destinationsSection singleton's curated list, all-list fallback (see the
+  // homepage's identical note, incl. why .filter(Boolean) guards null deref members).
+  const curated = (curatedDestinations ?? []).filter(Boolean)
+  const carouselDests = curated.length ? curated : (destinations ?? [])
 
   // FAQ composition mirrors the boat/destination pages: this page's own categories first, then
   // shared General FAQ categories (showOnPrivateChartersPage toggle, filtered in the query).
@@ -130,16 +130,19 @@ export default async function PrivateChartersPage() {
         />
         {/* Shared sections (Adinda, 2026-07-23): Destinations = the homepage component verbatim;
             Boats = the destination page's component with this page's own chrome fields. */}
-        <Destinations destinations={destinations ?? []} />
+        <Destinations destinations={carouselDests} />
         {/* texture={false}: plain page background on THIS page only (Adinda, 2026-07-23) — the
             component itself stays shared, so design edits still propagate everywhere. Chrome from
             the shared boatsSection singleton (same day). */}
+        {/* eyebrowGeneric, not the {destination}-token eyebrow — this is a non-destination page,
+            and the wording is editor-owned on the boatsSection doc (no hardcoded token values;
+            Adinda, 2026-07-23). */}
         <DestinationBoats
           boats={boats ?? []}
-          eyebrow={t(boatsSection?.eyebrow)}
-          heading={t(boatsSection?.heading)}
-          headingSingular={t(boatsSection?.headingSingular)}
-          ctaText={t(boatsSection?.ctaText)}
+          eyebrow={boatsSection?.eyebrowGeneric}
+          heading={boatsSection?.heading}
+          headingSingular={boatsSection?.headingSingular}
+          ctaText={boatsSection?.ctaText}
           texture={false}
         />
         <DestinationTrips

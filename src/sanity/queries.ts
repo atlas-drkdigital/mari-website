@@ -54,6 +54,17 @@ export const HOMEPAGE_QUERY = groq`{
     "category": category->name,
     coverImage${IMAGE}
   },
+  // The Destinations CAROUSEL pulls the destinationsSection singleton's drag-curated array
+  // (2026-07-23, Adinda — order = array order, omission hides). The all-list below stays for the
+  // hero search + contact dropdown, which must never hide a destination.
+  "curatedDestinations": coalesce(*[_id == "destinationsSection"][0].destinations[]->{
+    _id, name, tagline, excerpt, "slug": slug.current,
+    "cardSeason": stats[label == "Season"][0].value,
+    "cardDuration": stats[label == "Duration"][0].value,
+    useCoverAsCardImage,
+    cardImage${IMAGE},
+    coverImage${IMAGE}
+  }, []),
   // Card season/duration derive from the hero stats (one source of truth — the separate
   // seasonNights field was removed 2026-07-22, Adinda). Matched by the seeded stat LABELS: if an
   // editor renames "Season"/"Duration" on a destination, that part of its card line disappears —
@@ -248,7 +259,7 @@ export const PRIVATE_CHARTERS_QUERY = groq`{
   "sharedFaqSections": *[_id == "faqGeneral"][0].categories[showOnPrivateChartersPage == true]{
     _key, title, questions[]{ question, answer }
   },
-  "boatsSection": *[_id == "boatsSection"][0]{ eyebrow, heading, headingSingular, ctaText },
+  "boatsSection": *[_id == "boatsSection"][0]{ eyebrow, eyebrowGeneric, heading, headingSingular, ctaText },
   "boats": *[_type == "boat" && defined(slug.current)] | order(name asc){
     _id, name, pageTitle, tagline,
     "slug": slug.current,
@@ -258,6 +269,17 @@ export const PRIVATE_CHARTERS_QUERY = groq`{
     excerpt,
     stats[]{ _key, label, value }
   },
+  // The CAROUSEL's list = the destinationsSection singleton's drag-curated array (order = array
+  // order, omission hides). Coalesced to [] so an unseeded singleton degrades to the all-list
+  // fallback in the page, never a crash.
+  "curatedDestinations": coalesce(*[_id == "destinationsSection"][0].destinations[]->{
+    _id, name, tagline, excerpt, "slug": slug.current,
+    "cardSeason": stats[label == "Season"][0].value,
+    "cardDuration": stats[label == "Duration"][0].value,
+    useCoverAsCardImage,
+    cardImage${IMAGE},
+    coverImage${IMAGE}
+  }, []),
   "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
     _id, name, tagline, excerpt, "slug": slug.current,
     "cardSeason": stats[label == "Season"][0].value,
@@ -600,7 +622,10 @@ export type BoatsIndexQueryResult = {
 // Shared "About the Boats" section chrome (boatsSection singleton, 2026-07-23) — one doc serves
 // every page mounting the component; {destination} resolves per page.
 export type BoatsSectionData = {
+  /** Destination pages — carries the {destination} token. */
   eyebrow?: string
+  /** Every non-destination page (charters, future pages). */
+  eyebrowGeneric?: string
   heading?: string
   headingSingular?: string
   ctaText?: string
@@ -652,6 +677,7 @@ export type PrivateChartersQueryResult = {
   sharedFaqSections: FaqSectionData[] | null
   boatsSection: BoatsSectionData | null
   boats: BoatCardData[]
+  curatedDestinations: DestinationCardData[]
   destinations: DestinationCardData[]
   settings: SiteSettingsContact | null
 }
@@ -660,6 +686,7 @@ export type HomePageQueryResult = {
   home: HomePageData | null
   cta: { cards?: CtaCardData[] } | null
   latestPosts: LatestPostData[]
+  curatedDestinations: DestinationCardData[]
   destinations: DestinationCardData[]
   settings: SiteSettingsContact | null
   faq: { questions?: FaqItemData[] } | null

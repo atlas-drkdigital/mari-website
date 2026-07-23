@@ -16,10 +16,20 @@ export const boatsSectionType = defineType({
   type: 'document',
   description: 'The "About the Boats" section shown across pages — edited once, changes everywhere. Type {destination} to insert the page\'s destination name.',
   fields: [
+    // TWO eyebrows (Adinda, 2026-07-23): destination pages get the {destination}-token one;
+    // every other page gets the generic one. This is what killed the page-code's hardcoded
+    // "Indonesia" token value — the generic wording is now editor-owned.
     defineField({
       name: 'eyebrow',
-      title: 'Eyebrow',
+      title: 'Eyebrow (destination pages)',
       type: 'string',
+      description: 'Shown on destination pages. Type {destination} to insert the destination name.',
+    }),
+    defineField({
+      name: 'eyebrowGeneric',
+      title: 'Eyebrow (other pages)',
+      type: 'string',
+      description: 'Shown wherever this section appears outside a destination page.',
     }),
     defineField({
       name: 'heading',

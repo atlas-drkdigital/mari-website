@@ -131,14 +131,15 @@ export const boatType = defineType({
     // Added 2026-07-22 (Adinda: the destination boats card rendered the FULL overviewBody — far
     // too long; a card needs its own short copy). richTextBasic per the Portable Text tier rule:
     // card descriptions are tier 2. Mirrors destination.excerpt in name and purpose.
+    // Moved Cards → Basic Info + retitled "Summary" 2026-07-23 (Adinda) — key stays `excerpt`.
     defineField({
       name: 'excerpt',
-      title: 'Card summary',
+      title: 'Summary',
       type: 'richTextBasic',
-      group: 'cards',
-      fieldset: 'cardsFs',
+      group: 'basicInfo',
+      fieldset: 'basicInfoFs',
       description:
-        'A short paragraph or two shown where this boat appears as a card — not the full overview. About 500 characters fits the card best.',
+        'A short paragraph or two used wherever this boat appears as a card — not the full overview. About 500 characters fits the card best.',
       components: { input: RichTextCharCountInput },
       // maxLength is the custom option the counter reads — same cast as seo.ts.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

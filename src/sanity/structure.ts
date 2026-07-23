@@ -2,7 +2,7 @@ import type { StructureResolver } from 'sanity/structure'
 
 // Singletons are enforced here (fixed document ID), not via a schema option —
 // see sanity-best-practices skill's studio-structure.md.
-const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage', 'privateCharters', 'destinationDefaults', 'boatDefaults', 'boatsSection', 'cta', 'faqGeneral']
+const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage', 'privateCharters', 'destinationDefaults', 'destinationsSection', 'boatDefaults', 'boatsSection', 'cta', 'faqGeneral']
 // Pinned single-instance `page` documents (About) — schema type is still the generic `page`
 // (About never needed its own type), but each gets a fixed sidebar slot by document ID so
 // they're easy to find, same technique as `singleton()` below just without enforcing
@@ -73,6 +73,7 @@ export const structure: StructureResolver = (S) =>
             .items([
               S.documentTypeListItem('destination').title('Destinations'),
               singleton(S, 'destinationDefaults', 'Destination Defaults'),
+              singleton(S, 'destinationsSection', 'Destinations Section'),
             ])
         ),
 

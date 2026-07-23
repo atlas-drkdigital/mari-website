@@ -44,8 +44,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
   const { data } = await sanityFetch({ query: HOMEPAGE_QUERY })
-  const { home, cta, latestPosts, destinations, settings, faq } = (data ?? {}) as HomePageQueryResult
+  const { home, cta, latestPosts, curatedDestinations, destinations, settings, faq } = (data ?? {}) as HomePageQueryResult
   const dests = destinations ?? []
+  // The CAROUSEL takes the destinationsSection singleton's drag-curated list (2026-07-23);
+  // an unseeded/empty singleton degrades to the all-list so the section never silently vanishes.
+  // Hero search + Contact keep the all-list — those must never hide a destination.
+  // .filter(Boolean): a reference whose target isn't published dereferences to null (the same
+  // null-member class that 500'd the homepage FAQ, commit 8ded5ec — and again here on first seed).
+  const curated = (curatedDestinations ?? []).filter(Boolean)
+  const carouselDests = curated.length ? curated : dests
 
   // FAQPage JSON-LD for the homepage's FAQ block (the boat page already emits its own). Same reason
   // as the boat page: answer engines, not Google rich results. The Organization block is emitted
@@ -71,7 +78,7 @@ export default async function Home() {
         <Hero home={home} destinations={dests} />
         <TheBoat home={home} />
         <WhyUs home={home} />
-        <Destinations destinations={dests} />
+        <Destinations destinations={carouselDests} />
         <LatestArticles
           eyebrow={home?.latestArticlesEyebrow}
           heading={home?.latestArticlesHeading}
