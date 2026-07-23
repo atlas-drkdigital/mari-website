@@ -1,0 +1,17 @@
+# Internal working docs + tooling config: committed to the (private) GitHub repo as a living
+# backup, but excluded from every Vercel deployment — they are never uploaded, never part of
+# the deployment's source snapshot, and never served. The build needs none of them.
+# Note: serving was never the risk (only build output + /public are ever served); this file
+# exists so these files don't LIVE on Vercel at all.
+/_*
+/.agents
+/.claude
+/.vscode
+/content
+CLAUDE.md
+AGENTS.md
+MANAGER.md
+COMPONENTS.md
+SANITY-SETUP.md
+README.md
+skills-lock.json
