@@ -24,6 +24,7 @@ const ROUTE_BY_TYPE: Record<string, (slug?: string) => string | null> = {
   blogPost: (slug) => (slug ? `/blog/${slug}` : null),
   page: (slug) => (slug ? `/${slug}` : null),
   privateCharters: () => '/private-charters',
+  aboutPage: () => '/about',
   faqGeneral: () => '/faq',
   scheduleRates: () => '/schedule-rates',
 }

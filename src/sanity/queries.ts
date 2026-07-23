@@ -28,9 +28,13 @@ export const HOMEPAGE_QUERY = groq`{
     whyUsItems[]->{ _id, headline, description, image${IMAGE} },
     latestArticlesEyebrow, latestArticlesHeading, latestArticlesLinkText,
     faqEyebrow, faqHeading, faqLinkText,
-    testimonialsEyebrow, testimonialsHeading, testimonialsLinkText,
-    testimonialItems[]->{ _id, name, date, title, text, rating },
     seo
+  },
+  // Testimonials chrome + curated list = the testimonialsSection singleton (2026-07-23 — moved off
+  // homePage when About became the second consumer; same shared-section family as boatsSection).
+  "testimonialsSection": *[_id == "testimonialsSection"][0]{
+    eyebrow, heading, linkText,
+    testimonialItems[]->{ _id, name, date, title, text, rating }
   },
   "cta": *[_id == "cta"][0]{
     cards[]{
@@ -315,6 +319,44 @@ export const PRIVATE_CHARTERS_QUERY = groq`{
   }
 }`
 
+// One fetch for the About page (singleton — no $slug). Sections per Adinda's spec (_PAGE-SPECS.md
+// #1): hero → overview (PageOverview) → Why Us (the homepage's, verbatim — chrome + items come
+// from the homePage doc on purpose, "same as homepage" is the spec) → crew (page-owned) →
+// CTA/Testimonials/Contact shared singletons.
+export const ABOUT_QUERY = groq`{
+  "about": *[_id == "aboutPage"][0]{
+    name,
+    heroHeadingIntro, heroHeadingMain, heroSubheading,
+    heroImage${IMAGE},
+    heroVideo{ url, playOnMobile },
+    overviewEyebrow, overviewHeading, overviewBody,
+    crewEyebrow, crewHeading, crewIntro, crewViewMoreText,
+    crewMembers[]->{ _id, name, position, bio, photo${IMAGE} },
+    seo
+  },
+  "whyUs": *[_id == "homePage"][0]{
+    whyUsEyebrow, whyUsHeading,
+    whyUsItems[]->{ _id, headline, description, image${IMAGE} }
+  },
+  "testimonialsSection": *[_id == "testimonialsSection"][0]{
+    eyebrow, heading, linkText,
+    testimonialItems[]->{ _id, name, date, title, text, rating }
+  },
+  "cta": *[_id == "cta"][0]{
+    cards[]{
+      _key, heading, description, buttonText,
+      buttonLink{ linkType, "internalType": internalLink->_type, "internalSlug": internalLink->slug.current, externalUrl, openInNewTab },
+      image${IMAGE}
+    }
+  },
+  "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
+    _id, name, "slug": slug.current
+  },
+  "settings": *[_id == "siteSettings"][0]{
+    siteTitle, contactEyebrow, contactHeading, contactIntro
+  }
+}`
+
 // ----- Result types (manual — TypeGen not set up on this project yet) -----
 export type WhyUsItemData = {
   _id: string
@@ -406,11 +448,16 @@ export type HomePageData = {
   faqEyebrow?: string
   faqHeading?: string
   faqLinkText?: string
-  testimonialsEyebrow?: string
-  testimonialsHeading?: string
-  testimonialsLinkText?: string
-  testimonialItems?: TestimonialData[]
   seo?: SeoData
+}
+
+// Shared testimonials section chrome + curated reviews (testimonialsSection singleton,
+// 2026-07-23) — one doc serves every page mounting <Testimonials>.
+export type TestimonialsSectionData = {
+  eyebrow?: string
+  heading?: string
+  linkText?: string
+  testimonialItems?: TestimonialData[]
 }
 
 // ----- Boat page -----
@@ -707,8 +754,46 @@ export type PrivateChartersQueryResult = {
   settings: SiteSettingsContact | null
 }
 
+// ----- About page -----
+export type CrewMemberData = {
+  _id: string
+  name?: string
+  position?: string
+  bio?: string
+  photo?: SanityImageWithMeta
+}
+
+export type AboutPageData = {
+  name?: string
+  heroHeadingIntro?: string
+  heroHeadingMain?: string
+  heroSubheading?: string
+  heroImage?: SanityImageWithMeta
+  heroVideo?: HeroVideoData
+  overviewEyebrow?: string
+  overviewHeading?: string
+  overviewBody?: PortableTextBlock[]
+  crewEyebrow?: string
+  crewHeading?: string
+  crewIntro?: PortableTextBlock[]
+  crewViewMoreText?: string
+  crewMembers?: CrewMemberData[]
+  seo?: SeoData
+}
+
+export type AboutQueryResult = {
+  about: AboutPageData | null
+  /** The homepage's Why Us chrome + items — About mounts the section verbatim per the spec. */
+  whyUs: Pick<HomePageData, 'whyUsEyebrow' | 'whyUsHeading' | 'whyUsItems'> | null
+  testimonialsSection: TestimonialsSectionData | null
+  cta: { cards?: CtaCardData[] } | null
+  destinations: { _id: string; name?: string; slug?: string }[]
+  settings: SiteSettingsContact | null
+}
+
 export type HomePageQueryResult = {
   home: HomePageData | null
+  testimonialsSection: TestimonialsSectionData | null
   cta: { cards?: CtaCardData[] } | null
   latestPosts: LatestPostData[]
   destinationsSectionCta: string | null

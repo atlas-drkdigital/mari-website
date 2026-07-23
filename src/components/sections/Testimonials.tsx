@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { CarouselArrowButton } from '@/components/CarouselArrowButton'
 import { useDragScroll } from '@/lib/useDragScroll'
-import type { HomePageData } from '@/sanity/queries'
+import type { TestimonialsSectionData } from '@/sanity/queries'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 // Deterministic (UTC) — matches the original "28 Jan, 2026" style without a hydration mismatch.
@@ -40,11 +40,15 @@ function StarRating() {
   )
 }
 
-export function Testimonials({ home }: { home: HomePageData | null }) {
-  const eyebrow = home?.testimonialsEyebrow ?? ''
-  const heading = home?.testimonialsHeading ?? ''
-  const linkText = home?.testimonialsLinkText ?? ''
-  const reviews = (home?.testimonialItems ?? []).map((t) => ({ key: t._id, name: t.name ?? '', date: formatDate(t.date), title: t.title ?? '', text: t.text ?? '' }))
+// Chrome + curated list come from the testimonialsSection SINGLETON since 2026-07-23 (was the
+// homepage's own fields — moved when About became the second consumer, per Adinda's "edited once,
+// shown everywhere" spec; homepage values migrated by _scripts/migrate-testimonials-section.ts).
+// .filter(Boolean): an unpublished reference target dereferences to null (the 8ded5ec class).
+export function Testimonials({ section }: { section: TestimonialsSectionData | null }) {
+  const eyebrow = section?.eyebrow ?? ''
+  const heading = section?.heading ?? ''
+  const linkText = section?.linkText ?? ''
+  const reviews = (section?.testimonialItems ?? []).filter(Boolean).map((t) => ({ key: t._id, name: t.name ?? '', date: formatDate(t.date), title: t.title ?? '', text: t.text ?? '' }))
 
   const trackRef = useDragScroll<HTMLDivElement>()
   const [expanded, setExpanded] = useState<Record<number, boolean>>({})

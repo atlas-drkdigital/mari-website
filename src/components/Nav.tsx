@@ -205,7 +205,7 @@ export function Nav() {
       {/* Real route since the Private Charters slice (2026-07-23) — path pending Adinda's slug
           confirm, see src/app/private-charters/page.tsx. */}
       <a href="/private-charters" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">Private Charters</a>
-      <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">About</a>
+      <a href="/about" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">About</a>
       <button
         type="button"
         aria-expanded={megaOpen === 'resources'}
@@ -526,7 +526,7 @@ export function Nav() {
 
           <Link href="/boats/mari" onClick={() => setMobileMenuOpen(false)} className="border-b-[0.25px] border-accent-ondark-onprimary/15 py-16 text-nav uppercase text-text-ondark-primary opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">The Boat</Link>
           <a href="/private-charters" onClick={() => setMobileMenuOpen(false)} className="border-b-[0.25px] border-accent-ondark-onprimary/15 py-16 text-nav uppercase text-text-ondark-primary opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">Private Charters</a>
-          <a href="#" onClick={() => setMobileMenuOpen(false)} className="border-b-[0.25px] border-accent-ondark-onprimary/15 py-16 text-nav uppercase text-text-ondark-primary opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">About</a>
+          <a href="/about" onClick={() => setMobileMenuOpen(false)} className="border-b-[0.25px] border-accent-ondark-onprimary/15 py-16 text-nav uppercase text-text-ondark-primary opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">About</a>
 
           <div className="border-b-[0.25px] border-accent-ondark-onprimary/15">
             <button

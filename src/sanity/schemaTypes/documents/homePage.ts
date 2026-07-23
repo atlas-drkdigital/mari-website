@@ -219,39 +219,16 @@ export const homePageType = defineType({
         'This section shows the questions you have marked “Feature on homepage”. Turn that switch on for any question on the FAQ page, or on a boat. The link above goes to the full FAQ page for everything else.',
     }),
 
-    // ----- Testimonials -----
-    defineField({
-      name: 'testimonialsHeading',
-      title: 'Heading',
-      type: 'string',
-      group: 'testimonials',
-      fieldset: 'testimonialsFs',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'testimonialsLinkText',
-      title: 'Link text',
-      type: 'string',
-      group: 'testimonials',
-      fieldset: 'testimonialsFs',
-      description: 'Text of the link to the full testimonials page.',
-    }),
-    defineField({
-      name: 'testimonialItems',
-      title: 'Reviews',
-      type: 'array',
-      group: 'testimonials',
-      fieldset: 'testimonialsFs',
-      description: 'Choose which reviews appear on the homepage, and in what order.',
-      of: [defineArrayMember({ type: 'reference', to: [{ type: 'testimonial' }] })],
-    }),
+    // ----- Testimonials (fully shared since 2026-07-23 — chrome + curated list moved to the
+    // testimonialsSection singleton when About became the second consumer; the old homepage
+    // fields were migrated by _scripts/migrate-testimonials-section.ts) -----
     sharedComponentNote({
       name: 'testimonialsNote',
       title: 'Where this content lives',
       group: 'testimonials',
       fieldset: 'testimonialsFs',
       message:
-        'Reviews are managed under “Testimonials” in Shared Components. Above you only choose which of them appear on the homepage.',
+        'The testimonials section (heading, link text and which reviews appear) is edited once under Testimonials → “Testimonials Section” and shown on every page that has it. The review documents themselves also live there.',
     }),
 
     // ----- CTA (fully shared — no homepage-owned content) -----
@@ -310,14 +287,8 @@ export const homePageType = defineType({
       group: 'sectionLabels',
       fieldset: 'sectionLabelsFs',
     }),
-    defineField({
-      name: 'testimonialsEyebrow',
-      title: 'Testimonials eyebrow',
-      type: 'string',
-      group: 'sectionLabels',
-      fieldset: 'sectionLabelsFs',
-    }),
-    // (Contact eyebrow lives in siteSettings "Contact Section", not here.)
+    // (Testimonials eyebrow moved to the testimonialsSection singleton, 2026-07-23. Contact
+    // eyebrow lives in siteSettings "Contact Section", not here.)
 
     // ----- SEO -----
     defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),

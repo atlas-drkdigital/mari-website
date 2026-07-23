@@ -396,3 +396,14 @@ classes**. That is CLAUDE.md's Portable Text tiering working as documented, not 
 tier-3 (`richTextFull`), and tier-3 heading/alignment styling is explicitly deferred until that work is
 scheduled. This is simply the first field to actually put a heading on the page. Decide when tier-3 styling
 lands; until then any rich-text heading anywhere on the site will look unstyled.
+
+## About page (`aboutPage` singleton) — seeded 2026-07-23
+| Field | Status | Source | Note |
+|---|---|---|---|
+| hero copy (intro/main/sub) | 🟢 | Codex draft | `content/about-page.md`, approved by Adinda, seeded verbatim |
+| `heroImage` | 🟢 | real photo | crew-folder master 1538×1023 uploaded full-res (library ceiling; Adinda accepted on sight) |
+| overview (eyebrow/heading/body) | 🟢 | Codex draft | 4 h3 subsections, verbatim |
+| crew chrome (eyebrow/heading/intro/viewMore) | 🟢 | Codex draft | verbatim |
+| `crewMembers` | 🔴 | placeholder | ONE `crewMember-placeholder` doc so the layout is QA-able — replace with real crew before launch |
+| `seo.title` / `seo.description` | 🟡 | Claude draft | "About Us — The Story of Mari | {siteName}" — Adinda to review wording |
+| testimonialsSection singleton | 🟢 | migrated | chrome + 8 curated reviews moved from homePage fields (values unchanged; the 4 [DRAFT] reviews remain a separate pre-launch 🔴) |
