@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { CarouselChevron } from '@/components/CarouselChevron'
@@ -114,12 +114,23 @@ export function AboutCrew({ about }: { about: AboutPageData }) {
         </ul>
 
         {members.length > MOBILE_VISIBLE ? (
+          /* Restyled 2026-07-24 (Adinda's QA): the navy rectangle looked heavy — this is now the
+             site's "READ MORE ˅" control, classes copied verbatim from PageOverview.tsx's
+             expander (uppercase action-primary label + icon-nav-chevron mask, rotate-180 when
+             open). */
           <button
             type="button"
             onClick={() => setShowAll((v) => !v)}
-            className="inline-flex h-48 w-fit items-center rounded-xs bg-background-ondark-page px-20 py-8 text-button-small uppercase text-text-ondark-primary transition-opacity duration-300 ease-in-out hover:opacity-85 lg:hidden"
+            aria-expanded={showAll}
+            className="group inline-flex w-fit items-center gap-4 py-4 text-button-small uppercase text-action-primary transition-colors duration-300 ease-in-out hover:text-accent-muted lg:hidden"
           >
             {showAll ? about.crewViewLessText || 'View Less' : about.crewViewMoreText || 'View More'}
+            <span
+              aria-hidden="true"
+              className={`block h-[6px] w-[7px] shrink-0 bg-current transition-transform duration-300 ease-in-out [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${
+                showAll ? 'rotate-180' : ''
+              }`}
+            />
           </button>
         ) : null}
       </div>
@@ -155,6 +166,14 @@ function CrewBioModal({
     ? urlForImage(member.photo).width(1280).fit('max').quality(75).auto('format').url()
     : null
 
+  // Mobile steps by SWIPE, not arrows (Adinda's QA 2026-07-24) — the on-image chevron pair is
+  // desktop-only (hidden lg:flex below). Rides pointerup per the locked touch rule (never click;
+  // see DestinationItineraries for the movement-test pattern): pointerdown records the touch
+  // origin, pointerup fires only on a decisive horizontal move (>40px, more horizontal than
+  // vertical), so taps and vertical scrolls pass through untouched. No preventDefault anywhere —
+  // vertical scrolling stays native.
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
+
   // PORTALED to <body> with z-[70]: the section's `isolate` traps any z-index inside its own
   // stacking context, so however high the modal's z, the fixed z-50 nav always painted above it —
   // nav visible over the scrim, and on short viewports the opaque light nav swallowed the card's
@@ -179,6 +198,26 @@ function CrewBioModal({
       <div
         className="relative w-full max-w-[min(640px,calc(100dvh-180px))] overflow-hidden rounded-xs shadow-[0px_4px_10px_rgba(44,37,34,0.2)]"
         onClick={(e) => e.stopPropagation()}
+        onPointerDown={
+          hasSiblings
+            ? (e) => {
+                if (e.pointerType === 'touch') touchStart.current = { x: e.clientX, y: e.clientY }
+              }
+            : undefined
+        }
+        onPointerUp={
+          hasSiblings
+            ? (e) => {
+                if (e.pointerType !== 'touch' || !touchStart.current) return
+                const dx = e.clientX - touchStart.current.x
+                const dy = e.clientY - touchStart.current.y
+                touchStart.current = null
+                if (Math.abs(dx) <= 40 || Math.abs(dx) <= Math.abs(dy)) return
+                if (dx < 0) onNext()
+                else onPrev()
+              }
+            : undefined
+        }
       >
         {/* The card IS the photo, SQUARE-cropped (Adinda, QA round 2: square card + square
             portrait — easier to provide a square photo; was 3:4); the bio overlays it on the
@@ -191,15 +230,20 @@ function CrewBioModal({
           ) : (
             <Image src="/assets/placeholder-photo.svg" alt="" fill className="object-cover" />
           )}
+          {/* ONE overlay div, not gradient + text as siblings (Adinda's QA 2026-07-24: on her
+              phone the separate h-[75%] gradient band stopped short of the card's bottom edge and
+              the photo showed through under the bio). The gradient is this div's OWN background —
+              SiteLightbox's captionsDescriptionContainer recipe — so it spans exactly the text
+              block plus the generous top padding, and by construction always touches bottom. Top
+              stop is rgba(...,0), NOT the `transparent` keyword, per SiteLightbox: `transparent`
+              is rgba(0,0,0,0) and interpolating to it drags the fade toward grey. */}
           <div
-            aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-[75%]"
+            className="absolute inset-x-0 bottom-0 flex flex-col gap-8 p-24 pt-96 lg:p-32 lg:pt-128"
             style={{
               background:
                 'linear-gradient(to top, rgba(10,17,31,0.95) 0%, rgba(10,17,31,0.75) 40%, rgba(10,17,31,0) 100%)',
             }}
-          />
-          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-8 p-24 lg:p-32">
+          >
             <div className="flex flex-col gap-4">
               <p className="text-body-large font-bold text-text-ondark-primary">{member.name}</p>
               {member.position ? (
@@ -212,9 +256,11 @@ function CrewBioModal({
           {/* On-image chevron pair — THE single-image-carousel standard (the boat gallery pair,
               copied via ChartersBenefits: bare CarouselChevron + drop-shadow, inline style because
               the filter's commas/parens mangle Tailwind's parser). Adinda 2026-07-24: replaces the
-              round outside arrows, which looked wrong flanking the card. */}
+              round outside arrows, which looked wrong flanking the card. Desktop-only since
+              2026-07-24 (Adinda's QA) — below lg the modal steps by swipe instead (pointer
+              handlers on the card container above). */}
           {hasSiblings ? (
-            <div className="pointer-events-none absolute inset-x-16 top-1/2 flex -translate-y-1/2 items-center justify-between">
+            <div className="pointer-events-none absolute inset-x-16 top-1/2 hidden -translate-y-1/2 items-center justify-between lg:flex">
               <button
                 type="button"
                 onClick={onPrev}
@@ -237,16 +283,21 @@ function CrewBioModal({
           ) : null}
         </div>
 
+        {/* Bare glyph + drop-shadow, no circle (Adinda's QA 2026-07-24: the grey disc stopped
+            matching once the arrows went bare) — same inline drop-shadow as the chevrons (inline
+            on purpose: the filter's commas/parens break Tailwind's class parser). The 44px box is
+            the hit target; the glyph is 18px. */}
         <button
           type="button"
           onClick={onClose}
           aria-label="Close bio"
           autoFocus
-          className="absolute right-12 top-12 grid size-[38px] place-items-center rounded-full bg-background-ondark-page/60 text-text-ondark-primary transition-colors duration-300 ease-in-out hover:bg-background-ondark-page/85"
+          style={{ filter: 'drop-shadow(0 1px 4px rgba(19, 29, 52, 0.55))' }}
+          className="absolute right-8 top-8 grid size-[44px] place-items-center text-text-ondark-primary transition-opacity duration-300 ease-in-out hover:opacity-80"
         >
           <span
             aria-hidden="true"
-            className="block size-[16px] bg-current [mask-image:url('/assets/icon-close.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+            className="block size-[18px] bg-current [mask-image:url('/assets/icon-close.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
           />
         </button>
       </div>
