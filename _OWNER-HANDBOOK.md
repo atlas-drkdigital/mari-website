@@ -3,7 +3,8 @@
 Started 2026-07-22 (Adinda's ask): a running list of behaviours that are correct-by-design but
 not guessable from the Studio UI alone. **This is the source material for the final handoff
 guide** given to the site owner — written as entries land, not reconstructed at handoff time.
-Local-only (`_` prefix, never committed); graduates into the real owner guide at handoff.
+Internal working doc (committed to the private repo since 2026-07-23's backup decision, still
+never deployed); graduates into the real owner guide at handoff.
 
 Format per entry: what the owner sees → what's actually true → what to do.
 
@@ -80,6 +81,15 @@ Format per entry: what the owner sees → what's actually true → what to do.
   and the contact form on purpose.
 - **Do:** drag to reorder; remove/add rows to hide/show. If the list is ever empty, the carousel
   falls back to showing every destination.
+
+## Body text headings start at "H2" — there is deliberately no "H1" option
+- **You see:** the big rich-text editor's style menu offers Normal, H2–H6 and Quote, but no H1.
+- **What's true:** every page already has exactly one main heading (H1) — the big title in the
+  page's hero, built from the hero fields. Search engines require one-and-only-one H1 per page,
+  so the body editor doesn't offer a second one. Headings you add in body copy live UNDER the
+  section they're in: start at H2 and step down without skipping levels.
+- **Do:** use H2 for a body section's main subheadings, H3 inside those, and so on. If a page's
+  main title needs changing, edit the hero fields, not the body.
 
 ## "Can't delete" on a destination, boat or itinerary: it's still placed somewhere
 - **You see:** deleting a destination/boat/itinerary fails with a message naming another document.

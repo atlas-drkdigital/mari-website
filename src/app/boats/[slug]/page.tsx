@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
+import { JsonLd } from '@/components/JsonLd'
 import { Nav } from '@/components/Nav'
 import { ScrollReveal } from '@/components/ScrollReveal'
 import { BoatCabins } from '@/components/sections/boat/BoatCabins'
@@ -14,7 +15,7 @@ import { FaqCategorized } from '@/components/sections/FaqCategorized'
 import { Footer } from '@/components/sections/Footer'
 import { SubNav, type SubNavItem } from '@/components/SubNav'
 import { toPlainText } from '@/lib/portableText'
-import { buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
+import { buildBreadcrumbJsonLd, buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
 import { resolveTokens } from '@/lib/tokens'
 import { sanityFetch } from '@/sanity/lib/live'
 import { BOAT_QUERY, type BoatQueryResult } from '@/sanity/queries'
@@ -100,6 +101,14 @@ export default async function BoatPage({ params }: { params: Promise<Params> }) 
   // override also replaces the FAQPage block, which is what "override" should mean.
   const jsonLd = resolveJsonLd(boat.seo, faqJsonLd)
 
+  // BreadcrumbList mirrors BoatHero's visual trail exactly (Home / Boats / {name}, incl. the
+  // breadcrumbTitle override) — per buildBreadcrumbJsonLd's contract.
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: 'Home', path: '/' },
+    { name: 'Boats', path: '/boats' },
+    { name: boat.seo?.breadcrumbTitle || boat.name || '', path: `/boats/${slug}` },
+  ])
+
   // SubNav items — an item exists only when its section will actually render ("hide what's empty":
   // a link to a section that isn't there is worse than no link — the Gallery item appears by itself
   // the moment images are uploaded). Each guard mirrors the section's own empty test. LAYOUT and
@@ -169,12 +178,8 @@ export default async function BoatPage({ params }: { params: Promise<Params> }) 
       </main>
       <Footer />
       <ScrollReveal />
-      {jsonLd ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      ) : null}
+      <JsonLd data={jsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
     </>
   )
 }

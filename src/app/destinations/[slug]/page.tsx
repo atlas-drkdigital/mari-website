@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
+import { JsonLd } from '@/components/JsonLd'
 import { Nav } from '@/components/Nav'
 import { ScrollReveal } from '@/components/ScrollReveal'
 import { Contact } from '@/components/sections/Contact'
@@ -16,7 +17,7 @@ import { Footer } from '@/components/sections/Footer'
 import { LatestArticles } from '@/components/sections/LatestArticles'
 import { SubNav, type SubNavItem } from '@/components/SubNav'
 import { toPlainText } from '@/lib/portableText'
-import { buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
+import { buildBreadcrumbJsonLd, buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
 import { resolvePortableTextTokens, resolveTokens } from '@/lib/tokens'
 import { sanityFetch } from '@/sanity/lib/live'
 import { DESTINATION_QUERY, type DestinationQueryResult } from '@/sanity/queries'
@@ -93,6 +94,14 @@ export default async function DestinationPage({ params }: { params: Promise<Para
     : null
 
   const jsonLd = resolveJsonLd(destination.seo, faqJsonLd)
+
+  // BreadcrumbList mirrors DestinationHero's visual trail exactly (Home / Destinations / {name},
+  // incl. the breadcrumbTitle override) — per buildBreadcrumbJsonLd's contract.
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: 'Home', path: '/' },
+    { name: 'Destinations', path: '/destinations' },
+    { name: destination.seo?.breadcrumbTitle || destination.name || '', path: `/destinations/${slug}` },
+  ])
 
   // Boats: curated drag list (boatsSection.boats) with all-list fallback; .filter(Boolean)
   // guards null deref members (unpublished ref targets).
@@ -182,12 +191,8 @@ export default async function DestinationPage({ params }: { params: Promise<Para
       </main>
       <Footer />
       <ScrollReveal />
-      {jsonLd ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      ) : null}
+      <JsonLd data={jsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
     </>
   )
 }

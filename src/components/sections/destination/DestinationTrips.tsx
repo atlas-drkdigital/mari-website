@@ -40,7 +40,7 @@ export function DestinationTrips({
   return (
     <section
       id={id}
-      aria-labelledby="upcoming-trips-heading"
+      {...(heading ? { 'aria-labelledby': 'upcoming-trips-heading' } : {})}
       /* Mobile pt: 80 → 48 read as touching the top edge (Adinda, same day) → 64, the standard
          mobile section top (Overview/Benefits/Boats all pt-64). Shared component — both the
          destination and charters pages get it. */
@@ -52,11 +52,17 @@ export function DestinationTrips({
           content width. Mobile/tablet keep the standard page-gutter values (24/48) — she signed
           off mobile as-is. Not page-gutter-x because a lg:px-* can't reliably override it. */}
       <div className="mx-auto flex w-full max-w-[1400px] flex-col items-center gap-[36px] px-24 md:px-48 lg:gap-64 lg:px-[160px]">
+        {/* Chrome guards (SEO pass, 2026-07-23): this section renders whenever the EMBED exists, so
+            cleared chrome fields must drop their elements, not emit empty tags — the sibling
+            sections' convention, previously missing here. */}
+        {eyebrow || heading || intro?.length ? (
         <div data-reveal className="flex flex-col items-center gap-24 text-center lg:gap-32">
-          <p className="text-eyebrow uppercase text-action-primary">{eyebrow}</p>
+          {eyebrow ? <p className="text-eyebrow uppercase text-action-primary">{eyebrow}</p> : null}
           {/* 800px cap is a one-off exception (Adinda, 2026-07-22): at 720 the templated heading
               ("Upcoming {destination} liveaboard trips") wrapped awkwardly. Desktop only. */}
-          <h2 id="upcoming-trips-heading" className="max-w-[720px] text-display-h2 text-text-primary lg:max-w-[800px]">{heading}</h2>
+          {heading ? (
+            <h2 id="upcoming-trips-heading" className="max-w-[720px] text-display-h2 text-text-primary lg:max-w-[800px]">{heading}</h2>
+          ) : null}
           {/* Intro matches the HEADING's max-width and reads in primary navy (Adinda, 2026-07-23:
               560px was "way too tight" and text-secondary "not visible enough" — shared component,
               one change, both pages). Rich text since the same day (links/bold/multi-paragraph —
@@ -67,6 +73,7 @@ export function DestinationTrips({
             </div>
           ) : null}
         </div>
+        ) : null}
 
         {/* Card chrome mirrors the Testimonials cards (same surface + shadow — Adinda's ask).
             EmbedHtml, not dangerouslySetInnerHTML: the INSEANQ embed is a loader <script>, and

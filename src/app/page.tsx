@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { JsonLd } from '@/components/JsonLd'
 import { Nav } from '@/components/Nav'
 import { ScrollReveal } from '@/components/ScrollReveal'
 import { Contact } from '@/components/sections/Contact'
@@ -92,12 +93,7 @@ export default async function Home() {
       </main>
       <Footer />
       <ScrollReveal />
-      {homeJsonLd ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(homeJsonLd) }}
-        />
-      ) : null}
+      <JsonLd data={homeJsonLd} />
     </>
   )
 }

@@ -11,6 +11,12 @@ import { linkAnnotation } from '../../linkAnnotation'
 // Spec locked 2026-07-15: H1-H6 + Normal + Quote, bold/italic/underline/strike/code, alignment,
 // inline image, raw HTML embed. Text color explicitly NOT included for now ("not resolved yet") —
 // was on page.ts's original inline config, dropped here on purpose, not an oversight.
+//
+// H1 REMOVED from the style list (Adinda, 2026-07-23, site-wide SEO pass): every page's H1 is its
+// hero title, so an editor picking "H1" in body copy would create a second page H1 — an SEO defect
+// no other control can prevent. Amends the 2026-07-15 "H1-H6" spec line above. Existing content is
+// unaffected (no body uses h1); if one ever did, RichText.tsx would still render the style — this
+// only removes the MENU option.
 export const richTextFullType = defineType({
   name: 'richTextFull',
   title: 'Rich Text',
@@ -20,7 +26,6 @@ export const richTextFullType = defineType({
       type: 'block',
       styles: [
         { title: 'Normal', value: 'normal' },
-        { title: 'H1', value: 'h1' },
         { title: 'H2', value: 'h2' },
         { title: 'H3', value: 'h3' },
         { title: 'H4', value: 'h4' },

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
+import { JsonLd } from '@/components/JsonLd'
 import { Nav } from '@/components/Nav'
 import { ScrollReveal } from '@/components/ScrollReveal'
 import { ChartersBenefits } from '@/components/sections/charters/ChartersBenefits'
@@ -14,7 +15,7 @@ import { FaqCategorized } from '@/components/sections/FaqCategorized'
 import { Footer } from '@/components/sections/Footer'
 import { SubNav, type SubNavItem } from '@/components/SubNav'
 import { toPlainText } from '@/lib/portableText'
-import { buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
+import { buildBreadcrumbJsonLd, buildSeoMetadata, resolveJsonLd } from '@/lib/seo'
 import { sanityFetch } from '@/sanity/lib/live'
 import { PRIVATE_CHARTERS_QUERY, type PrivateChartersQueryResult } from '@/sanity/queries'
 
@@ -98,6 +99,13 @@ export default async function PrivateChartersPage() {
 
   const jsonLd = resolveJsonLd(charters.seo, faqJsonLd)
 
+  // BreadcrumbList mirrors ChartersHero's visual trail exactly (Home / {name}) — including the
+  // breadcrumbTitle override — per buildBreadcrumbJsonLd's contract.
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: 'Home', path: '/' },
+    { name: charters.seo?.breadcrumbTitle || charters.name || 'Private Charters', path: '/private-charters' },
+  ])
+
   // Sub-nav items per Adinda 2026-07-23 (the node's own tab labels were a stale copy-paste of the
   // boat page's set). ONE tab for the dates section: "Available Dates" was cut as redundant; the
   // Check Availability tab alone navigates there (plain styling — its amber accent variant was
@@ -173,9 +181,8 @@ export default async function PrivateChartersPage() {
       </main>
       <Footer />
       <ScrollReveal />
-      {jsonLd ? (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      ) : null}
+      <JsonLd data={jsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
     </>
   )
 }

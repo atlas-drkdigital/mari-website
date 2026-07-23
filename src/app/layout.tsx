@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
+import { JsonLd } from "@/components/JsonLd";
 import { ScrollTopButton } from "@/components/ScrollTopButton";
 import { SITE_URL } from "@/lib/seo";
 import { SanityLive } from "@/sanity/lib/live";
@@ -60,10 +61,7 @@ export default function RootLayout({
         <SanityLive />
         {/* Site-wide back-to-top (Adinda, 2026-07-21) — appears at the nav-flip scroll threshold. */}
         <ScrollTopButton />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-        />
+        <JsonLd data={organizationJsonLd} />
       </body>
     </html>
   );
