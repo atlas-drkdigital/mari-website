@@ -20,9 +20,12 @@ Working tree clean, **GitHub in sync** (push-everything convention locked 2026-0
    MANAGER.md ACTIVE QUEUE gated item (queued 2026-07-23). Summary: `git mv` every root `_*` entry
    into `_internal/` (inner underscores dropped); `CLAUDE.md`/`AGENTS.md`/`MANAGER.md`/
    `COMPONENTS.md` STAY at root; reference sweep + final stale-path grep; simplify `.gitignore` +
-   `.vercelignore` to `/_internal/`-based rules. ⚠️ **`content/` (no underscore) is the canonical
-   TRACKED copy-drafts folder — do NOT sweep it into `_internal/`** (AGENTS.md rule; a parallel
-   session already nearly lost Codex's rewrite that way — recovered in `ad06118`). ~30–45 min.
+   `.vercelignore` to `/_internal/`-based rules. ⚠️ **`content/` moves too** (Adinda's re-cut: NO
+   stray folders at root) — `git mv content _internal/content` so it STAYS TRACKED (the `ad06118`
+   near-loss was about losing tracking, not location), verify with `git ls-files`, **amend
+   AGENTS.md's "do not move content/" paragraph in the same commit** (else Codex recreates it),
+   and keep ignored scratch separate as `_internal/content-scratch/`. Full spec: the gated item.
+   ~30–45 min.
 4. **Only then, new pages** per `_PAGE-SPECS.md`: Schedule & Rates (#2), Testimonials page (#3),
    FAQ page (#4) — FAQ/Testimonials were displaced from Jul 23's slot by About (named sprint
    deviation). Jul 24 staging-push re-cut is due in the AM — say it out loud, don't absorb.
@@ -55,7 +58,8 @@ Working tree clean, **GitHub in sync** (push-everything convention locked 2026-0
 > Continuing Mari. Read `_RESUME.md` first — the NEXT list is ordered and locked by Adinda:
 > (1) finish the About page (her round-2 review + queued small refinements), (2) commit, (3) run
 > the `_internal/` root-cleanup refactor from MANAGER.md's gated item BEFORE any new page —
-> careful: `content/` stays at root — then (4) Schedule & Rates / Testimonials / FAQ pages per
+> EVERYTHING moves, `content/` included (git mv, stays tracked; amend AGENTS.md in the same
+> commit) — then (4) Schedule & Rates / Testimonials / FAQ pages per
 > _PAGE-SPECS.md. Dev server should be running; don't clean-restart unless schema changed.
 > Model note: Fable trial ongoing (memory: user-fable-model-test).
 

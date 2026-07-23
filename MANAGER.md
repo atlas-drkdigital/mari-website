@@ -60,10 +60,17 @@ genuinely architectural call in it.
 refinements) and its fixes are COMMITTED. Run the refactor immediately after that commit and BEFORE
 starting any other page.** (Original gate — the parallel editor session finishing — has cleared; its
 About/SEO checkpoint is committed at `2ee0d98`.)
-⚠️ **`content/` (NO underscore) is the canonical git-TRACKED copy-drafts folder and must NOT be swept
-into `_internal/`** — AGENTS.md rule; a parallel session already moved it into ignored `_content/` and
-nearly lost Codex's charters rewrite (recovered `ad06118`). The `content/` named in the scope below
-means the OLD `_content/` scratch folder only.
+⚠️ **`content/` MOVES TOO (Adinda's re-cut, 2026-07-23 evening — supersedes the AGENTS.md
+"do not move it" rule): no stray folders at root, everything internal goes under `_internal/`.** The
+lesson from the `ad06118` near-loss is about TRACKING, not location — `content/` was nearly lost
+because it got swept into a *gitignored* folder. So the move is `git mv content _internal/content`
+(stays tracked), with THREE hard sub-steps: (1) **verify tracking after the move** — `git ls-files
+_internal/content/` must be non-empty; (2) **amend AGENTS.md in the same commit** — it currently
+instructs Codex "do not move or rename content/"; rewrite that paragraph to point at
+`_internal/content/` as the canonical tracked copy-drafts home, or Codex recreates `content/` at
+root; (3) **name collision**: the OLD `_content/` scratch images (gitignored, masters in
+Drive/Sanity) go to `_internal/content-scratch/` (stays gitignored), NOT `_internal/content/` —
+tracked drafts and ignored scratch must not share a folder, that's the near-loss recipe.
 
 **Scope when it runs (proposal accepted as-is):** move every root `_*` entry into `_internal/`
 (`handoff/`, `scripts/`, `content/`, `backup/`, `image-test/`, and all the `_*.md` docs, inner
