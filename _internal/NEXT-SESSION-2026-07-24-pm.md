@@ -1,13 +1,10 @@
 # ▶ Handoff — 2026-07-24 midday (Fable session → Opus). READ TOP TO BOTTOM BEFORE ACTING.
 
-## ⚠️ FIRST: two in-flight things this session could not finish
+## ⚠️ FIRST: the one thing left to finish
 
-### 1. A /terms build agent may have DIED mid-work when the session ended
-A background agent was building the Terms & Conditions slice. **Check `git status` + `git log --oneline -5`:**
-- If a commit like "terms slice / simple page" landed on main → it finished; verify /terms renders, then proceed.
-- If the tree has UNCOMMITTED changes (src/app/[slug]/, SimplePageHero, queries.ts PAGE_QUERY, page schema,
-  seed-terms script) → the agent died mid-arc. Review what's there: finish + verify (tsc/lint//terms 200) and
-  commit honestly, or `git checkout -- .` and re-run the slice fresh.
+### 1. /terms — NOT STARTED, run it fresh (agent died at step 1, wrote NOTHING)
+The build agent hit Adinda's session limit after only reading files. Tree was clean; there is no
+half-finished work to untangle. **Just run the brief below as a fresh agent.**
 - Its brief (re-runnable): /terms, first instance of the generic `page` simple-page pattern. Light hero
   (NO image), bg = deepest existing beige token (Adinda asked "beige 250" which DOESN'T EXIST — started on
   bg-bg-accent/beige-150, flag at QA), H1 split text-editorial-h1 lg:text-display-h1, breadcrumbs light
@@ -26,22 +23,26 @@ being built: **a stripped, squashed `deploy` branch published by GitHub Actions 
 `staging`** — kills BOTH stored internal files AND working commit messages in the dashboard (labels become
 "Staging deploy <sha>", neutral author; matters because Adinda says the client will eventually get
 dashboard access).
-- ✅ DONE + committed: `.github/workflows/deploy-branch.yml` (strip list mirrors .vercelignore — keep in sync).
-- ❌ TODO (in order):
-  a. Create `vercel.json` at root: `{ "git": { "deploymentEnabled": { "main": false, "staging": false } } }`
-     — stops Vercel uploading unstripped branches; `deploy` stays enabled by omission. Commit.
-  b. Update CLAUDE.md "Deployment boundary" section: verification FAILED 2026-07-24 (Git integration uploads
-     the whole repo); mechanism is now the deploy branch; .vercelignore kept for CLI-only. Keep history.
-  c. Promote staging: `git checkout staging; git reset --hard main; git push --force-with-lease` (the
-     LOCKED promotion model — staging = exact snapshot of main, empty trigger commits get discarded).
-     This fires the Action → `deploy` branch appears on GitHub.
-  d. Walk Adinda through (her side): Vercel → Settings → Environments → Production → Branch Tracking →
-     change `staging` → **`deploy`**. Then DELETE all existing deployments (each row ⋯ → Delete) — they
-     permanently store the internal files. Then re-run the Source-tab check on the first deploy-branch
-     build: must show ONLY build input.
-  e. 🔍 OPEN QUESTION for Adinda: she saw a "yarl test" file in the Source tab — no `*yarl*` file exists in
-     the repo today (globbed). Ask her for the exact filename/path she sees. If it's under _internal/ it
-     dies with the deploy-branch fix anyway; if it's in public/ or src/ it needs hunting.
+- ✅ ALL CODE-SIDE WORK DONE (commits bc13758 → e5e431a): `.github/workflows/deploy-branch.yml` (strip list
+  mirrors .vercelignore — KEEP IN SYNC), `vercel.json` (main/staging auto-deploy off), CLAUDE.md's
+  deployment-boundary section rewritten to record the FAILED verification + the new mechanism.
+- ✅ `deploy` BRANCH EXISTS AND IS VERIFIED STRIPPED. The Action fired on the staging promotion; its root
+  is exactly: .gitignore, eslint.config.mjs, next.config.ts, package*.json, postcss.config.mjs, public,
+  sanity.cli.ts, sanity.config.ts, src, tsconfig.json, vercel.json. No _internal/, no CLAUDE.md, no
+  MANAGER.md, no AGENTS.md, no COMPONENTS.md, no README.md.
+- ✅ "yarl test" RESOLVED — it was NOT an internal doc: `src/app/yarl-test/` was a leftover
+  lightbox-library evaluation page shipping as a REAL PUBLIC ROUTE (/yarl-test). Deleted in e5e431a
+  (unreferenced; tsc+lint green). Lesson worth keeping: the Source-tab check caught a live-route leak
+  the internal-docs audit would never have found.
+- ❌ REMAINING — ADINDA'S DASHBOARD STEPS (walk her through, nothing left in code):
+  a. Vercel → Settings → Environments → Production → Branch Tracking → `staging` → **`deploy`**.
+  b. DELETE every existing deployment (row ⋯ → Delete) — they permanently store the internal files
+     AND the working commit messages. This is the actual remediation; the new mechanism only fixes
+     deployments made from now on.
+  c. Re-run the Source-tab check on the first `deploy`-branch build: must show ONLY build input.
+  d. NOTE: the deploy branch's commits are authored "drk-deploy" with neutral "Staging deploy <sha>"
+     messages — so the dashboard stops showing working commit messages too (matters once the client
+     has dashboard access).
 
 ## Vercel state (all set up today, working)
 Project `mari-website` (separate from the MVP project — untouched). Domain: mari-website-beta.vercel.app.
@@ -78,9 +79,9 @@ PageOverview heading→body gap 24→32. Dev-server rules: session-start autosta
 - Adinda is switching THIS session to Opus for usage-limit reasons (Fable trial note in memory stands).
 
 ## 📋 Ready-to-paste kickoff prompt
-> Continuing Mari on Opus. Read `_internal/NEXT-SESSION-2026-07-24-pm.md` top to bottom before acting —
-> two in-flight items: (1) a /terms build agent may have died mid-work, check git status/log and
-> finish-or-rerun per the handoff; (2) finish the Vercel deploy-branch fix (vercel.json + CLAUDE.md update +
-> promote staging + walk me through pointing Vercel at `deploy` and deleting old deployments — the
-> .vercelignore verification FAILED and internal files are stored on Vercel). Also ask me for the exact
-> "yarl test" filename I saw in the Source tab. Dev server: check :3000, start unsandboxed if down.
+> Continuing Mari on Opus. Read `_internal/NEXT-SESSION-2026-07-24-pm.md` top to bottom before acting.
+> Two things: (1) build the /terms simple page — the brief is in that file, it was never started, run it
+> as a fresh agent; (2) walk me through the three remaining Vercel dashboard steps (point Production at
+> the `deploy` branch, delete all old deployments, re-run the Source-tab check) — all the code-side
+> deploy-branch work is already done and the stripped branch is verified. Dev server: check :3000, start
+> unsandboxed if down.
