@@ -883,16 +883,23 @@ retained anywhere on their platform). Defense in depth: (1) build-output-only se
 keeps the files out of the pipeline entirely, (3) the private GitHub repo is the only place the docs exist
 outside this machine.
 
-**⚠️ VERIFICATION REQUIRED — Adinda is deliberately testing this over the first few deploys; treat the
-mechanism as UNPROVEN until then.** Vercel's own docs only explicitly document `.vercelignore` for CLI
-uploads; the Git-integration behaviour ("acts as an extension of `.gitignore`") is community-confirmed
-(vercel/vercel discussion #4679), not officially stated. **The check that can actually fail: after each of
-the first few deploys, open the deployment in the Vercel dashboard → Source tab → confirm `_internal/handoff/`,
-`CLAUDE.md`, and `MANAGER.md` are ABSENT.** Repeat until trusted, then note the result here. If the files
-DO appear: the failure mode is "stored on Vercel, visible to Vercel project members" — NOT public — and
-the fallback is deploying via CLI/GitHub Actions (where `.vercelignore` filters before upload ever
-happens) or a stripped deploy branch. Fold this check into the pre-launch no-AI-traces pass — same
-concern, same timing.
+**❌ VERIFICATION FAILED 2026-07-24 — `.vercelignore` does NOT filter Git-integration deploys.** Adinda
+ran the Source-tab check on the first real deployment (project `mari-website`, staging): `_internal/`,
+`CLAUDE.md`, `AGENTS.md`, `MANAGER.md`, `COMPONENTS.md`, `README.md` were ALL present in the stored
+source. The community claim ("acts as an extension of `.gitignore`") is false for Git-connected
+deployments — the whole repo tree is uploaded and stored. Failure mode as predicted: stored on Vercel,
+visible to project members, not public — but Adinda's requirement (and the eventual client dashboard
+access she now expects) rules that out.
+
+**THE MECHANISM IS NOW THE STRIPPED `deploy` BRANCH** (the pre-planned fallback, built the same day):
+`.github/workflows/deploy-branch.yml` republishes every push to `staging` as a single squashed orphan
+commit on `deploy` containing only build input; `vercel.json` disables auto-deploys of `main`/`staging`
+so unstripped trees are never uploaded; Vercel's production branch is `deploy`. Side benefit, load-bearing:
+the dashboard's deployment labels become neutral "Staging deploy <sha>" instead of working commit
+messages — relevant to the no-AI-traces posture once the client has dashboard access. **Keep the
+workflow's strip list in sync with `.vercelignore`** (which stays, but is CLI-only). Old deployments made
+before the switch still store the internal files — they must be DELETED in the dashboard (deployment →
+⋯ → Delete); re-run the Source-tab check on the first `deploy`-branch build to verify the new mechanism.
 
 **Maintenance rules (updated 2026-07-24 for the `_internal/` refactor):** (a) new internal doc → put it
 in `_internal/`, auto-covered forever; (b) a new internal file at repo root must be added to
