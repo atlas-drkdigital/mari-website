@@ -102,3 +102,9 @@ during the build, don't wait until the end to backfill it.
       is this one-type-with-conditional-fields intuitive to fill, or confusing enough that a separate
       "destination FAQ" document type would be clearer? Adinda wants his read before locking it — the
       current single-type approach avoids duplicated question/answer structure, which is the tradeoff.
+- [ ] 🔴 **PRE-LAUNCH BLOCKER — remove `SITE_NOINDEX=1` from the Vercel project env vars when the real
+      domain goes live (added 2026-07-24).** The flag makes the whole site noindex + robots disallow-all
+      (staging privacy: the staging production alias is public — Vercel's free protection only covers
+      preview URLs). A launched site still carrying this flag is invisible to every search engine.
+      Verify at launch: `curl -s https://<domain>/robots.txt` must show the ALLOW policy, and any page's
+      HTML must have NO `noindex` robots meta.

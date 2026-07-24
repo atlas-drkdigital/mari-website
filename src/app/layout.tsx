@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   // set (e.g. `/boats/mari`) verbatim. Crawlers and social scrapers can't resolve a relative URL in
   // a <link rel=canonical> or an og:image, so both were silently useless. Added 2026-07-20.
   metadataBase: new URL(SITE_URL),
+  // Staging kill-switch — pairs with robots.ts's SITE_NOINDEX gate (see its header comment for
+  // the why + the 🔴 remove-at-launch warning). Root-layout metadata cascades to every page that
+  // doesn't set its own `robots`, which none do today.
+  ...(process.env.SITE_NOINDEX === "1" ? { robots: { index: false, follow: false } } : {}),
   title: "Mari Liveaboard",
   description: "A traditional Phinisi liveaboard for serious divers.",
   icons: {
