@@ -1,0 +1,86 @@
+import { defineArrayMember, defineField, defineType } from 'sanity'
+
+import { CharCountInput } from '../../components/CharCountInput'
+
+// Stub only, per locked scope (mari-project skill / CLAUDE.md): itineraries are listed on the
+// Schedule & Rates page and referenced from their destination page, but individual itinerary
+// pages are NOT clickable/published at launch — full itinerary detail pages are a future paid
+// add-on. Content/SEO groups + titled fieldsets added for form consistency (site-wide convention)
+// even though it's a stub; SEO included per Adinda's ask 2026-07-16.
+export const itineraryType = defineType({
+  name: 'itinerary',
+  title: 'Itinerary',
+  type: 'document',
+  groups: [
+    { name: 'content', title: 'Content', default: true },
+    { name: 'seo', title: 'SEO' },
+  ],
+  fieldsets: [
+    { name: 'contentFs', title: 'Content' },
+  ],
+  fields: [
+    defineField({
+      name: 'title',
+      type: 'string',
+      description: 'e.g. "Komodo to Badas"',
+      validation: (Rule) => Rule.required(),
+      group: 'content',
+      fieldset: 'contentFs',
+    }),
+    defineField({
+      name: 'destination',
+      title: 'Destination',
+      type: 'reference',
+      to: [{ type: 'destination' }],
+      group: 'content',
+      fieldset: 'contentFs',
+    }),
+    // season + image + order added 2026-07-22 for the destination-page itinerary cards (Figma
+    // 778:8688): the card's key-info line is "{season} ✦ {duration}", each card has its own
+    // photo, and drag-order isn't available across separate documents so `order` is a number.
+    defineField({ name: 'season', type: 'string', description: 'e.g. "May to June"', group: 'content', fieldset: 'contentFs' }),
+    defineField({ name: 'duration', type: 'string', description: 'e.g. "11 nights"', group: 'content', fieldset: 'contentFs' }),
+    defineField({ name: 'route', type: 'string', description: 'e.g. "Labuan Bajo to Badas"', group: 'content', fieldset: 'contentFs' }),
+    defineField({
+      name: 'image',
+      title: 'Card image',
+      type: 'imageWithAlt',
+      description: 'Shown on this itinerary’s card. Recommended: portrait, at least 1000px wide.',
+      group: 'content',
+      fieldset: 'contentFs',
+    }),
+    // `order` (a number field) lived here for a few hours on 2026-07-22 — replaced the same day
+    // by the drag-ordered reference array on `destination.itineraries`, which also gives
+    // hide-by-omission. Don't reintroduce a numeric order; the destination's list is the order.
+    defineField({
+      name: 'highlights',
+      type: 'array',
+      of: [defineArrayMember({ type: 'string' })],
+      description: 'Short bullet points shown on the itinerary card.',
+      group: 'content',
+      fieldset: 'contentFs',
+    }),
+    // Soft 240-char budget with a live counter (Adinda, 2026-07-22 — same treatment as the meta
+    // description): the destination card clamps the summary to 6 lines on phones, and ~240 chars
+    // is what fits. Warning, not required — the frontend clamp is the safety net.
+    defineField({
+      name: 'summary',
+      type: 'text',
+      rows: 3,
+      group: 'content',
+      fieldset: 'contentFs',
+      components: { input: CharCountInput },
+      // maxLength is a custom option read by CharCountInput — not part of Sanity's built-in typing
+      // (same cast as seo.ts).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      options: { maxLength: 240 } as any,
+      validation: (Rule) =>
+        Rule.max(240).warning('Keep the summary under 240 characters — longer text is cut off on the card.'),
+      description: 'Short description shown on the itinerary card when it opens.',
+    }),
+    defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
+  ],
+  preview: {
+    select: { title: 'title', subtitle: 'duration' },
+  },
+})

@@ -1,0 +1,100 @@
+'use client'
+
+import { useState } from 'react'
+
+import { FaqAccordionItem } from '@/components/Accordion'
+import { toPlainText } from '@/components/RichText'
+import type { FaqItemData, HomePageData } from '@/sanity/queries'
+
+// The homepage shows the questions editors marked "Feature on homepage", drawn from the General FAQ
+// and from boats (see HOMEPAGE_QUERY). The cap is a safety net against an editor featuring everything,
+// not the selection mechanism — the selection is the toggle. The "Read More" link goes to the full FAQ
+// page for the rest; no inline expand, per the locked decision.
+const HOMEPAGE_FAQ_LIMIT = 10
+
+// Ported from ../v1-static-homepage/sections/faq.html + assets/faq.js. Figma Section/FAQ
+// 401:1774. Only one item open at a time; clicking the open item closes it. Two STABLE
+// HTML columns (not CSS `columns-2`) — a multi-column layout re-balances items by height on
+// every reflow, which would visibly shift OTHER items when one expands (a real bug Adinda
+// caught in the original build, not just a style preference). Questions come from Sanity
+// (full-wire slice, 2026-07-16) — no hardcoded fallback.
+type FaqItem = { q: string; a: string }
+
+function FaqColumn({ items, openId, onToggle, columnOffset }: { items: FaqItem[]; openId: string | null; onToggle: (id: string) => void; columnOffset: number }) {
+  return (
+    <div className="flex flex-1 flex-col">
+      {items.map((item, i) => {
+        const id = `faq-${columnOffset + i}`
+        return (
+          <FaqAccordionItem key={id} question={item.q} open={openId === id} onToggle={() => onToggle(id)}>
+            {/* Homepage answer is pre-flattened plain text (toPlainText). The overflow-hidden collapse
+                is owned by FaqAccordionItem; the <p> keeps its own top gap + type. */}
+            <p className="mt-12 text-body-medium lg:text-body-large text-text-ondark-primary">{item.a}</p>
+          </FaqAccordionItem>
+        )
+      })}
+    </div>
+  )
+}
+
+export function Faq({ home, faq }: { home: HomePageData | null; faq: { questions?: FaqItemData[] } | null }) {
+  const eyebrow = home?.faqEyebrow ?? ''
+  const heading = home?.faqHeading ?? ''
+  const linkText = home?.faqLinkText ?? ''
+  // The null filter is LOAD-BEARING (500'd the homepage 2026-07-22): the query flattens
+  // categories[].questions[...] and a category WITHOUT a questions array projects a literal
+  // null member into the concatenated list. Filter BEFORE slice so nulls don't eat limit slots.
+  const allItems: FaqItem[] = (faq?.questions ?? [])
+    .filter((f) => f?.question)
+    .slice(0, HOMEPAGE_FAQ_LIMIT)
+    .map((f) => ({ q: f.question ?? '', a: toPlainText(f.answer) }))
+  const splitAt = Math.ceil(allItems.length / 2)
+  const col1 = allItems.slice(0, splitAt)
+  const col2 = allItems.slice(splitAt)
+
+  // First item open on load (locked 2026-07-17, Adinda): one expanded item shows the rest are
+  // clickable — a column of headings otherwise reads as static text. No SEO/AEO angle either way,
+  // since every answer is in the DOM regardless (the collapse is visual only, via grid-template-rows).
+  // MUST be the FIRST item, not a fixed index: this was hardcoded to 'faq-7' from the static build,
+  // which silently opened NOTHING once the questions came from Sanity and fewer than 8 were featured.
+  // 'faq-0' exists for any non-empty list.
+  const [openId, setOpenId] = useState<string | null>('faq-0')
+  const toggle = (id: string) => setOpenId((prev) => (prev === id ? null : id))
+
+  // Nothing FEATURED means nothing to show — hide the section rather than render a heading over an
+  // empty accordion. The empty test is "0 featured questions", not "0 questions": HOMEPAGE_QUERY
+  // already filters to `isFeatured == true`, so a site full of FAQs with nothing featured correctly
+  // renders nothing here. Must sit below the hooks above — an early return before them would change
+  // hook order between renders.
+  if (allItems.length === 0) return null
+
+  // Section min-height is one viewport MINUS the sticky nav (70px), locked 2026-07-17 (Adinda) —
+  // it should fill the screen under the nav once scrolled to, not overflow it by the nav's height.
+  // No floor: an earlier max(600px, ...) was dropped deliberately, so the section always tracks the
+  // viewport rather than jumping to a fixed 600px on short windows. Desktop only (`lg:`) — mobile
+  // has no minimum height at all, by design.
+  return (
+    <section id="faq" aria-labelledby="faq-heading" className="relative isolate w-full pt-80 pb-80 lg:min-h-[calc(100dvh-70px)] lg:pt-[144px] lg:pb-160">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-dark)] bg-cover bg-center" />
+      <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-[36px] page-gutter-x lg:gap-64">
+        <div data-reveal="left" className="flex flex-col gap-24 lg:gap-32">
+          <p className="text-eyebrow uppercase text-accent-ondark-primary">{eyebrow}</p>
+          <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:gap-48">
+            <h2 id="faq-heading" className="mr-[40px] max-w-[640px] text-display-h2 text-text-ondark-primary lg:mr-0">{heading}</h2>
+            {/* /faq doesn't exist yet — linked ahead of the build (Adinda, 2026-07-21), same as the
+                boat FAQ's button. Both flip to next/link Link when the page ships. */}
+            <a href="/faq" className="group inline-flex h-48 w-fit shrink-0 items-center gap-4 border border-border-onimage-primary px-20 py-8 text-button-small uppercase text-text-ondark-primary transition-colors duration-300 ease-in-out hover:bg-text-ondark-primary/10 lg:ml-auto">
+              {linkText}
+              <span aria-hidden="true" className="block size-[12px] shrink-0 bg-text-ondark-primary transition-transform duration-300 ease-in-out group-hover:translate-x-[2px] [mask-image:url('/assets/icon-arrow.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" />
+            </a>
+          </div>
+        </div>
+
+        <div data-reveal className="flex flex-col gap-8 lg:flex-row lg:gap-80">
+          <FaqColumn items={col1} openId={openId} onToggle={toggle} columnOffset={0} />
+          <FaqColumn items={col2} openId={openId} onToggle={toggle} columnOffset={col1.length} />
+        </div>
+      </div>
+    </section>
+  )
+}

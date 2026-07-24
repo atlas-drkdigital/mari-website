@@ -1,0 +1,70 @@
+'use client'
+
+/**
+ * This configuration is used to for the Sanity Studio that’s mounted on the `\src\app\studio\[[...tool]]\page.tsx` route
+ */
+
+import {visionTool} from '@sanity/vision'
+import {colorInput} from '@sanity/color-input'
+import {table} from '@sanity/table'
+import {buildLegacyTheme, defineConfig} from 'sanity'
+import {structureTool} from 'sanity/structure'
+
+// Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
+import {apiVersion, dataset, projectId} from './src/sanity/env'
+import {schema} from './src/sanity/schemaTypes'
+import {structure} from './src/sanity/structure'
+import {RequiredFieldMarker} from './src/sanity/components/RequiredFieldMarker'
+
+// Brand colors from theme.css (../v1-static-homepage, Figma TKjkHpjqPVn5yL5TnpuWAt).
+// buildLegacyTheme is Sanity's own currently-supported (if deprecated, "will be removed in an
+// upcoming major version" per its own JSDoc) simple theming API — revisit when v6/v7 ships its
+// replacement, don't assume this stays valid indefinitely.
+const theme = buildLegacyTheme({
+  // Brand colour, changed from #8f6d51 2026-07-16 (Adinda's pick from Figma). The old value sat in a
+  // dead zone: Sanity DERIVES the title/subtitle colours on a selected list row from this and we cannot
+  // set them, so its derived muted-grey subtitle was unreadable on it. A lighter brand colour makes the
+  // derived text go dark instead.
+  //
+  // These two MUST move together — they are one brand colour (both were #8f6d51). Verified by DOM
+  // inspect: the selected list row's `--card-bg-color` / `--card-border-color` derive from
+  // --default-button-primary-color, NOT from --brand-primary. Changing only --brand-primary changes
+  // nothing visible, which is exactly what cost a round of guessing here.
+  //
+  // Also drives primary buttons, so re-check a Publish button in a browser after changing it.
+  '--brand-primary': '#bca18a', // Figma chocolate/400 = our --chocolate-400
+  '--default-button-primary-color': '#bca18a', // Figma chocolate/400 = our --chocolate-400
+  '--focus-color': '#b58a2d', // primitive-amber-600
+  '--component-text-color': '#1b2a4a', // primitive-navy-900, same as the website's --color-text-primary
+  // --font-bricolage-grotesque is set by next/font/google on the <html> element in
+  // src/app/layout.tsx — cascades down into /studio since it's the same document.
+  '--font-family-base': 'var(--font-bricolage-grotesque), ui-sans-serif, system-ui, sans-serif',
+})
+
+export default defineConfig({
+  basePath: '/studio',
+  title: 'Mari Studio',
+  projectId,
+  dataset,
+  theme,
+  // Add and edit the content schema in the './sanity/schemaTypes' folder
+  schema,
+  // Site-wide "required" marker on every required field's label, shown upfront (before the
+  // editor fills the form) — see src/sanity/components/RequiredFieldMarker.tsx.
+  form: {
+    components: {
+      field: RequiredFieldMarker,
+    },
+  },
+  plugins: [
+    structureTool({structure}),
+    // Vision is for querying with GROQ from inside the Studio
+    // https://www.sanity.io/docs/the-vision-plugin
+    visionTool({defaultApiVersion: apiVersion}),
+    // Needed for the `color` field type used by the page body's text-color annotation.
+    colorInput(),
+    // Registers the `table`/`tableRow` object types + the array-input UI used by richTextFull's
+    // table array member (see richTextFull.ts). 2026-07-24.
+    table(),
+  ],
+})

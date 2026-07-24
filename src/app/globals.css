@@ -1,0 +1,444 @@
+/* ============================================================================
+   globals.css  -  Mari Liveaboard | token layer (SINGLE SOURCE OF TRUTH)
+   Ported 2026-07-14 from ../v1-static-homepage/theme.css (frozen static build).
+   Generated from Figma file TKjkHpjqPVn5yL5TnpuWAt (MARI-Website-1.0), 2026-07-01.
+   Sources: Color 413:2 | Typography 492:1527 | Spacing (Component/Layout screenshot).
+   Tailwind v4 CSS-first @theme. Sections REFERENCE tokens only - never hardcode.
+
+   DECISIONS (locked): Figma variable values win | exact names kept | two layers
+   (primitives -> semantics alias) | ONLY Display headings scale via clamp() 375->1440
+   (min=55%); Editorial + body + UI are FIXED. Radius default 'rounded' = MD (8px).
+
+   Porting deltas from the static-build source (Next.js specific, not new decisions):
+   - Font: static build loaded "Bricolage Grotesque" via a <link> tag; here it's
+     `var(--font-bricolage-grotesque)`, set by next/font/google in src/app/layout.tsx.
+   - Texture URLs: static build's were dist-relative (`../assets/...`); here they're
+     Next.js public-folder-absolute (`/assets/...`) — assets copied to public/assets/.
+   - Dropped the default create-next-app `@media (prefers-color-scheme: dark)` block —
+     Mari's design system uses explicit ondark/onimage semantic tokens per-section, not
+     OS-preference-driven dark mode.
+   ============================================================================ */
+
+@import "tailwindcss";
+
+/* ---------- LAYER 1 | PRIMITIVES (raw palette; not utilities; aliased by semantics) ----------
+
+   ✅ NAME DRIFT vs FIGMA — FULLY RESOLVED 2026-07-17. Kept as the record; nothing here is outstanding
+   except the Figma-side item flagged at the bottom. Read before touching any colour name.
+
+   WHAT HAPPENED: the palette was hand-ported from Figma once (2026-07-14) and never re-synced. Figma
+   later renamed two families (cream->beige, copper->chocolate) and the port went stale. Worse, it had
+   been PARTIAL — so one palette lived under two naming generations, and 11 legacy `--primitive-*` tokens
+   each filled a MISSING step in its modern scale. Nobody noticed until a colour was named out loud and
+   design and code meant different things.
+
+   FIXED IN TWO STEPS: all 11 confirmed at source against Figma's variable panels (6 screenshots, ~15 min),
+   then renamed in one mechanical pass. **Zero `--primitive-*` tokens remain — that is the completion
+   test, and it passes.** The served stylesheet emitted an IDENTICAL set of 54 hexes before and after.
+
+   THE FINAL MAP (historical record — do not re-derive):
+     --primitive-cream-10   #fdfcfa -> --beige-50        --primitive-navy-900  #1b2a4a -> --navy-900
+     --primitive-cream-50   #f5f0e8 -> --beige-150       --primitive-navy-950  #131d34 -> --navy-950
+     --primitive-cream-70   #ece4d6 -> --beige-200       --primitive-stone-400 #7c7469 -> --stone-500 ☠️
+     --primitive-cream-80   #dbcdb2 -> --beige-300       --primitive-red-600   #c10007 -> --red-700   ☠️
+     --primitive-copper-600 #8f6d51 -> --chocolate-600   --primitive-teal-600  #008236 -> --green-600  ☠️
+     --primitive-amber-600  #b58a2d -> --amber-600
+   Earlier, 2026-07-16: --primitive-cream-30 -> --beige-100 · --primitive-copper-300 -> --chocolate-300.
+
+   ☠️ THE THREE TRAPS WERE ALL REAL — each would have silently swapped a RENDERED colour under an
+   "obvious" prefix-drop rename. This is why the hex-diff safety net is mandatory, not ceremonial:
+     --primitive-stone-400 was Figma stone/500; --stone-400 (#a19a91) already exists and is CORRECT.
+     --primitive-red-600   was Figma red/700;   --red-600   (#e7000b) already exists and is CORRECT.
+     --primitive-teal-600  was Figma green/600. There is NO `teal` family in Figma AT ALL — the name was
+       invented at port time. Right step, fabricated family.
+
+   THE LESSONS THAT OUTLIVE THIS FILE (all four earned, none theoretical):
+     1. MATCH BY HEX, NEVER BY NAME. In all three traps the NAME was wrong and the HEX was always right.
+        A stale token name is not a lagging version of the truth — it can be outright FICTION. Nothing
+        inside the codebase could reveal `teal`; only the source could.
+     2. GENERATE, DON'T HAND-COPY. A copy is stale the moment a designer renames anything, and nothing
+        tells you. This whole episode is one hand-transcription.
+     3. NEVER PARTIALLY PORT, AND NEVER INVENT A NAME. A partial port is worse than none: it looks
+        finished. If the source has no name for a value, do not make one up.
+     4. VERIFY THE TOKENS YOU BELIEVE ARE ALREADY RIGHT. --beige-100 had been "confirmed" off a rendered
+        screenshot, not the panel (it was right — but nobody actually knew); --stone-400 had to be checked
+        to prove the trap beside it. A right guess and a wrong guess look identical until the source says.
+
+   SAFETY NET FOR ANY FUTURE RENAME (mandatory): snapshot every hex the SERVED css emits, before and
+   after. The sets must be identical — a rename that changes a rendered value is a bug, and that diff is
+   the only check that catches it. Grepping source is NOT enough; comments contain hexes too.
+
+   🔴 OUTSTANDING — FIGMA SIDE, NOT CODE. Figma's code-syntax bindings still point at the OLD
+   `--primitive-*` names, which is why its MCP returns e.g. "var(--primitive-cream-10)". Those names NO
+   LONGER EXIST as of 2026-07-17. A rename is a TWO-SIDED job and only the code side is done — the Figma
+   bindings must be updated to the new names by someone with Figma access. Until then, treat any CSS name
+   returned by the Figma MCP as STALE and resolve it through the map above. Tracked in _handoff/figma.md.
+   ---------------------------------------------------------------------------------------------- */
+:root {
+  --beige-50: #fdfcfa;
+  --beige-100: #fbf8f2;
+  --beige-150: #f5f0e8;
+  --beige-200: #ece4d6;
+  --beige-300: #dbcdb2;
+  --chocolate-300: #cfbbaa;
+  --chocolate-600: #8f6d51;
+  --amber-600: #b58a2d;
+  --navy-900: #1b2a4a;
+  --navy-950: #131d34;
+  /* Extends the navy ramp below Figma's darkest step (2026-07-20, Adinda). Added for the lightbox
+     scrim, which needed to go darker than navy-950 — that was already the darkest primitive.
+     Near-black but NOT pure black: it keeps a faint navy cast so the scrim reads as part of this
+     palette rather than a system default, against a site that is otherwise warm cream. */
+  --navy-975: #0a111f;
+  --stone-500: #7c7469;
+  --red-700: #c10007;
+  --green-600: #008236;
+  --white: #ffffff;
+  --beige-250: #e4d8c4;
+  --beige-350: #d3c1a1;
+  --beige-400: #c9b89a;
+  --beige-450: #c3aa7e;
+  --beige-500: #bb9f6d;
+  --chocolate-50: #fbfaf8;
+  --chocolate-100: #f4efeb;
+  --chocolate-150: #ebe2db;
+  --chocolate-200: #e1d5cb;
+  --chocolate-250: #d8c8bb;
+  --chocolate-350: #c6ae9a;
+  --chocolate-400: #bca18a;
+  --chocolate-450: #b3947a;
+  --chocolate-500: #aa8669;
+  --chocolate-550: #9f7a5b;
+  --chocolate-650: #7f6148;
+  --chocolate-700: #6f543f;
+  --amber-100: #f9f3e6;
+  --amber-200: #efdfbe;
+  --amber-300: #e5cb95;
+  --amber-400: #dab86c;
+  --amber-500: #d0a443;
+  --amber-550: #c89932;
+  --navy-600: #446abb;
+  --navy-700: #375595;
+  --navy-800: #294070;
+  --stone-100: #e8e6e3;
+  --stone-200: #d0cdc8;
+  --stone-300: #b9b3ac;
+  --stone-400: #a19a91;
+  --stone-600: #615a52;
+  --stone-700: #534d46;
+  --stone-800: #45403a;
+  --stone-900: #37342f;
+  --stone-950: #292723;
+  --green-800: #0d542b;
+  --red-600: #e7000b;
+  --red-800: #9f0712;
+
+  /* ---------- TEXTURES ----------
+     --texture-light: a TILEABLE topographic line-art pattern (shells/seahorse/coral). Reusable as a faint
+     section-background overlay on cream/light sections. Usage (opacity handled at point of use):
+       <div aria-hidden class="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] bg-repeat opacity-20"></div>
+     --texture-dark: NOT the same kind of asset — despite the matching name, this is a single full-bleed
+     photographic grain/gradient background (exported from the FAQ section, Figma node 401:1774), not a
+     tileable line pattern. Figma's own design-system library only lists ONE shared "Texture/Primary" fill
+     style (no separate dark variant), and this section's actual composited background doesn't show the
+     topo-line pattern at all when exported — Adinda confirmed: use this exact photo verbatim as the dark
+     texture, not a recolored derivation of the light pattern. Because it's a photo, not a tile, use it with
+     `bg-cover bg-center` (crops to fill), NEVER `bg-repeat` — repeating it would show hard seams from its
+     directional lighting falloff. Usage:
+       <div aria-hidden class="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-dark)] bg-cover bg-center"></div> */
+  --texture-light: url("/assets/texture-light.webp");
+  --texture-dark: url("/assets/texture-dark.webp");
+}
+
+@theme {
+  /* ---------- FONT ---------- */
+  --font-sans: var(--font-bricolage-grotesque), ui-sans-serif, system-ui, sans-serif;
+
+  /* ---------- LAYER 2 | SEMANTIC COLORS (utilities: bg- / text- / border-) ---------- */
+  /* aliased to a primitive where a unique match exists; translucent/unmatched keep raw value */
+  /* 🔴 REVERTED TO --beige-50 on 2026-07-17 (Adinda: "bg-page is supposed to be beige-50, I never
+     decided to change it"). READ THIS BEFORE TOUCHING IT AGAIN — it has been wrong once already.
+
+     What happened: 8d5dc53 (2026-07-16) moved this #fdfcfa -> #fbf8f2 and justified it as "Adinda's
+     pick from Figma". What Adinda actually confirmed in that session was a NAME->HEX MAPPING
+     (`--primitive-cream-30 #fbf8f2 = Figma beige/100`). She never approved repointing bg-page AT
+     that colour. A mapping confirmation was silently upgraded into a value change, and her name was
+     attached to it — which is why nobody questioned it for a day.
+
+     Figma agrees with the revert, and this is the check that settles it: `Section/LayoutAndSpecs`
+     (778:8878) paints its background `--primitive-cream-10` = #fdfcfa. So Figma's PAGE background is
+     beige-50. #fbf8f2 (cream-30/beige-100) is what `Section/Cabins` (778:8762) uses — a step AWAY
+     from the page, not the page itself. That's `bg-accent-secondary` below.
+
+     THE LESSON, and it generalises: confirming what a colour is NAMED is not the same as approving
+     what a token POINTS AT. Never let the first become evidence for the second. */
+  --color-bg-page: var(--beige-50); /* Figma: cream-10 / beige-50 — the page ground */
+  --color-bg-surface: var(--white);
+  /* The "secondary accent background" (Adinda, 2026-07-17): one step warmer than the page, used to
+     lift a whole section off it — Section/Cabins (778:8762) is the first consumer. Distinct from
+     `bg-accent` (beige-150), which is a step further again. Figma has NO semantic name for this, only
+     the raw primitive, so the name here is Adinda's own words, not invented. */
+  --color-bg-accent-secondary: var(--beige-100); /* Figma: cream-30 / beige-100 */
+  --color-bg-accent: var(--beige-150);
+  --color-text-primary: var(--navy-900);
+  --color-text-secondary: var(--stone-400);
+  --color-border-default: var(--beige-300);
+  /* Lighter divider than border-default, for rules INSIDE a content block (spec rows, FAQ/accordion
+     separators) rather than around a component. Added 2026-07-17: Figma uses #ece4d6 for these and
+     no semantic token resolved to it, so three sections had reached for the unexposed `beige-200`
+     primitive and silently rendered no border at all. Adinda's call to name it rather than hardcode. */
+  --color-border-subtle: var(--beige-200);
+  --color-border-input: var(--beige-400);
+  --color-action-primary: var(--chocolate-600);
+  --color-action-primary-text: var(--beige-50);
+  --color-status-limited: var(--red-700);
+  --color-status-available: #016630; /* no primitive match */
+  --color-background-ondark-muted: var(--navy-950);
+  /* Lightbox scrim — its own semantic token, not background-ondark-muted, because the two have
+     different jobs: ondark-muted is a SECTION background (content sits on it), this is an overlay
+     that must recede behind a photo. Sharing one token would mean a future tweak to either silently
+     moves the other. */
+  --color-background-lightbox-scrim: var(--navy-975);
+  --color-background-ondark-page: var(--navy-900);
+  --color-background-ondark-surface: #fdfcfa0a; /* translucent (baked alpha) */
+  --color-background-onimage-surface: var(--navy-900);
+  --color-text-eyebrow: var(--chocolate-600);
+  --color-text-link: var(--chocolate-600);
+  --color-text-linkhover: var(--chocolate-500);
+  --color-text-muted: var(--stone-300);
+  --color-text-ondark-eyebrow: var(--amber-500);
+  --color-text-ondark-link: var(--beige-150);
+  --color-text-ondark-linkhover: var(--beige-250);
+  --color-text-ondark-muted: #fdfcfab2; /* translucent (baked alpha) */
+  --color-text-ondark-primary: var(--beige-50);
+  --color-text-ondark-secondary: var(--beige-300);
+  --color-text-onimage-eyebrow: var(--beige-50);
+  --color-border-ondark-input: var(--beige-500);
+  --color-border-ondark-inputactive: var(--beige-300);
+  --color-border-ondark-muted: #fdfcfa66; /* translucent (baked alpha) */
+  --color-border-ondark-subtle: #fdfcfa33; /* translucent (baked alpha) */
+  --color-border-onimage-input: #fdfcfacc; /* translucent (baked alpha) */
+  --color-border-onimage-inputactive: var(--beige-50);
+  --color-border-onimage-primary: var(--beige-50);
+  --color-accent-muted: var(--chocolate-500);
+  --color-accent-subtle: var(--beige-400);
+  --color-accent-ondark-muted: var(--amber-600);
+  --color-accent-ondark-onprimary: var(--beige-50);
+  --color-accent-ondark-onprimarymuted: var(--amber-200);
+  --color-accent-ondark-primary: var(--amber-500);
+  --color-accent-ondark-subtle: #fdfcfacc; /* translucent (baked alpha) */
+  --color-accent-onimage-muted: #fdfcfacc; /* translucent (baked alpha) */
+  --color-accent-onimage-onprimary: var(--amber-500);
+  --color-accent-onimage-onprimarymuted: var(--amber-600);
+  --color-accent-onimage-primary: var(--beige-50);
+  --color-accent-onimage-subtle: #fdfcfa66; /* translucent (baked alpha) */
+
+  /* ---------- SPACING (name = px value) ---------- */
+  --spacing-*: initial;   /* reset Tailwind's default 0.25rem-multiplier scale: any bare number
+                             NOT explicitly listed below must fail loudly, never silently fall back */
+  --spacing-0: 0px;   /* zero is not a Figma spacing step but is required for inset-0/top-0/p-0/etc. */
+  /* component */
+  --spacing-2: 0.125rem;   /* 2px */
+  --spacing-4: 0.25rem;   /* 4px */
+  --spacing-8: 0.5rem;   /* 8px */
+  --spacing-12: 0.75rem;   /* 12px */
+  --spacing-16: 1rem;   /* 16px */
+  --spacing-20: 1.25rem;   /* 20px */
+  --spacing-24: 1.5rem;   /* 24px */
+  --spacing-32: 2rem;   /* 32px */
+  /* layout */
+  --spacing-48: 3rem;   /* 48px */
+  --spacing-64: 4rem;   /* 64px */
+  --spacing-80: 5rem;   /* 80px */
+  --spacing-96: 6rem;   /* 96px */
+  --spacing-128: 8rem;   /* 128px */
+  --spacing-160: 10rem;   /* 160px */
+
+  /* ---------- RADIUS (from Figma; default 'rounded' = MD 8px) ---------- */
+  --radius: 0.5rem;   /* default (bare `rounded`) = MD 8px */
+  --radius-none: 0;
+  --radius-xs: 0.125rem;   /* 2px */
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.5rem;   /* 8px (default) */
+  --radius-lg: 1rem;   /* 16px */
+  --radius-full: 9999px;
+
+  /* ---------- SHADOW (effect layer; from Figma effect styles) ---------- */
+  --shadow-card: 0 16px 40px rgb(0 0 0 / 0.4);   /* elevated overlays e.g. search dropdown; verify vs Figma Shadow/Card */
+
+  /* ---------- TYPE (two-track; headings clamp, body/UI fixed) ----------
+     SCALED DOWN 2026-07-04 (Adinda: sizing felt "too extreme"), THREE ROUNDS, DISPLAY TRACK ONLY:
+     Round 1: base 17px -> 16px, same modular ratio (x1.333) + same min/max ratio, only the anchor moved.
+     Round 2: H1 restored to its original pre-rescale clamp; H2-H5 + accent cut further (desktop max only).
+     Round 3 (this one): mobile minimums for H2-H5 + accent were an unintended side effect of round 1/2 (the
+     shared min/max ratio pulled mobile down whenever desktop was cut) — Adinda didn't ask for mobile to
+     shrink and it now reads too small there. DECOUPLED: mobile minimums restored to their ORIGINAL
+     pre-rescale values; only the desktop maximum keeps the round-2 smaller size. H1 already decoupled
+     (fully restored both ends in round 2).
+     Editorial track and body/UI tokens are explicitly UNCHANGED (Adinda: editorial H5/H6 are "already very
+     small," don't touch; only Display was flagged).
+     FLAGGED FOR FIGMA: these new sizes need to be applied in the Figma type styles too. */
+  --text-display-h1: clamp(2.75rem, 1.9577rem + 3.3803vw, 5rem);   /* RESTORED to original 44->80 */
+  --text-display-h1--line-height: 1.04;
+  --text-display-h1--letter-spacing: -0.0187em;
+  --text-display-h1--font-weight: 600;
+  --text-display-h2: clamp(1.875rem, 1.5669rem + 1.3146vw, 2.75rem);   /* mobile min RESTORED to original 30, desktop max 44 */
+  --text-display-h2--line-height: 1.1;
+  --text-display-h2--letter-spacing: -0.0093em;
+  --text-display-h2--font-weight: 600;
+  --text-display-h3: clamp(1.375rem, 1.1109rem + 1.1268vw, 2.125rem);   /* mobile min RESTORED to original 22, desktop max 34 */
+  --text-display-h3--line-height: 1.15;
+  --text-display-h3--font-weight: 600;
+  --text-display-h4: clamp(1.25rem, 0.8019rem + 0.8451vw, 1.5625rem);   /* mobile min bumped 16->20px (2026-07-07): at real phone widths the curve is pinned at its floor anyway (doesn't meaningfully grow until ~611px viewport), and 16px made H4 card titles (Why Us, Latest Articles) the same size as body text -- zero hierarchy step between a heading and its own paragraph. Desktop max 25 untouched. */
+  --text-display-h4--line-height: 1.2;
+  --text-display-h4--font-weight: 600;
+  --text-display-h5: clamp(0.8125rem, 0.6805rem + 0.5634vw, 1.1875rem);   /* mobile min RESTORED to original 13, desktop max 19 */
+  --text-display-h5--line-height: 1.3;
+  --text-display-h5--font-weight: 600;
+  --text-display-accent: clamp(2rem, 1.8239rem + 0.7512vw, 2.5rem);   /* mobile min RESTORED to original 32, desktop max 40 */
+  --text-display-accent--line-height: 1.04;
+  --text-display-accent--letter-spacing: -0.05em;
+  --text-display-accent--font-weight: 200;
+  --text-editorial-h1: 2.0625rem;   /* was 35px, now 33px */
+  --text-editorial-h1--line-height: 1.25;
+  --text-editorial-h1--font-weight: 600;
+  --text-editorial-h2: 1.75rem;   /* was 29px, now 28px */
+  --text-editorial-h2--line-height: 1.3;
+  --text-editorial-h2--font-weight: 600;
+  --text-editorial-h3: 1.4375rem;   /* was 24px, now 23px */
+  --text-editorial-h3--line-height: 1.35;
+  --text-editorial-h3--font-weight: 500;
+  --text-editorial-h4: 1.1875rem;   /* was 20px, now 19px */
+  --text-editorial-h4--line-height: 1.4;
+  --text-editorial-h4--font-weight: 600; /* was 500 — h4 is only 19px vs body's 16px, so weight is what makes it read as a heading (Adinda 2026-07-17) */
+  --text-editorial-h5: 1rem;   /* was 17px, now 16px */
+  --text-editorial-h5--line-height: 1.45;
+  --text-editorial-h5--font-weight: 600;
+  --text-editorial-h6: 0.8125rem;   /* was 14px, now 13px */
+  --text-editorial-h6--line-height: 1.5;
+  --text-editorial-h6--font-weight: 600;
+  --text-editorial-quote-text: 1.5rem;
+  --text-editorial-quote-text--line-height: 1.45;
+  --text-editorial-quote-text--font-weight: 300;
+  --text-editorial-quote-cite: 0.875rem;
+  --text-editorial-quote-cite--line-height: 1.6;
+  --text-editorial-quote-cite--font-weight: 500;
+  --text-body-large: 1rem;   /* was 17px, now 16px (the scale's new base) */
+  --text-body-large--line-height: 1.8; /* was 1.65 — drifted from Figma (Body/Large = 1.8), corrected 2026-07-17 */
+  --text-body-large--font-weight: 400;
+  --text-body-medium: 0.875rem;
+  --text-body-medium--line-height: 1.8; /* was 1.6 — drifted from Figma (Body/Medium = 1.8), corrected 2026-07-17 */
+  --text-body-medium--font-weight: 500;
+  --text-caption-label: 0.75rem;
+  --text-caption-label--line-height: 1.5;
+  --text-caption-label--font-weight: 400;
+  --text-eyebrow: 0.6875rem;
+  --text-eyebrow--line-height: 1.5;
+  --text-eyebrow--letter-spacing: 0.125em;
+  --text-eyebrow--font-weight: 500;
+  --text-button: 0.875rem;
+  --text-button--line-height: 1.1;
+  --text-button--letter-spacing: 0.0857em;
+  --text-button--font-weight: 600;
+  --text-button-small: 0.75rem;
+  --text-button-small--line-height: 1.25;
+  --text-button-small--letter-spacing: 0.1em;
+  --text-button-small--font-weight: 600;
+  --text-nav: 0.875rem;
+  --text-nav--line-height: 1.1;
+  --text-nav--letter-spacing: 0.0857em;
+  --text-nav--font-weight: 400;
+  --text-nav-large: 1.5rem;
+  --text-nav-large--line-height: 1.3;
+  --text-nav-large--font-weight: 600;
+  --text-nav-xl: 1.75rem;
+  --text-nav-xl--line-height: 1.2;
+  --text-nav-xl--font-weight: 600;
+  --text-system-caption-s-lowercase: 0.625rem;
+  --text-system-caption-s-lowercase--line-height: 1.4;
+  --text-system-caption-s-lowercase--font-weight: 400;
+  --text-system-caption-s-uppercase: 0.6875rem;
+  --text-system-caption-s-uppercase--line-height: 1.4;
+  --text-system-caption-s-uppercase--font-weight: 400;
+}
+
+body {
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+}
+
+/* ---------- Page gutter — the site's one horizontal-inset system, ported from
+   ../v1-static-homepage/src/input.css. Use page-gutter-x for full padding-inline;
+   -l/-r for one side only; -inset-l/-inset-r for absolutely/fixed positioned elements
+   using left-N/right-N instead of padding. ---------- */
+@utility page-gutter-x {
+  padding-inline: var(--spacing-24);
+  @media (width >= 48rem) { padding-inline: var(--spacing-48); }
+  @media (width >= 64rem) { padding-inline: var(--spacing-80); }
+}
+@utility page-gutter-l {
+  padding-left: var(--spacing-24);
+  @media (width >= 48rem) { padding-left: var(--spacing-48); }
+  @media (width >= 64rem) { padding-left: var(--spacing-80); }
+}
+@utility page-gutter-r {
+  padding-right: var(--spacing-24);
+  @media (width >= 48rem) { padding-right: var(--spacing-48); }
+  @media (width >= 64rem) { padding-right: var(--spacing-80); }
+}
+@utility page-gutter-inset-r {
+  right: var(--spacing-24);
+  @media (width >= 48rem) { right: var(--spacing-48); }
+  @media (width >= 64rem) { right: var(--spacing-80); }
+}
+@utility page-gutter-inset-l {
+  left: var(--spacing-24);
+  @media (width >= 48rem) { left: var(--spacing-48); }
+  @media (width >= 64rem) { left: var(--spacing-80); }
+}
+
+/* ---------- Scrollbar hiding — one name for the three-property incantation that was
+   copy-pasted across every drag-scroll track (Nav, WhyUs, Testimonials, Destinations,
+   LatestArticles, BoatGallery). The element still SCROLLS; only the visible bar is gone,
+   so it must always be paired with a real affordance (the useDragScroll hook, arrows, or
+   a snap track) or the overflow becomes unreachable. ---------- */
+@utility scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* SubNav floating bar entrance — a plain eased fade (Adinda, 2026-07-21: the earlier top-
+   transition made it slide up from the bottom of the screen, an artifact, not a design).
+   Referenced via animate-[subnav-reveal_300ms_ease-out]. */
+@keyframes subnav-reveal {
+  from { opacity: 0; }
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  label[for],
+  summary {
+    cursor: pointer;
+  }
+
+  /* Scroll-reveal primitive — elements marked [data-reveal] start hidden and animate in once
+     ScrollReveal.tsx adds [data-revealed] (IntersectionObserver). Direction via the attribute value:
+       [data-reveal]        fade + rise from below (default)
+       [data-reveal="left"] fade + slide in from the left (text / body copy)
+       [data-reveal="none"] fade only (e.g. the nav on load) */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(1.25rem);
+      transition: opacity 700ms ease-out, transform 700ms ease-out;
+    }
+    [data-reveal="left"] { transform: translateX(-1.5rem); }
+    [data-reveal="none"] { transform: none; }
+    [data-reveal][data-revealed] {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
