@@ -43,12 +43,22 @@ export const faqSectionType = defineType({
       initialValue: false,
       hidden: ({ document }) => document?._type !== 'faqGeneral',
     }),
-    // Private Charters triplet (2026-07-23, charters page slice) — same pattern again.
+    // Private Charters — third of what is now a QUADRUPLET of page toggles (2026-07-23, charters
+    // page slice) — same pattern again.
     defineField({
       name: 'showOnPrivateChartersPage',
       title: 'Show on the Private Charters page',
       type: 'boolean',
       description: 'Include this category in the FAQ section of the Private Charters page.',
+      initialValue: false,
+      hidden: ({ document }) => document?._type !== 'faqGeneral',
+    }),
+    // Schedule & Rates (/booking) — fourth of the quadruplet (2026-07-24, booking page slice).
+    defineField({
+      name: 'showOnBookingPage',
+      title: 'Show on the Schedule & Rates page',
+      type: 'boolean',
+      description: 'Include this category in the FAQ section of the Schedule & Rates page.',
       initialValue: false,
       hidden: ({ document }) => document?._type !== 'faqGeneral',
     }),

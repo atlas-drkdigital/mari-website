@@ -407,3 +407,13 @@ lands; until then any rich-text heading anywhere on the site will look unstyled.
 | `crewMembers` | 🔴 | placeholder | ONE `crewMember-placeholder` doc so the layout is QA-able — replace with real crew before launch |
 | `seo.title` / `seo.description` | 🟡 | Claude draft | "About Us — The Story of Mari | {siteName}" — Adinda to review wording |
 | testimonialsSection singleton | 🟢 | migrated | chrome + 8 curated reviews moved from homePage fields (values unchanged; the 4 [DRAFT] reviews remain a separate pre-launch 🔴) |
+
+## Schedule & Rates page (`scheduleRates` singleton, /booking) — seeded 2026-07-24
+| Field | Status | Source | Note |
+|---|---|---|---|
+| `title` | 🟢 | Adinda's design dictation | "Schedule & Rates" |
+| `description` | 🔴 | placeholder | one honest paragraph marked [PLACEHOLDER] — real page copy to follow |
+| `embedCode` | 🟢 | real | the live INSEANQ all-trips widget (insqwdgt-2j4v5DSymU), renders on the page |
+| FAQ chrome (eyebrow/heading/linkText) | 🟡 | Claude draft | tone-matched to charters ("Good to Know" / "Booking FAQ & Payment Terms" / "Read all FAQs") — Adinda to review wording |
+| `seo.title` / `seo.description` | 🟡 | Claude draft | "Schedule & Rates — Liveaboard Trips & Prices | {siteName}" — review in the post-slice drk-seo pass |
+| General FAQ `showOnBookingPage` toggles | 🟢 | seeded | all 3 categories on (11 questions compose in) — editor curates from Studio |

@@ -21,7 +21,14 @@ type MegaKey = 'destinations' | 'resources' | null
 
 const RESOURCE_LINKS = ['Blog', 'Terms & Conditions', 'Onboard Prices', 'FAQ']
 
-export function Nav() {
+// lightHero (2026-07-24, first consumer: /booking — the Schedule & Rates page): for pages whose
+// hero is a LIGHT band (no photo), the nav at the top of the page uses the LIGHT theme's colors
+// (dark text) but a TRANSPARENT background, flipping to the normal solid light bar on scroll.
+// Implemented as a second data attribute (data-navbg = clear|solid) CHAINED with data-nav=light
+// on the bg/shadow classes — chained data variants, NOT class-order overrides (order in the class
+// attribute does not control the cascade). Without the prop, navbg is always 'solid', so every
+// existing page behaves byte-identically.
+export function Nav({ lightHero = false }: { lightHero?: boolean } = {}) {
   // Current route, for the aria-current active state on menu links (Adinda, 2026-07-21).
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
@@ -63,7 +70,14 @@ export function Nav() {
     megaOpen ? 'mega'
     : navCompact ? 'light'
     : scrolled && !(isDesktop && subNavPresent) ? 'light'
+    : lightHero ? 'light'
     : 'top'
+
+  // Transparent-over-light-hero state (see the lightHero comment above): dark text with no bar
+  // ONLY while sitting at the top of a lightHero page with nothing open; every other state keeps
+  // the solid light bar. Mobile included — dark text over the texture at the top, same flip.
+  const navBg: 'clear' | 'solid' =
+    lightHero && !scrolled && !megaOpen && !mobileMenuOpen ? 'clear' : 'solid'
 
   // Scroll-based theme flip — fixed distance, not tied to hero height (see nav.js's own comment
   // on why: waiting for the full hero to clear read as unresponsive on a near-full-viewport hero).
@@ -219,7 +233,8 @@ export function Nav() {
           className="block h-[6px] w-[7px] shrink-0 bg-accent-ondark-onprimary transition-[transform,background-color] duration-300 ease-in-out group-hover/mt:bg-accent-ondark-primary group-data-[nav=light]/nav:bg-text-primary group-data-[nav=light]/nav:group-hover/mt:bg-action-primary group-aria-expanded/mt:bg-accent-ondark-muted group-aria-expanded/mt:rotate-180 [mask-image:url('/assets/icon-nav-chevron.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
         />
       </button>
-      <a href="#" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">Schedule &amp; Rates</a>
+      {/* Real route since the booking slice (2026-07-24) — /booking locked by Adinda. */}
+      <a href="/booking" className="pb-4 text-nav uppercase opacity-85 transition-[color,opacity] duration-300 ease-in-out hover:text-accent-ondark-primary hover:opacity-100 group-data-[nav=light]/nav:hover:text-action-primary">Schedule &amp; Rates</a>
     </>
   )
 
@@ -227,7 +242,10 @@ export function Nav() {
     <header
       ref={navRef}
       data-nav={navTheme}
-      className="group/nav fixed inset-x-0 top-0 z-50 w-full text-accent-ondark-onprimary data-[nav=light]:bg-bg-page data-[nav=light]:text-text-primary data-[nav=light]:shadow-[0_1px_0_0_rgb(0_0_0/0.06)] data-[nav=mega]:bg-background-ondark-muted"
+      data-navbg={navBg}
+      /* bg + shadow are CHAINED on navbg=solid so the lightHero 'clear' state keeps the light
+         theme's dark text without painting the bar (see the lightHero comment above). */
+      className="group/nav fixed inset-x-0 top-0 z-50 w-full text-accent-ondark-onprimary data-[nav=light]:text-text-primary data-[nav=light]:data-[navbg=solid]:bg-bg-page data-[nav=light]:data-[navbg=solid]:shadow-[0_1px_0_0_rgb(0_0_0/0.06)] data-[nav=mega]:bg-background-ondark-muted"
     >
       {/* MOBILE bar (<lg): wordmark + hamburger */}
       <div className="flex items-center justify-between page-gutter-x py-8 lg:hidden">
@@ -272,7 +290,9 @@ export function Nav() {
         {/* Light-mode row separator: a shadow hairline IDENTICAL to the header's own bottom line
             (0_1px_0_0 black/6%), not border-border-default — the beige border read as a different
             colour than the greyish bottom hairline (Adinda, 2026-07-24: both lines one colour). */}
-        <div className="flex items-center border-b-[0.25px] border-accent-ondark-onprimary page-gutter-x py-16 group-data-[nav=light]/nav:border-transparent group-data-[nav=light]/nav:shadow-[0_1px_0_0_rgb(0_0_0/0.06)]">
+        {/* The row hairline is also chained on navbg=solid — in the lightHero 'clear' state a
+            floating hairline over the hero texture would read as leftover chrome. */}
+        <div className="flex items-center border-b-[0.25px] border-accent-ondark-onprimary page-gutter-x py-16 group-data-[nav=light]/nav:border-transparent group-data-[nav=light]/nav:group-data-[navbg=solid]/nav:shadow-[0_1px_0_0_rgb(0_0_0/0.06)]">
           <div className="flex w-[480px] items-center">
             <Link
               href="/"
@@ -562,7 +582,7 @@ export function Nav() {
             </div>
           </div>
 
-          <a href="#" onClick={() => setMobileMenuOpen(false)} className="py-16 text-nav uppercase text-text-ondark-primary opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">Schedule &amp; Rates</a>
+          <a href="/booking" onClick={() => setMobileMenuOpen(false)} className="py-16 text-nav uppercase text-text-ondark-primary opacity-85 transition-opacity duration-300 ease-in-out hover:opacity-100">Schedule &amp; Rates</a>
         </nav>
 
         <div className="flex flex-wrap items-center gap-16 border-t-[0.25px] border-accent-ondark-onprimary page-gutter-x py-24">

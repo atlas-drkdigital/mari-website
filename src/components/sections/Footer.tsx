@@ -89,10 +89,9 @@ export function Footer() {
         </div>
 
         <nav aria-label="Footer" data-reveal className="order-1 flex flex-col gap-4 border-b border-white/10 px-24 py-32 lg:order-3 lg:flex-1 lg:items-end lg:border-b-0 lg:py-48 lg:pl-[56px] lg:pr-[72px]">
-          {/* /schedule-rates: route not built yet, linked anyway per the established convention
-              (FAQ links /faq the same way; the Trips CTA already links this route). Was a bare
-              "#schedule-rates" hash — caught by the 2026-07-22 drk-seo pass as a dead anchor. */}
-          <a href="/schedule-rates" className="text-body-medium text-text-ondark-primary transition-colors duration-300 ease-in-out hover:text-accent-ondark-primary lg:text-right">Schedule &amp; Rates</a>
+          {/* Real route since the booking slice (2026-07-24) — /booking locked by Adinda
+              (superseding the earlier /schedule-rates placeholder path). */}
+          <a href="/booking" className="text-body-medium text-text-ondark-primary transition-colors duration-300 ease-in-out hover:text-accent-ondark-primary lg:text-right">Schedule &amp; Rates</a>
           <a href="#" className="text-body-medium text-text-ondark-primary transition-colors duration-300 ease-in-out hover:text-accent-ondark-primary lg:text-right">Terms &amp; Conditions</a>
           <a href="#" className="text-body-medium text-text-ondark-primary transition-colors duration-300 ease-in-out hover:text-accent-ondark-primary lg:text-right">Onboard Prices</a>
           <a href="#faq" className="text-body-medium text-text-ondark-primary transition-colors duration-300 ease-in-out hover:text-accent-ondark-primary lg:text-right">FAQ</a>

@@ -319,6 +319,35 @@ export const PRIVATE_CHARTERS_QUERY = groq`{
   }
 }`
 
+// One fetch for the Schedule & Rates page at /booking (singleton — no $slug; fixed _id like the
+// other page singletons). Composition mirrors PRIVATE_CHARTERS_QUERY's shapes/naming: the page
+// doc, the shared General FAQ categories toggled onto this page (showOnBookingPage), the
+// destinations list (the Contact section consumes it — same projection as the charters query),
+// and the contact/site settings.
+export const BOOKING_QUERY = groq`{
+  "schedule": *[_id == "scheduleRates"][0]{
+    title,
+    description,
+    "embedCode": embedCode.html,
+    faqEyebrow, faqHeading, faqLinkText,
+    seo
+  },
+  "sharedFaqSections": *[_id == "faqGeneral"][0].categories[showOnBookingPage == true]{
+    _key, title, questions[]{ question, answer }
+  },
+  "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
+    _id, name, tagline, excerpt, "slug": slug.current,
+    "cardSeason": stats[label == "Season"][0].value,
+    "cardDuration": stats[label == "Duration"][0].value,
+    useCoverAsCardImage,
+    cardImage${IMAGE},
+    coverImage${IMAGE}
+  },
+  "settings": *[_id == "siteSettings"][0]{
+    siteTitle, contactEyebrow, contactHeading, contactIntro
+  }
+}`
+
 // One fetch for the About page (singleton — no $slug). Sections per Adinda's spec (_PAGE-SPECS.md
 // #1): hero → overview (PageOverview) → Why Us (the homepage's, verbatim — chrome + items come
 // from the homePage doc on purpose, "same as homepage" is the spec) → crew (page-owned) →
@@ -750,6 +779,25 @@ export type PrivateChartersQueryResult = {
   boats: BoatCardData[]
   destinationsSectionCta: string | null
   curatedDestinations: DestinationCardData[]
+  destinations: DestinationCardData[]
+  settings: SiteSettingsContact | null
+}
+
+// ----- Schedule & Rates page (/booking) -----
+export type ScheduleRatesData = {
+  title?: string
+  description?: PortableTextBlock[]
+  /** Raw embed HTML (htmlEmbed.html) — the widget section hides when absent. */
+  embedCode?: string
+  faqEyebrow?: string
+  faqHeading?: string
+  faqLinkText?: string
+  seo?: SeoData
+}
+
+export type BookingQueryResult = {
+  schedule: ScheduleRatesData | null
+  sharedFaqSections: FaqSectionData[] | null
   destinations: DestinationCardData[]
   settings: SiteSettingsContact | null
 }

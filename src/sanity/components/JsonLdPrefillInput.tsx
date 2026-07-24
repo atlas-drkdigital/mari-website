@@ -26,7 +26,7 @@ const ROUTE_BY_TYPE: Record<string, (slug?: string) => string | null> = {
   privateCharters: () => '/private-charters',
   aboutPage: () => '/about',
   faqGeneral: () => '/faq',
-  scheduleRates: () => '/schedule-rates',
+  scheduleRates: () => '/booking',
 }
 
 export function JsonLdPrefillInput(props: TextInputProps) {

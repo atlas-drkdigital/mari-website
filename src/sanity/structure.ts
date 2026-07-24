@@ -2,7 +2,7 @@ import type { StructureResolver } from 'sanity/structure'
 
 // Singletons are enforced here (fixed document ID), not via a schema option —
 // see sanity-best-practices skill's studio-structure.md.
-const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage', 'privateCharters', 'aboutPage', 'destinationDefaults', 'destinationsSection', 'boatDefaults', 'boatsSection', 'testimonialsSection', 'cta', 'faqGeneral']
+const SINGLETON_TYPES = ['siteSettings', 'navigation', 'homePage', 'privateCharters', 'aboutPage', 'scheduleRates', 'destinationDefaults', 'destinationsSection', 'boatDefaults', 'boatsSection', 'testimonialsSection', 'cta', 'faqGeneral']
 // Pinned single-instance `page` documents — NOW EMPTY (kept as the mechanism): Private Charters
 // left 2026-07-23 (dedicated `privateCharters` singleton), About left the same day (dedicated
 // `aboutPage` singleton — the spec made it a structured section page too). Old placeholder docs
@@ -11,7 +11,6 @@ const PINNED_PAGE_IDS: Array<{ id: string; title: string }> = []
 const PLACED_TYPES = [
   ...SINGLETON_TYPES,
   'page',
-  'scheduleRates',
   'announcementBar',
   'redirect',
   'language',
@@ -109,7 +108,9 @@ export const structure: StructureResolver = (S) =>
 
       // Its own top-level entry, not nested under Pages — more variants of this
       // shape are coming (Specials, etc.), each will likely get its own entry too.
-      S.documentTypeListItem('scheduleRates').title('Schedule & Rates'),
+      // SINGLETON since the booking slice (2026-07-24) — fixed-id page doc like
+      // privateCharters/aboutPage, backing the /booking route.
+      singleton(S, 'scheduleRates', 'Schedule & Rates'),
 
       ...PINNED_PAGE_IDS.map(({ id, title }) => pinnedPage(S, id, title)),
 

@@ -16,8 +16,8 @@ import { RichText } from '@/components/RichText'
 // globals.css's --texture-light note: tileable pattern, bg-repeat, opacity-20.
 //
 // The CTA button reuses the Contact form's solid-navy button expression; it links to the Schedule
-// & Rates page per the mock ("View all trips") — route not built yet, linked anyway per the
-// established convention (the FAQ sections already link /faq the same way).
+// & Rates page per the mock ("View all trips") — /booking, a real route since the booking slice
+// (2026-07-24; the earlier /schedule-rates placeholder path is superseded).
 export function DestinationTrips({
   eyebrow,
   heading,
@@ -89,7 +89,7 @@ export function DestinationTrips({
 
         {ctaText ? (
           <a
-            href="/schedule-rates"
+            href="/booking"
             className="group inline-flex h-48 w-fit items-center gap-[6px] rounded-xs bg-background-ondark-page py-8 pl-20 pr-12 text-button-small uppercase text-text-ondark-primary transition-opacity duration-300 ease-in-out hover:opacity-85"
           >
             {ctaText}

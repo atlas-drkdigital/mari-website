@@ -1030,6 +1030,53 @@ history:
 
 ---
 
+## SESSION CHECKPOINT — 2026-07-24, SCHEDULE & RATES (/booking) SLICE BUILT + SEEDED (one commit)
+
+**/booking is LIVE from Sanity — per-section QA by Adinda PENDING** (built to her dictated design,
+no Figma mockup — T&C-reference-screenshot pattern revising `_internal/PAGE-SPECS.md` #2). Route
+**/booking locked by Adinda**; the old `/schedule-rates` placeholder links (Footer, DestinationTrips
+CTA, JsonLdPrefillInput route map) all point at the real route now, and both Nav "Schedule & Rates"
+items (desktop + mobile) un-hardcoded per the incremental link rule.
+
+**What shipped:**
+- **Page composition** (`src/app/booking/page.tsx`, mirrors private-charters): Nav(lightHero) →
+  BookingHero (NEW — light-texture band on `bg-bg-accent-secondary` beige-100, breadcrumbs +
+  H1 + rich description, bottom 6%-black hairline; no hero image, no SubNav) → BookingSchedule
+  (NEW — INSEANQ widget in a white shadowed card OVERLAPPING the band seam via `-mt-[64px]` /
+  `lg:-mt-[120px]`, DestinationTrips' 160px desktop gutter override, locked mobile full-bleed
+  negative-margin rule) → FaqCategorized (General FAQ categories via NEW `showOnBookingPage`
+  toggle — the boat/destination/charters toggle set is now a quadruplet) → Contact → Footer.
+  generateMetadata via buildSeoMetadata (no social image on purpose — no hero photo);
+  FAQPage + BreadcrumbList JSON-LD emitted.
+- **Nav `lightHero` prop** (first consumer: /booking): at the top of a light-hero page the nav is
+  the LIGHT theme (dark text) with TRANSPARENT background, flipping to the normal solid light bar
+  on scroll. Implemented as `data-navbg=clear|solid` CHAINED with `data-nav=light` on the
+  bg/shadow classes (chained data variants, not class-order overrides). No prop → navbg always
+  `solid` → verified byte-equivalent: `/` serves `data-nav="top" data-navbg="solid"`, /about solid.
+- **Schema:** `scheduleRates` grown into the page doc (description richTextBasic; embedCode type
+  text → htmlEmbed — safe, GROQ-verified ZERO existing docs; FAQ chrome mirrors charters; groups +
+  titled fieldsets) and made a fixed-id SINGLETON in structure.ts. Field names unchanged.
+- **Query:** BOOKING_QUERY + ScheduleRatesData/BookingQueryResult in queries.ts. Sitemap lists
+  /booking (named per-slice step done).
+- **Seed** (`_internal/scripts/seed-booking.ts`, idempotent, seed LAW honoured — drafts.faqGeneral
+  absent, skipped): real INSEANQ widget embed (renders live on the page), title, slug `booking`,
+  FAQ chrome tone-matched to charters ("Good to Know" / "Booking FAQ & Payment Terms" / "Read all
+  FAQs"), `showOnBookingPage=true` on all 3 General FAQ categories (11 questions compose in).
+
+**Placeholder rows (for `_internal/CONTENT-STATUS.md`):** `description` 🔴 [PLACEHOLDER] one
+honest paragraph — real copy to follow; `seo.title`/`seo.description` 🟡 draft — review in the
+post-slice drk-seo pass (NOT yet run — pending, after Adinda's visual QA, per the standing rule).
+
+**Verification:** tsc + eslint green; clean dev restart (`.next` wiped); / /studio /about /booking
+all 200; /booking HTML carries the H1 ("Schedule & Rates", display-h1), `insqwdgt` (embed in the
+RSC payload — EmbedHtml mounts it client-side), resolved `<title>` ("…| Mari Liveaboard"), both
+JSON-LD blocks, seeded FAQ chrome + categories, and `data-navbg="clear"` at top.
+
+**Open:** Adinda's per-section QA (desktop + MOBILE viewport explicitly — hero paddings
+`pt-[112px]/lg:pt-[224px]` and the card overlap depths are suggested values, tune on sight);
+post-slice drk-seo pass; real description copy; hero band vs widget band contrast check
+(beige-100 vs beige-50 + hairline seam).
+
 ## SESSION CHECKPOINT — 2026-07-24, `_internal/` ROOT CLEANUP REFACTOR EXECUTED (one commit)
 The gated root-cleanup item ran and is DONE — full detail in the ✅ DONE entry in the ACTIVE QUEUE
 above (what moved, same-commit amendments, what was deliberately left alone). Verification results:
