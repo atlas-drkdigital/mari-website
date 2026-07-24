@@ -53,18 +53,39 @@ foreach ($path in $Strip) {
   if (Test-Path $path) { Remove-Item -Recurse -Force $path }
 }
 
-git add -A --quiet
+# NOTE: `git add` has NO --quiet flag. Passing one makes the command FAIL, which left the strip
+# unstaged and pushed the full tree - caught 2026-07-24 only because the run was aimed at a
+# throwaway branch. Hence the hard guard below.
+git add -A
 git config user.name "drk-deploy"
 git config user.email "deploy@drkdigital.com"
 git commit --quiet -m "Deploy $sha"
 
 # Squash to a single orphan commit so no working history travels with the branch.
 $tree = (git rev-parse "HEAD^{tree}").Trim()
+
+# GUARD - a check that can actually fail. Inspect the exact tree about to be pushed and abort if
+# any stripped path survived. Without this the failure mode is SILENT: a green run that shipped
+# every internal document to Vercel.
+$shipped = git ls-tree -r --name-only $tree
+$leaked = @()
+foreach ($path in $Strip) {
+  $needle = $path.TrimEnd('/')
+  if ($shipped | Where-Object { $_ -eq $needle -or $_.StartsWith("$needle/") }) { $leaked += $needle }
+}
+if ($leaked.Count -gt 0) {
+  git checkout --quiet --force $original
+  git branch -D "_promote-tmp" | Out-Null
+  git config --unset user.name
+  git config --unset user.email
+  throw "ABORTED - strip failed, these would have shipped: $($leaked -join ', ')"
+}
+
 $commit = (git commit-tree $tree -m "Deploy $sha").Trim()
 git push --force origin "${commit}:refs/heads/$Target"
 
 git checkout --quiet --force $original
-git branch -D "_promote-tmp" --quiet
+git branch -D "_promote-tmp" | Out-Null
 git config --unset user.name
 git config --unset user.email
 
