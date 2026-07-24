@@ -18,7 +18,10 @@ import Link from 'next/link'
 // bg-bg-accent is the deepest light background the semantic layer actually exposes. If she wants
 // the deeper tone at QA, the fix is a new semantic token in @theme, not a primitive class.
 //
-// TYPE: H1 is the LOCKED booking split — text-editorial-h1 on mobile, text-display-h1 from lg.
+// TYPE: H1 is text-editorial-h1 at EVERY breakpoint (Adinda, 2026-07-24: display-h1 on desktop
+// "feels very aggressively large" on a plain title-only page). This DIVERGES from BookingHero's
+// mobile-editorial/desktop-display split ON PURPOSE — booking's photo hero carries a big title;
+// a document page (T&C, Onboard Pricing) does not. Simple pages own this smaller ramp.
 // Same per-breakpoint ramp mix BookingHero carries (see its header for why); don't unify it.
 // Breadcrumb markup is BookingHero's verbatim, re-themed to the LIGHT palette: base
 // text-text-secondary → hover text-text-primary, current page text-action-primary.
@@ -68,7 +71,7 @@ export function SimplePageHero({
           </ol>
         </nav>
 
-        <h1 id={headingId} className="max-w-[720px] text-editorial-h1 text-text-primary lg:text-display-h1">
+        <h1 id={headingId} className="max-w-[720px] text-editorial-h1 text-text-primary">
           {title}
         </h1>
       </div>
