@@ -1040,3 +1040,15 @@ noindex the real domain (the code checks the host) OR accidentally index a stagi
 canonical host). Self-correcting, no env var to remember. Requires making `robots.ts` + the root
 `robots` metadata read `headers()` host (dynamic). **Until then, Mari keeps the manual env var + the 🔴
 QA-CHECKLIST blocker** — but the host-based mechanism is the DRK-wide answer.
+
+🔒 **STANDING REQUIREMENT (Adinda, 2026-07-24) — this must never depend on someone remembering it.**
+Two enforcement points, both to be baked into `drk-website` when this merges:
+1. **`references/pre-launch.md` gets a hard checklist row on EVERY site:** "indexability — the live
+   domain serves an ALLOW robots.txt and NO `noindex` meta; staging/preview serve disallow + noindex"
+   with the exact `curl <domain>/robots.txt` verification. A launch is not done until this row is ticked.
+2. **The session-bookend / planning flow (`references/workflow.md`) surfaces it automatically:** whenever
+   a project is at or near launch, the plan MUST list the indexability flip as its own line item. This is
+   the "verification ritual only counts if it can fail" rule applied at the process level — the check
+   lives in the checklist that always runs, not in a person's memory.
+Preferred end state is the automated host-based mechanism above (then the checklist row is just a
+confirmation); the checklist is the floor that holds even before the automation exists.

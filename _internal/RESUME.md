@@ -2,6 +2,20 @@
 
 **New session? Read THIS file, then MANAGER.md's 2026-07-24 checkpoints. Don't re-derive.**
 
+## 🔴 ADINDA'S OPEN ACTIONS — when she asks "what do I do?", READ THESE OUT FIRST
+Things only she can do (dashboard/editorial/decisions); Claude cannot close these from the repo.
+Keep this list current every session — add here the moment a Claude task hands something back to her.
+- [ ] **Vercel: delete the OLD pre-strip deployments** (dashboard → each old deployment → ⋯ → Delete).
+      They still store internal files from before today's strip fix. Safe now — a good stripped build is live.
+- [ ] **🔴 AT LAUNCH: remove `SITE_NOINDEX=1`** from the Vercel project env vars, then `curl <domain>/robots.txt`
+      shows ALLOW + no page has a `noindex` meta. Without this the live site is invisible to Google.
+      (This is ALSO a hard pre-launch checklist row now — see _internal/handoff/drk-website.md — so it
+      surfaces automatically in launch planning, but it's HER dashboard action to perform.)
+- [ ] **Write real SEO title/description** for `/terms` and `/onboard-pricing` in Studio (currently 🟡 drafts).
+- [ ] **Decide + provide** for the blog when it starts: any featured-article curation, real post content.
+- [ ] Optional whenever: skills handoff round (separate read-only terminal); real testimonials + 4 crew photos.
+
+
 ## One-line state
 Staging is **live, stripped, and noindexed** at `mari-website-beta.vercel.app`. Shipped today:
 `/booking` (Schedule & Rates), `/terms`, `/onboard-pricing` (all live + on staging), the

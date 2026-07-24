@@ -1258,6 +1258,13 @@ ritual only counts if it can actually fail": a ritual that *falsely* fails is ju
   learnings (the relevant `drk-website` skill reference + a `_internal/handoff/drk-website.md` entry). Full
   spec: `drk-website` skill's `references/workflow.md`, "End-of-session retrospective."
 
+## "What do I do?" → read Adinda's open-actions list FIRST (locked 2026-07-24, Adinda)
+When Adinda asks what to do / what's next / "what do I do" at session start, the FIRST thing to surface
+is the **`🔴 ADINDA'S OPEN ACTIONS` list at the top of `_internal/RESUME.md`** — the dashboard/editorial/
+decision items only she can close (Claude can't do them from the repo). Read those out before proposing
+build work. Keep that list current: whenever a task hands something back to her, add it there in the same
+breath, so it never lives only in a chat message that scrolls away.
+
 ## Dev server at session start — always bring localhost up (locked 2026-07-24, Adinda)
 At the start of every session, check whether the dev server is listening on :3000 and start
 `npm run dev` in the background if it isn't — without being asked. Idempotent check first
