@@ -6,6 +6,7 @@
 
 import {visionTool} from '@sanity/vision'
 import {colorInput} from '@sanity/color-input'
+import {table} from '@sanity/table'
 import {buildLegacyTheme, defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 
@@ -62,5 +63,8 @@ export default defineConfig({
     visionTool({defaultApiVersion: apiVersion}),
     // Needed for the `color` field type used by the page body's text-color annotation.
     colorInput(),
+    // Registers the `table`/`tableRow` object types + the array-input UI used by richTextFull's
+    // table array member (see richTextFull.ts). 2026-07-24.
+    table(),
   ],
 })

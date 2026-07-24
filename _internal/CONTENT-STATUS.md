@@ -447,13 +447,8 @@ Content-only slice: reuses the generic `[slug]` simple-page route, no new schema
 | `title` | 🟢 | live site | "On Board Pricing" — the live H1 verbatim |
 | `slug` | 🟢 | live site | `on-board-pricing`, matching the live URL so inbound links survive. ⚠️ OPEN: the footer label reads "Onboard Prices" — Adinda may prefer `onboard-prices`. Cheap now, needs a redirect doc once real traffic exists. |
 | `body` — prose (4 H3 sections + payment notes) | 🟢 | live site | Verbatim. Headings kept in Title Case as-is (deliberate exception to the sentence-case rule — same precedent as T&C's numbered headings). |
-| `body` — THE FOUR PRICING TABLES | 🔴 **NOT SEEDED** | live site | **Blocked on a table-rendering decision.** A `[TABLE PLACEHOLDER …]` paragraph marks each position on the page and in Studio. The full verbatim content (Diving Equipment Rental 12 rows · Park & Port Fees 3 · Fuel Surcharge 2 · Beverages 5, all € prices) is preserved in `_internal/scripts/seed-onboard-pricing.ts`'s header comment as markdown tables, ready to paste. |
+| `body` — THE FOUR PRICING TABLES | 🟢 **SEEDED 2026-07-24** | live site | Real `table` blocks (via the new `@sanity/table` plugin — see richTextFull.ts / RichText.tsx / MANAGER.md's 2026-07-24 checkpoint), seeded by `_internal/scripts/seed-onboard-tables.ts`, replacing all four `[TABLE PLACEHOLDER …]` paragraphs. Diving Equipment Rental 12 rows · Park & Port Fees 3 · Fuel Surcharge 2 · Beverages 5, all € prices, verified in served HTML. Styling is a first pass — Adinda to iterate on sight. |
 | `seo.title` / `seo.description` | 🟡 | Claude draft | Light editorial pass wanted, not urgent (same convention as Terms) |
 
-**The table decision (open, needs Adinda):** `richTextFull` ALREADY offers `htmlEmbed` and `RichText.tsx`
-already renders it — so tables can ship today with zero code, which is exactly how the LIVE site does it
-(its four tables are `dangerouslySetInnerHTML` embeds). But that means the owner edits raw HTML, which
-cuts against the intuitive-CMS principle, and unstyled tables won't match the design system or behave on
-mobile. Alternatives: `@sanity/table` plugin (proper grid, rows-of-strings, external dep) or a custom
-Portable Text object (most control, clunkiest editing). **Whichever wins, a styled + horizontally
-scrollable renderer is needed either way** — that is the real work, not the storage format.
+**The table decision — RESOLVED 2026-07-24:** `@sanity/table` plugin, pinned `^3.1.3` (not `latest` — see
+MANAGER.md's checkpoint for why). `htmlEmbed` stays alongside it (Adinda confirmed both are wanted).

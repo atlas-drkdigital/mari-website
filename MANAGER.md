@@ -3039,3 +3039,67 @@ metadata only — changing them later costs no migration. What must be reasonabl
 actual field `name` keys and document type `name`s, since renaming those after real content exists needs a
 migration script. Today's skeleton pass already handles this; labeling/grouping polish is legitimately a
 finalize-last task — better done last anyway, once the full type list is visible.
+
+## Table support added to richTextFull; Onboard Pricing's four tables seeded (2026-07-24)
+
+**What shipped:** `richTextFull` (tier-3 rich text) now offers a real, editable TABLE block alongside the
+existing `htmlEmbed` member (htmlEmbed stays — Adinda confirmed both are wanted, not a replacement). First
+(and so far only) consumer: the Onboard Pricing page's four pricing tables, previously held by
+`[TABLE PLACEHOLDER …]` paragraphs (see `_internal/scripts/seed-onboard-pricing.ts`'s header, 2026-07-24
+earlier same day).
+
+- **Plugin: `@sanity/table`, PINNED at `^3.1.3`, not `latest` (3.1.12).** `npm view` peer-range check alone
+  said 3.1.12 was compatible (`sanity: ^5 || ^6.0.0-0`, `react: ^19.2`) — but that check doesn't see
+  transitive breakage. 3.1.4+ bumped `@sanity/table`'s own `@sanity/ui` requirement, and `@sanity/ui@3.4.3`
+  in turn bumped ITS `@sanity/icons` dependency from `^3.8.0` to `^5.2.1` — a real breaking change (v5
+  renamed/removed exports like `HelpCircleIcon`/`HomeIcon`/`InfoOutlineIcon`, which several of our own
+  schema files import by name). Installing 3.1.12 crashed Studio AND every page (`/studio`, `/terms`,
+  `/private-charters`, `/onboard-pricing` all 500'd — Turbopack: "Export HelpCircleIcon doesn't exist in
+  target module"). Checked `npm view @sanity/table@<version> dependencies` across the version history:
+  3.0.0–3.1.3 all declare `@sanity/icons: ^3.7.4` directly, which co-exists fine with the project's existing
+  `@sanity/ui@3.3.5` → `@sanity/icons@3.8.0` — **3.1.3 was the last version before the icons jump**, so
+  that's what's pinned (`^3.1.3` in package.json, not `latest`/`^3.1.12`). Verified with a full clean
+  `rm -rf node_modules && npm install`: `npm ls @sanity/icons @sanity/ui` shows `@sanity/ui` staying at
+  `3.3.5` (byte-identical to the pre-`@sanity/table` baseline) and `@sanity/table` nesting its own private
+  `@sanity/icons@3.8.0` copy — no shared-tree disruption at all. **Lesson for next plugin install: a
+  peerDependencies check is necessary but not sufficient — walk the target version's OWN `dependencies`
+  (not just peers) for anything that could cascade a major bump through a shared package (here `@sanity/ui`
+  → `@sanity/icons`), and prefer the oldest version that still satisfies the peer range over `latest` when
+  the newer versions carry a heavier dependency bump.** Also surfaced (unrelated, pre-existing, now
+  incidentally fixed by the clean reinstall): the on-disk `node_modules` had drifted from the lockfile
+  before this session touched anything (`tsc` showed one stale `InfoOutlineIcon` type error even before any
+  of today's edits) — a clean `npm install` resolved it as a side effect. Not chased further; noting it in
+  case it resurfaces.
+- **Shape** (verified against `node_modules/@sanity/table/dist/index.js`'s plugin body, not guessed):
+  `{ _type: 'table', rows: [{ _type: 'tableRow', cells: string[] }, ...] }`. `tableRow` is the plugin's
+  default row-type name (no override passed to `table()` in `sanity.config.ts`).
+- **Renderer** (`RichText.tsx`): first row = `<thead><th scope="col">`, remaining rows =
+  `<tbody><td>`, wrapped in `overflow-x-auto` (mobile horizontal-scroll guard, not a page-wide break — the
+  locked responsive-table rule). Token classes only, verified against `globals.css`: `border-border-default`
+  / `border-border-subtle`, `bg-bg-accent-secondary` (header row), `text-text-primary`, `text-body-medium`,
+  `divide-y divide-border-subtle` (row dividers, same pattern as `MultiSelect.tsx`), `px-16 py-12` cell
+  padding. Left-aligned throughout — the markdown source's right-aligned price column was a markdown
+  artifact, not a design decision (explicitly not carried over). **First pass, not final** — Adinda to
+  iterate the visual treatment on sight; the structural part (real `<table>/<thead>/<tbody>/<th>/<td>`,
+  token classes, responsive wrapper) is what's load-bearing.
+- **Seed:** new script `_internal/scripts/seed-onboard-tables.ts` (kept separate from
+  `seed-onboard-pricing.ts` — that one's header comment stays as the source-of-truth record of the verbatim
+  fetched content; this one just does the placeholder→table swap). Walks `page-onboard-pricing`'s existing
+  `body` array, replaces each `[TABLE PLACEHOLDER …]` paragraph in place with a `table` block built from the
+  four tables (Diving Equipment Rental 12 rows / Park & Port Fees 3 / Fuel Surcharge 2 / Beverages 5, all
+  with their header row), leaving the H3 headings and italic payment notes untouched. No draft existed for
+  `page-onboard-pricing`, so only the published doc was patched (seed LAW still checked/logged). Verified:
+  0 placeholders remaining, 4 `table` blocks present, served HTML confirmed with real prices (`€16`,
+  `Nitrox`, `Fuel Surcharge`) and zero remaining "TABLE PLACEHOLDER" text.
+- **Verification matrix:** `tsc --noEmit` 0 errors (matches baseline exactly — 0, not the earlier
+  stale-node_modules 1). `eslint` 12 pre-existing `no-html-link-for-pages` errors + 1 pre-existing unused-var
+  warning, 0 new. Clean `.next` + unsandboxed dev server: `/studio` 200, `/onboard-pricing` 200, `/terms`
+  200, `/private-charters` 200 (the other two tier-3-rich-text pages don't crash with the new array member
+  present). Served `/onboard-pricing` HTML: 4 `<thead>`, 8 `<th scope="col">`, 4 `<tbody>`, 44 `<td>` (tallies
+  exactly against the four tables' row×column counts).
+- **`_internal/CONTENT-STATUS.md`** Onboard Pricing table row flipped 🔴→🟢 (seeded), same edit.
+- **Not done / next:** Adinda's visual iteration pass on the table styling (explicitly deferred, first-pass
+  only). The open slug question from the earlier onboard-pricing checkpoint (`on-board-pricing` vs
+  `onboard-pricing` vs footer's "Onboard Prices" label) was independently resolved by another parallel
+  session mid-task today (commit `57c400d`, slug is now `onboard-pricing`) — noted here only because this
+  session's own testing initially 404'd on the old slug and had to re-check.

@@ -74,6 +74,10 @@ function alignClassOf(value: unknown): string {
 // why this is a margin and not the parent's gap.
 const HEADING_SPACING = 'mt-8 first:mt-0'
 
+// @sanity/table's row shape — see richTextFull.ts's `table` member.
+type TableRow = { _key: string; cells: string[] }
+type TableValue = { rows?: TableRow[] }
+
 const components: PortableTextComponents = {
   block: {
     normal: ({ children, value }) => <p className={alignClassOf(value)}>{children}</p>,
@@ -147,6 +151,48 @@ const components: PortableTextComponents = {
     // Studio access, which is the same boundary that already governs every other field.
     htmlEmbed: ({ value }: { value: { html?: string } }) =>
       value?.html ? <div dangerouslySetInnerHTML={{ __html: value.html }} /> : null,
+    // Table — richTextFull's fourth member, added 2026-07-24 for the Onboard Pricing tables (see
+    // richTextFull.ts). Shape from @sanity/table: `{ rows: [{ _key, cells: string[] }, ...] }` — no
+    // separate header flag, so by convention (matches every table this plugin has seeded so far) the
+    // FIRST row is the header. `overflow-x-auto` is the responsive guard: a 2-column price table must
+    // scroll horizontally on a phone rather than force the whole page wide (locked responsive-table
+    // rule, CLAUDE.md). Token classes only (verified against globals.css) — FIRST PASS, Adinda will
+    // iterate the visual treatment on sight; the structural part (real table/thead/tbody/th/td) is
+    // what's load-bearing here, not the exact shade.
+    table: ({ value }: { value: TableValue }) => {
+      const [headerRow, ...bodyRows] = value?.rows ?? []
+      if (!headerRow) return null
+      return (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[480px] border-collapse border border-border-default text-body-medium text-text-primary">
+            <thead>
+              <tr className="bg-bg-accent-secondary">
+                {headerRow.cells.map((cell, i) => (
+                  <th
+                    key={`${headerRow._key}-${i}`}
+                    scope="col"
+                    className="border border-border-default px-16 py-12 text-left font-bold text-text-primary"
+                  >
+                    {cell}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border-subtle">
+              {bodyRows.map((row) => (
+                <tr key={row._key}>
+                  {row.cells.map((cell, i) => (
+                    <td key={`${row._key}-${i}`} className="border border-border-subtle px-16 py-12 text-left">
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+    },
   },
 }
 

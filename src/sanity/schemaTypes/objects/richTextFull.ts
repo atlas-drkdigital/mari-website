@@ -17,6 +17,10 @@ import { linkAnnotation } from '../../linkAnnotation'
 // no other control can prevent. Amends the 2026-07-15 "H1-H6" spec line above. Existing content is
 // unaffected (no body uses h1); if one ever did, RichText.tsx would still render the style — this
 // only removes the MENU option.
+//
+// TABLE added 2026-07-24 (Adinda) via the `@sanity/table` plugin (registered in sanity.config.ts) —
+// first consumer is the Onboard Pricing page's four pricing tables. htmlEmbed stays alongside it
+// (Adinda confirmed both are wanted, not a replacement).
 export const richTextFullType = defineType({
   name: 'richTextFull',
   title: 'Rich Text',
@@ -86,5 +90,11 @@ export const richTextFullType = defineType({
       ],
     }),
     defineArrayMember({ type: 'htmlEmbed' }),
+    // `table` — registered by the @sanity/table plugin (sanity.config.ts), added 2026-07-24 for the
+    // Onboard Pricing tables (see seed-onboard-pricing.ts's header for why this was deferred out of
+    // the original content-only pass). Shape: `{ rows: [{ _type: 'tableRow', cells: string[] }] }`.
+    // htmlEmbed STAYS — Adinda confirmed both are wanted (table for real editable data, htmlEmbed for
+    // booking widgets/maps). Rendered in RichText.tsx per the "render it in the same pass" rule above.
+    defineArrayMember({ type: 'table' }),
   ],
 })
