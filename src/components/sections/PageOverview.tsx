@@ -13,8 +13,10 @@ import { RichText } from '@/components/RichText'
 // three fields both pages pass.
 //
 // All layout decisions and their history live in this file's git blame via ChartersOverview
-// (900px column, heading max 720, gap-24 rhythm override vs the node's 48, content-based desktop
-// Read More cap at 960px vs the standard 60dvh mobile cap, bg walked beige-100→150→page-50).
+// (900px column, heading max 720, content-based desktop Read More cap at 960px vs the standard
+// 60dvh mobile cap, bg walked beige-100→150→page-50). Rhythm: eyebrow→heading gap-24 (the
+// homepage convention), heading→body gap-32 — one step UP from 24 (Adinda, 2026-07-24: the body
+// needed breathing room under the heading; shared component, both charters + about get it).
 // The Read More mechanics are BoatOverview's locked pattern verbatim — reasoning lives there.
 export function PageOverview({
   id = 'overview',
@@ -75,7 +77,7 @@ export function PageOverview({
       <div data-reveal className="mx-auto flex w-full max-w-[900px] flex-col items-center gap-24 page-gutter-x">
         {eyebrow ? <p className="text-center text-eyebrow uppercase text-action-primary">{eyebrow}</p> : null}
 
-        <div className="flex w-full flex-col items-center gap-24">
+        <div className="flex w-full flex-col items-center gap-32">
           {heading ? (
             <h2 id={headingId} className="max-w-[720px] text-center text-display-h2 text-text-primary">
               {heading}
