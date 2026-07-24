@@ -50,8 +50,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return buildSeoMetadata({
     seo: page.seo,
     fallbackTitle: page.title,
-    // No hero image on this page shape, so no fallbackImage — the OG image falls through to
-    // whatever the editor sets in seo.ogImage.
+    // No hero image on this page shape, so no fallbackImage — the OG image falls through to the
+    // editor's seo.ogImage, then to the site-wide default below. Before that default existed
+    // (2026-07-24) this shape served NO og:image at all, which is what prompted it.
+    siteDefaultImage: settings?.defaultShareImage,
     fallbackDescription: toPlainText(page.body).slice(0, 200),
     path: `/${slug}`,
     siteName: settings?.siteTitle,

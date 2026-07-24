@@ -36,6 +36,7 @@ export function buildSeoMetadata({
   fallbackTitle,
   fallbackDescription,
   fallbackImage,
+  siteDefaultImage,
   path,
   siteName,
 }: {
@@ -49,6 +50,15 @@ export function buildSeoMetadata({
    * hero video — a video can never be an og:image.
    */
   fallbackImage?: SanityImageWithMeta
+  /**
+   * The SITE-WIDE default social image (`siteSettings.defaultShareImage`) — the LAST tier, used
+   * only when the editor set no `seo.ogImage` AND the page has no hero/cover of its own. Added
+   * 2026-07-24: page shapes with no hero (the generic `page` type — T&C, Onboard Prices) served no
+   * og:image at all, so a shared link rendered as a bare text card. Pass
+   * `settings?.defaultShareImage` — every page query selects it. Never overrides a more specific
+   * tier; absent, behaviour is unchanged.
+   */
+  siteDefaultImage?: SanityImageWithMeta
   /** Site-relative path for the default canonical, e.g. `/boats/mari`. */
   path: string
   /**
@@ -70,9 +80,17 @@ export function buildSeoMetadata({
   const ogTitle = r(seo?.ogTitle) || title
   const ogDescription = r(seo?.ogDescription) || description
   // Social image is NEVER left empty (Adinda, 2026-07-21 — now a standing rule): the editor's
-  // ogImage wins, else the page's own hero/cover image is the default. A hero VIDEO can never be an
-  // og:image, so callers pass the poster/cover image and this keys off that, not the video.
-  const ogImageSource = seo?.ogImage?.asset?._ref ? seo.ogImage : fallbackImage
+  // ogImage wins, else the page's own hero/cover image, else the site-wide default from
+  // siteSettings (added 2026-07-24 — a page shape with no hero, e.g. /terms, otherwise emitted no
+  // og:image at all). Most-specific first; each tier only applies when the one above it is absent.
+  // A hero VIDEO can never be an og:image, so callers pass the poster/cover image and this keys off
+  // that, not the video. twitterImageSource below falls back to THIS value, so it inherits the new
+  // tier automatically — deliberately no second branch to keep in sync.
+  const ogImageSource = seo?.ogImage?.asset?._ref
+    ? seo.ogImage
+    : fallbackImage?.asset?._ref
+      ? fallbackImage
+      : siteDefaultImage
   const ogImage = ogImageUrl(ogImageSource)
   // og:image:alt — social scrapers read this, not the image's own alt attribute. Derived down a
   // chain so it is never blank when there is an image (this is also why seo.ogImage carries no alt

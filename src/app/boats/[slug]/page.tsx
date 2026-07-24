@@ -53,6 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     fallbackTitle: boat.pageTitle || boat.name,
     fallbackDescription: boat.tagline,
     fallbackImage: boat.coverImage,
+    siteDefaultImage: settings?.defaultShareImage,
     path: `/boats/${slug}`,
     siteName: settings?.siteTitle,
   })

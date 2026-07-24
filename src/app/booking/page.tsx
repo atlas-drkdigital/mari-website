@@ -44,6 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
     seo: schedule.seo,
     fallbackTitle: schedule.title,
     fallbackImage: schedule.heroImage,
+    siteDefaultImage: settings?.defaultShareImage,
     fallbackDescription: plainDescription
       ? plainDescription.length > 160
         ? `${plainDescription.slice(0, 157).trimEnd()}…`

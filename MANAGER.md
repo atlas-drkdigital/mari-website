@@ -1030,6 +1030,65 @@ history:
 
 ---
 
+## SESSION CHECKPOINT — 2026-07-24, SITE-WIDE DEFAULT SOCIAL SHARE IMAGE (one commit)
+
+Closes the 🔴 logged in the Terms checkpoint below: **/terms served no `og:image` at all**, confirmed by
+diffing its served HTML against /booking's. Not patched per-page — fixed as a site-wide default, so every
+future hero-less page (Onboard Prices next) is covered with zero extra work.
+
+**The chain, as implemented** (`buildSeoMetadata`, `src/lib/seo.ts`) — most specific first, each tier
+applying only when the one above is absent:
+```
+seo.ogImage (editor, per page)  →  the page's own hero/cover (fallbackImage)  →  siteSettings.defaultShareImage  →  none
+```
+The first two tiers keep their exact prior precedence. `twitterImage` needed **no second branch**: it
+already falls back to `ogImageSource`, so it inherits the new tier automatically — one chain to keep in
+sync, not two.
+
+- **Schema** — `siteSettings.defaultShareImage`, type **`imageWithAlt`** (never bare `image`), no
+  `Rule.required()`, group `seo` / fieldset `seoDefaults`. Evergreen description ("Used when a page has no
+  social image of its own. 1200×630px recommended."). Deliberately **top-level, not `defaultSeo.ogImage`**:
+  `defaultSeo` has **no frontend consumer today**, so hanging a live behaviour off it would put a working
+  control inside a dead object — the "schema field nothing renders is a promise" rule pointed the other way
+  for once. Verified before relying on it that `ogImageAlt` = `source.alt || ogTitle || title`, so a filled
+  alt here becomes the `og:image:alt` and an empty one changes nothing.
+- **Queries** — `defaultShareImage${IMAGE}` added to **all 7** `"settings"` projections (homepage, boat,
+  destination, private charters, booking, simple page, about) + `SiteSettingsContact`. All 7 selections were
+  byte-identical, so one scripted replace with a match-count assertion (`expected 7`) rather than 7 hand
+  edits that could silently miss one.
+- **Call sites** — all 7 `buildSeoMetadata(` callers pass `siteDefaultImage: settings?.defaultShareImage`.
+  Every one already fetched `settings` for `siteName`; **no second fetch added anywhere**.
+- **Seed** — `_internal/scripts/seed-default-share-image.ts`. Adinda's call: default it to the **homepage
+  hero**. It **reuses that asset's reference** (`…fc7e1152…-2400x1480-webp`) rather than re-uploading, alt
+  reused from the hero ("Mari phinisi liveaboard sailing in Indonesia"). Hard-stops if `homePage.heroImage`
+  is absent rather than inventing a source. `drafts.siteSettings` didn't exist → skipped, per the seed law.
+
+**Verification — the regression check is the one that mattered.** A default social image is only correct if
+it *loses* to every more specific tier. Read out of SERVED HTML after a clean `.next` wipe + restart:
+
+| Route | og:image asset | tier that fired |
+|---|---|---|
+| `/terms` | `…fc7e1152…` | **site default (was NONE)** ✅ |
+| `/` | `…fc7e1152…` | own hero (same asset by design) |
+| `/booking` | `…65833c2e…` (pink beach) | own hero — **unchanged** ✅ |
+| `/about` | `…99ce9958…` (crew) | own hero — **unchanged** ✅ |
+| `/private-charters` | `…2dfd2994…` | own hero — **unchanged** ✅ |
+| `/boats/mari` | `…e08971b8…` | own hero — **unchanged** ✅ |
+
+`twitter:image` tracked `og:image` on every route and `twitter:card` stayed `summary_large_image`. A GROQ
+query-back proved the `/terms` result can only have come from the new tier: `page-terms` has
+`seo.ogImage == null` AND `seo.twitterImage == null`, so nothing else could have supplied it. `tsc --noEmit`
+0 errors; `npm run lint` only the 11 pre-existing `no-html-link-for-pages` + 1 pre-existing unused-var
+warning. `/` and `/studio` 200.
+
+**Left open (deliberate).** `defaultShareImage` is 🟡 in `_internal/CONTENT-STATUS.md` — a 2400×1480 hero
+centre-cropped to 1200×630 works but isn't *composed* for it; a purpose-made share image is the eventual
+want, and swapping it is a Studio action with no code change. Separately noted while in here, NOT fixed:
+`siteSettings.defaultSeo` and `siteSettings.siteDescription` have **no consumer anywhere in the codebase** —
+same promise-not-a-feature class as the `seo.ts` gap closed on 2026-07-20, still needing a real slot.
+
+---
+
 ## SESSION CHECKPOINT — 2026-07-24, TERMS & CONDITIONS (/terms) SLICE — the FIRST generic "simple page"
 
 **What shipped.** `_PAGE-SPECS.md` #5/#8's generic simple-page pattern, built once and consumed for the

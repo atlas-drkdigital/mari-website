@@ -40,6 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     fallbackTitle: [about.heroHeadingIntro, about.heroHeadingMain].filter(Boolean).join(' ') || about.name,
     fallbackDescription: about.heroSubheading,
     fallbackImage: about.heroImage,
+    siteDefaultImage: settings?.defaultShareImage,
     path: '/about',
     siteName: settings?.siteTitle,
   })

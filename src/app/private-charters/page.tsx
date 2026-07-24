@@ -55,6 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
     fallbackTitle: [charters.heroHeadingIntro, charters.heroHeadingMain].filter(Boolean).join(' ') || charters.name,
     fallbackDescription: charters.heroSubheading,
     fallbackImage: charters.heroImage,
+    siteDefaultImage: settings?.defaultShareImage,
     path: '/private-charters',
     siteName: settings?.siteTitle,
   })

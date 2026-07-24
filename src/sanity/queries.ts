@@ -83,7 +83,8 @@ export const HOMEPAGE_QUERY = groq`{
     coverImage${IMAGE}
   },
   "settings": *[_id == "siteSettings"][0]{
-    siteTitle, contactEyebrow, contactHeading, contactIntro
+    siteTitle, contactEyebrow, contactHeading, contactIntro,
+    defaultShareImage${IMAGE}
   }
 }`
 
@@ -146,7 +147,8 @@ export const BOAT_QUERY = groq`{
     }
   },
   "settings": *[_id == "siteSettings"][0]{
-    siteTitle, contactEyebrow, contactHeading, contactIntro
+    siteTitle, contactEyebrow, contactHeading, contactIntro,
+    defaultShareImage${IMAGE}
   },
   "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
     _id, name, "slug": slug.current
@@ -231,7 +233,8 @@ export const DESTINATION_QUERY = groq`{
     }
   },
   "settings": *[_id == "siteSettings"][0]{
-    siteTitle, contactEyebrow, contactHeading, contactIntro
+    siteTitle, contactEyebrow, contactHeading, contactIntro,
+    defaultShareImage${IMAGE}
   },
   "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
     _id, name, "slug": slug.current
@@ -315,7 +318,8 @@ export const PRIVATE_CHARTERS_QUERY = groq`{
     coverImage${IMAGE}
   },
   "settings": *[_id == "siteSettings"][0]{
-    siteTitle, contactEyebrow, contactHeading, contactIntro
+    siteTitle, contactEyebrow, contactHeading, contactIntro,
+    defaultShareImage${IMAGE}
   }
 }`
 
@@ -345,7 +349,8 @@ export const BOOKING_QUERY = groq`{
     coverImage${IMAGE}
   },
   "settings": *[_id == "siteSettings"][0]{
-    siteTitle, contactEyebrow, contactHeading, contactIntro
+    siteTitle, contactEyebrow, contactHeading, contactIntro,
+    defaultShareImage${IMAGE}
   }
 }`
 
@@ -373,7 +378,8 @@ export const SIMPLE_PAGE_QUERY = groq`{
     _id, name, "slug": slug.current
   },
   "settings": *[_id == "siteSettings"][0]{
-    siteTitle, contactEyebrow, contactHeading, contactIntro
+    siteTitle, contactEyebrow, contactHeading, contactIntro,
+    defaultShareImage${IMAGE}
   }
 }`
 
@@ -411,7 +417,8 @@ export const ABOUT_QUERY = groq`{
     _id, name, "slug": slug.current
   },
   "settings": *[_id == "siteSettings"][0]{
-    siteTitle, contactEyebrow, contactHeading, contactIntro
+    siteTitle, contactEyebrow, contactHeading, contactIntro,
+    defaultShareImage${IMAGE}
   }
 }`
 
@@ -472,6 +479,12 @@ export type DestinationCardData = {
 export type SiteSettingsContact = {
   /** Brand name for the {siteName} token in SEO titles (buildSeoMetadata). */
   siteTitle?: string
+  /**
+   * Site-wide default social share image — the LAST tier of buildSeoMetadata's OG/Twitter image
+   * chain (seo.ogImage → the page's own hero/cover → this). Selected by EVERY page query's
+   * "settings" projection so no page shape can silently lose it.
+   */
+  defaultShareImage?: SanityImageWithMeta
   contactEyebrow?: string
   contactHeading?: string
   contactIntro?: string

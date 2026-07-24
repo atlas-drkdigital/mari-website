@@ -122,6 +122,27 @@ export const siteSettingsType = defineType({
       fieldset: 'seoDefaults',
       description: 'Fallback used by any page that doesn’t set its own SEO tab — not homepage-specific, applies to every page without its own SEO override.',
     }),
+    // The LAST tier of the social-image chain in src/lib/seo.ts:
+    //   seo.ogImage (editor, per page) → the page's own hero/cover → THIS.
+    // It exists because a page shape with no hero image (the generic `page` type — T&C, Onboard
+    // Prices) previously served NO og:image at all: tier 1 is usually blank and tier 2 doesn't
+    // exist for it, so a shared link rendered as a bare text card.
+    //
+    // Deliberately a TOP-LEVEL field rather than `defaultSeo.ogImage`: (a) `defaultSeo` has no
+    // consumer in the frontend today, so hanging a live behaviour off it would put a working
+    // control inside a dead object; (b) the `seo` object's images are bare `type: 'image'` under
+    // the documented social-image carve-out (og:image:alt is derived in buildSeoMetadata), while
+    // this is a normal site asset and takes `imageWithAlt` like every other image on the site.
+    // A filled alt here becomes the og:image:alt; an empty one falls back to the page's own title,
+    // exactly as the derivation chain in seo.ts already handles.
+    defineField({
+      name: 'defaultShareImage',
+      title: 'Default social share image',
+      type: 'imageWithAlt',
+      group: 'seo',
+      fieldset: 'seoDefaults',
+      description: 'Used when a page has no social image of its own. 1200×630px recommended.',
+    }),
     // Added 2026-07-16, Adinda's ask — a place to paste tracking/verification snippets (Google Tag
     // Manager, Google Search Console site-verification meta tag, etc.) without a code deploy.
     // Rendered into the document <head> once the frontend's metadata/layout wiring reads this
