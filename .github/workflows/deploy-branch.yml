@@ -1,0 +1,37 @@
+# Builds the STRIPPED `deploy` branch Vercel actually deploys (2026-07-24).
+#
+# Why this exists: the .vercelignore approach FAILED verification — Vercel's Git integration
+# uploads the ENTIRE repo to the deployment's stored source (confirmed in the Source tab,
+# 2026-07-24), so internal docs (_internal/, CLAUDE.md, MANAGER.md, …) were being stored on
+# Vercel despite it. This workflow republishes every push to `staging` as a single squashed
+# orphan commit on `deploy` containing ONLY build input. Vercel's production branch is `deploy`;
+# main/staging auto-deploys are disabled in vercel.json. Two birds: no internal files stored on
+# Vercel, and the dashboard shows neutral "Staging deploy <sha>" labels instead of working
+# commit messages.
+#
+# The strip list below MUST stay in sync with .vercelignore (kept for CLI deploys) — if a new
+# internal root file appears, add it in BOTH places (or better: use the _internal/ folder, which
+# is covered forever).
+name: Publish stripped deploy branch
+on:
+  push:
+    branches: [staging]
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strip internal files
+        run: |
+          rm -rf _internal .claude .agents .vscode .github
+          rm -f CLAUDE.md AGENTS.md MANAGER.md COMPONENTS.md SANITY-SETUP.md README.md skills-lock.json .vercelignore
+      - name: Publish squashed deploy branch
+        run: |
+          git config user.name "drk-deploy"
+          git config user.email "deploy@drkdigital.com"
+          git checkout --orphan deploy
+          git add -A
+          git commit -m "Staging deploy ${GITHUB_SHA::7}"
+          git push -f origin deploy
