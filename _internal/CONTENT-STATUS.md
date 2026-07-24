@@ -438,3 +438,22 @@ Only the fields whose VALUE status is worth tracking are listed; the contact/soc
 | Field | Status | Source | Note |
 |---|---|---|---|
 | `defaultShareImage` | 🟡 | **reuses the homepage hero** | Seeded 2026-07-24 by `_internal/scripts/seed-default-share-image.ts` to the SAME asset reference as `homePage.heroImage` (`…fc7e1152…-2400x1480-webp`, alt reused from the hero) — no re-upload, no second copy. It is the last tier of the social-image chain, so it only ever shows for pages with no `seo.ogImage` and no hero of their own (today: /terms; next: Onboard Prices). **The eventual want is a purpose-made 1200×630 share image** — a 2400×1480 hero centre-cropped to 630 tall loses the top and bottom of the frame, which is fine but not composed for it. Swap the asset in Studio when one exists; no code change needed. |
+
+## Onboard Pricing page (`page-onboard-pricing`, /on-board-pricing) — seeded 2026-07-24
+Content-only slice: reuses the generic `[slug]` simple-page route, no new schema or components.
+
+| Field | Status | Source | Note |
+|---|---|---|---|
+| `title` | 🟢 | live site | "On Board Pricing" — the live H1 verbatim |
+| `slug` | 🟢 | live site | `on-board-pricing`, matching the live URL so inbound links survive. ⚠️ OPEN: the footer label reads "Onboard Prices" — Adinda may prefer `onboard-prices`. Cheap now, needs a redirect doc once real traffic exists. |
+| `body` — prose (4 H3 sections + payment notes) | 🟢 | live site | Verbatim. Headings kept in Title Case as-is (deliberate exception to the sentence-case rule — same precedent as T&C's numbered headings). |
+| `body` — THE FOUR PRICING TABLES | 🔴 **NOT SEEDED** | live site | **Blocked on a table-rendering decision.** A `[TABLE PLACEHOLDER …]` paragraph marks each position on the page and in Studio. The full verbatim content (Diving Equipment Rental 12 rows · Park & Port Fees 3 · Fuel Surcharge 2 · Beverages 5, all € prices) is preserved in `_internal/scripts/seed-onboard-pricing.ts`'s header comment as markdown tables, ready to paste. |
+| `seo.title` / `seo.description` | 🟡 | Claude draft | Light editorial pass wanted, not urgent (same convention as Terms) |
+
+**The table decision (open, needs Adinda):** `richTextFull` ALREADY offers `htmlEmbed` and `RichText.tsx`
+already renders it — so tables can ship today with zero code, which is exactly how the LIVE site does it
+(its four tables are `dangerouslySetInnerHTML` embeds). But that means the owner edits raw HTML, which
+cuts against the intuitive-CMS principle, and unstyled tables won't match the design system or behave on
+mobile. Alternatives: `@sanity/table` plugin (proper grid, rows-of-strings, external dep) or a custom
+Portable Text object (most control, clunkiest editing). **Whichever wins, a styled + horizontally
+scrollable renderer is needed either way** — that is the real work, not the storage format.

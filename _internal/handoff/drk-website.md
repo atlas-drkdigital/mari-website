@@ -919,3 +919,86 @@ Two items from the About build:
    h3+ headings inside rich-text body copy (the editorial standard; proper nouns keep capitals;
    hero H1s and short card titles may deviate as exceptions). Belongs in the copy/content
    conventions so every DRK site and every copy-drafting agent (Codex included) inherits it.
+
+---
+
+## 🆕 QUEUED 2026-07-24 — Internal files & the deployment boundary: the COMPLETE workflow (Adinda's ask)
+**Destination: `drk-website`'s `references/workflow.md` (+ a pointer from `references/pre-launch.md`).**
+Every DRK site wants this exact split. Proven end-to-end on Mari 2026-07-24, including two failures.
+
+### The requirement
+The repo is the project's **living backup** — internal docs, handoffs, working notes, copy drafts all
+live in git so nothing is ever lost. But the **client eventually gets deployment-platform access**, so
+those files must not be *stored on the platform at all* — not served, not in the dashboard's Source view,
+not retained anywhere. Two masters, one repo.
+
+### Layer 1 — one folder, so the boundary is self-maintaining
+All internal material lives in **`_internal/`** at the repo root (docs, handoffs, scripts, copy drafts,
+scratch). Root keeps only `CLAUDE.md`, `AGENTS.md`, `MANAGER.md`, `COMPONENTS.md` + real build input.
+One glob then covers everything forever; a new internal file needs zero per-file maintenance.
+⚠️ Root-anchored only (`/_internal`), never recursive — Next.js App Router uses `_`-prefixed folders
+INSIDE `src/app/` as a real routing convention (`_components/`, `_lib/`). Never touch those.
+
+### Layer 2 — 🔴 `.vercelignore` DOES NOT WORK FOR GIT-INTEGRATION DEPLOYS. Verified failure.
+The community claim that it "acts as an extension of `.gitignore`" is **false for Git-connected
+projects** — Vercel uploads and stores the ENTIRE repo tree regardless. Confirmed 2026-07-24 by opening
+the deployment → **Source** tab: `_internal/`, `CLAUDE.md`, `MANAGER.md`, `AGENTS.md`, `COMPONENTS.md`,
+`README.md` were all present. Vercel documents `.vercelignore` for **CLI uploads only**, and that is
+exactly what it does. **Do not rely on it for a Git-connected project on any future DRK site.**
+
+### Layer 3 — THE MECHANISM: strip BEFORE the push (three branches, no more)
+| Branch | What it is |
+|---|---|
+| `main` | internal working branch — code + ALL documents. The living backup. **Never deployed.** |
+| `staging` | auto-generated **stripped** snapshot of main → the staging site |
+| `production` | auto-generated **stripped** snapshot of main → the live site (created at launch) |
+
+**Both deployable branches are stripped BY CONSTRUCTION** — there is no with-documents version of a
+public branch, because that version *is* `main`. (A 4-branch shape — `staging`-with-docs plus a separate
+`deploy` mirror — was built first and **rejected by Adinda as redundant**: production is public by
+definition, so a "production-public" twin is noise. Her simplification was correct; don't reintroduce it.
+The name `deploy` also actively confused things, because in the standard three-stage model it reads as
+"production". Name deployable branches after the ENVIRONMENT they serve.)
+
+Promotion = one script (Mari's is `_internal/scripts/promote.ps1`, `… promote.ps1 production` for live):
+copy main → delete the strip list → force-push **ONE squashed orphan commit**, authored `drk-deploy`,
+message `Deploy <sha>`. The branch's history is disposable by design; main holds the real history.
+
+**Second, load-bearing benefit — commit messages.** The dashboard labels each deployment with its commit
+message, so working notes ("Booking hero QA-2: stock Pink Beach…") are visible to anyone with project
+access. Adinda flagged this the moment she saw it. The squashed neutral commit solves it in the same step
+— pair the two, they are one requirement.
+
+### The two silent traps (both hit while building it — bake these into any port)
+1. **`git add` has NO `--quiet` flag.** Passing one makes the command fail, leaving the strip unstaged,
+   so the script pushes the FULL tree **while still reporting success**. Caught only because the test run
+   was aimed at a throwaway branch. **→ Always test a promote script against a scratch branch first.**
+2. **`.ps1` is read as ANSI by PowerShell 5.1** — a UTF-8 em-dash in a comment breaks parsing. ASCII only.
+
+**→ The script MUST end with a guard that can actually fail:** inspect the exact tree object about to be
+pushed (`git ls-tree -r --name-only <tree>`) and abort if any stripped path survived. This is the
+"verification ritual only counts if it can fail" rule applied to deployment.
+
+### Layer 4 — staging privacy (separate concern, commonly conflated)
+Vercel's free **Deployment Protection only gates PREVIEW deployments**, not the production environment —
+and a staging project's alias IS its production environment, so it is publicly reachable. Password
+protection is a paid add-on. **The standard answer instead: keep the URL obscure and make it
+uncrawlable** via a `SITE_NOINDEX=1` env var that flips `robots.ts` to disallow-all AND adds a
+`noindex, nofollow` robots meta site-wide.
+🔴 **This creates a pre-launch blocker in the same breath: REMOVE the env var at launch.** A launched
+site still carrying it is invisible to every search engine — the worst possible SEO bug. Log it as a
+blocker the day it is added, with the verification command (`curl <domain>/robots.txt` must show the
+allow policy; no `noindex` meta on any page).
+
+### The verification, and what it catches beyond docs
+**After the first deploy of every new project: open the deployment → Source tab and read the file list.**
+It must contain only build input. On Mari this ALSO surfaced `src/app/yarl-test/` — a leftover
+library-evaluation page shipping as a **real, publicly reachable route**. An internal-docs audit would
+never have looked for it. **Treat the Source tab as a general "what am I actually shipping" audit,
+not just a docs check**, and fold it into the pre-launch pass.
+
+### Ordering rule when remediating an existing project
+Deployments made before the switch **store the old files permanently** — they must be deleted in the
+dashboard. Order matters: point the project at the stripped branch → let a build go green → confirm the
+site works and the Source tab is clean → **only then** delete the old deployments. Deleting first can
+leave the URL with nothing to serve.
