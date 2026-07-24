@@ -1002,3 +1002,41 @@ Deployments made before the switch **store the old files permanently** — they 
 dashboard. Order matters: point the project at the stripped branch → let a build go green → confirm the
 site works and the Source tab is clean → **only then** delete the old deployments. Deleting first can
 leave the URL with nothing to serve.
+
+---
+
+## 🆕 QUEUED 2026-07-24 — Sanity plugin installs: PIN the version, never `latest` (DRK-wide)
+**Destination: `drk-website`'s Sanity/CMS reference + `sanity-best-practices` cross-ref.**
+Installing `@sanity/table` at `latest` (3.1.12) **crashed the entire Studio and every page (500s,
+"Export HelpCircleIcon doesn't exist")** on Mari 2026-07-24. Cause chain, worth keeping because it's
+the general trap: `@sanity/table@3.1.4+` bumped its `@sanity/ui` dep → `@sanity/ui@3.4.3` bumped its
+`@sanity/icons` requirement `^3.8.0` → `^5.2.1` → a **major** icons bump our schema files' icon
+imports don't survive. The plugin's OWN peer range looked fine — the break was two levels down the
+transitive tree.
+**Rules that fell out of it (all DRK-wide):**
+1. **Pin the plugin to an exact/caret-minor version, never float `latest`.** Mari pinned `^3.1.3` — the
+   last line before the `@sanity/ui` bump.
+2. **Vet transitively, not just the peer range.** `npm view <pkg>@<ver> dependencies` down the chain;
+   the peer-dependency declaration is necessary-not-sufficient. The real check is what `@sanity/ui` and
+   `@sanity/icons` resolve to AFTER install.
+3. **Verify with a clean `rm -rf node_modules && npm install`** and confirm the shared deps
+   (`@sanity/ui`, `@sanity/icons`) stayed at their pre-install versions — a plugin carrying its own
+   private non-conflicting copy is fine; one that HOISTS a bump over the app's is the failure.
+This is the "smoke-test plugins installed together before relying on them" principle (already in
+CLAUDE.md for the i18n plugins) made concrete with a second casualty.
+
+## 🆕 QUEUED 2026-07-24 — Staging noindex: the MECHANISM must be self-correcting, not a remembered step
+**Destination: `drk-website`'s pre-launch + deployment references.**
+Mari's staging privacy today = a manual `SITE_NOINDEX=1` env var → `robots.ts` disallow-all + a
+site-wide `noindex,nofollow` meta (layout.tsx). It WORKS, but the failure mode is asymmetric and
+dangerous: **forget to REMOVE it at launch → the live site is invisible to every search engine.** A
+documented blocker + a curl check is the current safeguard — that is a *remembered* step, and the
+"verification ritual only counts if it can fail" rule says that's not enough.
+**The robust mechanism to build at/before launch (recommended, not yet built — we have no production
+domain yet):** key indexability to the REQUEST HOST, not a manual flag. Index only when the host equals
+the canonical production domain (the `SITE_URL`/`metadataBase` we already carry); every other host —
+`*.vercel.app`, previews, staging — is noindexed automatically. Then it is impossible to accidentally
+noindex the real domain (the code checks the host) OR accidentally index a staging alias (not the
+canonical host). Self-correcting, no env var to remember. Requires making `robots.ts` + the root
+`robots` metadata read `headers()` host (dynamic). **Until then, Mari keeps the manual env var + the 🔴
+QA-CHECKLIST blocker** — but the host-based mechanism is the DRK-wide answer.

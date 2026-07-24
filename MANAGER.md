@@ -3103,3 +3103,47 @@ earlier same day).
   `onboard-pricing` vs footer's "Onboard Prices" label) was independently resolved by another parallel
   session mid-task today (commit `57c400d`, slug is now `onboard-pricing`) — noted here only because this
   session's own testing initially 404'd on the old slug and had to re-check.
+
+---
+
+## 2026-07-24 (Opus + Fable) — CHECKPOINT: staging live, 3 pages shipped, deployment boundary solved, table support
+
+**Pages shipped (all live locally + on staging, stripped):**
+- `/booking` (Schedule & Rates): photo hero (stock Pink Beach Komodo aerial 3200px 🟡, overlay 50%,
+  H1 editorial-mobile/display-desktop), INSEANQ embed in shadowed card overlapping the band seam,
+  categorized FAQ (General FAQ `showOnBookingPage` toggles — the triplet became a quadruplet),
+  breadcrumbs + FAQPage/BreadcrumbList JSON-LD + sitemap. Nav links un-hardcoded to /booking.
+- `/terms`: first generic simple-page (`[slug]` route + SimplePageHero/SimplePageBody). Real legal
+  copy verbatim from the live site (131 PT blocks). Light hero (beige-150 stand-in for the nonexistent
+  "beige-250"), body band beige-100, overlapping card.
+- `/onboard-pricing`: second simple-page. Real copy verbatim; four pricing tables now SEEDED as real
+  tables (see table support below). Slug matches label per Adinda.
+
+**Simple-page title ramp (Adinda QA, several rounds):** landed on a BESPOKE size 38→52px — display-h1
+too big, editorial-h1 too small (collapsed vs body h2), display-h2 still too small. Semantic <h1> kept.
+
+**Table support (NEW):** `@sanity/table` **pinned ^3.1.3** (latest crashed Studio via a transitive
+`@sanity/icons` major bump — see handoff learning). Added to `richTextFull`, rendered in RichText.tsx
+(semantic table, first-row header, overflow-x-auto, `table-fixed` equal columns, mb-32 after). htmlEmbed
+retained. Four onboard tables seeded (22 rows, € prices). Styling is Adinda-iterable.
+
+**Deployment boundary — SOLVED + VERIFIED.** `.vercelignore` does NOT filter Git-integration deploys
+(Adinda's Source-tab check found all internal docs stored on Vercel). Replaced with the strip-before-push
+model: `main` (internal) → `staging`/`production` auto-stripped snapshots via `_internal/scripts/
+promote.ps1` (squashed orphan commit, `drk-deploy` author, guard that aborts on leak). vercel.json
+disables main/staging auto-deploy. Adinda verified the stripped staging Source tab = build input only.
+The check also caught `src/app/yarl-test/` — a leftover library-eval page shipping as a live route,
+deleted.
+
+**Staging privacy:** `SITE_NOINDEX=1` env var → robots disallow-all + noindex meta site-wide (free
+Vercel protection only gates previews, not the production alias). 🔴 REMOVE at launch (QA-CHECKLIST).
+
+**Also:** site-wide default share image (siteSettings.defaultShareImage → homepage hero; fixes /terms
+serving no og:image); Testimonials `texture` opt-out (About: two textured bands back-to-back read flat);
+SimplePageBody body-large at all breakpoints (14px too small for prose on mobile); homepage SEO seeded +
+browser-tab verified (CLAUDE.md latent-fix caveat closed); PageOverview heading→body gap 24→32.
+
+**Learnings queued for drk-website:** the full deployment-boundary workflow; @sanity/table version-pinning
+(vet transitively, not just peer range); the self-correcting host-based noindex mechanism.
+
+**NEXT:** blog list + blog post pages (the last big slice). Full state + order: `_internal/RESUME.md`.
