@@ -92,7 +92,8 @@ export function Footer() {
           {/* Real route since the booking slice (2026-07-24) — /booking locked by Adinda
               (superseding the earlier /schedule-rates placeholder path). */}
           <a href="/booking" className="text-body-medium text-text-ondark-primary transition-colors duration-300 ease-in-out hover:text-accent-ondark-primary lg:text-right">Schedule &amp; Rates</a>
-          <a href="#" className="text-body-medium text-text-ondark-primary transition-colors duration-300 ease-in-out hover:text-accent-ondark-primary lg:text-right">Terms &amp; Conditions</a>
+          {/* Real route since the terms slice (2026-07-24) — the generic /[slug] simple page. */}
+          <a href="/terms" className="text-body-medium text-text-ondark-primary transition-colors duration-300 ease-in-out hover:text-accent-ondark-primary lg:text-right">Terms &amp; Conditions</a>
           <a href="#" className="text-body-medium text-text-ondark-primary transition-colors duration-300 ease-in-out hover:text-accent-ondark-primary lg:text-right">Onboard Prices</a>
           <a href="#faq" className="text-body-medium text-text-ondark-primary transition-colors duration-300 ease-in-out hover:text-accent-ondark-primary lg:text-right">FAQ</a>
         </nav>

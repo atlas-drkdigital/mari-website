@@ -349,6 +349,34 @@ export const BOOKING_QUERY = groq`{
   }
 }`
 
+// One fetch for a generic simple `page` document at /[slug] — the T&C / Onboard Prices shape
+// (_PAGE-SPECS.md #5/#8). The page doc itself is looked up BY SLUG (the only slug-driven query
+// outside boats/destinations); everything else is the shared page furniture, projected with the
+// SAME shapes as ABOUT_QUERY so the components below it take identical props: the CTA singleton,
+// the destinations list the Contact section consumes, and the contact/site settings.
+export const SIMPLE_PAGE_QUERY = groq`{
+  "page": *[_type == "page" && slug.current == $slug][0]{
+    title,
+    "slug": slug.current,
+    body,
+    showContactSection,
+    seo
+  },
+  "cta": *[_id == "cta"][0]{
+    cards[]{
+      _key, heading, description, buttonText,
+      buttonLink{ linkType, "internalType": internalLink->_type, "internalSlug": internalLink->slug.current, externalUrl, openInNewTab },
+      image${IMAGE}
+    }
+  },
+  "destinations": *[_type == "destination" && defined(slug.current)] | order(order asc, name asc){
+    _id, name, "slug": slug.current
+  },
+  "settings": *[_id == "siteSettings"][0]{
+    siteTitle, contactEyebrow, contactHeading, contactIntro
+  }
+}`
+
 // One fetch for the About page (singleton — no $slug). Sections per Adinda's spec (_PAGE-SPECS.md
 // #1): hero → overview (PageOverview) → Why Us (the homepage's, verbatim — chrome + items come
 // from the homePage doc on purpose, "same as homepage" is the spec) → crew (page-owned) →
@@ -837,6 +865,24 @@ export type AboutQueryResult = {
   /** The homepage's Why Us chrome + items — About mounts the section verbatim per the spec. */
   whyUs: Pick<HomePageData, 'whyUsEyebrow' | 'whyUsHeading' | 'whyUsItems'> | null
   testimonialsSection: TestimonialsSectionData | null
+  cta: { cards?: CtaCardData[] } | null
+  destinations: { _id: string; name?: string; slug?: string }[]
+  settings: SiteSettingsContact | null
+}
+
+// ----- Generic simple page (/[slug]) -----
+export type SimplePageData = {
+  title?: string
+  slug?: string
+  /** Tier-3 rich text (`richTextFull`) — headings, quotes, inline images, embeds. */
+  body?: PortableTextBlock[]
+  /** Editor toggle on the document; the "Talk to Us" section is omitted when explicitly false. */
+  showContactSection?: boolean
+  seo?: SeoData
+}
+
+export type SimplePageQueryResult = {
+  page: SimplePageData | null
   cta: { cards?: CtaCardData[] } | null
   destinations: { _id: string; name?: string; slug?: string }[]
   settings: SiteSettingsContact | null
