@@ -18,12 +18,12 @@ import Link from 'next/link'
 // bg-bg-accent is the deepest light background the semantic layer actually exposes. If she wants
 // the deeper tone at QA, the fix is a new semantic token in @theme, not a primitive class.
 //
-// TYPE: the element is a semantic <h1>; the VISUAL ramp is text-display-h2 (Adinda, 2026-07-24).
-// History, so it isn't re-litigated: display-h1 (up to 80px) "feels very aggressively large" on a
-// plain document page; editorial-h1 (33px) was then tried and collapsed the hierarchy — it sits
-// only 5px above the body's editorial-h2 section headings (28px), so the title stopped reading as a
-// title. display-h2 (30->44px) is the fix: still a TITLE ramp (clearly above the body headings),
-// but tops out at 44px, not 80. Ramp != tag — this stays <h1> for document structure/SEO.
+// TYPE: semantic <h1>, BESPOKE size (Adinda, 2026-07-24). The tuning walked the whole ramp:
+// display-h1 (up to 80px) "aggressively large"; editorial-h1 (33px) collapsed the hierarchy (only
+// 5px over the body's editorial-h2 sections at 28px); display-h2 (max 44px) "still too small". The
+// title genuinely wants a size BETWEEN display-h2 (44) and display-h1 (80) — a gap the named ramps
+// don't cover — so it's an arbitrary responsive size, 38px mobile -> 52px desktop, with display-h2's
+// leading/tracking/weight kept. Dial the two rem values to taste. Ramp != tag: stays <h1> for SEO.
 // Same per-breakpoint ramp mix BookingHero carries (see its header for why); don't unify it.
 // Breadcrumb markup is BookingHero's verbatim, re-themed to the LIGHT palette: base
 // text-text-secondary → hover text-text-primary, current page text-action-primary.
@@ -73,7 +73,7 @@ export function SimplePageHero({
           </ol>
         </nav>
 
-        <h1 id={headingId} className="max-w-[720px] text-display-h2 text-text-primary">
+        <h1 id={headingId} className="max-w-[720px] text-display-h2 text-[2.375rem] text-text-primary lg:text-[3.25rem]">
           {title}
         </h1>
       </div>
