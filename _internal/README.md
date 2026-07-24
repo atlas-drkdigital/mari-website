@@ -15,7 +15,6 @@ itself, and none of it ever appears online.
 | `MANAGER.md` | The running project log: what's done, what's next, session history. |
 | `COMPONENTS.md` | Notes on reusable building blocks of the site. |
 | `README.md` | The standard technical readme for the code project. |
-| `SANITY-SETUP.md` | Notes on how the content management system (Sanity) was set up. |
 | `package.json`, `tsconfig.json`, `next.config.ts`, etc. | Technical configuration files the build needs. |
 | `_internal/` | This folder — all internal working material, in one place. |
 
@@ -23,6 +22,8 @@ itself, and none of it ever appears online.
 
 | Entry | What it is |
 |---|---|
+| `SANITY-SETUP.md` | Notes on how the content management system (Sanity) was set up. |
+| `VERCEL-CLI.md` | What the Vercel command-line tool is, and which commands are safe to run. |
 | `handoff/` | Notes queued up to be merged into the shared skill library later. |
 | `content/` | Approved copy drafts for website pages (these ARE backed up in git). |
 | `content-scratch/` | Old scratch images — the real masters live in Google Drive and Sanity. |

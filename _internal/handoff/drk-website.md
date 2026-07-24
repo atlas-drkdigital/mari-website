@@ -1092,3 +1092,40 @@ distinguished a real staging site from a protected placeholder during Mari's 202
 
 **Proven value:** 15 stale deployments (which permanently stored pre-strip internal files) removed
 from the repo in two commands, a task previously blocked on the owner clicking through a dashboard.
+
+
+---
+
+## Repo-root structure + the two-guard deployment boundary (queued 2026-07-24, Adinda)
+Refines the `_internal/` deployment-boundary entry above with the rule that makes it hold over time.
+
+**The convention every DRK project should START in, not refactor into:**
+**Default is `_internal/`; a file at the repo ROOT requires a reason, and the reason must be that
+something functionally reads it from there.** Legitimate root docs and their exemptions:
+- `CLAUDE.md`, `AGENTS.md` - loaded from the repo root by the tooling. Cannot move.
+- `README.md` - conventional landing page / entry point after a fresh clone.
+- the project log (Mari: `MANAGER.md`) - owner preference; it is the daily driver.
+Everything else internal goes in `_internal/`.
+
+**Why the default matters:** each root doc is a HAND-MAINTAINED exception in TWO places
+(`.vercelignore` and the promote script's strip list). Anything under `_internal/` is covered by one
+line in each, forever. **The exception list can never reach zero** (CLAUDE.md/AGENTS.md are pinned by
+tooling) - which is precisely why the default has to be `_internal/`: the list stays short and boring
+instead of growing silently. Do not sell this as "one folder is tidier"; sell it as "the number of
+things a human has to remember stops growing."
+
+**🔴 THE REUSABLE ENGINEERING LESSON - a denylist guard is not enough, ship TWO guards.**
+Mari's promote script originally verified that every path on its strip list was absent from the
+pushed tree. That guard is real and it works, but it can only catch **what someone remembered to
+list**. A brand-new internal file at the repo root sails through it silently - the exact failure the
+whole boundary exists to prevent.
+- **Guard 1 (denylist):** every stripped path is absent. Proves the strip ran.
+- **Guard 2 (allowlist):** the pushed tree's TOP LEVEL contains ONLY the enumerated build inputs
+  (`src`, `public`, `package.json`, configs...). **Anything unlisted aborts the promote.**
+Guard 2 is the one that catches the unknown. Adding a genuine new build input is SUPPOSED to fail it
+once - the operator adds it deliberately and re-runs. That single forced decision is the feature.
+This is "a verification ritual only counts if it can actually fail" applied to deploys: guard 1
+proves the list was applied; guard 2 catches what was never on it.
+
+**Port both guards into `references/workflow.md`'s deploy section as the standard promote-script
+shape** - a strip list alone should be considered incomplete on any DRK project.

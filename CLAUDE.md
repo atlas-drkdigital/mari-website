@@ -869,7 +869,7 @@ The repo now serves two different masters, and the boundary between them is expl
   gets access).
 - **Vercel = the deploy target, and it gets ONLY what the build needs.** `.vercelignore` (repo root,
   created 2026-07-23; simplified 2026-07-24 when the `_internal/` refactor landed) excludes
-  `_internal/`, `CLAUDE.md`, `AGENTS.md`, `MANAGER.md`, `COMPONENTS.md`, `SANITY-SETUP.md`,
+  `_internal/`, `CLAUDE.md`, `AGENTS.md`, `MANAGER.md`, `COMPONENTS.md`,
   `README.md`, `skills-lock.json`, `.claude/`, `.agents/`, `.vscode/` — per Vercel's docs these are
   never uploaded, never in the deployment's source snapshot, never served, and never stored on Vercel
   at all. (The old `/_*` + `content/` lines are gone: everything internal, copy drafts included, now
@@ -931,6 +931,35 @@ in `_internal/`, auto-covered forever; (b) a new internal file at repo root must
 and nothing in `src` reads them — if a build ever imports from there, it fails loudly at build time.
 Skill-wide (every DRK site wants this exact split) — queued for `drk-website` via
 `_internal/handoff/drk-website.md`.
+
+### 🔑 Repo-root structure going forward — DEFAULT IS `_internal/`, root is the exception (locked 2026-07-24, Adinda)
+**Every new internal file goes in `_internal/`. Putting one at the repo root requires a REASON, and
+the reason has to be that something functionally reads it from there.** This is the standing rule
+for this project and the shape every future DRK project starts in — not a cleanup we did once.
+
+**The only legitimate root docs, and why each is exempt:**
+| File | Why it cannot move |
+|---|---|
+| `CLAUDE.md` | Claude Code loads it from the repo root. Functional. |
+| `AGENTS.md` | Codex/other agents load it from the repo root. Functional. |
+| `README.md` | Conventional landing page; the entry point after a fresh clone. |
+| `MANAGER.md` | Adinda's call 2026-07-24 — it's the daily-driver log, wanted at root. |
+| `COMPONENTS.md` | 🔵 **No exemption — queued to MOVE into `_internal/`, scheduled LAST** (50 refs; do it during the skills round when those refs are being touched anyway). |
+`SANITY-SETUP.md` moved into `_internal/` on 2026-07-24 as part of this lock.
+
+**Why the default matters:** each root doc is a hand-maintained exception in **two** places
+(`.vercelignore` and `promote.ps1`'s `$Strip`). Anything inside `_internal/` is covered by one line
+in each, forever. **The exception list can never reach zero** (CLAUDE.md and AGENTS.md are pinned by
+tooling), which is exactly why the default has to be `_internal/` — the list should stay short and
+boring rather than growing silently.
+
+**🔴 The real backstop is `promote.ps1`'s SECOND guard (`$AllowRoot`), added 2026-07-24.** The strip
+list is a *denylist* and can only catch what someone remembered to add; a brand-new internal file at
+the root would ship silently. `$AllowRoot` asserts the pushed tree's top level against the complete
+set of permitted build inputs, so **an unlisted file aborts the promote instead of leaking.** Adding
+a genuine new build input (e.g. `proxy.ts` for redirects) is *supposed* to fail there once — add it
+deliberately and re-run. This is "a verification ritual only counts if it can actually fail" applied
+to the deployment boundary: guard 1 proves the list was applied, guard 2 catches what's not on it.
 
 ## Vercel CLI — installed + linked 2026-07-24; full reference is `_internal/VERCEL-CLI.md`
 The CLI (published by **Vercel**, v56.5.0, authed as `atlas-drkdigital`) now does the dashboard

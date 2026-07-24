@@ -31,10 +31,25 @@
 
 param([string]$Target = "staging")
 
+# DENYLIST - what to delete before pushing. Everything under _internal/ is covered by one entry;
+# the rest are root paths that CANNOT move there (tools read CLAUDE.md / AGENTS.md from the repo
+# root, README.md is the conventional landing page, MANAGER.md stays at root by Adinda's call).
+# COMPONENTS.md is queued to move into _internal/ (scheduled last - see MANAGER.md ACTIVE QUEUE).
 $Strip = @(
   "_internal", ".claude", ".agents", ".vscode", ".github",
-  "CLAUDE.md", "AGENTS.md", "MANAGER.md", "COMPONENTS.md", "SANITY-SETUP.md", "README.md",
+  "CLAUDE.md", "AGENTS.md", "MANAGER.md", "COMPONENTS.md", "README.md",
   "skills-lock.json", ".vercelignore"
+)
+
+# ALLOWLIST - the real backstop. The denylist above can only catch what someone REMEMBERED to add
+# to it; a brand-new internal file at the repo root would sail straight through. This list is the
+# inverse: the complete set of top-level entries a deployable tree is allowed to contain. Anything
+# else aborts the promote, including files nobody thought of. Adding a genuine new build input
+# (e.g. proxy.ts for redirects) is SUPPOSED to fail here once - add it deliberately, then re-run.
+$AllowRoot = @(
+  ".gitignore", "eslint.config.mjs", "next.config.ts", "next-env.d.ts",
+  "package.json", "package-lock.json", "postcss.config.mjs",
+  "public", "sanity.cli.ts", "sanity.config.ts", "src", "tsconfig.json", "vercel.json"
 )
 
 $ErrorActionPreference = "Stop"
@@ -79,6 +94,21 @@ if ($leaked.Count -gt 0) {
   git config --unset user.name
   git config --unset user.email
   throw "ABORTED - strip failed, these would have shipped: $($leaked -join ', ')"
+}
+
+# GUARD 2 (the one that catches the UNKNOWN). Guard 1 proves the strip list was applied; it cannot
+# know about a root file nobody listed. This asserts the shipped tree's top level against the
+# allowlist, so an unlisted file fails LOUDLY instead of shipping silently.
+$rootEntries = git ls-tree --name-only $tree
+$unexpected = @($rootEntries | Where-Object { $AllowRoot -notcontains $_ })
+if ($unexpected.Count -gt 0) {
+  git checkout --quiet --force $original
+  git branch -D "_promote-tmp" | Out-Null
+  git config --unset user.name
+  git config --unset user.email
+  throw ("ABORTED - unexpected top-level entries: $($unexpected -join ', '). " +
+         "If these are genuine build input, add them to `$AllowRoot in this script. " +
+         "If they are internal, move them into _internal/ (or add them to `$Strip).")
 }
 
 $commit = (git commit-tree $tree -m "Deploy $sha").Trim()

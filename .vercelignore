@@ -9,10 +9,14 @@
 /.agents
 /.claude
 /.vscode
+# Root-level docs that CANNOT move into /_internal/ (tools read CLAUDE.md and AGENTS.md from the
+# repo root; README.md is the conventional landing page; MANAGER.md stays at root by Adinda's call
+# 2026-07-24). Each one here is a HAND-MAINTAINED exception — a new root doc must be added by hand.
+# Prefer putting new internal files in /_internal/, which is covered automatically forever.
+# COMPONENTS.md is queued to move into /_internal/ (scheduled last, see MANAGER.md ACTIVE QUEUE).
 CLAUDE.md
 AGENTS.md
 MANAGER.md
 COMPONENTS.md
-SANITY-SETUP.md
 README.md
 skills-lock.json

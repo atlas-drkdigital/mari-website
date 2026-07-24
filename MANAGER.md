@@ -66,7 +66,7 @@ by plain filesystem move: `_backup/` → `_internal/backup/`, `_image-test/` →
 the old `_content/` image scratch → `_internal/content-scratch/` (NOT `_internal/content/` — tracked
 drafts and ignored scratch never share a folder), plus `_skill-image-retouch/` (+ .zip) and
 `_dev-out.log`. **Stays at root: `CLAUDE.md`, `AGENTS.md`, `MANAGER.md`, `COMPONENTS.md`,
-`README.md`, `SANITY-SETUP.md`, `skills-lock.json`, and all real build input.**
+`README.md`, `skills-lock.json`, and all real build input.** (`SANITY-SETUP.md` moved into `_internal/` on 2026-07-24.)
 Same-commit amendments: AGENTS.md's "do not move content/" paragraph rewritten to name
 `_internal/content/` as the canonical tracked copy-drafts home (so Codex doesn't recreate `content/`
 at root); `.gitignore` rewritten from the `/_*` + `!` exception scheme to `/_internal/`-scoped
@@ -78,6 +78,18 @@ ask). Chat-side skills still say `_handoff/` until the next skill round — the 
 authoritatively meanwhile. ⚠️ Deliberately NOT touched: `src/` and `public/` (a handful of code
 comments still cite old doc names like `_PAGE-SPECS.md` — cosmetic, fix opportunistically when those
 files are next edited; the dev server was left running throughout).
+
+### 🔵 GATED ITEM — move `COMPONENTS.md` into `_internal/` (queued 2026-07-24, Adinda; SCHEDULE LAST)
+**Trigger: the skills-handoff round**, not before. Adinda agreed it belongs in `_internal/` (it is a
+pure internal doc with no functional reason to sit at the root) but explicitly accepted deferring it.
+**Why last:** it carries **50 inbound references**, and the chat-side skills still cite pre-refactor
+paths from the 2026-07-24 root cleanup. Moving it now creates a *second* wave of path drift on top of
+the one not yet merged; moving it *during* the skills round means those references get rewritten while
+they are already being touched. Cost when it runs: ~20 min (git mv + reference sweep + drop it from
+`.vercelignore` and `promote.ps1`'s `$Strip`).
+**Do NOT move `MANAGER.md`** — Adinda's explicit call the same day: it stays at the root as the
+daily-driver log. `README.md`, `CLAUDE.md`, `AGENTS.md` also stay (see CLAUDE.md's root-structure lock
+for why each is exempt). `SANITY-SETUP.md` already moved on 2026-07-24.
 
 ### 🆕 QUEUED 2026-07-22 (Adinda) — per-section QA is the LOCKED review method; homepage + boat get it retroactively
 The destination build's rhythm — **every section reviewed TWICE at the moment it ships: (a) the
@@ -2494,7 +2506,7 @@ guessing one now.
 
 ### Done, committed, verified (typecheck + lint + Studio/homepage smoke-tested clean throughout)
 - Sanity project `kb8eim50` ("Mari Liveaboard") created, Studio embedded at `/studio`, fully isolated from
-  the live MVP project (`sjkpkyaw`) — see `SANITY-SETUP.md`.
+  the live MVP project (`sjkpkyaw`) — see `_internal/SANITY-SETUP.md`.
 - Full schema skeleton: `page` (generic, rich text matched to the live MVP's proven spec — colors via
   `@sanity/color-input`, sized/aligned images, HTML embed, no link annotation), `scheduleRates`,
   `announcementBar` (multi-doc, exclusive-active warning validation, Normal/Medium/High urgency),
@@ -3030,7 +3042,7 @@ MVP's project (`sjkpkyaw`) — Adinda's call: full isolation, new repo + new San
 project later at deploy time), zero shared state with the currently-live site. Studio embedded at
 `/studio/[[...tool]]`, smoke-tested (200 response, boots clean, zero schema types yet). Upgraded off the
 CLI's default `sanity@5`/`@sanity/vision@5` to the verified `6.4.0` per CLAUDE.md's stack table. Full
-connection details + redo steps: see `SANITY-SETUP.md` (new file, root of repo).
+connection details + redo steps: see `_internal/SANITY-SETUP.md` (moved there 2026-07-24).
 
 ## Studio editor-organization — deferred to last, confirmed safe (2026-07-14)
 
