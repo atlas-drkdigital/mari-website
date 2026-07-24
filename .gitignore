@@ -53,3 +53,6 @@ next-env.d.ts
 /_internal/skill-image-retouch/
 /_internal/*.zip
 /_internal/*.log
+
+.vercel
+.env*

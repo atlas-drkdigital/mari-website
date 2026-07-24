@@ -932,6 +932,25 @@ and nothing in `src` reads them — if a build ever imports from there, it fails
 Skill-wide (every DRK site wants this exact split) — queued for `drk-website` via
 `_internal/handoff/drk-website.md`.
 
+## Vercel CLI — installed + linked 2026-07-24; full reference is `_internal/VERCEL-CLI.md`
+The CLI (published by **Vercel**, v56.5.0, authed as `atlas-drkdigital`) now does the dashboard
+actions that used to be Adinda's manual work. **Read `_internal/VERCEL-CLI.md` before running any
+`vercel` command.** The four tripwires, here so they can't be missed:
+1. 🔴 **TWO projects on the `mari-liveaboard` team.** `mari-website` = our staging build.
+   **`mari-liveaboard-website` = the client's LIVE MVP site at `www.mari-liveaboard.com` — never
+   touch it.** Every command carries `--scope mari-liveaboard` AND names `mari-website`.
+2. 🔴 **`vercel remove mari-website` (bare project name) deletes THE WHOLE PROJECT.** Only ever pass
+   full deployment URLs. Use `--safe` on the first pass so aliased deployments skip instead of die.
+3. 🔴 **NEVER `vercel deploy` / `vercel --prod` from this repo** — it uploads the working directory,
+   internal files and all, bypassing the strip boundary in one command. Deploys go **only** through
+   `_internal/scripts/promote.ps1`. The CLI manages; it does not deploy.
+4. **Adinda's standing rule: every state-changing Vercel command is run BY HER first** (propose the
+   exact command + targets, then wait). Read-only commands need no ask.
+**Verification gotcha:** an auth-gated Vercel URL returns **HTTP 200 with `<title>Login – Vercel`**,
+so a 200 proves nothing — **assert on the title.** The plugin's MCP is read-only and cannot do any
+of the above; plugin for reading, CLI for changing.
+Skill-wide — queued for `drk-website` via `_internal/handoff/drk-website.md`.
+
 ## Daily recap template — standing format, locked 2026-07-16
 Whenever Adinda asks for a session/day recap ("give me today's recap," "what did we do," "where are we"),
 use this structure every time — she journals from it and wants it consistent, not reinvented per ask.

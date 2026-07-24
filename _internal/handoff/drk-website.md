@@ -1052,3 +1052,43 @@ Two enforcement points, both to be baked into `drk-website` when this merges:
    lives in the checklist that always runs, not in a person's memory.
 Preferred end state is the automated host-based mechanism above (then the checklist row is just a
 confirmation); the checklist is the floor that holds even before the automation exists.
+
+
+---
+
+## Vercel CLI as the account-management surface (queued 2026-07-24, Adinda)
+Every DRK site has a Vercel account whose dashboard actions are otherwise manual client/owner work.
+Installing Vercel's own CLI (`npm i -g vercel`, device-OAuth login) moves them into the repo. Port
+the whole pattern from Mari's `_internal/VERCEL-CLI.md`; the generalizable parts:
+
+**The CLI vs the plugin.** Both published by Vercel; the Claude Code plugin
+(`vercel@claude-plugins-official`) is distributed via Anthropic's marketplace but authored by Vercel
+(`github.com/vercel/vercel-plugin`, Apache-2.0). Its MCP is **READ-ONLY in the initial release** (its
+own `.mcp.json` states it) so it cannot remove deployments or change env vars. **Default split:
+plugin for reading, CLI for changing.** Do not present them as alternatives - they are complements.
+
+**The safety rules that generalize to any client account:**
+1. **Enumerate the projects FIRST.** A client account routinely holds BOTH the site being built and
+   the client's existing LIVE site (on Mari: `mari-website` staging vs `mari-liveaboard-website` =
+   `www.mari-liveaboard.com`). Every command must name the project explicitly AND carry `--scope`.
+   This is the highest-severity failure mode in the whole tool.
+2. **`vercel remove <projectName>` deletes the PROJECT; `vercel remove <deploymentUrl>` deletes one
+   deployment.** One argument shape apart, wildly different blast radius. Always pass full URLs.
+   `--safe` skips aliased deployments - use it on the first pass, inspect the skips, then decide.
+3. **NEVER `vercel deploy` / `--prod` on a repo using the strip-before-push deploy boundary.** It
+   uploads the working directory (internal docs and all), bypassing the boundary in one command.
+   The CLI manages; the promote script deploys. These must never blur.
+4. **State-changing commands get the owner's explicit yes every time** (Adinda's standing rule):
+   propose the exact command and exact targets, then wait. Read-only commands need no ask.
+5. **`vercel login` is not automatable** - interactive browser OAuth. The owner runs it; everything
+   after is scriptable. `vercel link` side-effects (`.vercel` + `.env*` appended to `.gitignore`, a
+   `VERCEL_OIDC_TOKEN` written to `.env.local`) are correct but must be verified ignored + untracked.
+
+**Verification gotcha worth its own line in `references/troubleshooting.md`:** an auth-gated Vercel
+URL returns **HTTP 200 with `<title>Login - Vercel</title>`**. A 200 therefore proves nothing about
+whether a site is live. **Assert on the title/content, never the status code.** This is the "a
+verification ritual only counts if it can actually fail" rule applied to HTTP checks, and it is what
+distinguished a real staging site from a protected placeholder during Mari's 2026-07-24 cleanup.
+
+**Proven value:** 15 stale deployments (which permanently stored pre-strip internal files) removed
+from the repo in two commands, a task previously blocked on the owner clicking through a dashboard.
