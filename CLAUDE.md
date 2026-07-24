@@ -721,10 +721,11 @@ rule — the check passed because it was structurally incapable of failing.
 
 **Current state:** `HOMEPAGE_QUERY` selects `seo`; `HomePageData` carries it; `src/app/page.tsx` has
 `generateMetadata`; both pages read the real field names.
-⚠️ **The fix is LATENT and NOT verified against served HTML.** `homePage.seo` and `boat.seo` are both
-**`null` in the production dataset**, so the served output is byte-identical to before and no page will
-change until an editor fills the field. **The only test that can actually fail: type an SEO title into
-Studio and confirm the browser tab changes.** Do that before trusting this.
+✅ **VERIFIED against served HTML 2026-07-24** — `homePage.seo` was seeded with real draft copy
+(`_internal/scripts/seed-homepage-seo.ts`, 🟡 wording pending Adinda's review) and the served `<title>`
+now reads "Mari Liveaboard — Phinisi Diving Liveaboard in Indonesia". The test that could fail, run and
+passed. `boat.seo` remains null/untested — same wiring, but fill it and check the tab when boat SEO copy
+lands.
 
 **Still open, same class, wider scope:** `ogTitle` / `ogDescription` / `twitterTitle` / `twitterImage` /
 `canonicalUrl` / `focusKeyword` / `breadcrumbTitle` / `noFollow` / `overrideJsonLd` / `jsonLd` in
