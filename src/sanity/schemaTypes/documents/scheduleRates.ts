@@ -11,8 +11,9 @@ import { AutoSlugInput } from '../../components/AutoSlugInput'
 // changed text → htmlEmbed (matches privateCharters.availabilityEmbed); safe because zero
 // scheduleRates documents existed at change time (verified by GROQ 2026-07-24).
 //
-// Page shape (Adinda's dictation 2026-07-24): light-texture hero band (H1 + description) →
-// widget card overlapping the band seam → categorized FAQ (General FAQ categories toggled on via
+// Page shape (Adinda's dictation 2026-07-24, revised same day at QA round 1): PHOTO hero band
+// (H1 + description over a full-bleed image — was a light-texture band for one day) → widget
+// card overlapping the band seam → categorized FAQ (General FAQ categories toggled on via
 // showOnBookingPage) → Contact. FAQ chrome mirrors privateCharters' faq block; no page-own FAQ
 // categories here — this page only composes shared General FAQ ones.
 // Groups mirrored by titled fieldsets (site-wide convention).
@@ -50,6 +51,16 @@ export const scheduleRatesType = defineType({
       group: 'content',
       fieldset: 'contentFs',
       description: 'Shown under the page title — supports bold, links, multiple paragraphs.',
+    }),
+    // Added at QA round 1 (2026-07-24, Adinda): the hero became a photo hero (was a light-texture
+    // band for exactly one day). Same imageWithAlt shape as every other page hero.
+    defineField({
+      name: 'heroImage',
+      title: 'Hero image',
+      type: 'imageWithAlt',
+      group: 'content',
+      fieldset: 'contentFs',
+      description: 'Full-width background image for the page hero.',
     }),
     defineField({
       name: 'embedCode',

@@ -1030,6 +1030,44 @@ history:
 
 ---
 
+## SESSION CHECKPOINT — 2026-07-24, /booking QA ROUND 1 — HERO IS NOW A REAL PHOTO HERO (one commit)
+
+**Adinda's QA round on the just-built booking slice (all from her dictation, same day):**
+- **Hero: light-texture band → PHOTO hero.** New `scheduleRates.heroImage` (imageWithAlt, content
+  group, after description) + `heroImage${IMAGE}` in BOOKING_QUERY + ScheduleRatesData. BookingHero
+  rebuilt on the ChartersHero background recipe (next/image fill/priority/q80/sizes 100vw +
+  the FLAT `bg-background-ondark-page/60` overlay — same 60% as charters, her explicit ask). NO
+  bottom gradient band (that's SubNav chrome; this page has none) and the texture + bottom
+  hairline divs are DELETED ("we can get rid of that bottom border" — the photo edge is the seam).
+  Text ondark (breadcrumbs = ChartersHero's verbatim; description ondark-primary).
+  **H1 = `text-editorial-h1`** — deliberate ramp override, her explicit pick (display-h1 read too
+  big on a title-only hero); commented in the component so nobody "fixes" it back. Desktop content
+  moved up 48px (`lg:pt-[224px]` → `lg:pt-[176px]`). NOT min-h-dvh — title band,
+  `min-h-[45dvh]`/`lg:min-h-[50dvh]` floor, content flex-centered.
+- **Nav back to standard `<Nav />`** (dark-over-photo). `lightHero` infrastructure KEPT unused in
+  Nav.tsx — comment updated: /booking consumed it for one day; first real consumer TBD
+  (FAQ/Testimonials/simple pages are candidates).
+- **Widget band bg: `bg-bg-page` → `bg-bg-accent-secondary`** (beige-100, token verified). Card
+  chrome + shadow + `-mt-[64px]`/`lg:-mt-[120px]` overlap untouched.
+- **Hero image SEEDED REAL** (`_internal/scripts/seed-booking-qa1.ts`, uploadOnce-by-
+  originalFilename, full-res as-is per the pipeline rule): `mari-liveaboard-raja-ampat-
+  landscape-001.jpg` → asset `image-723086f73c465795aacb20eceeb46054c1521c2d-1448x1086-jpg`
+  (1448×1086 source), alt "Aerial view of Raja Ampat islands and turquoise reef lagoons". Seed LAW:
+  published patched; `drafts.scheduleRates` absent, skipped. Content row: **heroImage ✅ real**.
+- **generateMetadata now passes `fallbackImage: schedule.heroImage`** → /booking serves og:image.
+- **Mobile pass:** hero paddings kept `pt-[112px]/pb-[104px]` (clears the ~56px mobile bar; card
+  overlap -64px still lands on photo), band proportionate (~45dvh floor), breadcrumbs flex-wrap,
+  editorial-h1 is a static 33px (no step needed — under display-h1's 44px mobile floor), card
+  full-bleed `-mx-24` unchanged.
+
+**Verification:** tsc + eslint green; schema changed → clean restart (`.next` wiped, unsandboxed
+dev); / /studio /booking all 200; /booking HTML: cdn.sanity.io URL for the Raja Ampat asset ✓,
+`text-editorial-h1` on the H1 ✓, og:image meta ✓, hero markup free of texture/hairline ✓ (the one
+remaining `texture-light` hit is Contact's own, correct), widget band `bg-bg-accent-secondary` ✓.
+
+**Open:** Adinda's re-review of the new hero (desktop + MOBILE explicitly); post-slice drk-seo
+pass still pending; real description copy still 🔴.
+
 ## SESSION CHECKPOINT — 2026-07-24, SCHEDULE & RATES (/booking) SLICE BUILT + SEEDED (one commit)
 
 **/booking is LIVE from Sanity — per-section QA by Adinda PENDING** (built to her dictated design,

@@ -20,13 +20,13 @@ import { BOOKING_QUERY, type BookingQueryResult } from '@/sanity/queries'
 // ROUTE PATH: '/booking' — LOCKED by Adinda 2026-07-24 (supersedes the earlier /schedule-rates
 // placeholder path the Footer/Trips CTA carried while the page didn't exist).
 //
-// No Figma mockup — built to Adinda's dictated design (T&C-reference-screenshot pattern, revising
-// _internal/PAGE-SPECS.md #2): light-texture hero band (H1 + description, centered, breadcrumbs)
-// → hairline seam → lighter band where the INSEANQ widget sits in a white shadowed card
-// OVERLAPPING the seam → categorized FAQ (General FAQ categories toggled on via
-// showOnBookingPage) → Contact → Footer. No SubNav, no hero image, no CTA after the embed. The
-// main nav rides <Nav lightHero>: light theme (dark text) with a transparent background at the
-// top over the texture, flipping to the normal solid light bar on scroll.
+// No Figma mockup — built to Adinda's dictated design (revised at QA round 1, 2026-07-24): PHOTO
+// hero band (H1 + description over a full-bleed image, centered, breadcrumbs — was a
+// light-texture band for one day) → beige-100 band where the INSEANQ widget sits in a white
+// shadowed card OVERLAPPING the hero's bottom edge → categorized FAQ (General FAQ categories
+// toggled on via showOnBookingPage) → Contact → Footer. No SubNav, no CTA after the embed. The
+// main nav is the standard dark-over-photo <Nav /> again — lightHero was consumed here for one
+// day and released back (see Nav.tsx's lightHero comment).
 
 async function getData() {
   const { data } = await sanityFetch({ query: BOOKING_QUERY })
@@ -39,12 +39,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const { schedule, settings } = (data ?? {}) as BookingQueryResult
   if (!schedule) return {}
 
-  // No fallbackImage on purpose: this page has no hero photo, and buildSeoMetadata's image
-  // parameter is optional — an absent image degrades to a text-only social card.
   const plainDescription = toPlainText(schedule.description)
   return buildSeoMetadata({
     seo: schedule.seo,
     fallbackTitle: schedule.title,
+    fallbackImage: schedule.heroImage,
     fallbackDescription: plainDescription
       ? plainDescription.length > 160
         ? `${plainDescription.slice(0, 157).trimEnd()}…`
@@ -92,7 +91,7 @@ export default async function BookingPage() {
 
   return (
     <>
-      <Nav lightHero />
+      <Nav />
       <main className="flex flex-1 flex-col">
         <BookingHero schedule={schedule} />
         <BookingSchedule embedCode={schedule.embedCode} />

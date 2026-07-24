@@ -21,13 +21,17 @@ type MegaKey = 'destinations' | 'resources' | null
 
 const RESOURCE_LINKS = ['Blog', 'Terms & Conditions', 'Onboard Prices', 'FAQ']
 
-// lightHero (2026-07-24, first consumer: /booking — the Schedule & Rates page): for pages whose
+// lightHero (2026-07-24, currently UNUSED — kept on purpose): for pages whose
 // hero is a LIGHT band (no photo), the nav at the top of the page uses the LIGHT theme's colors
 // (dark text) but a TRANSPARENT background, flipping to the normal solid light bar on scroll.
 // Implemented as a second data attribute (data-navbg = clear|solid) CHAINED with data-nav=light
 // on the bg/shadow classes — chained data variants, NOT class-order overrides (order in the class
 // attribute does not control the cascade). Without the prop, navbg is always 'solid', so every
 // existing page behaves byte-identically.
+// HISTORY: /booking (Schedule & Rates) consumed this for exactly one day — built 2026-07-24 with
+// a light-texture hero, moved to a photo hero at QA the same day and back to the standard
+// dark-over-photo <Nav />. Infrastructure kept; first real consumer TBD (the FAQ / Testimonials /
+// simple pages are the candidates).
 export function Nav({ lightHero = false }: { lightHero?: boolean } = {}) {
   // Current route, for the aria-current active state on menu links (Adinda, 2026-07-21).
   const pathname = usePathname()

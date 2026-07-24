@@ -328,6 +328,7 @@ export const BOOKING_QUERY = groq`{
   "schedule": *[_id == "scheduleRates"][0]{
     title,
     description,
+    heroImage${IMAGE},
     "embedCode": embedCode.html,
     faqEyebrow, faqHeading, faqLinkText,
     seo
@@ -787,6 +788,7 @@ export type PrivateChartersQueryResult = {
 export type ScheduleRatesData = {
   title?: string
   description?: PortableTextBlock[]
+  heroImage?: SanityImageWithMeta
   /** Raw embed HTML (htmlEmbed.html) — the widget section hides when absent. */
   embedCode?: string
   faqEyebrow?: string
