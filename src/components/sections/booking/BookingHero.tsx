@@ -45,13 +45,17 @@ export function BookingHero({ schedule }: { schedule: ScheduleRatesData }) {
           sizes="100vw"
           className="object-cover"
         />
-        {/* Flat full-cover overlay — same 60% as ChartersHero (Adinda's explicit ask). */}
-        <div className="absolute inset-0 bg-background-ondark-page/60" />
+        {/* Flat full-cover overlay — started at ChartersHero's 60%, eased to 50% at QA round 2
+            (Adinda, 2026-07-24: "opacity can slightly be reduced" — the pink-beach photo is
+            bright enough to carry a lighter scrim; contrast re-checked against the ondark text). */}
+        <div className="absolute inset-0 bg-background-ondark-page/50" />
       </div>
 
       <div
         data-reveal
-        className="flex w-full flex-col items-center gap-24 page-gutter-x pb-[104px] pt-[112px] text-center lg:gap-32 lg:pb-[200px] lg:pt-[176px]"
+        /* Mobile pt 112→96 / pb 104→120 (QA round 2, Adinda): content sits 16px higher WITHOUT
+           changing the band's height — the 216px padding total is preserved, only redistributed. */
+        className="flex w-full flex-col items-center gap-24 page-gutter-x pb-[120px] pt-[96px] text-center lg:gap-32 lg:pb-[200px] lg:pt-[176px]"
       >
         <div className="flex flex-col items-center gap-16">
           <nav aria-label="Breadcrumb">

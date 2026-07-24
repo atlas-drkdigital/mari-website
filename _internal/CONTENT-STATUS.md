@@ -412,7 +412,7 @@ lands; until then any rich-text heading anywhere on the site will look unstyled.
 | Field | Status | Source | Note |
 |---|---|---|---|
 | `title` | 🟢 | Adinda's design dictation | "Schedule & Rates" |
-| `heroImage` | 🟢 | real | Raja Ampat aerial (`mari-liveaboard-raja-ampat-landscape-001.jpg`, 1448×1086, full-res upload) + real alt — QA round 1 2026-07-24, hero became a photo hero |
+| `heroImage` | 🟡 | STOCK (Pexels #2499777, Stijn Dijkstra) | Pink Beach Komodo aerial, 3200×5267 — replaced the Drive Raja Ampat file (1448px, too soft for a 100vw retina hero) at QA round 2 2026-07-24. Free license, no attribution required. Swap for a real Mari photo if a high-res one lands. |
 | `description` | 🔴 | placeholder | one honest paragraph marked [PLACEHOLDER] — real page copy to follow |
 | `embedCode` | 🟢 | real | the live INSEANQ all-trips widget (insqwdgt-2j4v5DSymU), renders on the page |
 | FAQ chrome (eyebrow/heading/linkText) | 🟡 | Claude draft | tone-matched to charters ("Good to Know" / "Booking FAQ & Payment Terms" / "Read all FAQs") — Adinda to review wording |
