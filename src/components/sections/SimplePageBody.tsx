@@ -33,7 +33,13 @@ export function SimplePageBody({ body }: { body?: PortableTextBlock[] | null }) 
           data-reveal
           className="relative z-10 -mx-24 -mt-48 bg-bg-surface p-24 shadow-[0px_4px_10px_rgba(44,37,34,0.2)] md:mx-0 md:p-48 lg:-mt-96 lg:p-[100px]"
         >
-          <div className="flex flex-col gap-12 text-body-medium text-text-primary lg:gap-16 lg:text-body-large">
+          {/* body-large at EVERY breakpoint, not the usual body-medium→large step (Adinda,
+              2026-07-24: 14px is too small for long-form reading on a phone). This matches
+              PageOverview, the site's other long-form body surface, which has always been
+              body-large throughout — the step belongs on short intro/description blurbs, not on
+              a page whose entire content is prose. gap-16 accordingly (the paragraph-spacing
+              rule pairs gap-16 with body-large). */}
+          <div className="flex flex-col gap-16 text-body-large text-text-primary">
             <RichText value={body} />
           </div>
         </div>

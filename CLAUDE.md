@@ -891,15 +891,39 @@ deployments — the whole repo tree is uploaded and stored. Failure mode as pred
 visible to project members, not public — but Adinda's requirement (and the eventual client dashboard
 access she now expects) rules that out.
 
-**THE MECHANISM IS NOW THE STRIPPED `deploy` BRANCH** (the pre-planned fallback, built the same day):
-`.github/workflows/deploy-branch.yml` republishes every push to `staging` as a single squashed orphan
-commit on `deploy` containing only build input; `vercel.json` disables auto-deploys of `main`/`staging`
-so unstripped trees are never uploaded; Vercel's production branch is `deploy`. Side benefit, load-bearing:
-the dashboard's deployment labels become neutral "Staging deploy <sha>" instead of working commit
-messages — relevant to the no-AI-traces posture once the client has dashboard access. **Keep the
-workflow's strip list in sync with `.vercelignore`** (which stays, but is CLI-only). Old deployments made
-before the switch still store the internal files — they must be DELETED in the dashboard (deployment →
-⋯ → Delete); re-run the Source-tab check on the first `deploy`-branch build to verify the new mechanism.
+## ✅ THE MECHANISM — strip-before-push, VERIFIED ON REAL INFRASTRUCTURE 2026-07-24
+**Branch model (Adinda's, and it is deliberately three — no more):**
+| Branch | What it is |
+|---|---|
+| `main` | internal working branch — code + ALL documents. The living backup. **Never deployed.** |
+| `staging` | auto-generated **stripped** snapshot of main → the Vercel staging site |
+| `production` | auto-generated **stripped** snapshot of main → the live site (**created at launch**) |
+
+**Both deployable branches are stripped BY CONSTRUCTION.** There is no with-documents version of a public
+branch, because that version *is* `main`. An earlier 4-branch shape (a `staging` carrying docs plus a
+separate `deploy` mirror) was **rejected by Adinda as redundant** — production is public by definition, so
+a "production-public" twin is noise. Don't reintroduce it.
+
+**Promotion = `_internal/scripts/promote.ps1` (`… promote.ps1 production` for the live branch).** It copies
+main, deletes the strip list, and force-pushes ONE squashed orphan commit authored `drk-deploy` with the
+message `Deploy <sha>`. Two effects, both required: internal docs never reach Vercel, **and** the dashboard
+never shows working commit messages (matters now that Adinda expects the client to get dashboard access).
+The branch's history is disposable by design — main holds the real history.
+
+**✅ VERIFIED 2026-07-24 (Adinda, Source tab):** the deployment source contains exactly `public/`, `src/`,
+`.gitignore`, the configs, `package*.json`, `vercel.json` — and NO `_internal/`, CLAUDE.md, AGENTS.md,
+MANAGER.md, COMPONENTS.md, README.md, `.claude/`, `.agents/`, `skills-lock.json`. The boundary holds.
+
+🔴 **THE SCRIPT'S STRIP LIST IS THE WHOLE MECHANISM — keep it in sync.** A new internal file at repo ROOT
+must be added to `$Strip` (and `.vercelignore`, which stays for CLI-only use). Anything inside `_internal/`
+is covered forever — prefer putting it there.
+⚠️ **Two traps already hit while building it, both silent:** (1) `git add` has NO `--quiet` flag — passing
+one makes the command fail, leaving the strip unstaged and pushing the FULL tree, with the run still
+reporting success. The script now inspects the exact tree it is about to push and aborts if any stripped
+path survived — a check that can actually fail, per the standing rule. (2) `.ps1` files are read as ANSI by
+PowerShell 5.1, so a UTF-8 em-dash in a comment breaks parsing — **ASCII only in that script.**
+⚠️ **Deployments made BEFORE the switch still store the internal files permanently** — delete them in the
+dashboard (deployment row → ⋯ → Delete), only after a good stripped build is live.
 
 **Maintenance rules (updated 2026-07-24 for the `_internal/` refactor):** (a) new internal doc → put it
 in `_internal/`, auto-covered forever; (b) a new internal file at repo root must be added to

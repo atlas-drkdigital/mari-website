@@ -44,7 +44,17 @@ function StarRating() {
 // homepage's own fields — moved when About became the second consumer, per Adinda's "edited once,
 // shown everywhere" spec; homepage values migrated by _scripts/migrate-testimonials-section.ts).
 // .filter(Boolean): an unpublished reference target dereferences to null (the 8ded5ec class).
-export function Testimonials({ section }: { section: TestimonialsSectionData | null }) {
+export function Testimonials({
+  section,
+  texture = true,
+}: {
+  section: TestimonialsSectionData | null
+  /** Light-texture overlay. Off where a sibling section already carries it — on the About page
+   *  this section sits directly above Contact, and two textured bands in a row read as one flat
+   *  slab (Adinda, 2026-07-24). Same opt-out prop as DestinationBoats, for the same reason:
+   *  the component stays shared so design edits still propagate everywhere. */
+  texture?: boolean
+}) {
   const eyebrow = section?.eyebrow ?? ''
   const heading = section?.heading ?? ''
   const linkText = section?.linkText ?? ''
@@ -156,7 +166,9 @@ export function Testimonials({ section }: { section: TestimonialsSectionData | n
 
   return (
     <section id="testimonials" aria-labelledby="testimonials-heading" className="relative isolate w-full bg-bg-page pt-80 pb-80 lg:pt-160 lg:pb-[200px]">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] [background-size:720px_auto] bg-repeat opacity-20" />
+      {texture ? (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[image:var(--texture-light)] [background-size:720px_auto] bg-repeat opacity-20" />
+      ) : null}
       <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-[36px] page-gutter-x lg:gap-64">
         <div data-reveal="left" className="flex flex-col gap-24 lg:gap-32">
           <p className="text-eyebrow uppercase text-action-primary">{eyebrow}</p>

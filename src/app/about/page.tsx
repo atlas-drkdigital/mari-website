@@ -83,7 +83,10 @@ export default async function AboutPage() {
         <WhyUs home={whyUs} />
         <AboutCrew about={about} />
         <Cta cta={cta} />
-        <Testimonials section={testimonialsSection} />
+        {/* texture={false} on THIS page only (Adinda, 2026-07-24): Contact sits directly below and
+            carries the light texture — two textured bands back to back read as one flat slab.
+            Plain bg-page here restores the separation. */}
+        <Testimonials section={testimonialsSection} texture={false} />
         <Contact settings={settings} destinations={destinations ?? []} />
       </main>
       <Footer />
