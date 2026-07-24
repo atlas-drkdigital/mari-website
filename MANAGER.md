@@ -1030,6 +1030,100 @@ history:
 
 ---
 
+## SESSION CHECKPOINT — 2026-07-24, TERMS & CONDITIONS (/terms) SLICE — the FIRST generic "simple page"
+
+**What shipped.** `_PAGE-SPECS.md` #5/#8's generic simple-page pattern, built once and consumed for the
+first time by Terms & Conditions. Everything below is reusable for Onboard Prices, which should now be a
+content-only job (seed a `page` doc, no code).
+
+- **Route `src/app/[slug]/page.tsx`** — the root-level catch-all for every `page` document. Composition:
+  `<Nav lightHero />` → SimplePageHero → SimplePageBody → `<Cta>` (shared singleton) → `<Contact>` →
+  Footer → ScrollReveal → 2× JsonLd. Next 16 async `params` awaited. **No route collision**: static
+  segments beat dynamic ones, so /about, /booking, /private-charters, /boats/…, /destinations/…, /studio
+  are all untouched — verified by hitting each (all 200).
+- **`SimplePageHero.tsx` (new, shared)** — flat light band, no image, no texture, no bottom hairline.
+  Breadcrumbs + H1 only, centered, mirroring BookingHero's markup in the LIGHT palette
+  (`text-text-secondary` base → `text-text-primary` hover → `text-action-primary` current). H1 keeps the
+  locked booking split `text-editorial-h1 lg:text-display-h1`.
+- **`SimplePageBody.tsx` (new, shared)** — beige-100 band with a white shadowed card OVERLAPPING the hero
+  seam. BookingSchedule's card pattern verbatim (same shadow, same `lg:px-[160px]` gutter override, same
+  mobile `-mx-24` full-bleed — never `w-screen`/`100vw`). Inner padding `p-24 md:p-48 lg:p-[100px]`.
+- **`<Nav lightHero />` HAS ITS FIRST REAL CONSUMER.** The variant was built for /booking on 2026-07-24,
+  released the same day when that hero became a photo, and sat unused for a few hours. /terms is now
+  named in Nav.tsx's comment as the consumer. Verified in the served HTML: `data-nav="light"
+  data-navbg="clear"` at the top of the page.
+- **Schema** — `page` already had everything the spec asked for (title / slug / `body: richTextFull`
+  (tier 3) / `showContactSection` / `seo`, with groups + the matching titled fieldset). **Only change:
+  `Rule.required()` on `title` and `slug`** — the route is literally built from both, so a doc missing
+  either is an unreachable or heading-less URL. No field renamed, nothing added.
+- **`SIMPLE_PAGE_QUERY` + `SimplePageData`/`SimplePageQueryResult`** in `queries.ts` — page doc looked up
+  BY SLUG, plus the shared furniture (cta / destinations / settings) in ABOUT_QUERY's exact shapes.
+- **Sitemap** — generic `page` docs now listed (noIndex filtered), `changeFrequency: yearly`,
+  `priority: 0.3`. **New `RESERVED_SLUGS` guard**, and it is not hypothetical: the dataset holds a
+  leftover `page-about` doc (slug `about`) from before `aboutPage` became its own singleton. /about
+  serves the singleton, so listing the page doc would advertise a URL whose content isn't the document
+  the `lastModified` came from. Filtered out; sitemap verified to contain /terms once and /about once.
+- **Footer** — "Terms & Conditions" `href="#"` → `/terms` (the standing per-slice un-hardcode step). The
+  Resources mega-menu stays for the global-chrome slice.
+
+**Content — 🟢 REAL, and it is client legal copy.** Fetched verbatim from the live site
+(`https://www.mari-liveaboard.com/terms`) and seeded via `_internal/scripts/seed-terms.ts` into
+`page-terms` (slug `terms`). **131 Portable Text blocks: all 16 numbered sections as h2, all 6 sub-heads
+(7.1–7.4, No Show, Trip Interruption) as h3**, bullet + numbered lists, `**bold**` lead-ins as `strong`.
+Nothing rewritten or paraphrased — see the script header for the two typographic normalisations applied
+(non-breaking hyphens → hyphens, curly → straight apostrophes), neither of which touches meaning.
+`seo.title`/`description`/`breadcrumbTitle` are 🟡 Claude drafts.
+
+**Tier-3 promise VERIFIED, not assumed** (the "a schema field nothing renders is a promise" rule):
+`richTextFull` offers h2–h6 (h1 removed site-wide 2026-07-23) and `RichText.tsx` renders every one of
+them. Confirmed in the served HTML — `<h2 class="… text-editorial-h2 …">1. Inclusion</h2>` and
+`<h3 class="… text-editorial-h3 …">7.1 …</h3>`, i.e. the EDITORIAL ramp, not display.
+
+**🟡 OPEN FOR ADINDA'S QA — the hero background is a stand-in.** She asked for **"beige 250"**. There is
+no semantic background token on that value. The primitive `--beige-250: #e4d8c4` *does* exist in
+globals.css (it backs `--color-text-ondark-linkhover`), but primitives live in `:root`, **not** in
+`@theme`, so no `bg-beige-250` utility is emitted and writing one renders nothing. Started on
+**`bg-bg-accent` (beige-150 `#f5f0e8`)** — the deepest light background the semantic layer actually
+exposes. If she wants the deeper tone, the fix is a new semantic token in `@theme`, not a primitive class.
+
+**Rhythm (her explicit ask: equal space above and below the hero content).** Computed against the two
+known constants rather than eyeballed — desktop nav ≈110px, mobile ≈56px:
+desktop `pt-[190px]` → 80px clear, `pb-[176px]` − card `lg:-mt-96` → 80px clear;
+mobile `pt-[112px]` → 56px clear, `pb-[104px]` − card `-mt-48` → 56px clear. The paddings and the card's
+negative margin are a COUPLED pair — the coupling is spelled out in SimplePageHero's header so a future
+change to either recomputes both. Arbitrary px throughout: the spacing scale has no steps in this range.
+
+**Verification matrix (dev server clean-restarted — schema changed — `.next` removed, unsandboxed):**
+`tsc --noEmit` exit 0 · `eslint` 0 NEW errors (10 pre-existing `no-html-link-for-pages` errors in
+Nav/Faq/FaqCategorized/Footer/DestinationTrips, +1 of the same class added by the new `/terms` `<a>` —
+consistent with every sibling link in that Footer nav; converting them all is a separate mechanical pass)
+· routes `/` `/studio` `/booking` `/terms` `/about` `/private-charters` all **200** · /terms HTML: exactly
+**one `<h1>`**, 18 h2 / 8 h3, breadcrumb `<nav aria-label="Breadcrumb">` present, **6 ld+json blocks**
+(WebPage + BreadcrumbList emitted by this page), `<title>Terms &amp; Conditions | Mari Liveaboard</title>`
+(**the `{siteName}` token resolved** — this is also the first proof that a real `seo.title` reaches the
+browser tab, which CLAUDE.md flagged as the one test that could actually fail), canonical
+`https://mari-liveaboard.com/terms`, "Important Notice" present, last section ("competent courts of
+Denpasar") present · every new Tailwind class confirmed EMITTED in the served CSS with a known-good
+control (`page-gutter-x` → 6 hits) and a known-bad control (`bg-beige-250` → 0, `pt-[999px]` → 0).
+
+**⚠️ REPO INCIDENT — this slice's CODE was committed by a PARALLEL SESSION, under an unrelated message.**
+While this work was in flight, another Claude session ran a blanket `git add -A` and swept all 10 of this
+slice's files into **`9fc098a` "Branch model simplified to main / staging / production"** — a commit whose
+message describes none of it. It was **pushed before it could be caught**, so `origin/main` already has it
+and rewriting is off the table (force-pushing over a branch another session is actively working on is
+strictly worse than a wrong message). **Nothing was lost and nothing is broken** — the code is correct and
+verified above; only the history is misleading. This checkpoint is the honest record of what `9fc098a`
+actually contains. **Lesson, and it generalises:** CLAUDE.md's parallel-session rule already says "don't
+commit another session's in-flight work" — it needs the converse too, that a session committing with
+`git add -A` in a repo with concurrent sessions will silently adopt work it cannot describe. **Stage
+explicit paths, not `-A`, whenever parallel sessions are possible.** Queued for `drk-website`.
+
+**Next:** Adinda's per-section QA on /terms (desktop AND mobile, explicitly separate) — the hero-bg
+beige-150 stand-in is the one open decision. Then the post-slice `drk-seo` pass. Onboard Prices should
+need no new code.
+
+---
+
 ## SESSION CHECKPOINT — 2026-07-24, /booking QA ROUND 1 — HERO IS NOW A REAL PHOTO HERO (one commit)
 
 **Adinda's QA round on the just-built booking slice (all from her dictation, same day):**

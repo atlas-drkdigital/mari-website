@@ -418,3 +418,17 @@ lands; until then any rich-text heading anywhere on the site will look unstyled.
 | FAQ chrome (eyebrow/heading/linkText) | 🟡 | Claude draft | tone-matched to charters ("Good to Know" / "Booking FAQ & Payment Terms" / "Read all FAQs") — Adinda to review wording |
 | `seo.title` / `seo.description` | 🟡 | Claude draft | "Schedule & Rates — Liveaboard Trips & Prices | {siteName}" — review in the post-slice drk-seo pass |
 | General FAQ `showOnBookingPage` toggles | 🟢 | seeded | all 3 categories on (11 questions compose in) — editor curates from Studio |
+
+## Terms & Conditions (`page` doc `page-terms`, slug `terms`, /terms) — seeded 2026-07-24
+First consumer of the generic "simple page" shape. Seeded by `_internal/scripts/seed-terms.ts`.
+| Field | Status | Source | Note |
+|---|---|---|---|
+| `title` | 🟢 | real | "Terms & Conditions" |
+| `slug` | 🟢 | real | `terms` — Adinda's locked route |
+| `body` | 🟢 | **REAL CLIENT LEGAL COPY** | Fetched VERBATIM from the live site (`https://www.mari-liveaboard.com/terms`) 2026-07-24. 131 Portable Text blocks — Important Notice intro + all 16 numbered sections (h2) + all 6 sub-heads (7.1–7.4, No Show, Trip Interruption, h3) + bullet/numbered lists + `strong` lead-ins. **Do NOT rewrite, shorten or "improve" this** — it is a contract; changes belong to whoever owns the legal text, in Studio. Only two typographic normalisations were applied on transcription (non-breaking hyphens → hyphens, curly → straight apostrophes); neither touches meaning. |
+| `showContactSection` | 🟢 | seeded `true` | editor toggle; the route omits Contact only on an explicit `false` |
+| `seo.title` | 🟡 | Claude draft | "Terms & Conditions \| {siteName}" — verified resolving to "Terms & Conditions \| Mari Liveaboard" in the served `<title>`. Review in the post-slice drk-seo pass. |
+| `seo.description` | 🟡 | Claude draft | booking/payment/cancellation/liability summary — review in the post-slice drk-seo pass |
+| `seo.breadcrumbTitle` | 🟢 | real | "Terms & Conditions" — drives both the visual crumb and the BreadcrumbList JSON-LD |
+| `seo.ogImage` | 🔴 | **absent** | This page shape has NO hero image, so there is no `fallbackImage` for `buildSeoMetadata` — /terms currently serves **no `og:image` at all**. Every other page falls back to its hero. Needs either a per-doc ogImage or a site-wide default social image (the latter is the better fix and would cover Onboard Prices too). |
+| Hero background token | 🟡 | **stand-in, QA decision open** | Adinda asked for "beige 250". No semantic background token exists on that value — the primitive `--beige-250` exists in `:root` but primitives aren't in `@theme`, so `bg-beige-250` emits nothing. Started on `bg-bg-accent` (beige-150 `#f5f0e8`), the deepest exposed light background. If she wants the deeper tone the fix is a NEW semantic token in `@theme`. |
