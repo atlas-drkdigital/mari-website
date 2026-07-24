@@ -18,10 +18,12 @@ import Link from 'next/link'
 // bg-bg-accent is the deepest light background the semantic layer actually exposes. If she wants
 // the deeper tone at QA, the fix is a new semantic token in @theme, not a primitive class.
 //
-// TYPE: H1 is text-editorial-h1 at EVERY breakpoint (Adinda, 2026-07-24: display-h1 on desktop
-// "feels very aggressively large" on a plain title-only page). This DIVERGES from BookingHero's
-// mobile-editorial/desktop-display split ON PURPOSE — booking's photo hero carries a big title;
-// a document page (T&C, Onboard Pricing) does not. Simple pages own this smaller ramp.
+// TYPE: the element is a semantic <h1>; the VISUAL ramp is text-display-h2 (Adinda, 2026-07-24).
+// History, so it isn't re-litigated: display-h1 (up to 80px) "feels very aggressively large" on a
+// plain document page; editorial-h1 (33px) was then tried and collapsed the hierarchy — it sits
+// only 5px above the body's editorial-h2 section headings (28px), so the title stopped reading as a
+// title. display-h2 (30->44px) is the fix: still a TITLE ramp (clearly above the body headings),
+// but tops out at 44px, not 80. Ramp != tag — this stays <h1> for document structure/SEO.
 // Same per-breakpoint ramp mix BookingHero carries (see its header for why); don't unify it.
 // Breadcrumb markup is BookingHero's verbatim, re-themed to the LIGHT palette: base
 // text-text-secondary → hover text-text-primary, current page text-action-primary.
@@ -71,7 +73,7 @@ export function SimplePageHero({
           </ol>
         </nav>
 
-        <h1 id={headingId} className="max-w-[720px] text-editorial-h1 text-text-primary">
+        <h1 id={headingId} className="max-w-[720px] text-display-h2 text-text-primary">
           {title}
         </h1>
       </div>
