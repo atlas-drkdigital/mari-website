@@ -73,8 +73,14 @@ export function BookingHero({ schedule }: { schedule: ScheduleRatesData }) {
           </nav>
 
           {schedule.title ? (
-            // editorial-h1 on purpose — see the ramp-override note in the header.
-            <h1 id="booking-hero-heading" className="max-w-[720px] text-editorial-h1 text-text-ondark-primary">
+            // Ramp history (Adinda, both calls 2026-07-24): display-h1 → editorial-h1 ("really
+            // big" on the texture band) → SPLIT once the photo hero landed: editorial-h1 stays on
+            // mobile ("perfect, don't touch"), display-h1 returns on desktop ("feels very small
+            // now"). Deliberate per-breakpoint ramp mix — don't unify it either way.
+            <h1
+              id="booking-hero-heading"
+              className="max-w-[720px] text-editorial-h1 text-text-ondark-primary lg:text-display-h1"
+            >
               {schedule.title}
             </h1>
           ) : null}
