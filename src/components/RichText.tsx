@@ -162,9 +162,13 @@ const components: PortableTextComponents = {
     table: ({ value }: { value: TableValue }) => {
       const [headerRow, ...bodyRows] = value?.rows ?? []
       if (!headerRow) return null
+      // mb-32: breathing room before the next block (e.g. the following h2) — Adinda 2026-07-24;
+      // renderer-level so every table gets it, not seeded per-table. `table-fixed` gives EQUAL
+      // column widths for any column count (her ask) without hardcoding a colgroup — fixed layout
+      // ignores content length and divides width evenly across columns with no explicit width.
       return (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[480px] border-collapse border border-border-default text-body-medium text-text-primary">
+        <div className="mb-32 overflow-x-auto">
+          <table className="w-full min-w-[480px] table-fixed border-collapse border border-border-default text-body-medium text-text-primary">
             <thead>
               <tr className="bg-bg-accent-secondary">
                 {headerRow.cells.map((cell, i) => (
